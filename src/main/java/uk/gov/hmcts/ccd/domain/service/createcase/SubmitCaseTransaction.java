@@ -189,34 +189,34 @@ public class SubmitCaseTransaction implements AccessControl {
 
     private CaseDetails submitDecentralisedCase(Event event, CaseTypeDefinition caseTypeDefinition, IdamUser idamUser,
                                        CaseEventDefinition caseEventDefinition, IdamUser onBehalfOfUser,
-                                       CaseDetails caseDetailsAfterCallbackWithoutHashes,
+                                       CaseDetails newCaseDetails,
                                        List<DocumentHashToken> documentHashes) {
-        var casePointer = this.casePointerRepository.persistCasePointer(caseDetailsAfterCallbackWithoutHashes);
+        this.casePointerRepository.persistCasePointerAndInitId(newCaseDetails);
 
-        caseDataAccessControl.grantAccess(casePointer, idamUser.getId());
+        caseDataAccessControl.grantAccess(newCaseDetails, idamUser.getId());
 
         caseDocumentService.attachCaseDocuments(
-            casePointer.getReferenceAsString(),
-            casePointer.getCaseTypeId(),
-            casePointer.getJurisdiction(),
+            newCaseDetails.getReferenceAsString(),
+            newCaseDetails.getCaseTypeId(),
+            newCaseDetails.getJurisdiction(),
             documentHashes
         );
 
         try {
             return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
-                    caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes, Optional.empty(),
+                    caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
                 Optional.ofNullable(onBehalfOfUser))
                 .getCaseDetails();
         } catch (ApiException apiException) {
             // Rollback case pointer if downstream service returns errors
             if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {
-                rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+                rollbackCasePointer(newCaseDetails.getReference());
             }
             throw apiException;
         } catch (FeignException feignException) {
             // Rollback case pointer if downstream service returns 4xx error
             if (feignException.status() >= 400 && feignException.status() < 500) {
-                rollbackCasePointer(caseDetailsAfterCallbackWithoutHashes.getReference());
+                rollbackCasePointer(newCaseDetails.getReference());
             }
             throw feignException;
         }

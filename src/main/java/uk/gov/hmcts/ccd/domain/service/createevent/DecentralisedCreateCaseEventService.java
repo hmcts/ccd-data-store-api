@@ -56,6 +56,7 @@ public class DecentralisedCreateCaseEventService {
                 .caseDetailsBefore(caseDetailsBefore.orElse(null))
                 .caseDetails(caseDetails)
                 .eventDetails(eventDetails.build())
+                .internalCaseId(Long.valueOf(caseDetails.getId()))
                 .build();
 
         try {
