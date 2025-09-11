@@ -23,7 +23,7 @@
           "__elementId__": "label"
         },
         {
-          "label": "Search `Complex` field",
+          "label": "Search `complex` field",
           "order": 3,
           "field": {
             "id": "ComplexField",
@@ -45,10 +45,10 @@
           "display_context_parameter": null
         },
         {
-          "label": "Search `Collection` of `Text` fields",
-          "order": 2,
-          "field": {
-            "id": "CollectionField",
+          "label" : "Search `collection address` field",
+          "order" : 2,
+          "field" : {
+            "id" : "AddressCollectionField",
             "elementPath": null,
             "metadata": false,
             "field_type": {
@@ -59,16 +59,7 @@
               "regular_expression": null,
               "fixed_list_items": [],
               "complex_fields": [],
-              "collection_field_type": {
-                "id": "Text",
-                "type": "Text",
-                "min": null,
-                "max": null,
-                "regular_expression": null,
-                "fixed_list_items": [],
-                "complex_fields": [],
-                "collection_field_type": null
-              }
+              "collection_field_type": "[[ANYTHING_PRESENT]]"
             },
             "show_condition": null
           },

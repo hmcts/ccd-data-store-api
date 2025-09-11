@@ -35,7 +35,7 @@ class FieldTypeUtilTest {
 
         when(field.getType()).thenReturn(fieldType);
         when(fieldType.getCollectionFieldTypeDefinition()).thenReturn(collectionFieldType);
-        when(collectionFieldType.isCollectionFieldType()).thenReturn(true);
+        when(fieldType.isCollectionFieldType()).thenReturn(true);
 
         String result = FieldTypeUtil.getDataTypeFromField(field);
         assertEquals(DataType.COLLECTION.toString(), result);

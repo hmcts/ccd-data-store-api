@@ -15,7 +15,7 @@ public class FieldTypeUtil {
         if (field != null && field.getType() != null) {
             LOG.info("Field Type : {}", field.getType());
             if (field.getType().getCollectionFieldTypeDefinition() != null
-                && field.getType().getCollectionFieldTypeDefinition().isCollectionFieldType()) {
+                && field.getType().isCollectionFieldType()) {
                 return DataType.COLLECTION.toString();
             } else {
                 if (field.getType().getComplexFields() != null
