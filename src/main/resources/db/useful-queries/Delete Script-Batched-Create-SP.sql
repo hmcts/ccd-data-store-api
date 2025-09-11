@@ -1,3 +1,12 @@
+-- - Steps to automate the calling of this SP
+-- - 1. Execute this script to create the stored procedure
+-- - 2. Create a cron file to call this SP at regular intervals as below
+-- -    # Run stored procedure cleanup_case_type_data weekly on Sunday at 3:00 AM
+-- -    0 3 * * 0 psql -h <db hostname> -p <db port> -U <db user> -d <db name> -c "CALL cleanup_old_case_data();" >> /var/log/cleanup_proc.log 2>&1
+-- - 3. Schedule the cron job using the command below:
+-- -    crontab <full qualified path to cron file>
+-- - 4. Ensure the cron job is registered by checking the cron logs or using `crontab -l`
+
 CREATE OR REPLACE PROCEDURE cleanup_old_case_data()
 LANGUAGE plpgsql
 AS $$
