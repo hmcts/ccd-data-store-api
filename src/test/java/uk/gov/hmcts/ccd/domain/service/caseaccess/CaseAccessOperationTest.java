@@ -2606,7 +2606,7 @@ class CaseAccessOperationTest {
     }
 
     private String getOrgUserNewCaseSupDataKey(String organisationId) {
-        return NewCaseUtils.ORG_POLICY_NEW_CASE + "." + organisationId;
+        return NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE + "." + organisationId;
     }
 
     @SuppressWarnings("SameParameterValue")

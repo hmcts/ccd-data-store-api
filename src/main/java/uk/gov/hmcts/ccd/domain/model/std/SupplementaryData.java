@@ -41,7 +41,7 @@ public class SupplementaryData {
                     Object value = context.read("$." + key, Object.class);
                     this.response.put(key, value);
                 } catch (PathNotFoundException e) {
-                    if (key.contains(NewCaseUtils.ORG_POLICY_NEW_CASE)) {
+                    if (key.contains(NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE)) {
                         this.response.put(key, null);
                     } else {
                         throw new ServiceException(String.format("Path %s is not found", key));
