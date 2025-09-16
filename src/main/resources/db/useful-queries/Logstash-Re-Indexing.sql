@@ -1,9 +1,12 @@
 -- -Assumptions:
 -- 1. General data-store cleanup performed (removing all case_types older than X months)
--- 1. Deletion of all ES indexes performed
--- 2. ES re-indexing triggered via ccd-admin-web (creates the static indexes)
+-- 1. Deletion of all ES indexes performed (curl -XDELETE <ES node IP address>:9200/_all;)
+--     (ES node IP address details can be found here: 
+--     https://tools.hmcts.net/confluence/display/RCCD/Connecting+to+and+deleting+data+from+CCD+Data+Store+and+CCD+Definition+Store)
+-- 2. ES re-indexing triggered via ccd-admin-web 
+--     (note, this only creates the static indexes i.e place holders)
 
--- 3. Script below will loop through each Jurisdiction starting with the most cases 
+-- 3. Run the below script. This will loop through each Jurisdiction starting with the most cases 
 --    and update the marked_by_logstash field to false in batches of 1000
 -- 4. Once a row is markes as false, an automatic job is triggered perform logstash indexing
 
