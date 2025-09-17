@@ -30,5 +30,6 @@
     <cve>CVE-2025-53506</cve>
     <cve>CVE-2025-48989</cve>
     <cve>CVE-2025-55668</cve>
+    <cve>CVE-2023-51074</cve>
   </suppress>
 </suppressions>
