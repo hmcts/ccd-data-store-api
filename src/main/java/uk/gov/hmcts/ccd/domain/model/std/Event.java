@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.util.EventDescriptionRedactor;
 public class Event {
     @JsonProperty("id")
     private String eventId;
-    @JsonProperty("summary")
+
     private String summary;
 
     private String description;
@@ -23,10 +23,12 @@ public class Event {
         this.eventId = eventId;
     }
 
+    @JsonProperty("summary")
     public String getSummary() {
-        return summary;
+        return redactor.redact(summary);
     }
 
+    @JsonProperty("summary")
     public void setSummary(String summary) {
         this.summary = summary;
     }
