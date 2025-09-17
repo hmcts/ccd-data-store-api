@@ -67,12 +67,11 @@ elasticsearch:
   persistence:
     enabled: false
   ingress:
-    enabled: false
+    enabled: true
     className: traefik
-    # hosts:
-    #   - host: es-${SERVICE_FQDN}
-    #     paths:
-    #       - path: /
+    path: /
+    hosts:
+      - host: es-${SERVICE_FQDN}
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
   imageTag: "7.16.1"
