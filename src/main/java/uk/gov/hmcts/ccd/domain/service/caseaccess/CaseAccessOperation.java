@@ -44,7 +44,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 public class CaseAccessOperation {
 
     public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
-    public static final String NEW_CASE_ORG_PATH = NewCaseUtils.ORG_POLICY_NEW_CASE + ".";
+    public static final String NEW_CASE_SUPPLEMENTRY_PATH = NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE + ".";
 
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -528,7 +528,7 @@ public class CaseAccessOperation {
 
     private void setUserAssignedNewCaseForOrganisationIdToFalse(String caseReference, String organisationId) {
         // Set supplementary data new cases for organisationId to false
-        String orgNewCaseSupDataKey = NEW_CASE_ORG_PATH + organisationId;
+        String orgNewCaseSupDataKey = NEW_CASE_SUPPLEMENTRY_PATH + organisationId;
         try {
             supplementaryDataRepository.setSupplementaryData(caseReference,
                     orgNewCaseSupDataKey, false);
