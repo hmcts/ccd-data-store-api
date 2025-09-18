@@ -16,7 +16,6 @@ public class DecentralisedEventDetails {
     private String caseType;
     private String eventId;
     private String eventName;
-    private String stateName;
     private String description;
     private String summary;
     private String proxiedBy;

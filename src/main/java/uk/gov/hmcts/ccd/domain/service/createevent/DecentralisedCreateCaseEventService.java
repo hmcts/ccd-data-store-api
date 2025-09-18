@@ -42,8 +42,7 @@ public class DecentralisedCreateCaseEventService {
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
                 .summary(event.getSummary())
-                .description(event.getDescription())
-                .stateName(caseStateDefinition.getName());
+                .description(event.getDescription());
 
         if (onBehalfOf.isPresent()) {
             var onBehalfOfUser = onBehalfOf.get();
