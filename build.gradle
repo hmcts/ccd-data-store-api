@@ -3,16 +3,16 @@ plugins {
     id 'jacoco'
     id 'idea'
     id 'eclipse'
-    id 'org.springframework.boot' version '3.5.4'
+    id 'org.springframework.boot' version '3.5.5'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.sonarqube' version '6.2.0.5505'
+    id 'org.sonarqube' version '6.3.1.5724'
     id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.2'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.67'
-    id 'au.com.dius.pact' version '4.6.16'
+    id 'au.com.dius.pact' version '4.6.17'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '12.1.3'
 }
@@ -25,20 +25,21 @@ def versions = [
 
 ext {
     set('springCloudVersion', '2025.0.0')
-    set('spring-framework.version', '6.2.9')
-    set('spring-security.version', '6.5.2')
+    set('spring-framework.version', '6.2.11')
+    set('spring-security.version', '6.5.3')
     set('log4j2.version', '2.24.3')
     set('jackson.version', '2.16.0')
     set('snakeyaml.version', '2.2')
     junit = '5.13.4'
     junitPlatform = '1.13.4'
+    jjwt = '0.13.0'
     appInsightsVersion = '2.6.4'
-    pactProviderVersion = '4.6.16'
+    pactProviderVersion = '4.6.17'
     lombokVersion = '1.18.38'
     lombokBindingVersion = '0.2.0'
     elasticVersion = '8.16.2'
     testContainersVersion = '1.21.3'
-    cucumber = '7.27.0'
+    cucumber = '7.28.2'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
     limits = [
@@ -214,7 +215,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.9'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.13'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
@@ -223,22 +224,22 @@ dependencies {
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
     implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.0'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jjwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jjwt
     implementation group: 'io.searchbox', name: 'jest', version: '6.3.1'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.7'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.5.0'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
@@ -257,7 +258,7 @@ dependencies {
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.5' 
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6' 
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
