@@ -32,7 +32,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String DOCUMENT_FIELD_ID = "DOCUMENT_FIELD_ID";
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
     private static final String CATEGORY_ID = "category_id";
-    private final String UPLOAD_TIMESTAMP = "upload_timestamp";
+    private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
     private static final String CASE_TYPE_ID = "FT_CaseAccessCategories";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String CASE_FIELD_STRING =
