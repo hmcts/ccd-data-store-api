@@ -28,6 +28,7 @@
             "field_type": "[[ANYTHING_PRESENT]]",
             "show_condition": null
           },
+          "dataType" : null,
           "display_context_parameter": null
         }
       ],
