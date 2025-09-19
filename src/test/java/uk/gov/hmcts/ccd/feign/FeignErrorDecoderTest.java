@@ -8,7 +8,9 @@ import feign.Request.HttpMethod;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -24,6 +26,10 @@ class FeignErrorDecoderTest {
     private static final String CASE_ACTION_URL = "http://localhost/service/audit/caseAction";
     private static final String CASE_SEARCH_URL = "http://localhost/service/audit/caseSearch";
     private static final String METHOD_KEY = "methodKey";
+
+    @Mock
+    private SecurityUtils securityUtils;
+
 
     @InjectMocks
     private FeignErrorDecoder feignErrorDecoder;
@@ -47,6 +53,46 @@ class FeignErrorDecoderTest {
     @Test
     void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus401() {
         isRetryableException(401, POST_METHOD, CASE_ACTION_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus403() {
+        isRetryableException(403, POST_METHOD, CASE_ACTION_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus502() {
+        isRetryableException(502, POST_METHOD, CASE_ACTION_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus504() {
+        isRetryableException(504, POST_METHOD, CASE_ACTION_URL);
+    }
+
+    @Test
+    void shouldReturnFeignExceptionForPostRequestWithActionUrlAndStatus500() {
+        isNotRetryableException(500, POST_METHOD, CASE_ACTION_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus401() {
+        isRetryableException(401, POST_METHOD, CASE_SEARCH_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus403() {
+        isRetryableException(403, POST_METHOD, CASE_SEARCH_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus502() {
+        isRetryableException(502, POST_METHOD, CASE_SEARCH_URL);
+    }
+
+    @Test
+    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus504() {
+        isRetryableException(504, POST_METHOD, CASE_SEARCH_URL);
     }
 
     @Test
@@ -80,22 +126,22 @@ class FeignErrorDecoderTest {
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionInPath() {
+    void shouldNotReturnRetryableExceptionForPostRequestWithCaseActionInPath() {
         isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseAction/user");
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchInPath() {
+    void shouldNotReturnRetryableExceptionForPostRequestWithCaseSearchInPath() {
         isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseSearch/user");
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionAsQueryParam() {
+    void shouldNotReturnRetryableExceptionForPostRequestWithCaseActionAsQueryParam() {
         isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseAction&user=123");
     }
 
     @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchAsQueryParam() {
+    void shouldNotReturnRetryableExceptionForPostRequestWithCaseSearchAsQueryParam() {
         isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseSearch&user=123");
     }
 
