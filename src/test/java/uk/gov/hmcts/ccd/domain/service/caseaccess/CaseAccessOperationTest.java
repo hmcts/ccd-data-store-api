@@ -122,9 +122,11 @@ class CaseAccessOperationTest {
 
         doAnswer(invocation -> {
             String caseReference = invocation.getArgument(0);
-            var updateRequest = invocation.getArgument(1, uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest.class);
-            updateRequest.getOperationProperties(SupplementaryDataOperation.INC)
-                .forEach((path, value) -> supplementaryDataRepository.incrementSupplementaryData(caseReference, path, value));
+            var updateRequest = invocation.getArgument(1,
+                uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest.class);
+            updateRequest.getOperationProperties(SupplementaryDataOperation.INC).forEach((path, value) ->
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, path, value)
+            );
             return null;
         }).when(supplementaryDataUpdateOperation).updateSupplementaryData(anyString(), any());
     }

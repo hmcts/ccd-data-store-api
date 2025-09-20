@@ -405,7 +405,10 @@ class SubmitCaseTransactionTest {
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty()),
-            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(eq(savedDecentralisedCaseDetails), any()),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(
+                eq(savedDecentralisedCaseDetails),
+                any()
+            ),
             () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
@@ -437,7 +440,10 @@ class SubmitCaseTransactionTest {
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser)),
-            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(eq(savedDecentralisedCaseDetails), any()),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(
+                eq(savedDecentralisedCaseDetails),
+                any()
+            ),
             () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),

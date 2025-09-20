@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.domain.service.createevent.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -41,11 +42,13 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CaseDocumentTimestampService caseDocumentTimestampService,
                                              DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                              PersistenceStrategyResolver resolver,
-                                             CasePointerRepository creator) {
+                                             CasePointerRepository creator,
+                                             SynchronisedCaseProcessor synchronisedCaseProcessor) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
-            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedCreateCaseEventService, resolver, creator);
+            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedCreateCaseEventService, resolver, creator,
+            synchronisedCaseProcessor);
 
     }
 }
