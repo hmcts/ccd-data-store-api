@@ -55,7 +55,7 @@ interface ServicePersistenceAPI {
     DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(
         URI baseURI,
         @PathVariable("case-ref") Long caseRef,
-        SupplementaryDataUpdateRequest supplementaryData);
+        @RequestBody SupplementaryDataUpdateRequest supplementaryData);
 
     @GetMapping(value = "/ccd-persistence/cases")
     List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
