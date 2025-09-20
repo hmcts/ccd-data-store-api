@@ -48,7 +48,7 @@ public class DecentralisedCreateCaseEventService {
             var onBehalfOfUser = onBehalfOf.get();
             eventDetails.proxiedBy(onBehalfOfUser.getId())
                 .proxiedByFirstName(onBehalfOfUser.getForename())
-                .proxiedByFirstName(onBehalfOfUser.getSurname());
+                .proxiedByLastName(onBehalfOfUser.getSurname());
         }
 
         DecentralisedCaseEvent decentralisedCaseEvent = DecentralisedCaseEvent.builder()
