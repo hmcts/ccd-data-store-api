@@ -38,6 +38,7 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.domain.service.createevent.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
@@ -45,22 +46,27 @@ import feign.FeignException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -152,6 +158,8 @@ class SubmitCaseTransactionTest {
     private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
     @Mock
     private CasePointerRepository casePointerRepository;
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
 
     @BeforeEach
     void setup() {
@@ -176,7 +184,8 @@ class SubmitCaseTransactionTest {
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
             resolver,
-            casePointerRepository
+            casePointerRepository,
+            synchronisedCaseProcessor
         );
 
         idamUser = buildIdamUser();
@@ -197,6 +206,8 @@ class SubmitCaseTransactionTest {
         doReturn("12345").when(savedCaseDetails).getReferenceAsString();
         doReturn("TestType").when(savedCaseDetails).getCaseTypeId();
         doReturn("TestJurisdiction").when(savedCaseDetails).getJurisdiction();
+        doReturn(1234567890L).when(savedCaseDetails).getReference();
+        doReturn(LocalDate.of(2030, 1, 1)).when(savedCaseDetails).getResolvedTTL();
 
         doReturn("12345").when(caseDetails).getReferenceAsString();
         doReturn("TestType").when(caseDetails).getCaseTypeId();
@@ -206,6 +217,13 @@ class SubmitCaseTransactionTest {
         savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
         savedDecentralisedCaseDetails.setVersion(1L);
+
+        doAnswer(invocation -> {
+            DecentralisedCaseDetails responseDetails = invocation.getArgument(0);
+            Consumer<CaseDetails> consumer = invocation.getArgument(1);
+            consumer.accept(responseDetails.getCaseDetails());
+            return null;
+        }).when(synchronisedCaseProcessor).applyConditionallyWithLock(any(), any());
 
         doNothing().when(casePointerRepository).persistCasePointerAndInitId(caseDetails);
 
@@ -387,6 +405,8 @@ class SubmitCaseTransactionTest {
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.empty()),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(eq(savedDecentralisedCaseDetails), any()),
+            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
             () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
@@ -417,6 +437,8 @@ class SubmitCaseTransactionTest {
             () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
                 event, caseEventDefinition, caseTypeDefinition, caseDetails,
                 Optional.empty(), Optional.of(onBehalfOfUser)),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(eq(savedDecentralisedCaseDetails), any()),
+            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
             () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
@@ -583,6 +605,8 @@ class SubmitCaseTransactionTest {
         // Verify case pointer was persisted then deleted
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
     @Test
@@ -610,6 +634,8 @@ class SubmitCaseTransactionTest {
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
     @Test
@@ -638,6 +664,8 @@ class SubmitCaseTransactionTest {
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
     @Test
@@ -658,6 +686,8 @@ class SubmitCaseTransactionTest {
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
     @Test
@@ -679,6 +709,8 @@ class SubmitCaseTransactionTest {
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
         verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
 }

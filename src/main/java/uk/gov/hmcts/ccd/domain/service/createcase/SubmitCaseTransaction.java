@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.domain.service.createevent.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -64,6 +66,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
     private final PersistenceStrategyResolver resolver;
     private final CasePointerRepository casePointerRepository;
+    private final SynchronisedCaseProcessor synchronisedCaseProcessor;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -81,7 +84,8 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final CaseDocumentTimestampService caseDocumentTimestampService,
                                  final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
                                  final PersistenceStrategyResolver resolver,
-                                 final CasePointerRepository casePointerRepository
+                                 final CasePointerRepository casePointerRepository,
+                                 final SynchronisedCaseProcessor synchronisedCaseProcessor
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -98,6 +102,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.decentralisedSubmitCaseTransaction = decentralisedSubmitCaseTransaction;
         this.resolver = resolver;
         this.casePointerRepository = casePointerRepository;
+        this.synchronisedCaseProcessor = synchronisedCaseProcessor;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -203,10 +208,18 @@ public class SubmitCaseTransaction implements AccessControl {
         );
 
         try {
-            return decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
+            DecentralisedCaseDetails decentralisedCaseDetails =
+                decentralisedSubmitCaseTransaction.submitDecentralisedEvent(event,
                     caseEventDefinition, caseTypeDefinition, newCaseDetails, Optional.empty(),
-                Optional.ofNullable(onBehalfOfUser))
-                .getCaseDetails();
+                    Optional.ofNullable(onBehalfOfUser));
+
+            synchronisedCaseProcessor.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails ->
+                casePointerRepository.updateResolvedTtl(
+                    freshDetails.getReference(),
+                    freshDetails.getResolvedTTL())
+            );
+
+            return decentralisedCaseDetails.getCaseDetails();
         } catch (ApiException apiException) {
             // Rollback case pointer if downstream service returns errors
             if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {

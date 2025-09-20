@@ -42,6 +42,7 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.domain.service.createevent.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -142,6 +143,12 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private PersistenceStrategyResolver resolver;
 
+    @Mock
+    private CasePointerRepository casePointerRepository;
+
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -176,7 +183,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDocumentTimestampService,
             decentralisedSubmitCaseTransaction,
             resolver,
-            Mockito.mock(CasePointerRepository.class)
+            casePointerRepository,
+            synchronisedCaseProcessor
         );
 
         idamUser = buildIdamUser();
