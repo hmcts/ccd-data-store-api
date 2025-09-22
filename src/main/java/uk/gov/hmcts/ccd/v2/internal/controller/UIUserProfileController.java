@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
@@ -38,17 +40,15 @@ public class UIUserProfileController {
             V2.MediaType.UI_USER_PROFILE
         }
     )
-    @ApiOperation(
-        value = "Validate case data",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Validate case data",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseViewResource.class
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseViewResource.class))
+    )
     public ResponseEntity<UserProfileViewResource> getUserProfile() {
 
         UserProfile userProfile = getUserProfileOperation.execute(AccessControlService.CAN_READ);

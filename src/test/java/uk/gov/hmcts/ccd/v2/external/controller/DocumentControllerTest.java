@@ -50,7 +50,7 @@ class DocumentControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         Document document = new Document();
         document.setName("name1");

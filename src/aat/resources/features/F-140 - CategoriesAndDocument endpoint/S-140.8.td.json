@@ -35,6 +35,9 @@
       "case_version": "[[ANYTHING_PRESENT]]",
       "categories": [
         {
+    			"__ordering__": "UNORDERED"
+        },
+        {
           "category_id": "CategoryID1",
           "category_name": "Evidences",
           "category_order": 100,
