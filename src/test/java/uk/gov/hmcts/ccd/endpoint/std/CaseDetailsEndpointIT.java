@@ -510,7 +510,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventInstanceId").toString(),
             containsString(caseAuditEvent.getId().toString()));
         assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("PreviousStateId").toString());
-        assertThat(messageQueueList.get(0).getId(), equalTo(1L));
+        assertThat(messageQueueList.get(0).getId(), equalTo("1"));
         assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
     }
 
@@ -2213,8 +2213,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -2227,8 +2227,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertNotNull(updatedCaseDetails);
         assertEquals("state4", updatedCaseDetails.getState());
         assertNotEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -2248,8 +2248,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -2259,8 +2259,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertNotNull(updatedCaseDetails);
         assertEquals("CaseCreated", updatedCaseDetails.getState());
         assertEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -3841,7 +3841,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         String expected = "{  \n" +
             "   \"case_details\":{  \n" +
-            "      \"id\":1504259907353610,\n" +
+            "      \"id\":\"1504259907353610\",\n" +
             "      \"jurisdiction\":\"PROBATE\",\n" +
             "      \"state\":\"CaseCreated\",\n" +
             "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +

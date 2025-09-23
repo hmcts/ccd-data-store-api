@@ -156,7 +156,7 @@ public class CaseAccessService {
     public Boolean isExplicitAccessGranted(CaseDetails caseDetails) {
         final List<String> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
-        if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
+        if (null != grantedCases && grantedCases.contains(caseDetails.getId())) {
             return Boolean.TRUE;
         }
 

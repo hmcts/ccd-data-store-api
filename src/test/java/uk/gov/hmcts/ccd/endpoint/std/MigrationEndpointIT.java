@@ -312,7 +312,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             MigrationResult migrationResult = mapper.readValue(content, MigrationResult.class);
 
             assertEquals(2, migrationResult.getRecordCount());
-            assertEquals(CASE_LINKS_CASE_03_ID, migrationResult.getFinalRecordId());
+            assertEquals(CASE_LINKS_CASE_03_ID, String.valueOf(migrationResult.getFinalRecordId()));
         }
     }
 

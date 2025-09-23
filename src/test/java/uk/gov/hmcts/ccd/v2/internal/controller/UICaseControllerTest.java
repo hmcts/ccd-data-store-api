@@ -109,7 +109,7 @@ class UICaseControllerTest {
         @DisplayName("should return 200 when event found")
         void caseFound() {
             final ResponseEntity<CaseHistoryViewResource> response =
-                    caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString());
+                    caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -124,7 +124,7 @@ class UICaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID));
         }
 
         @Test
@@ -133,7 +133,7 @@ class UICaseControllerTest {
             when(getCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID.toString()));
+                () -> caseController.getCaseHistoryView(CASE_REFERENCE, EVENT_ID));
         }
     }
 

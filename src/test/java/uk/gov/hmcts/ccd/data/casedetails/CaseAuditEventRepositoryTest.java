@@ -73,7 +73,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         String createEventSummary = "The Create Event";
 
         setUpCaseData("100");
-        String eventId = String.valueOf(setUpCaseEvent("100", "The Create Event", "2017-09-28 08:46:16.258"));
+        String eventId = setUpCaseEvent("100", "The Create Event", "2017-09-28 08:46:16.258");
 
         Optional<AuditEvent> createEventOptional = classUnderTest.findByEventId(eventId);
 
@@ -124,7 +124,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         );
     }
 
-    private Long setUpCaseEvent(String caseDataId, String summary, String timestamp) {
+    private String setUpCaseEvent(String caseDataId, String summary, String timestamp) {
         Map<String, Object> params = new HashMap<>();
         params.put("EVENT_ID", "EVENT_ID");
         params.put("CREATED_DATE", timestamp);
@@ -144,7 +144,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         return new SimpleJdbcInsert(db)
             .withTableName("CASE_EVENT")
             .usingGeneratedKeyColumns("id")
-            .executeAndReturnKey(params).longValue();
+            .executeAndReturnKey(params).toString();
     }
 
 }

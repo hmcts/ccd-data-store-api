@@ -95,6 +95,7 @@ public class QueryEndpoint {
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final GetUserProfileOperation getUserProfileOperation;
 
+
     private final HashMap<String, Predicate<AccessControlList>> accessMap;
 
     @Inject
@@ -261,6 +262,7 @@ public class QueryEndpoint {
                                                           @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
         String validCaseTypeId = validateCaseTypeId(caseTypeId);
+
         return getEventTriggerOperation.executeForCaseType(validCaseTypeId, eventTriggerId, ignoreWarning);
     }
 
@@ -279,7 +281,7 @@ public class QueryEndpoint {
                                                       @PathVariable("etid") String eventId,
                                                       @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
-
+        validateCaseReference(caseId);
         return getEventTriggerOperation.executeForCase(caseId, eventId, ignoreWarning);
     }
 
@@ -350,6 +352,17 @@ public class QueryEndpoint {
             throw new BadRequestException(V2.Error.DATE_STRING_INVALID + String.join(", ", invalidDates));
         }
         return true;
+    }
+
+    private void validateCaseReference(String caseReference) {
+        /* if (caseReference == null || caseReference.length() != 16) {
+            throw new BadRequestException("Case reference is not valid");
+        }*/
+        for (int i = 0; i < caseReference.length(); i++) {
+            if (!Character.isDigit(caseReference.charAt(i))) {
+                throw new BadRequestException("Case reference is not valid");
+            }
+        }
     }
 
 }

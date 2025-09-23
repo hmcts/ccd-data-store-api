@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 
 public class CaseAuditEventMapperTest {
-    private static final Long CASE_DATA_ID = 101111L;
+    private static final String CASE_DATA_ID = "101111";
     private static final String CASE_TYPE_ID = "121212";
     private static final String EVENT_NAME = "eventName";
     private static final String STATE_NAME = "stateName";

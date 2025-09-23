@@ -378,12 +378,12 @@ public class CaseAccessOperation {
         }
 
         // find existing Case-User relationships for all the relevant cases + users found
-        Map<Long, List<String>> existingCaseUserRelationships =
+        Map<String, List<String>> existingCaseUserRelationships =
             existingCaseUserRoles.stream()
                 // filter out [CREATOR] case role
                 .filter(caseUserRole -> !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
                 .collect(Collectors.groupingBy(
-                    caseUserRole -> Long.parseLong(caseUserRole.getCaseDataId()),
+                    caseUserRole -> caseUserRole.getCaseDataId(),
                     Collectors.collectingAndThen(
                         Collectors.toList(),
                         caseUserRole -> caseUserRole.stream()

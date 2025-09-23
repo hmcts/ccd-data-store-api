@@ -785,7 +785,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackErrorsForCaseworker() throws Exception {
         final String URL =
-            String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%/event-triggers/%s/token",
+            String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s/token",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();

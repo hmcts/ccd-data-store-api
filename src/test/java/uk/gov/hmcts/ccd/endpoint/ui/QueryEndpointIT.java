@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -838,7 +839,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID","1504259907353529", caseView.getCaseId());
 
         final CaseViewType caseViewType = caseView.getCaseType();
         assertNotNull("Case View Type is null", caseViewType);
@@ -1446,7 +1447,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getEventTriggerForCase_invalidCaseReference() throws Exception {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE)
-                            .contentType(JSON_CONTENT_TYPE)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header(AUTHORIZATION, "Bearer user1"))
                .andExpect(status().is(400))
                .andReturn();

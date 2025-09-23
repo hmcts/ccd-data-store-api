@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.lang.Long.parseLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,17 +30,17 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     private CaseLinkEntity caseLinkEntity;
 
-    private final Map<String, Long> caseLinkIdToReferenceMap = new HashMap<>();
+    private final Map<String, String> caseLinkIdToReferenceMap = new HashMap<>();
 
     @BeforeEach
     void setup() {
         caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
-        caseLinkIdToReferenceMap.put(CASE_02_ID, parseLong(CASE_02_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_03_ID, parseLong(CASE_03_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_04_ID, parseLong(CASE_04_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_13_ID, parseLong(CASE_13_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_14_ID, parseLong(CASE_14_REFERENCE));
+        caseLinkIdToReferenceMap.put(CASE_02_ID, CASE_02_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_03_ID, CASE_03_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_04_ID, CASE_04_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_13_ID, CASE_13_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_14_ID, CASE_14_REFERENCE);
     }
 
     @Test

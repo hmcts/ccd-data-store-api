@@ -214,7 +214,7 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE).orElseThrow(() ->
                 new CaseNotFoundException(CASE_REFERENCE));
@@ -228,13 +228,13 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByReferenceAgain() {
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             cachedRepository.findByReference(CASE_REFERENCE);
 
             verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE);
 
-            doReturn(new CaseDetails()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
             CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE).orElseThrow(() ->
                 new CaseNotFoundException(CASE_REFERENCE));
 

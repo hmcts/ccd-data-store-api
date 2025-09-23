@@ -34,8 +34,9 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
     private static final String EXTERNAL_CASETYPE = "TestAddressBookCaseExternal";
     private static final String GET_CASE_HISTORY_FOR_EVENT_EXTERNAL =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
-            + EXTERNAL_CASETYPE + "/cases/1504259907353529/"
-            + "events/%d/case-history";
+            + EXTERNAL_CASETYPE + "/cases/%s/"
+            + "events/%s/case-history";
+    private static final String CASE_01_REFERENCE = "1504259907353529";
 
 
     @Inject
@@ -75,7 +76,7 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", 3, eventList.size());
 
         mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
-                eventList.get(1).getId()))
+                CASE_01_REFERENCE, eventList.get(1).getId()))
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
