@@ -41,6 +41,7 @@ public class CasePointerRepository {
         pointer.setDataClassification(Map.of());
         pointer.setSecurityClassification(SecurityClassification.RESTRICTED);
         pointer.setLastModified(null);
+        pointer.setLastStateModifiedDate(null);
         pointer.setVersion(null);
         pointer.setState("");
         var result = caseDetailsRepository.set(pointer);

@@ -18,6 +18,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
@@ -50,6 +51,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         caseDetails.setState(CASE_STATE);
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        caseDetails.setLastStateModifiedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setVersion(1);
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
@@ -70,6 +72,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         assertThat(originalCaseDetails.getLastModified(), is(notNullValue()));
         assertThat(originalCaseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC));
         assertThat(originalCaseDetails.getDataClassification(), is(notNullValue()));
+        assertThat(originalCaseDetails.getLastStateModifiedDate(), is(notNullValue()));
         assertThat(originalCaseDetails.getId(), is(notNullValue()));
 
         // And: The case pointer should be persisted in the database
@@ -86,6 +89,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(pointer.getState(), is("")),
             () -> assertThat(pointer.getSecurityClassification(), is(SecurityClassification.RESTRICTED)),
             () -> assertThat(pointer.getDataClassification().isEmpty(), is(true)),
+            () -> assertThat(pointer.getLastStateModifiedDate(), is(nullValue())),
 
             // Database-managed fields: version is set by DB, lastModified is updated on save
             () -> assertThat(pointer.getVersion(), is(notNullValue())),
