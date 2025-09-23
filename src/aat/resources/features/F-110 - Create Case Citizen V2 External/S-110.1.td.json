@@ -108,7 +108,9 @@
       "state" : "TODO",
       "security_classification" : "PUBLIC",
       "data" : {
-        "CollectionComplexDateTime" : [ {
+        "CollectionComplexDateTime" : [ 				{
+          "__elementId__": "value.DateField"
+        }, {
           "value" : {
             "DateField" : "1970-02-01",
             "DateTimeField" : "1970-10-01T01:01:00.000",
