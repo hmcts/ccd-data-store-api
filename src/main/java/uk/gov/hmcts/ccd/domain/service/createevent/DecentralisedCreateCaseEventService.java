@@ -13,10 +13,8 @@ import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 
 @Slf4j
@@ -24,7 +22,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 @Service
 public class DecentralisedCreateCaseEventService {
 
-    private final CaseTypeService caseTypeService;
     private final ServicePersistenceClient servicePersistenceClient;
 
 
@@ -34,9 +31,6 @@ public class DecentralisedCreateCaseEventService {
                                                              final CaseDetails caseDetails,
                                                              final Optional<CaseDetails> caseDetailsBefore,
                                                              final Optional<IdamUser> onBehalfOf) {
-        CaseStateDefinition caseStateDefinition =
-                caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
-
         DecentralisedEventDetails.DecentralisedEventDetailsBuilder eventDetails = DecentralisedEventDetails.builder()
                 .caseType(caseTypeDefinition.getId())
                 .eventId(event.getEventId())

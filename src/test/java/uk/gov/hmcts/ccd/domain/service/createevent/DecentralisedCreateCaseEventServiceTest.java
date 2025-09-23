@@ -23,16 +23,11 @@ import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 @ExtendWith(MockitoExtension.class)
 class DecentralisedCreateCaseEventServiceTest {
-
-    @Mock
-    private CaseTypeService caseTypeService;
 
     @Mock
     private ServicePersistenceClient servicePersistenceClient;
@@ -55,8 +50,6 @@ class DecentralisedCreateCaseEventServiceTest {
 
         when(servicePersistenceClient.createEvent(any(DecentralisedCaseEvent.class)))
             .thenReturn(decentralisedResponse);
-        when(caseTypeService.findState(any(), any()))
-            .thenReturn(new CaseStateDefinition());
     }
 
     @Test
