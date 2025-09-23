@@ -241,6 +241,9 @@
           "classification": "PUBLIC",
           "value": [
             {
+              "__elementId__": "value.classification"
+            },
+            {
               "id": "[[ANY_STRING_NOT_NULLABLE]]",
               "classification": "PUBLIC"
             },
