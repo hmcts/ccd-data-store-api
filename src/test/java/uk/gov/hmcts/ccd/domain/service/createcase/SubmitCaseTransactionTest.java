@@ -616,6 +616,29 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
+    @DisplayName("should rollback case pointer when ApiException has warnings and ignoreWarning is false")
+    void shouldRollbackCasePointerWhenApiExceptionHasWarningsAndIgnoreWarningFalse() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Warnings present")
+            .withWarnings(Collections.singletonList("Upstream validation warning"));
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, Boolean.FALSE, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
     @DisplayName("should rollback case pointer when FeignException has 4xx status code")
     void shouldRollbackCasePointerWhenFeignExceptionIs4xx() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);

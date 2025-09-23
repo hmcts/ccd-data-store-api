@@ -221,8 +221,13 @@ public class SubmitCaseTransaction implements AccessControl {
 
             return decentralisedCaseDetails.getCaseDetails();
         } catch (ApiException apiException) {
-            // Rollback case pointer if downstream service returns errors
-            if (apiException.getCallbackErrors() != null && !apiException.getCallbackErrors().isEmpty()) {
+            // Downstream service rejected the submission (errors or warnings where ignore_warning was false)
+            boolean hasErrors = apiException.getCallbackErrors() != null
+                && !apiException.getCallbackErrors().isEmpty();
+            boolean hasWarnings = apiException.getCallbackWarnings() != null
+                && !apiException.getCallbackWarnings().isEmpty();
+
+            if (hasErrors || hasWarnings) {
                 rollbackCasePointer(newCaseDetails.getReference());
             }
             throw apiException;
