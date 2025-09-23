@@ -181,6 +181,24 @@ public class ServicePersistenceClientTest {
     }
 
     @Test
+    public void getCase_shouldThrowServiceException_whenJurisdictionDoesNotMatch() {
+        CaseDetails mismatchedCaseDetails = createCaseDetails();
+        mismatchedCaseDetails.setJurisdiction("DifferentJurisdiction");
+
+        DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
+        mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
+
+        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+            .thenReturn(List.of(mismatchedDetails));
+
+        assertThrows(
+            ServiceException.class,
+            () -> servicePersistenceClient.getCase(casePointer)
+        );
+    }
+
+    @Test
     public void createEvent_shouldReturnCaseDetailsWithInternalId() {
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
@@ -271,6 +289,32 @@ public class ServicePersistenceClientTest {
     public void createEvent_shouldThrowServiceException_whenResponseHasMismatchedCaseDetails() {
         CaseDetails mismatchedCaseDetails = createCaseDetails();
         mismatchedCaseDetails.setReference(9999999999999999L);
+
+        DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
+        mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
+        mismatchedDecentralisedCaseDetails.setVersion(1L);
+
+        DecentralisedSubmitEventResponse mismatchedResponse = new DecentralisedSubmitEventResponse();
+        mismatchedResponse.setCaseDetails(mismatchedDecentralisedCaseDetails);
+
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
+        when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
+        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+            .thenReturn(mismatchedResponse);
+
+        ServiceException exception = assertThrows(
+            ServiceException.class,
+            () -> servicePersistenceClient.createEvent(caseEvent)
+        );
+
+        assertThat(exception.getMessage(),
+            is("Downstream service returned mismatched case details for case reference " + CASE_REFERENCE));
+    }
+
+    @Test
+    public void createEvent_shouldThrowServiceException_whenResponseHasMismatchedJurisdiction() {
+        CaseDetails mismatchedCaseDetails = createCaseDetails();
+        mismatchedCaseDetails.setJurisdiction("DifferentJurisdiction");
 
         DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);

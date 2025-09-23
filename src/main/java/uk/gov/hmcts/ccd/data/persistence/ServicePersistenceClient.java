@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -115,15 +116,20 @@ public class ServicePersistenceClient {
                 + casePointer.getReference());
         }
         var returnedCaseDetails = details.getCaseDetails();
-        if (!casePointer.getReference().equals(returnedCaseDetails.getReference())
-            || !casePointer.getCaseTypeId().equals(returnedCaseDetails.getCaseTypeId())) {
+        if (!Objects.equals(casePointer.getReference(), returnedCaseDetails.getReference())
+            || !Objects.equals(casePointer.getCaseTypeId(), returnedCaseDetails.getCaseTypeId())
+            || !Objects.equals(casePointer.getJurisdiction(), returnedCaseDetails.getJurisdiction())) {
 
             log.error("""
-                 Downstream service returned mismatched case details Expected ref={} type={}, but got ref={} type={}""",
+                 Downstream service returned mismatched case details.
+                 Expected ref={} type={} jurisdiction={},
+                 but got ref={} type={} jurisdiction={}""",
                 casePointer.getReference(),
                 casePointer.getCaseTypeId(),
+                casePointer.getJurisdiction(),
                 returnedCaseDetails.getReference(),
-                returnedCaseDetails.getCaseTypeId());
+                returnedCaseDetails.getCaseTypeId(),
+                returnedCaseDetails.getJurisdiction());
 
             throw new ServiceException("Downstream service returned mismatched case details for case reference "
                 + casePointer.getReference());
