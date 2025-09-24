@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-125.3",
+  "_guid_": "S-125.5",
   "title": "Must return a positive appropriate response when Swagger config URL is accessed",
   "_extends_": "F-125_Test_Swagger_Config_Base_Data",
 
