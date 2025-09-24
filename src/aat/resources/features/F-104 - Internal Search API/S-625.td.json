@@ -36,23 +36,6 @@
           },
           "fields": [
             {
-              "label": "`TextArea` search",
-              "order": 1,
-              "metadata": false,
-              "case_field_id": "TextAreaField",
-              "case_field_type": {
-                "id": "TextArea",
-                "type": "TextArea",
-                "min": null,
-                "max": null,
-                "regular_expression": null,
-                "fixed_list_items": [],
-                "complex_fields": [],
-                "collection_field_type": null
-              },
-              "display_context_parameter": null
-            },
-            {
               "label" : "`Text` search",
               "order" : 3,
               "metadata" : false,
@@ -68,7 +51,46 @@
                 "collection_field_type" : null
               },
               "display_context_parameter" : null
+            },
+            {
+              "label": "`Email` search",
+              "order": 2,
+              "metadata": false,
+              "case_field_id": "EmailField",
+              "case_field_type": {
+                "id": "Email",
+                "type": "Email",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [
+
+                ],
+                "complex_fields": [
+
+                ],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            },
+            {
+              "label": "`TextArea` search",
+              "order": 1,
+              "metadata": false,
+              "case_field_id": "TextAreaField",
+              "case_field_type": {
+                "id": "TextArea",
+                "type": "TextArea",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
             }
+
           ],
           "cases": "[[ANYTHING_PRESENT]]"
         }
@@ -78,11 +100,13 @@
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "TextField" : "text",
-            "TextAreaField": "text area"
+            "TextAreaField": "text area",
+            "EmailField" : "fuctional@test.com"
           },
           "fields_formatted": {
             "TextField" : "text",
-            "TextAreaField": "text area"
+            "TextAreaField": "text area",
+            "EmailField" : "fuctional@test.com"
           }
         }
       ],

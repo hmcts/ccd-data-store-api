@@ -1131,7 +1131,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnCaseFieldsWithHigherSC() throws Exception {
+            void shouldReturnCaseFieldsWithHigherSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -1139,8 +1139,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.containsKey(PHONE_FIELD), is(false)), // PRIVATE
+                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.containsKey(PHONE_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.containsKey(COLLECTION_FIELD), is(true)) // PUBLIC
                 );
             }
@@ -1211,7 +1211,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnComplexNestedFieldsWithHigherSC() throws Exception {
+            void shouldReturnComplexNestedFieldsRegardlessOfSC() throws Exception {
                 if (applicationParams.getEnableAttributeBasedAccessControl()) {
                     String userId = "123";
                     String roleAssignmentResponseJson = roleAssignmentResponseJson(
@@ -1230,8 +1230,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
-                        .has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
+                        .has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                        .has(NESTED_NUMBER_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true)) // PUBLIC
                 );
             }
