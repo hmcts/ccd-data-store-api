@@ -227,6 +227,14 @@ public class SubmitCaseTransaction implements AccessControl {
             boolean hasWarnings = apiException.getCallbackWarnings() != null
                 && !apiException.getCallbackWarnings().isEmpty();
 
+            log.warn(
+                "Decentralised submission for case {} event {} rejected with {} callback error(s) and {} warning(s)",
+                newCaseDetails.getReference(),
+                event.getEventId(),
+                hasErrors ? apiException.getCallbackErrors().size() : 0,
+                hasWarnings ? apiException.getCallbackWarnings().size() : 0
+            );
+
             if (hasErrors || hasWarnings) {
                 rollbackCasePointer(newCaseDetails.getReference());
             }
@@ -234,7 +242,16 @@ public class SubmitCaseTransaction implements AccessControl {
         } catch (FeignException feignException) {
             // Rollback case pointer if downstream service returns 4xx error
             if (feignException.status() >= 400 && feignException.status() < 500) {
+                log.warn("Decentralised submission for case {} event {} failed with HTTP status {}",
+                    newCaseDetails.getReference(),
+                    event.getEventId(),
+                    feignException.status());
                 rollbackCasePointer(newCaseDetails.getReference());
+            } else {
+                log.error("Decentralised submission for case {} event {} failed with HTTP status {}",
+                    newCaseDetails.getReference(),
+                    event.getEventId(),
+                    feignException.status());
             }
             throw feignException;
         }

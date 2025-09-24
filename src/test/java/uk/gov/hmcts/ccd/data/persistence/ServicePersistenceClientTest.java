@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -45,6 +46,7 @@ public class ServicePersistenceClientTest {
     private static final String CASE_STATE = "CaseCreated";
     private static final URI SERVICE_URI = URI.create("http://test-service.com");
     private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
+    private static final String EVENT_ID = "testEvent";
 
     @Mock
     private ServicePersistenceAPI api;
@@ -100,6 +102,9 @@ public class ServicePersistenceClientTest {
     private DecentralisedCaseEvent createDecentralisedCaseEvent() {
         return DecentralisedCaseEvent.builder()
             .caseDetails(casePointer)
+            .eventDetails(DecentralisedEventDetails.builder()
+                .eventId(EVENT_ID)
+                .build())
             .build();
     }
 

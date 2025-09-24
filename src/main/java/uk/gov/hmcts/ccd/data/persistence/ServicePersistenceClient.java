@@ -78,6 +78,15 @@ public class ServicePersistenceClient {
         if (!isEmpty(response.getErrors())
             || (!isEmpty(response.getWarnings())
             && (response.getIgnoreWarning() == null || !response.getIgnoreWarning()))) {
+            var errors = response.getErrors();
+            var warnings = response.getWarnings();
+            int errorCount = errors == null ? 0 : errors.size();
+            int warningCount = warnings == null ? 0 : warnings.size();
+            log.warn("Decentralised submit rejected for case {} event {} with {} error(s) and {} warning(s)",
+                casePointer.getReference(),
+                caseEvent.getEventDetails().getEventId(),
+                errorCount,
+                warningCount);
             throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
                 .withErrors(response.getErrors())
                 .withWarnings(response.getWarnings());

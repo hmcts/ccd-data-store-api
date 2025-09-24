@@ -63,6 +63,11 @@ public class SynchronisedCaseProcessor {
                 .setParameter("newVersion", decentralisedCase.getVersion().intValue())
                 .setParameter("ref", caseDetails.getReference())
                 .executeUpdate();
+        } else {
+            log.debug("Skipping update for case {} because decentralised version {} is not greater than current {}",
+                caseDetails.getReference(),
+                decentralisedCase.getVersion(),
+                currentVersion);
         }
     }
 }

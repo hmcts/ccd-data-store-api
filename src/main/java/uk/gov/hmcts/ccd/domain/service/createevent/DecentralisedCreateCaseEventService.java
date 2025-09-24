@@ -59,6 +59,9 @@ public class DecentralisedCreateCaseEventService {
             result.getCaseDetails().setResolvedTTL(caseDetails.getResolvedTTL());
             return result;
         } catch (FeignException.Conflict conflict) {
+            log.warn("Decentralised service reported concurrency conflict for case {} event {}",
+                caseDetails.getReference(),
+                event.getEventId());
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \
                     another action happened at the same time.
