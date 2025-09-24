@@ -6,7 +6,7 @@
   "operationName": "Get Swagger Config JSON Page",
 
   "method": "GET",
-  "uri": "/v3/api-docs/swagger-config",
+  "uri": "/v2/api-docs/swagger-config",
 
   "expectedResponse": {
     "responseCode" : 200,
