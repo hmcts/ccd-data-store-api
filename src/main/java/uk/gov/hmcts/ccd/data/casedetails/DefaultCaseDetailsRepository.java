@@ -111,7 +111,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(final List<String> ids) {
+    public List<String> findCaseReferencesByIds(final List<String> ids) {
         return findReferencesByIds(ids);
     }
 
@@ -206,8 +206,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return getCaseDetailsEntity(id, reference, qb);
     }
 
-    private List<Long> findReferencesByIds(List<Long> ids) {
-        final CaseDetailsQueryBuilder<Long> qb = queryBuilderFactory.selectByReferenceSecured(em);
+    private List<String> findReferencesByIds(List<String> ids) {
+        final CaseDetailsQueryBuilder<String> qb = queryBuilderFactory.selectByReferenceSecured(em);
         qb.whereIdsAreIn(ids);
 
         return qb.build().getResultList();
