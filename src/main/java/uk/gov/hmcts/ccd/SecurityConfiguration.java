@@ -62,6 +62,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**",
+        "/v3/api-docs",
+        "/v3/api-docs/**",
         "/testing-support/cleanup-case-type/**"
     };
 
