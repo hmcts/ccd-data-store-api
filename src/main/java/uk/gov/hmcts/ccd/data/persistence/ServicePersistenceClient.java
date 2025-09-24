@@ -34,7 +34,7 @@ public class ServicePersistenceClient {
      * Retrieves case details from a decentralised service.
      */
     public CaseDetails getCase(CaseDetails casePointer) {
-        var uri = resolver.resolveUriOrThrow(casePointer.getReference());
+        var uri = resolver.resolveUriOrThrow(casePointer);
         var response = api.getCases(uri, List.of(casePointer.getReference()));
 
         if (response.isEmpty()) {

@@ -123,7 +123,7 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCase_shouldReturnCaseDetailsWithInternalId() {
-        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of(decentralisedCaseDetails));
 
@@ -139,7 +139,7 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCase_shouldThrowCaseNotFoundException_whenNoCasesReturned() {
-        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of());
 
@@ -157,7 +157,7 @@ public class ServicePersistenceClientTest {
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
 
-        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of(mismatchedDetails));
 
@@ -175,7 +175,7 @@ public class ServicePersistenceClientTest {
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
 
-        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of(mismatchedDetails));
 
@@ -193,7 +193,7 @@ public class ServicePersistenceClientTest {
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
 
-        when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of(mismatchedDetails));
 
