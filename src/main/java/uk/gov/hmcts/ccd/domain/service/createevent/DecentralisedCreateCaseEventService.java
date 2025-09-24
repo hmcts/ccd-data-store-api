@@ -36,8 +36,7 @@ public class DecentralisedCreateCaseEventService {
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
                 .summary(event.getSummary())
-                .description(event.getDescription())
-                .resolvedTtl(caseDetails.getResolvedTTL());
+                .description(event.getDescription());
 
         if (onBehalfOf.isPresent()) {
             var onBehalfOfUser = onBehalfOf.get();
@@ -50,6 +49,7 @@ public class DecentralisedCreateCaseEventService {
                 .caseDetailsBefore(caseDetailsBefore.orElse(null))
                 .caseDetails(caseDetails)
                 .eventDetails(eventDetails.build())
+                .resolvedTtl(caseDetails.getResolvedTTL())
                 .internalCaseId(Long.valueOf(caseDetails.getId()))
                 .build();
 

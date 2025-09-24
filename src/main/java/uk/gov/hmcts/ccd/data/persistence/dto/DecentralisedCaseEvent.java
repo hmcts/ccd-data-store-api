@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.persistence.dto;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -18,6 +20,7 @@ public class DecentralisedCaseEvent {
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
     private DecentralisedEventDetails eventDetails;
+    private LocalDate resolvedTtl;
     /**
      * The case_data.id column is needed for decentralised services to perform ElasticSearch indexing since it serves
      * as the unique identifier on ES indexes.

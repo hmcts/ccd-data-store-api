@@ -128,7 +128,7 @@ class DecentralisedCreateCaseEventServiceTest {
         verify(servicePersistenceClient).createEvent(caseEventCaptor.capture());
         var captured = caseEventCaptor.getValue();
 
-        assertThat(captured.getEventDetails().getResolvedTtl()).isEqualTo(resolvedTtl);
+        assertThat(captured.getResolvedTtl()).isEqualTo(resolvedTtl);
         assertThat(result.getCaseDetails().getResolvedTTL()).isEqualTo(resolvedTtl);
     }
 }
