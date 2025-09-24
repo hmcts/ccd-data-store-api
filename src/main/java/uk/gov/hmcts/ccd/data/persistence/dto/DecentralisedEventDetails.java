@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.data.persistence.dto;
 
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -21,4 +23,5 @@ public class DecentralisedEventDetails {
     private String proxiedBy;
     private String proxiedByFirstName;
     private String proxiedByLastName;
+    private LocalDate resolvedTtl;
 }

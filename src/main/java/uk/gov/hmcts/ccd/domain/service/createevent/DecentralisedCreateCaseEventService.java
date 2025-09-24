@@ -36,7 +36,8 @@ public class DecentralisedCreateCaseEventService {
                 .eventId(event.getEventId())
                 .eventName(caseEventDefinition.getName())
                 .summary(event.getSummary())
-                .description(event.getDescription());
+                .description(event.getDescription())
+                .resolvedTtl(caseDetails.getResolvedTTL());
 
         if (onBehalfOf.isPresent()) {
             var onBehalfOfUser = onBehalfOf.get();
@@ -53,7 +54,10 @@ public class DecentralisedCreateCaseEventService {
                 .build();
 
         try {
-            return servicePersistenceClient.createEvent(decentralisedCaseEvent);
+            var result = servicePersistenceClient.createEvent(decentralisedCaseEvent);
+            // Resolved TTL has @JsonIgnore so restore it
+            result.getCaseDetails().setResolvedTTL(caseDetails.getResolvedTTL());
+            return result;
         } catch (FeignException.Conflict conflict) {
             throw new CaseConcurrencyException("""
                     Unfortunately we were unable to save your work to the case as \

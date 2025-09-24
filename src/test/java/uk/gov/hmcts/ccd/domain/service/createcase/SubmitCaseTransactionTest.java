@@ -212,6 +212,7 @@ class SubmitCaseTransactionTest {
         doReturn("12345").when(caseDetails).getReferenceAsString();
         doReturn("TestType").when(caseDetails).getCaseTypeId();
         doReturn("TestJurisdiction").when(caseDetails).getJurisdiction();
+        doReturn(LocalDate.of(2030, 1, 1)).when(caseDetails).getResolvedTTL();
 
         // Setup DecentralisedCaseDetails mock
         savedDecentralisedCaseDetails = new DecentralisedCaseDetails();

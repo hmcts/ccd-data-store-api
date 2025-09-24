@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -91,5 +92,43 @@ class DecentralisedCreateCaseEventServiceTest {
 
         assertThat(captured.getEventDetails().getProxiedByFirstName()).isEqualTo("Alex");
         assertThat(captured.getEventDetails().getProxiedByLastName()).isEqualTo("Johnson");
+    }
+
+    @Test
+    @DisplayName("Should propagate resolved TTL to decentralised service and restore it on response")
+    void shouldPropagateResolvedTtl() {
+        Event event = new Event();
+        event.setEventId("UpdateCase");
+
+        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setName("Update Case");
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId("CASE-TYPE");
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId("1002");
+        caseDetails.setReference(1234567890123457L);
+        caseDetails.setCaseTypeId("CASE-TYPE");
+        caseDetails.setState("Open");
+
+        LocalDate resolvedTtl = LocalDate.now().plusDays(30);
+        caseDetails.setResolvedTTL(resolvedTtl);
+        decentralisedResponse.getCaseDetails().setResolvedTTL(null);
+
+        DecentralisedCaseDetails result = service.submitDecentralisedEvent(
+            event,
+            caseEventDefinition,
+            caseTypeDefinition,
+            caseDetails,
+            Optional.empty(),
+            Optional.empty()
+        );
+
+        verify(servicePersistenceClient).createEvent(caseEventCaptor.capture());
+        var captured = caseEventCaptor.getValue();
+
+        assertThat(captured.getEventDetails().getResolvedTtl()).isEqualTo(resolvedTtl);
+        assertThat(result.getCaseDetails().getResolvedTTL()).isEqualTo(resolvedTtl);
     }
 }

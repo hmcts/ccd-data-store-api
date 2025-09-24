@@ -216,7 +216,7 @@ public class SubmitCaseTransaction implements AccessControl {
             synchronisedCaseProcessor.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails ->
                 casePointerRepository.updateResolvedTtl(
                     freshDetails.getReference(),
-                    freshDetails.getResolvedTTL())
+                    newCaseDetails.getResolvedTTL())
             );
 
             return decentralisedCaseDetails.getCaseDetails();

@@ -251,6 +251,8 @@ public class CreateCaseEventService {
         }
 
 
+        caseDetailsAfterCallbackWithoutHashes
+            .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
         var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
         CaseDetails finalCaseDetails;
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
@@ -269,12 +271,13 @@ public class CreateCaseEventService {
 
             synchronisedCaseProcessor.applyConditionallyWithLock(decentralisedCaseDetails, freshDetails -> {
                 // A remaining mutable local column is resolvedTTL, which we continue to synchronise locally.
-                pointerRepository.updateResolvedTtl(freshDetails.getReference(), freshDetails.getResolvedTTL());
+                pointerRepository.updateResolvedTtl(
+                    freshDetails.getReference(),
+                    caseDetailsAfterCallbackWithoutHashes.getResolvedTTL()
+                );
                 caseLinkService.updateCaseLinks(freshDetails, caseTypeDefinition.getCaseFieldDefinitions());
             });
         } else {
-            caseDetailsAfterCallbackWithoutHashes
-                .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
                 caseEventDefinition, newState, timeNow);
             saveAuditEventForCaseDetails(
