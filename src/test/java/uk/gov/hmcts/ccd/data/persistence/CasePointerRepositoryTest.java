@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -74,10 +75,12 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         assertThat(originalCaseDetails.getDataClassification(), is(notNullValue()));
         assertThat(originalCaseDetails.getLastStateModifiedDate(), is(notNullValue()));
         assertThat(originalCaseDetails.getId(), is(notNullValue()));
+        assertThat(originalCaseDetails.getResolvedTTL(), is(nullValue()));
 
         // And: The case pointer should be persisted in the database
         CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(originalCaseDetails.getId()));
         assertThat("Case pointer should exist in database", pointer, is(notNullValue()));
+        LocalDate expectedDanglingPointerExpiry = LocalDate.now().plusYears(1);
         assertAll("Case pointer should have expected properties",
             () -> assertThat(pointer.getId(), is(originalCaseDetails.getId())),
             () -> assertThat(pointer.getReference(), is(CASE_REFERENCE)),
@@ -90,10 +93,24 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(pointer.getSecurityClassification(), is(SecurityClassification.RESTRICTED)),
             () -> assertThat(pointer.getDataClassification().isEmpty(), is(true)),
             () -> assertThat(pointer.getLastStateModifiedDate(), is(nullValue())),
+            () -> assertThat(pointer.getResolvedTTL(), is(expectedDanglingPointerExpiry)),
 
             // Database-managed fields: version is set by DB, lastModified is updated on save
             () -> assertThat(pointer.getVersion(), is(notNullValue())),
             () -> assertThat(pointer.getLastModified(), is(notNullValue()))
         );
+    }
+
+    @Test
+    public void persistCasePointer_shouldRespectExistingResolvedTtl() {
+        LocalDate existingTtl = LocalDate.now().plusMonths(3);
+        originalCaseDetails.setResolvedTTL(existingTtl);
+
+        casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
+
+        CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(originalCaseDetails.getId()));
+
+        assertThat(pointer, is(notNullValue()));
+        assertThat(pointer.getResolvedTTL(), is(existingTtl));
     }
 }

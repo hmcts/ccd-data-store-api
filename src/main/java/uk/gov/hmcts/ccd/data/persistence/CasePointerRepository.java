@@ -26,6 +26,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 @Service
 public class CasePointerRepository {
 
+    private static final long DANGLING_POINTER_EXPIRY_TIMEOUT_YEARS = 1L;
+
     private final DefaultCaseDetailsRepository caseDetailsRepository;
     private final CaseService caseService;
     private final EntityManager em;
@@ -44,6 +46,10 @@ public class CasePointerRepository {
         pointer.setLastStateModifiedDate(null);
         pointer.setVersion(null);
         pointer.setState("");
+        if (pointer.getResolvedTTL() == null) {
+            // Default a case pointer expiry so dangling pointers are always eventually cleaned up
+            pointer.setResolvedTTL(LocalDate.now().plusYears(DANGLING_POINTER_EXPIRY_TIMEOUT_YEARS));
+        }
         var result = caseDetailsRepository.set(pointer);
         caseDetails.setId(result.getId());
     }
