@@ -43,7 +43,6 @@ configurations {
 }
 
 dependencyUpdates.resolutionStrategy = {
-
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
@@ -53,6 +52,10 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
+    }
+
+    resolutionStrategy {
+        force 'net.bytebuddy:byte-buddy:1.17.2'
     }
 }
 
@@ -304,6 +307,7 @@ dependencies {
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
 
+    implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.2'
     testImplementation "org.flywaydb:flyway-core:8.5.13"
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
