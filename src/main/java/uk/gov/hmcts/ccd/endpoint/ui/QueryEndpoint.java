@@ -355,9 +355,6 @@ public class QueryEndpoint {
     }
 
     private void validateCaseReference(String caseReference) {
-        /* if (caseReference == null || caseReference.length() != 16) {
-            throw new BadRequestException("Case reference is not valid");
-        }*/
         for (int i = 0; i < caseReference.length(); i++) {
             if (!Character.isDigit(caseReference.charAt(i))) {
                 throw new BadRequestException("Case reference is not valid");
