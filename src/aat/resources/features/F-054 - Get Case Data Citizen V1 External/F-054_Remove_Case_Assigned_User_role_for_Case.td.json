@@ -25,7 +25,7 @@
       "case_users": [
         {
           "case_id": "${[scenarioContext][siblingContexts][Citizen_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-          "user_ids": "${[scenarioContext][testData][users][testUser][id]}",
+          "user_id": "${[scenarioContext][testData][users][testUser][id]}",
           "case_role": "[CREATOR]"
         }
       ]

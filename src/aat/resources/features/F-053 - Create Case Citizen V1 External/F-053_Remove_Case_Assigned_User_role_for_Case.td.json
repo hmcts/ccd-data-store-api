@@ -10,7 +10,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor3"
+      "_extends_": "BeftaCaseworker2Solicitor2"
     },
     "testUser": {
       "_extends_": "BeftaCitizen3"
@@ -24,8 +24,8 @@
     "body": {
       "case_users": [
         {
-          "case_ids": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-          "user_ids": "${[scenarioContext][testData][users][testUser][id]}",
+          "case_id": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][testUser][id]}",
           "case_role": "[CREATOR]"
         }
       ]
