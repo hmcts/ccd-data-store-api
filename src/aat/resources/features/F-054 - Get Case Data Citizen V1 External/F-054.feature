@@ -20,7 +20,9 @@ Scenario: must return 200 and list of case data for the given case id
 
      Then a positive response is received,
       And the response [code is HTTP-200],
-      And the response has all other details as expected.
+      And the response has all other details as expected,
+      And a successful call [is made to remove Case Role] as in [F-054_Remove_Case_Assigned_User_role_for_Case].
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-094 @Ignore # Response code mismatch, expected: 401, actual: 403 (defect RDM-6628)
