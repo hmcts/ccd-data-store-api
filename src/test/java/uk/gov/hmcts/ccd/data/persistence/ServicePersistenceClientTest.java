@@ -344,34 +344,117 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCaseHistory_shouldReturnAuditEvents() {
-        DecentralisedAuditEvent auditEvent = mock(DecentralisedAuditEvent.class);
         AuditEvent expectedEvent = new AuditEvent();
+        expectedEvent.setCaseTypeId(CASE_TYPE);
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setId(321L);
+        auditEvent.setCaseReference(CASE_REFERENCE);
+        auditEvent.setEvent(expectedEvent);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
         when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
             .thenReturn(List.of(auditEvent));
-        when(auditEvent.getEvent(CASE_ID)).thenReturn(expectedEvent);
 
         List<AuditEvent> result = servicePersistenceClient.getCaseHistory(caseDetails);
 
         assertThat(result.size(), is(1));
-        assertThat(result.get(0), is(expectedEvent));
+        AuditEvent actualEvent = result.get(0);
+        assertAll(
+            () -> assertThat(actualEvent, is(expectedEvent)),
+            () -> assertThat(actualEvent.getId(), is(auditEvent.getId())),
+            () -> assertThat(actualEvent.getCaseDataId(), is(CASE_ID)),
+            () -> assertThat(actualEvent.getCaseTypeId(), is(CASE_TYPE))
+        );
     }
 
     @Test
     public void getCaseHistoryEvent_shouldReturnSingleAuditEvent() {
         Long eventId = 123L;
-        DecentralisedAuditEvent auditEvent = mock(DecentralisedAuditEvent.class);
         AuditEvent expectedEvent = new AuditEvent();
+        expectedEvent.setCaseTypeId(CASE_TYPE);
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setId(eventId);
+        auditEvent.setCaseReference(CASE_REFERENCE);
+        auditEvent.setEvent(expectedEvent);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
         when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
             .thenReturn(auditEvent);
-        when(auditEvent.getEvent(CASE_ID)).thenReturn(expectedEvent);
 
         AuditEvent result = servicePersistenceClient.getCaseHistoryEvent(caseDetails, eventId);
 
-        assertThat(result, is(expectedEvent));
+        assertAll(
+            () -> assertThat(result, is(expectedEvent)),
+            () -> assertThat(result.getId(), is(eventId)),
+            () -> assertThat(result.getCaseDataId(), is(CASE_ID)),
+            () -> assertThat(result.getCaseTypeId(), is(CASE_TYPE))
+        );
+    }
+
+    @Test
+    public void getCaseHistory_shouldThrowServiceException_whenAuditEventCaseReferenceDiffers() {
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setCaseReference(9999999999999999L);
+        auditEvent.setEvent(new AuditEvent());
+
+        when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
+        when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
+            .thenReturn(List.of(auditEvent));
+
+        assertThrows(ServiceException.class, () -> servicePersistenceClient.getCaseHistory(caseDetails));
+    }
+
+    @Test
+    public void getCaseHistory_shouldThrowServiceException_whenAuditEventCaseTypeDiffers() {
+        AuditEvent event = new AuditEvent();
+        event.setCaseTypeId("WrongCaseType");
+
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setCaseReference(CASE_REFERENCE);
+        auditEvent.setEvent(event);
+
+        when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
+        when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
+            .thenReturn(List.of(auditEvent));
+
+        assertThrows(ServiceException.class, () -> servicePersistenceClient.getCaseHistory(caseDetails));
+    }
+
+    @Test
+    public void getCaseHistoryEvent_shouldThrowServiceException_whenAuditEventCaseReferenceDiffers() {
+        Long eventId = 321L;
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setId(eventId);
+        auditEvent.setCaseReference(9999999999999999L);
+        AuditEvent event = new AuditEvent();
+        event.setCaseTypeId(CASE_TYPE);
+        auditEvent.setEvent(event);
+
+        when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
+        when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
+            .thenReturn(auditEvent);
+
+        assertThrows(ServiceException.class,
+            () -> servicePersistenceClient.getCaseHistoryEvent(caseDetails, eventId));
+    }
+
+    @Test
+    public void getCaseHistoryEvent_shouldThrowServiceException_whenAuditEventCaseTypeDiffers() {
+        Long eventId = 321L;
+        AuditEvent event = new AuditEvent();
+        event.setCaseTypeId("WrongCaseType");
+
+        DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
+        auditEvent.setId(eventId);
+        auditEvent.setCaseReference(CASE_REFERENCE);
+        auditEvent.setEvent(event);
+
+        when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
+        when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
+            .thenReturn(auditEvent);
+
+        assertThrows(ServiceException.class,
+            () -> servicePersistenceClient.getCaseHistoryEvent(caseDetails, eventId));
     }
 
     @Test

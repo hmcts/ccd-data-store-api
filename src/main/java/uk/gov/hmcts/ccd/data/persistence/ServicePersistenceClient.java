@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
@@ -105,13 +106,14 @@ public class ServicePersistenceClient {
         var uri = resolver.resolveUriOrThrow(caseDetails);
         return api.getCaseHistory(uri, caseDetails.getReference())
             .stream()
-            .map(x -> x.getEvent(caseDetails.getId()))
+            .map(auditEvent -> extractValidatedAuditEvent(caseDetails, auditEvent))
             .toList();
     }
 
     public AuditEvent getCaseHistoryEvent(CaseDetails caseDetails, Long eventId) {
         var uri = resolver.resolveUriOrThrow(caseDetails);
-        return api.getCaseHistoryEvent(uri, caseDetails.getReference(), eventId).getEvent(caseDetails.getId());
+        var auditEvent = api.getCaseHistoryEvent(uri, caseDetails.getReference(), eventId);
+        return extractValidatedAuditEvent(caseDetails, auditEvent);
     }
 
     public JsonNode updateSupplementaryData(Long caseRef, SupplementaryDataUpdateRequest supplementaryData) {
@@ -143,5 +145,25 @@ public class ServicePersistenceClient {
             throw new ServiceException("Downstream service returned mismatched case details for case reference "
                 + casePointer.getReference());
         }
+    }
+
+    private AuditEvent extractValidatedAuditEvent(CaseDetails casePointer, DecentralisedAuditEvent auditEvent) {
+        if (!Objects.equals(casePointer.getReference(), auditEvent.getCaseReference())) {
+            log.error("Downstream service returned audit event for case reference {} but CCD expected {}",
+                auditEvent.getCaseReference(), casePointer.getReference());
+            throw new ServiceException("Downstream service returned audit event for unexpected case reference "
+                + casePointer.getReference());
+        }
+
+        AuditEvent event = auditEvent.getEvent(casePointer.getId());
+
+        if (!Objects.equals(casePointer.getCaseTypeId(), event.getCaseTypeId())) {
+            log.error("Downstream service returned audit event for case type {} but CCD expected {}",
+                event.getCaseTypeId(), casePointer.getCaseTypeId());
+            throw new ServiceException("Downstream service returned audit event for unexpected case type "
+                + casePointer.getCaseTypeId());
+        }
+
+        return event;
     }
 }
