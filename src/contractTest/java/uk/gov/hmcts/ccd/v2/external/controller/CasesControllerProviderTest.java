@@ -9,11 +9,13 @@ import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,14 +47,17 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -87,6 +92,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -95,6 +101,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -175,9 +183,6 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     CallbackInvoker callbackInvoker;
 
     @MockBean
-    EventTokenService eventTokenServiceMock;
-
-    @MockBean
     ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @MockBean
@@ -192,6 +197,9 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @MockBean
     GlobalSearchProcessorService globalSearchProcessorService;
+
+    @MockBean
+    EventTokenService eventTokenService;
 
     @MockBean
     @Qualifier("default")
@@ -260,6 +268,13 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @MockBean
     SecurityClassificationServiceImpl securityClassificationService;
 
+    @MockBean
+    @Qualifier("authorised")
+    CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+
+    private final ObjectMapper mapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 
     @TestTemplate
     @ExtendWith(PactVerificationSpringProvider.class)
@@ -288,7 +303,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
-        when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
+        when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 
     @State("adoption-web makes request to get cases")
@@ -321,66 +336,121 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @State("A Submit for a Citizen is requested")
     public void probateSubmitForCitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap, "submit_for_citizen.json"), dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Get Case is requested"})
     public void toGetACase(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap, "read_caseworker.json"), dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
-        toGetACase(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,"read_citizen.json"), dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
-        toGetACase(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,"read_caseworker.json"), dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
-            .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
+        CaseDetails caseDetails;
+        long total = 1L;
+        if (isDivorce(dataMap)) {
+            caseDetails  = mockCaseDetailsResponse(getFileName(dataMap, "search_for_cases.json"), dataMap);
+            total = 123L;
+        } else {
+            caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        }
+        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()))
+            .thenReturn(new CaseSearchResult(total, Arrays.asList(caseDetails), null));
     }
 
     @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        CaseDetails caseDetails;
+        if (isDivorce(dataMap)) {
+            caseDetails  = mockCaseDetailsResponse(getFileName(dataMap, "search_cases_citizen.json"), dataMap);
+        } else {
+            caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        }
+
         when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
             .thenReturn(Arrays.asList(caseDetails));
     }
 
     @State({"A Start Event for a Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/start_event_caseworker.json", dataMap);
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,
+            "start_event_caseworker.json"), dataMap);
+        setUpCaseDetailsFromStateMapForEvent(dataMap);
+        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+            caseDetails.getReferenceAsString());
+    }
+
+    @State({"A Start Event for a Citizen is requested"})
+    public void toStartEventForACitizen(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = mockCaseDetailsResponse(getFileName(dataMap,
+            "start_event_citizen.json"), dataMap);
+        setUpCaseDetailsFromStateMapForEvent(dataMap);
         startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
             caseDetails.getReferenceAsString());
     }
 
     @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/read_caseworker.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap,"read_caseworker.json"), dataMap);
+        setUpSecurityContextForEvent(dataMap);
+    }
+
+    @State({"A Start for a Citizen is requested"})
+    public void startForCitizen(Map<String, Object> dataMap) {
+        mockCaseDetailsResponse(getFileName(dataMap, "start_citizen.json"), dataMap);
         setUpSecurityContextForEvent(dataMap);
     }
 
     @State({"A Submit Event for a Caseworker is requested"})
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/submit_event_caseworker.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap, "submit_event_caseworker.json"), dataMap);
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
+        createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+    }
+
+    @State({"A Submit Event for a Citizen is requested"})
+    public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
+        mockCaseDetailsResponse(getFileName(dataMap,"submit_event_citizen.json"), dataMap);
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
-        mockCaseDetailsResponse("mock_responses/submit_for_caseworker.json", dataMap);
+        mockCaseDetailsResponse(getFileName(dataMap,"submit_for_caseworker.json"), dataMap);
         setUpSecurityContextForEvent(dataMap);
+    }
+
+    @State({"A case has been submitted"})
+    public void caseHasBeenSubmitted(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = mockCaseDetailsResponse("mock_responses/ia_case_has_submitted.json", dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        setUpSecurityContextForEvent(dataMap);
+    }
+
+    @State({"user roles are requested"})
+    public void userRoleRequested(Map<String, Object> dataMap) {
+        CaseAssignedUserRole assignedUserRole = new CaseAssignedUserRole("1", "1234", "role");
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+            .thenReturn(List.of(assignedUserRole));
+        when(uidService.validateUID(anyString())).thenReturn(true);
     }
 
     private CaseDetails setUpCaseDetailsFromStateMap(Map<String, Object> dataMap) {
@@ -408,6 +478,26 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     }
 
+    private String getFileName(Map<String, Object> dataMap, String fileName) {
+        String newFileName = fileName;
+        if (isIA(dataMap)) {
+            newFileName = "ia_" + fileName;
+        } else if (isDivorce(dataMap)) {
+            newFileName = "divorce_" + fileName;
+        }
+        return "mock_responses/" + newFileName;
+    }
+
+    private static boolean isIA(Map<String, Object> dataMap) {
+        String jurisdiction =  StringUtils.defaultString((String) dataMap.get(JURISDICTION_ID), "");
+        return jurisdiction.equalsIgnoreCase("IA");
+    }
+
+    private static boolean isDivorce(Map<String, Object> dataMap) {
+        String jurisdiction =  StringUtils.defaultString((String) dataMap.get(JURISDICTION_ID), "");
+        return jurisdiction.equalsIgnoreCase("DIVORCE");
+    }
+
     private void setUpSecurityContextForEvent(Map<String, Object> dataMap) {
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
@@ -417,22 +507,22 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         securityUtils.setSecurityContextUserAsCaseworkerByCaseType(caseTypeId, caseworkerUsername, caseworkerPassword);
     }
 
-    private CaseDetails mockCaseDetails(String fileName) {
+    private CaseDetails convertToCaseDetails(String fileName) {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
             if (inputStream == null) {
                 log.error("File not found: {}", fileName);
                 return null;
             }
-            return new ObjectMapper().readValue(inputStream, CaseDetails.class);
+            return mapper.readValue(inputStream, CaseDetails.class);
         } catch (IOException e) {
             log.error("Error reading file {}: {}", fileName, e.getMessage());
             return null;
         }
     }
 
-    private void mockCaseDetailsResponse(String fileName,
+    private CaseDetails mockCaseDetailsResponse(String fileName,
                                          Map<String, Object> dataMap) {
-        CaseDetails caseDetails = mockCaseDetails(fileName);
+        CaseDetails caseDetails = convertToCaseDetails(fileName);
         when(submitCaseTransaction.submitCase(any(),
             any(),
             any(),
@@ -440,13 +530,14 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
             any(),
             any(),
             any())).thenReturn(caseDetails);
-        when(casePostStateService.evaluateCaseState(any(), any())).thenReturn("");
+        when(casePostStateService.evaluateCaseState(any(), any())).thenReturn(caseDetails.getState());
         when(timeToLiveService.isCaseTypeUsingTTL(any())).thenReturn(false);
         when(timeToLiveService.getUpdatedResolvedTTL(any())).thenReturn(LocalDate.now());
         when(timeToLiveService.updateCaseDetailsWithTTL(any(), any(), any())).thenReturn(caseDetails.getData());
         doNothing().when(caseLinkService).updateCaseLinks(any(), any());
         when(uidService.validateUID(anyString())).thenReturn(true);
         when(caseDetailsRepository.findUniqueCase(any(), any(), any())).thenReturn(caseDetails);
+        when(caseDetailsRepository.findByReference(anyLong())).thenReturn(caseDetails);
         when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.of(caseDetails));
         when(caseDetailsRepository.set(any())).thenReturn(caseDetails);
         when(eventTriggerService.isPreStateValid(any(), any())).thenReturn(true);
@@ -457,7 +548,11 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         when(securityClassificationService.getClassificationForEvent(any(), any()))
             .thenReturn(SecurityClassification.PUBLIC);
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
-        when(caseStateDefinition.getName()).thenReturn("Created");
+        if (isDivorce(dataMap)) {
+            when(caseStateDefinition.getName()).thenReturn(caseDetails.getState());
+        } else {
+            when(caseStateDefinition.getName()).thenReturn("Created");
+        }
         when(caseTypeService.findState(any(), any())).thenReturn(caseStateDefinition);
 
         CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
@@ -466,6 +561,8 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         when(caseTypeDefinition.getVersion()).thenReturn(version);
         when(caseTypeDefinition.getJurisdictionId()).thenReturn(caseDetails.getJurisdiction());
         when(caseTypeDefinition.getId()).thenReturn(caseDetails.getCaseTypeId());
+        JurisdictionDefinition jurisdictionDefinition = mock(JurisdictionDefinition.class);
+        when(caseTypeDefinition.getJurisdictionDefinition()).thenReturn(jurisdictionDefinition);
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         ResponseEntity responseEntity = ResponseEntity.ok(caseTypeDefinition);
         when(definitionStoreClient.invokeGetRequest(anyString(), eq(CaseTypeDefinition.class)))
@@ -491,5 +588,17 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
         when(userRepository.getUser()).thenReturn(user);
         when(globalSearchProcessorService.populateGlobalSearchData(isA(CaseTypeDefinition.class), anyMap()))
             .thenReturn(caseDetails.getData());
+
+        when(eventTokenService.generateToken(anyString(),
+            isA(CaseEventDefinition.class),
+            isA((JurisdictionDefinition.class)),
+            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+
+        when(eventTokenService.generateToken(anyString(),
+            isA(CaseDetails.class),
+            isA(CaseEventDefinition.class),
+            isA((JurisdictionDefinition.class)),
+            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+        return caseDetails;
     }
 }

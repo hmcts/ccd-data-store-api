@@ -22,9 +22,11 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.feign.FeignClientConfig;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -41,6 +43,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
+@Import({FeignClientConfig.class})
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
@@ -67,7 +70,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     public static final String CASE_01_TYPE = "TestAddressBookCase";
     public static final String CASE_02_TYPE = "TestAddressBookCase";
     public static final String CASE_03_TYPE = "TestAddressBookCase";
-    public static final int NUMBER_OF_CASES = 23;
+    public static final int NUMBER_OF_CASES = 25;
     public static final JSONObject responseJson1 = new JSONObject("""
         {
             "user_task": {
