@@ -21,6 +21,7 @@ Scenario: must return 200 and list of case data for the given case id
      Then a positive response is received,
       And the response [code is HTTP-200],
       And the response has all other details as expected,
+      # Clean up role assignment made above
       And a successful call [is made to remove Case Role] as in [F-054_Remove_Case_Assigned_User_role_for_Case].
 
 
@@ -116,6 +117,8 @@ Scenario: must return negative response HTTP-403 when request contains a non-ex
      Then a negative response is received,
       And the response [code is HTTP-403],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-054_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-566 @Ignore # Response code mismatch, expected: 400, actual: 200 / RDM-7066
@@ -181,5 +184,7 @@ Scenario: must return negative response HTTP-403 when request contains a malfor
      Then a negative response is received,
       And the response [code is HTTP-403],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-054_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

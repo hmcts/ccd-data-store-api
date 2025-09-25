@@ -21,8 +21,6 @@ Scenario: must create case successfully and return positive response HTTP-201 f
       And the response [code is HTTP-201],
       And the response has all other details as expected,
         # Clean up role assignment made above
-        # This is needed as the case created above will have a Case Role assigned to the user who created the case
-        # Fails at the moment as case_id is null
       And a successful call [is made to remove Case Role] as in [F-053_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
