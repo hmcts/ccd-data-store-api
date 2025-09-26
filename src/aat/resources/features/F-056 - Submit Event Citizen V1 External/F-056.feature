@@ -70,6 +70,8 @@ Scenario: must return 201 when start event creation process for appropriate inpu
      Then a positive response is received,
       And the response [includes the case detail for the updated case, along with a HTTP 200 OK],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-056_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-584
