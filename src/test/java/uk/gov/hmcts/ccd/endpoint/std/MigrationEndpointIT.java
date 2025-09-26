@@ -287,7 +287,7 @@ class MigrationEndpointIT extends WireMockBaseTest {
             verify(auditRepository).save(captor.capture());
 
             assertEquals(AuditOperationType.MIGRATION.getLabel(), captor.getValue().getOperationType());
-            assertEquals(caseDataId.toString(), captor.getValue().getCaseId());
+            assertEquals(caseDataId, captor.getValue().getCaseId());
             assertEquals(CASE_TYPE_ID, captor.getValue().getCaseType());
             assertEquals(PROBATE_JURISDICTION_ID, captor.getValue().getJurisdiction());
         }

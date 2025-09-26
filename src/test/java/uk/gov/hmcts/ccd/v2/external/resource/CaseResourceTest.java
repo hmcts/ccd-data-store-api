@@ -67,7 +67,7 @@ class CaseResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
@@ -110,7 +110,7 @@ class CaseResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
@@ -155,7 +155,7 @@ class CaseResourceTest {
                             IGNORE_WARNING);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),

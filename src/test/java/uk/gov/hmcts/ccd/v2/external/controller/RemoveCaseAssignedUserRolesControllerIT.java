@@ -139,7 +139,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
-            new CaseAssignedUserRoleWithOrganisation(INVALID_CASE_ID.toString(), userId, CASE_ROLE_1)
+            new CaseAssignedUserRoleWithOrganisation(INVALID_CASE_ID, userId, CASE_ROLE_1)
         );
 
         // ACT

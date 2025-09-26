@@ -85,12 +85,12 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString()))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE))
             .thenReturn(Optional.of(caseDetails));
         when(userRepository.getUserId()).thenReturn(IDAM_ID);
         when(caseUserRepository.findCaseRoles(CASE_ID, IDAM_ID)).thenReturn(caseRoles);
         Set<AccessProfile> accessProfileList =
-            instance.generateAccessProfilesByCaseReference(CASE_REFERENCE.toString());
+            instance.generateAccessProfilesByCaseReference(CASE_REFERENCE);
         assertEquals(2, accessProfileList.size());
     }
 
@@ -100,7 +100,7 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE)).thenReturn(Optional.empty());
         when(caseDetailsRepository.findById(null, CASE_ID))
             .thenReturn(Optional.of(caseDetails));
         when(userRepository.getUserId()).thenReturn(IDAM_ID);
@@ -112,7 +112,7 @@ class RoleBasedCaseDataAccessControlTest {
     @Test
     @DisplayName("should throw exception when case reference or case id is invalid")
     void shouldThrowException() {
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE)).thenReturn(Optional.empty());
         when(caseDetailsRepository.findById(null, CASE_ID))
             .thenReturn(Optional.empty());
         when(userRepository.getUserId()).thenReturn(IDAM_ID);

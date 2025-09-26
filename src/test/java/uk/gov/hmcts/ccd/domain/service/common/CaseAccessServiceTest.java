@@ -424,7 +424,7 @@ class CaseAccessServiceTest {
             void shouldReturnCaseIdsForAccessControlForSolicitor() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
                 when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                    caseReferences.stream().map(element -> element).collect(Collectors.toList())
                 );
                 Optional<List<String>> result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
@@ -443,7 +443,7 @@ class CaseAccessServiceTest {
             void shouldReturnCaseIdsForAccessControlForCaseWorker() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
                 when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                    caseReferences.stream().map(element -> element).collect(Collectors.toList())
                 );
                 Optional<List<String>> result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
@@ -475,7 +475,7 @@ class CaseAccessServiceTest {
             void  shouldReturnCaseIds() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
                 when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                    caseReferences.stream().map(element -> element).collect(Collectors.toList())
                 );
                 final var result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
@@ -501,7 +501,7 @@ class CaseAccessServiceTest {
             void shouldReturnCaseIds() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
                 when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
-                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                    caseReferences.stream().map(element -> element).collect(Collectors.toList())
                 );
                 final var result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);

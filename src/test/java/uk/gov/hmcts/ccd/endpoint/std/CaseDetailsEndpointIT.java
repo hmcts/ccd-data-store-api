@@ -272,7 +272,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2039,7 +2039,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2149,7 +2149,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2338,7 +2338,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2411,7 +2411,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2481,7 +2481,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2552,7 +2552,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2699,7 +2699,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2735,7 +2735,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2771,7 +2771,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2817,7 +2817,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2866,7 +2866,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2903,7 +2903,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2940,7 +2940,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2977,7 +2977,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3013,7 +3013,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3049,7 +3049,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3083,7 +3083,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3117,7 +3117,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3262,7 +3262,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3313,7 +3313,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -4287,7 +4287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -4373,7 +4373,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -5815,7 +5815,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -5927,7 +5927,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -6062,7 +6062,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);

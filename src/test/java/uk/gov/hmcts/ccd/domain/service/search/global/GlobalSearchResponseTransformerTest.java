@@ -315,7 +315,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // THEN
         assertThat(actualResult)
             .isNotNull()
-            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE));
     }
 
     @Test
@@ -335,7 +335,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // THEN
         assertThat(actualResult)
             .isNotNull()
-            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE));
     }
 
     @ParameterizedTest

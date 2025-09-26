@@ -119,7 +119,7 @@ class CaseEventMessageServiceTest {
 
     private MessageInformation buildMessageInformation() {
         final MessageInformation msgInfo = new MessageInformation();
-        msgInfo.setCaseId(caseDetails.getReference().toString());
+        msgInfo.setCaseId(caseDetails.getReference());
         msgInfo.setJurisdictionId(caseDetails.getJurisdiction());
         msgInfo.setCaseTypeId(caseDetails.getCaseTypeId());
         msgInfo.setEventInstanceId(EVENT_INSTANCE_ID);

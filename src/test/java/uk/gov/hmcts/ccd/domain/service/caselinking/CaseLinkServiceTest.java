@@ -61,7 +61,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             when(caseLinkRepository.findAllByCaseReference(CASE_REFERENCE)).thenReturn(Collections.emptyList());
 
             // WHEN
-            final List<CaseLink> result = caseLinkService.findCaseLinks(CASE_REFERENCE.toString());
+            final List<CaseLink> result = caseLinkService.findCaseLinks(CASE_REFERENCE);
 
             // THEN
             assertTrue(result.isEmpty());
@@ -97,7 +97,7 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             setupMockForCaseDetailsRepositoryFindById(LINKED_CASE_DATA_ID_04, LINKED_CASE_REFERENCE_04);
 
             // WHEN
-            final List<CaseLink> result = caseLinkService.findCaseLinks(CASE_REFERENCE.toString());
+            final List<CaseLink> result = caseLinkService.findCaseLinks(CASE_REFERENCE);
 
             // THEN
             assertEquals(4, result.size());

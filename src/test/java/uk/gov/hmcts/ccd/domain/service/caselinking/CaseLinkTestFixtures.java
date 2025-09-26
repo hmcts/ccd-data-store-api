@@ -60,7 +60,7 @@ public abstract class CaseLinkTestFixtures {
                                   String expectedLinkedCaseReference,
                                   boolean expectedStandardCaseLinkFlag) {
         CaseLink actualCaseLink = results.stream()
-            .filter(caseLink -> expectedLinkedCaseReference.equals(caseLink.getLinkedCaseReference().toString()))
+            .filter(caseLink -> expectedLinkedCaseReference.equals(caseLink.getLinkedCaseReference()))
             .findAny().orElse(null);
 
         assertCaseLink(actualCaseLink, expectedLinkedCaseReference, expectedStandardCaseLinkFlag);
@@ -73,7 +73,7 @@ public abstract class CaseLinkTestFixtures {
 
         assertEquals(CASE_REFERENCE, actualCaseLink.getCaseReference());
 
-        assertEquals(expectedLinkedCaseReference, actualCaseLink.getLinkedCaseReference().toString());
+        assertEquals(expectedLinkedCaseReference, actualCaseLink.getLinkedCaseReference());
         assertEquals(expectedStandardCaseLinkFlag, actualCaseLink.getStandardLink());
     }
 
