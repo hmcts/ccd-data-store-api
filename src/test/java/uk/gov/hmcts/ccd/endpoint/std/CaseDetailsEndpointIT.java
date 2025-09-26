@@ -518,7 +518,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(messageQueueList.get(0).getMessageInformation().findPath("NewStateId").toString(),
             containsString(savedCaseDetails.getState()));
         assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventInstanceId").toString(),
-            containsString(caseAuditEvent.getId().toString()));
+            containsString(caseAuditEvent.getId()));
         assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("PreviousStateId").toString());
         assertThat(messageQueueList.get(0).getId(), equalTo("1"));
         assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
