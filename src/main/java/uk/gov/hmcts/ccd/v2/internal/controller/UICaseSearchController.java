@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
@@ -59,6 +60,7 @@ public class UICaseSearchController {
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
     private final ElasticsearchSortService elasticsearchSortService;
+    private final ServicePersistenceClient servicePersistenceClient;
 
     @Autowired
     @SuppressWarnings("checkstyle:LineLength") //don't want to break message
@@ -67,11 +69,13 @@ public class UICaseSearchController {
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
-        ElasticsearchSortService elasticsearchSortService) {
+        ElasticsearchSortService elasticsearchSortService,
+        ServicePersistenceClient servicePersistenceClient) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
         this.elasticsearchSortService = elasticsearchSortService;
+        this.servicePersistenceClient = servicePersistenceClient;
     }
 
     @PostMapping(path = "")
@@ -150,6 +154,8 @@ public class UICaseSearchController {
                                      @RequestParam(value = "use_case", required = false) final String useCase,
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
+
+        servicePersistenceClient.customSearchCases();
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())

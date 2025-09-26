@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -108,6 +109,10 @@ public class ServicePersistenceClient {
     public JsonNode updateSupplementaryData(Long caseRef, SupplementaryDataUpdateRequest supplementaryData) {
         var uri = resolver.resolveUriOrThrow(caseRef);
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
+    }
+
+    public void customSearchCases() {
+        api.customSearchCases(URI.create("http://localhost:3206"));
     }
 
     private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {

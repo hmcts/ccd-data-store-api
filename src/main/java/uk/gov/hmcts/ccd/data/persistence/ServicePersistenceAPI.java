@@ -67,4 +67,9 @@ interface ServicePersistenceAPI {
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
                                    @PathVariable("case-ref") Long caseReference,
                                    @PathVariable("event-id") Long eventId);
+
+    @PostMapping(value = "/customSearchCases",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    DecentralisedSubmitEventResponse customSearchCases(URI baseURI);
 }
