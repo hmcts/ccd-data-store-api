@@ -737,7 +737,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByReferenceWithoutJurisdiction() {
-        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE);
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
@@ -748,7 +748,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByReferenceWithNoAccessControl() {
         final Optional<CaseDetails> maybeCase =
-            caseDetailsRepository.findByReferenceWithNoAccessControl(REFERENCE.toString());
+            caseDetailsRepository.findByReferenceWithNoAccessControl(REFERENCE);
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
@@ -772,7 +772,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // THEN
         assertEquals(1, results.size());
-        assertCaseDetails(results.get(0), CASE_01_ID.toString(), JURISDICTION, CASE_01_REFERENCE);
+        assertCaseDetails(results.get(0), CASE_01_ID, JURISDICTION, CASE_01_REFERENCE);
     }
 
     @Test
@@ -811,7 +811,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // THEN
         assertEquals(1, results.size());
-        assertCaseDetails(results.get(0), CASE_03_ID.toString(), JURISDICTION, CASE_03_REFERENCE);
+        assertCaseDetails(results.get(0), CASE_03_ID, JURISDICTION, CASE_03_REFERENCE);
     }
 
     @Test

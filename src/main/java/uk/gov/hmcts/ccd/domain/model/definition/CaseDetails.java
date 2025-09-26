@@ -134,7 +134,7 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public String getReferenceAsString() {
-        return reference != null ? reference.toString() : null;
+        return reference != null ? reference : null;
     }
 
     @JsonSetter("id")

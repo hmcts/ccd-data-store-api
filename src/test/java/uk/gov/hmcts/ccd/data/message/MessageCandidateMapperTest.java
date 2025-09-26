@@ -85,7 +85,7 @@ class MessageCandidateMapperTest {
 
         final MessageInformation messageInformation = new MessageInformation();
 
-        messageInformation.setCaseId(CASE_DATA_ID.toString());
+        messageInformation.setCaseId(CASE_DATA_ID);
         messageInformation.setJurisdictionId(JURISDICTION);
         messageInformation.setCaseTypeId(CASE_TYPE_ID);
         messageInformation.setEventInstanceId(EVENT_INSTNACE_ID);

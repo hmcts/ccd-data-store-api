@@ -80,7 +80,7 @@ public class CaseAuditEventMapperTest {
         significantItem.setType(SignificantItemType.DOCUMENT.name());
         auditEvent.setSignificantItem(significantItem);
         auditEvent.setSecurityClassification(SecurityClassification.PUBLIC);
-        auditEvent.setCaseDataId(CASE_DATA_ID.toString());
+        auditEvent.setCaseDataId(CASE_DATA_ID);
         auditEvent.setCaseTypeId(CASE_TYPE_ID);
         auditEvent.setEventName(EVENT_NAME);
         auditEvent.setStateName(STATE_NAME);
