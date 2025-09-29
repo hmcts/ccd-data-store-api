@@ -71,5 +71,5 @@ interface ServicePersistenceAPI {
     @PostMapping(value = "/customSearchCases",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedSubmitEventResponse customSearchCases(URI baseURI);
+    DecentralisedSubmitEventResponse customSearchCases(URI baseURI, @RequestBody String json);
 }

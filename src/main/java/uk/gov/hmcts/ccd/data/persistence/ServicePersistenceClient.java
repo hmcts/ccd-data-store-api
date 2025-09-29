@@ -111,8 +111,8 @@ public class ServicePersistenceClient {
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }
 
-    public void customSearchCases() {
-        api.customSearchCases(URI.create("http://localhost:3206"));
+    public void customSearchCases(String caseTypeId, String jsonSearchRequest) {
+        api.customSearchCases(URI.create("http://localhost:3206"), jsonSearchRequest);
     }
 
     private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {
