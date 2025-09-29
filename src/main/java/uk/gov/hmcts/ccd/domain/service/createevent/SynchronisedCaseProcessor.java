@@ -52,7 +52,7 @@ public class SynchronisedCaseProcessor {
             .getSingleResult();
         log.debug("Lock acquired for case reference {}", caseDetails.getReference());
 
-        if (decentralisedCase.getVersion() > currentVersion) {
+        if (decentralisedCase.getRevision() > currentVersion) {
             log.info("Executing update for case {}, new version {}. Current version is {}.",
                 caseDetails.getReference(), caseDetails.getVersion(), currentVersion);
 
@@ -60,13 +60,13 @@ public class SynchronisedCaseProcessor {
 
             em.createQuery(
                     "UPDATE CaseDetailsEntity SET version = :newVersion WHERE reference = :ref")
-                .setParameter("newVersion", decentralisedCase.getVersion().intValue())
+                .setParameter("newVersion", decentralisedCase.getRevision().intValue())
                 .setParameter("ref", caseDetails.getReference())
                 .executeUpdate();
         } else {
             log.debug("Skipping update for case {} because decentralised version {} is not greater than current {}",
                 caseDetails.getReference(),
-                decentralisedCase.getVersion(),
+                decentralisedCase.getRevision(),
                 currentVersion);
         }
     }

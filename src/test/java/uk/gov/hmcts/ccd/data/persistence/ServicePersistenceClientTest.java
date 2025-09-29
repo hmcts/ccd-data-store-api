@@ -111,7 +111,7 @@ public class ServicePersistenceClientTest {
     private DecentralisedCaseDetails createDecentralisedCaseDetails() {
         DecentralisedCaseDetails details = new DecentralisedCaseDetails();
         details.setCaseDetails(caseDetails);
-        details.setVersion(1L);
+        details.setRevision(1L);
         return details;
     }
 
@@ -297,7 +297,7 @@ public class ServicePersistenceClientTest {
 
         DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
-        mismatchedDecentralisedCaseDetails.setVersion(1L);
+        mismatchedDecentralisedCaseDetails.setRevision(1L);
 
         DecentralisedSubmitEventResponse mismatchedResponse = new DecentralisedSubmitEventResponse();
         mismatchedResponse.setCaseDetails(mismatchedDecentralisedCaseDetails);
@@ -323,7 +323,7 @@ public class ServicePersistenceClientTest {
 
         DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
-        mismatchedDecentralisedCaseDetails.setVersion(1L);
+        mismatchedDecentralisedCaseDetails.setRevision(1L);
 
         DecentralisedSubmitEventResponse mismatchedResponse = new DecentralisedSubmitEventResponse();
         mismatchedResponse.setCaseDetails(mismatchedDecentralisedCaseDetails);

@@ -47,7 +47,7 @@ class DecentralisedCreateCaseEventServiceTest {
         CaseDetails returnedDetails = new CaseDetails();
         returnedDetails.setId("2000");
         decentralisedResponse.setCaseDetails(returnedDetails);
-        decentralisedResponse.setVersion(1L);
+        decentralisedResponse.setRevision(1L);
 
         when(servicePersistenceClient.createEvent(any(DecentralisedCaseEvent.class)))
             .thenReturn(decentralisedResponse);

@@ -99,7 +99,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
 
         DecentralisedCaseDetails decentralisedCaseDetails = new DecentralisedCaseDetails();
         decentralisedCaseDetails.setCaseDetails(caseDetails);
-        decentralisedCaseDetails.setVersion(version);
+        decentralisedCaseDetails.setRevision(version);
         return decentralisedCaseDetails;
     }
 

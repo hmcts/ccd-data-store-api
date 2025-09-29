@@ -105,22 +105,20 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
                 "errors": [],
                 "warnings": [],
                 "case_details": {
-                    "case_details": {
-                        "id": {{jsonPath request.body '$.case_details.id'}},
-                        "case_type_id": "{{jsonPath request.body '$.case_details.case_type_id'}}",
-                        "jurisdiction": "{{jsonPath request.body '$.case_details.jurisdiction'}}",
-                        "state": "{{jsonPath request.body '$.case_details.state'}}",
-                        "security_classification": "PUBLIC",
-                        "case_data": {
-                          "PersonLastName": "Last Name",
-                          "PersonAddress": {
-                            "AddressLine1": "Address Line 1",
-                            "AddressLine2": "Address Line 2"
-                          }
-                        }
-                    },
-                    "version": 1
-                }
+                    "id": {{jsonPath request.body '$.case_details.id'}},
+                    "case_type_id": "{{jsonPath request.body '$.case_details.case_type_id'}}",
+                    "jurisdiction": "{{jsonPath request.body '$.case_details.jurisdiction'}}",
+                    "state": "{{jsonPath request.body '$.case_details.state'}}",
+                    "security_classification": "PUBLIC",
+                    "case_data": {
+                      "PersonLastName": "Last Name",
+                      "PersonAddress": {
+                        "AddressLine1": "Address Line 1",
+                        "AddressLine2": "Address Line 2"
+                      }
+                    }
+                },
+                "revision": 1
             }
             """;
 
@@ -197,7 +195,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
                             }
                         }
                     },
-                    "version": 1
+                    "revision": 1
                 }
             ]
             """;

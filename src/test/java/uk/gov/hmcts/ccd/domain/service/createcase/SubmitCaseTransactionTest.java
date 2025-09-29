@@ -217,7 +217,7 @@ class SubmitCaseTransactionTest {
         // Setup DecentralisedCaseDetails mock
         savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
-        savedDecentralisedCaseDetails.setVersion(1L);
+        savedDecentralisedCaseDetails.setRevision(1L);
 
         doAnswer(invocation -> {
             DecentralisedCaseDetails responseDetails = invocation.getArgument(0);

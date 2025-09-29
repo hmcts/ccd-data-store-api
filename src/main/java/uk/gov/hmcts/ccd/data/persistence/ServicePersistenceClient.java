@@ -46,6 +46,7 @@ public class ServicePersistenceClient {
 
         validateCaseDetails(casePointer, first);
         var returnedCaseDetails = first.getCaseDetails();
+        returnedCaseDetails.setRevision(first.getRevision());
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
         returnedCaseDetails.setId(casePointer.getId());
@@ -97,6 +98,8 @@ public class ServicePersistenceClient {
 
         validateCaseDetails(casePointer, details);
 
+        details.getCaseDetails().setRevision(details.getRevision());
+
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
         details.getCaseDetails().setId(casePointer.getId());
         return details;
@@ -122,8 +125,8 @@ public class ServicePersistenceClient {
     }
 
     private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {
-        if (details.getVersion() == null) {
-            throw new ServiceException("Downstream service failed to return a version for case reference "
+        if (details.getRevision() == null) {
+            throw new ServiceException("Downstream service failed to return a revision for case reference "
                 + casePointer.getReference());
         }
         var returnedCaseDetails = details.getCaseDetails();

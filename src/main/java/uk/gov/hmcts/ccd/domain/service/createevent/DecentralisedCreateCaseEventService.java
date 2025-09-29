@@ -45,12 +45,21 @@ public class DecentralisedCreateCaseEventService {
                 .proxiedByLastName(onBehalfOfUser.getSurname());
         }
 
+        Long startRevision = caseDetails.getRevision();
+        Long mergeRevision = caseDetailsBefore
+            .map(CaseDetails::getRevision)
+            .orElse(null);
+
+        caseDetails.setRevision(mergeRevision);
+
         DecentralisedCaseEvent decentralisedCaseEvent = DecentralisedCaseEvent.builder()
                 .caseDetailsBefore(caseDetailsBefore.orElse(null))
                 .caseDetails(caseDetails)
                 .eventDetails(eventDetails.build())
                 .resolvedTtl(caseDetails.getResolvedTTL())
                 .internalCaseId(Long.valueOf(caseDetails.getId()))
+                .startRevision(startRevision)
+                .mergeRevision(mergeRevision)
                 .build();
 
         try {

@@ -27,4 +27,14 @@ public class DecentralisedCaseEvent {
      * We provide it here since the existing CaseDetails type by design omits it.
      */
     private Long internalCaseId;
+
+    /**
+     * Revision recorded when the user started the event (from the start-event token).
+     */
+    private Long startRevision;
+
+    /**
+     * Revision of the case that CCD merged updates into immediately before submission.
+     */
+    private Long mergeRevision;
 }

@@ -11,5 +11,5 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 @JsonIgnoreProperties(ignoreUnknown = true) // For forwards compatibility with future fields
 public class DecentralisedCaseDetails {
     private CaseDetails caseDetails;
-    private Long version;
+    private Long revision;
 }

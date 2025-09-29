@@ -202,6 +202,7 @@ public class CreateCaseEventService {
         updateCaseDetailsWithTtlIncrement(caseDetails, caseTypeDefinition, caseEventDefinition);
 
         final CaseDetails caseDetailsInDatabase = caseService.clone(caseDetails);
+        final boolean isDecentralisedCase = resolver.isDecentralised(caseDetailsInDatabase);
         final String uid = userAuthorisation.getUserId();
 
         eventTokenService.validateToken(content.getToken(),
@@ -209,7 +210,8 @@ public class CreateCaseEventService {
             caseDetails,
             caseEventDefinition,
             caseTypeDefinition.getJurisdictionDefinition(),
-            caseTypeDefinition);
+            caseTypeDefinition,
+            isDecentralisedCase);
 
         validatePreState(caseDetails, caseEventDefinition);
 
@@ -267,7 +269,7 @@ public class CreateCaseEventService {
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
         var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
         CaseDetails finalCaseDetails;
-        if (resolver.isDecentralised(caseDetailsInDatabase)) {
+        if (isDecentralisedCase) {
             // Documents must be attached before the event is committed.
             // When decentralised we must do the attach before the event is submitted to the decentralised service.
             caseDocumentService.attachCaseDocuments(
