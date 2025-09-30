@@ -74,7 +74,7 @@ public class CaseAuditEventEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     @Column(name = "user_id")
     private String userId;
     @Column(name = "user_last_name")
@@ -90,7 +90,7 @@ public class CaseAuditEventEntity {
     @Column(name = "description")
     private String description;
     @Column(name = "case_data_id")
-    private Long caseDataId;
+    private String caseDataId;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
     @Column(name = "state_id")

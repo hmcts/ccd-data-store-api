@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 @DisplayName("CaseResource")
 class CaseResourceTest {
-    private static final Long REFERENCE = 1234123412341238L;
+    private static final String REFERENCE = "1234123412341238";
     private static final Boolean IGNORE_WARNING = true;
     private static final LocalDateTime CREATED_ON = LocalDateTime.now();
     private static final LocalDateTime LAST_MODIFIED_ON = LocalDateTime.now();
@@ -67,7 +67,7 @@ class CaseResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
@@ -110,7 +110,7 @@ class CaseResourceTest {
                     new uk.gov.hmcts.ccd.v2.external.resource.CaseResource(caseDetails, caseDataContent);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),
@@ -155,7 +155,7 @@ class CaseResourceTest {
                             IGNORE_WARNING);
 
             assertAll(
-                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE.toString())),
+                () -> assertThat(caseResource.getReference(), equalTo(REFERENCE)),
                 () -> assertThat(caseResource.getCreatedOn(), equalTo(CREATED_ON)),
                 () -> assertThat(caseResource.getLastModifiedOn(), equalTo(LAST_MODIFIED_ON)),
                 () -> assertThat(caseResource.getJurisdiction(), equalTo(JURISDICTION)),

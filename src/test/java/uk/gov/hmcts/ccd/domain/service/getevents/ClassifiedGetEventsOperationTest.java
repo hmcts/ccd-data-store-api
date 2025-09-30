@@ -34,7 +34,7 @@ class ClassifiedGetEventsOperationTest {
     private static final String CASE_REFERENCE = "999999";
     private static final String CASE_REFERENCE_INVALID = "9999991";
     private static final String CASE_REFERENCE_INVALID_NULL = "9999992";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
 
     @Mock
     private GetEventsOperation getEventsOperation;
@@ -56,7 +56,7 @@ class ClassifiedGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
-        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setJurisdiction(JURISDICTION_ID);
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
         event = new AuditEvent();

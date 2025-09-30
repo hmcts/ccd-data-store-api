@@ -31,9 +31,9 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     private static final String COUNT_CASE_USERS =
         "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
-    private static final Long CASE_ID = 1L;
-    private static final Long CASE_ID_GRANTED = 2L;
-    private static final Long CASE_ID_3 = 3L;
+    private static final String CASE_ID = "1";
+    private static final String CASE_ID_GRANTED = "2";
+    private static final String CASE_ID_3 = "3";
     private static final String USER_ID = "89000";
     private static final String USER_ID_GRANTED = "89001";
     private static final String USER_ID_CLAIMANT = "89002";
@@ -90,7 +90,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldFindCasesUserIdHasAccessTo() {
-        List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
+        List<String> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
 
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CASE_ID));
@@ -101,11 +101,11 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
     }
 
-    private Integer countAccesses(Long caseId, String userId) {
+    private Integer countAccesses(String caseId, String userId) {
         return countAccesses(caseId, userId, GlobalCaseRole.CREATOR.getRole());
     }
 
-    private Integer countAccesses(Long caseId, String userId, String role) {
+    private Integer countAccesses(String caseId, String userId, String role) {
         em.flush();
 
         final Object[] parameters = new Object[]{

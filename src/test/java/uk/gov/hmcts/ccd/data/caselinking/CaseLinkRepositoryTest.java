@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.lang.Long.parseLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,17 +30,17 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     private CaseLinkEntity caseLinkEntity;
 
-    private final Map<Long, Long> caseLinkIdToReferenceMap = new HashMap<>();
+    private final Map<String, String> caseLinkIdToReferenceMap = new HashMap<>();
 
     @BeforeEach
     void setup() {
         caseLinkEntity = new CaseLinkEntity(CASE_13_ID, CASE_14_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
-        caseLinkIdToReferenceMap.put(CASE_02_ID, parseLong(CASE_02_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_03_ID, parseLong(CASE_03_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_04_ID, parseLong(CASE_04_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_13_ID, parseLong(CASE_13_REFERENCE));
-        caseLinkIdToReferenceMap.put(CASE_14_ID, parseLong(CASE_14_REFERENCE));
+        caseLinkIdToReferenceMap.put(CASE_02_ID, CASE_02_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_03_ID, CASE_03_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_04_ID, CASE_04_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_13_ID, CASE_13_REFERENCE);
+        caseLinkIdToReferenceMap.put(CASE_14_ID, CASE_14_REFERENCE);
     }
 
     @Test
@@ -118,7 +117,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testSaveFailsIfCaseIdDoesNotExist() {
 
         // WHEN
-        caseLinkEntity = new CaseLinkEntity(1003L, CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+        caseLinkEntity = new CaseLinkEntity("1003", CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         // THEN
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
@@ -129,7 +128,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testSaveFailsIfLinkedCaseIdDoesNotExist() {
 
         // WHEN
-        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, 999L, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
+        caseLinkEntity = new CaseLinkEntity(CASE_01_ID, "999", TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK);
 
         // THEN
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
@@ -150,7 +149,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         // WHEN
         int deletedCount = caseLinkRepository.deleteAllByCaseReference(
-            parseLong(CASE_01_REFERENCE)
+            CASE_01_REFERENCE
         );
 
         // THEN
@@ -174,8 +173,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         assertFalse(caseLinkRepository.findById(pk).isPresent());
 
         // WHEN
-        caseLinkRepository.insertUsingCaseReferences(parseLong(CASE_19_REFERENCE),
-                                                     parseLong(CASE_21_REFERENCE),
+        caseLinkRepository.insertUsingCaseReferences(CASE_19_REFERENCE,
+                                                     CASE_21_REFERENCE,
                                                      NON_STANDARD_LINK);
 
         // THEN
@@ -192,7 +191,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testFindAllByCaseReference() {
 
         // GIVEN
-        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
+        final List<String> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
             new CaseLinkEntity(CASE_01_ID, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
@@ -202,7 +201,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         caseLinkRepository.saveAll(caseLinkEntities);
 
-        long caseReference = parseLong(CASE_01_REFERENCE);
+        String caseReference = CASE_01_REFERENCE;
 
         // WHEN
         final List<CaseLinkEntity> allByCaseReference = caseLinkRepository.findAllByCaseReference(caseReference);
@@ -210,7 +209,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         // THEN
         assertEquals(caseLinkEntities.size(), allByCaseReference.size());
 
-        final List<Long> foundLinkedCaseIds = allByCaseReference.stream()
+        final List<String> foundLinkedCaseIds = allByCaseReference.stream()
             .filter(caseLinkEntity -> caseLinkEntity.getCaseTypeId().equals(TEST_ADDRESS_BOOK_CASE)
                 && caseLinkEntity.getCaseLinkPrimaryKey().getCaseId().equals(CASE_01_ID))
             .map(cle -> cle.getCaseLinkPrimaryKey().getLinkedCaseId())
@@ -224,7 +223,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testFindCaseReferencesByLinkedCaseReferenceAndStandardLinkTrue() {
 
         // GIVEN
-        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
+        final List<String> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
             new CaseLinkEntity(linkedCaseIds.get(0), CASE_01_ID, TEST_ADDRESS_BOOK_CASE, STANDARD_LINK),
@@ -235,8 +234,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         caseLinkRepository.saveAll(caseLinkEntities);
 
         // WHEN
-        final List<Long> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
-            parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+        final List<String> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+            CASE_01_REFERENCE, STANDARD_LINK);
 
         // THEN
         assertEquals(caseLinkEntities.size(), caseReferences.size());
@@ -250,7 +249,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testFindCaseReferencesByLinkedCaseReferenceAndStandardLinkFalse() {
 
         // GIVEN
-        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
+        final List<String> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
             new CaseLinkEntity(linkedCaseIds.get(0), CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
@@ -261,8 +260,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         caseLinkRepository.saveAll(caseLinkEntities);
 
         // WHEN
-        final List<Long> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
-            parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+        final List<String> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+            CASE_01_REFERENCE, STANDARD_LINK);
 
         // THEN
         assertEquals(0, caseReferences.size());
@@ -273,7 +272,7 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
     void testFindCaseReferencesByLinkedCaseReferenceAndStandardLink() {
 
         // GIVEN
-        final List<Long> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID, CASE_13_ID, CASE_14_ID);
+        final List<String> linkedCaseIds = List.of(CASE_02_ID, CASE_03_ID, CASE_04_ID, CASE_13_ID, CASE_14_ID);
 
         final List<CaseLinkEntity> caseLinkEntities = List.of(
             new CaseLinkEntity(linkedCaseIds.get(0), CASE_01_ID, TEST_ADDRESS_BOOK_CASE, NON_STANDARD_LINK),
@@ -286,8 +285,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         caseLinkRepository.saveAll(caseLinkEntities);
 
         // WHEN
-        final List<Long> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
-            parseLong(CASE_01_REFERENCE), STANDARD_LINK);
+        final List<String> caseReferences = caseLinkRepository.findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+            CASE_01_REFERENCE, STANDARD_LINK);
 
         // THEN
         // assert only find the two that use STANDARD_LINK

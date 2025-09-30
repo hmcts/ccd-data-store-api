@@ -4,5 +4,5 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 
 public interface GetCaseHistoryViewOperation {
 
-    CaseHistoryView execute(String caseReference, Long eventId);
+    CaseHistoryView execute(String caseReference, String eventId);
 }

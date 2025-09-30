@@ -32,7 +32,7 @@ class RoleBasedCaseDataAccessControlTest {
     private static final String IDAM_ID = "23";
     private static final String CASE_ID = "45677";
     private final List<String> caseRoles = asList("[CASE_ROLE_1]", "[CASE_ROLE_2]");
-    private static final Long CASE_REFERENCE = 1234123412341234L;
+    private static final String CASE_REFERENCE = "1234123412341234";
 
 
     @Mock
@@ -64,7 +64,7 @@ class RoleBasedCaseDataAccessControlTest {
 
         instance.grantAccess(caseDetails, IDAM_ID);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(CASE_ID, IDAM_ID, CREATOR.getRole());
     }
 
     @Test
@@ -85,12 +85,12 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString()))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE))
             .thenReturn(Optional.of(caseDetails));
         when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(caseUserRepository.findCaseRoles(CASE_ID, IDAM_ID)).thenReturn(caseRoles);
         Set<AccessProfile> accessProfileList =
-            instance.generateAccessProfilesByCaseReference(CASE_REFERENCE.toString());
+            instance.generateAccessProfilesByCaseReference(CASE_REFERENCE);
         assertEquals(2, accessProfileList.size());
     }
 
@@ -100,11 +100,11 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
-        when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE)).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findById(null, CASE_ID))
             .thenReturn(Optional.of(caseDetails));
         when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(caseUserRepository.findCaseRoles(CASE_ID, IDAM_ID)).thenReturn(caseRoles);
         Set<AccessProfile> accessProfileList = instance.generateAccessProfilesByCaseReference(CASE_ID);
         assertEquals(2, accessProfileList.size());
     }
@@ -112,11 +112,11 @@ class RoleBasedCaseDataAccessControlTest {
     @Test
     @DisplayName("should throw exception when case reference or case id is invalid")
     void shouldThrowException() {
-        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
-        when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE)).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findById(null, CASE_ID))
             .thenReturn(Optional.empty());
         when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(caseUserRepository.findCaseRoles(CASE_ID, IDAM_ID)).thenReturn(caseRoles);
         assertThrows(CaseNotFoundException.class, () -> instance.generateAccessProfilesByCaseReference(CASE_ID));
     }
 }
