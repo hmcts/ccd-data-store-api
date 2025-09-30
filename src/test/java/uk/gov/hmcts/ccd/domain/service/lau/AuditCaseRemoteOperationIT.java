@@ -248,7 +248,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
 
@@ -279,7 +278,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
     public void shouldRetryIf403StatusFromLAU()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
@@ -312,7 +310,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
     public void shouldRetryIfResponseStatus502()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
@@ -345,7 +342,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
     public void shouldRetryIfResponseStatus504()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()

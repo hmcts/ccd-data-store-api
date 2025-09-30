@@ -5,8 +5,11 @@ import feign.Response;
 import feign.RetryableException;
 import feign.Request;
 import feign.Request.HttpMethod;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +17,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,112 +54,63 @@ class FeignErrorDecoderTest {
             .build();
     }
 
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus401() {
-        isRetryableException(401, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus403() {
-        isRetryableException(403, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus502() {
-        isRetryableException(502, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseActionUrlAndStatus504() {
-        isRetryableException(504, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPostRequestWithActionUrlAndStatus500() {
-        isNotRetryableException(500, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus401() {
-        isRetryableException(401, POST_METHOD, CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus403() {
-        isRetryableException(403, POST_METHOD, CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus502() {
-        isRetryableException(502, POST_METHOD, CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnRetryableExceptionForPostRequestWithCaseSearchUrlAndStatus504() {
-        isRetryableException(504, POST_METHOD, CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPostRequestWithSearchUrlAndStatus500() {
-        isNotRetryableException(500, POST_METHOD, CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPostRequestWithoutCaseActionOrCaseSerachUrl() {
-        isNotRetryableException(403, POST_METHOD, "http://localhost/service/validate");
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForGetRequestEvenWithCaseActionUrl() {
-        isNotRetryableException(401, "GET", CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPutRequestWithCaseSearchUrl() {
-        isNotRetryableException(403, "PUT", CASE_SEARCH_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPostRequestWithCaseActionUrlAndStatus200() {
-        isNotRetryableException(200, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldReturnFeignExceptionForPostRequestWithCaseActionUrlAndStatus399() {
-        isNotRetryableException(399, POST_METHOD, CASE_ACTION_URL);
-    }
-
-    @Test
-    void shouldNotReturnRetryableExceptionForPostRequestWithCaseActionInPath() {
-        isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseAction/user");
-    }
-
-    @Test
-    void shouldNotReturnRetryableExceptionForPostRequestWithCaseSearchInPath() {
-        isNotRetryableException(403, POST_METHOD, "http://localhost/api/v1/audit/caseSearch/user");
-    }
-
-    @Test
-    void shouldNotReturnRetryableExceptionForPostRequestWithCaseActionAsQueryParam() {
-        isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseAction&user=123");
-    }
-
-    @Test
-    void shouldNotReturnRetryableExceptionForPostRequestWithCaseSearchAsQueryParam() {
-        isNotRetryableException(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseSearch&user=123");
-    }
-
-    private void isNotRetryableException(int status, String method, String url) {
-        Response response = buildResponse(status, method, url);
-        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
-        assertThat(ex).isInstanceOf(FeignException.class)
-            .isNotInstanceOf(RetryableException.class);
-    }
-
-    private void isRetryableException(int status, String method, String url) {
+    @ParameterizedTest(name = "[{index}] status={0}, method={1}, url={2} → Retryable")
+    @MethodSource("retryableCases")
+    @DisplayName("should return RetryableException for qualifying POSTs to caseAction/caseSearch")
+    void shouldReturnRetryableException(int status, String method, String url) {
         Response response = buildResponse(status, method, url);
         Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
         assertThat(ex).isInstanceOf(RetryableException.class);
+    }
+
+    @ParameterizedTest(name = "[{index}] status={0}, method={1}, url={2} → NOT Retryable")
+    @MethodSource("nonRetryableCases")
+    @DisplayName("should return FeignException (non-retryable) for all other cases")
+    void shouldReturnFeignException(int status, String method, String url) {
+        Response response = buildResponse(status, method, url);
+        Exception ex = feignErrorDecoder.decode(METHOD_KEY, response);
+        assertThat(ex)
+            .isInstanceOf(FeignException.class)
+            .isNotInstanceOf(RetryableException.class);
+    }
+
+    private static Stream<Arguments> retryableCases() {
+        return Stream.of(
+            // caseAction (POST)
+            Arguments.of(401, POST_METHOD, CASE_ACTION_URL),
+            Arguments.of(403, POST_METHOD, CASE_ACTION_URL),
+            Arguments.of(502, POST_METHOD, CASE_ACTION_URL),
+            Arguments.of(504, POST_METHOD, CASE_ACTION_URL),
+
+            // caseSearch (POST)
+            Arguments.of(401, POST_METHOD, CASE_SEARCH_URL),
+            Arguments.of(403, POST_METHOD, CASE_SEARCH_URL),
+            Arguments.of(502, POST_METHOD, CASE_SEARCH_URL),
+            Arguments.of(504, POST_METHOD, CASE_SEARCH_URL)
+        );
+    }
+
+    private static Stream<Arguments> nonRetryableCases() {
+        return Stream.of(
+            // 500s on both endpoints (POST)
+            Arguments.of(500, POST_METHOD, CASE_ACTION_URL),
+            Arguments.of(500, POST_METHOD, CASE_SEARCH_URL),
+
+            // wrong URLs or methods
+            Arguments.of(403, POST_METHOD, "http://localhost/service/validate"),
+            Arguments.of(401, "GET", CASE_ACTION_URL),
+            Arguments.of(403, "PUT", CASE_SEARCH_URL),
+
+            // non-retryable status codes
+            Arguments.of(200, POST_METHOD, CASE_ACTION_URL),
+            Arguments.of(399, POST_METHOD, CASE_ACTION_URL),
+
+            // endpoints only in path or query params
+            Arguments.of(403, POST_METHOD, "http://localhost/api/v1/audit/caseAction/user"),
+            Arguments.of(403, POST_METHOD, "http://localhost/api/v1/audit/caseSearch/user"),
+            Arguments.of(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseAction&user=123"),
+            Arguments.of(401, POST_METHOD, "http://localhost/api?endpoint=/audit/caseSearch&user=123")
+        );
     }
 }
 
