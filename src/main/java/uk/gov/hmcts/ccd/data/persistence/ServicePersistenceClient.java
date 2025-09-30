@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -111,8 +112,9 @@ public class ServicePersistenceClient {
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }
 
-    public void customSearchCases(String caseTypeId, String jsonSearchRequest) {
+    public CaseSearchResult customSearchCases(String caseTypeId, String jsonSearchRequest) {
         api.customSearchCases(URI.create("http://localhost:3206"), jsonSearchRequest);
+        return null;
     }
 
     private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {

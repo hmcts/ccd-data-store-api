@@ -155,8 +155,8 @@ public class UICaseSearchController {
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        //CaseSearchResult caseSearchResultTrial = servicePersistenceClient.customSearchCases(caseTypeId,
-        //    jsonSearchRequest);
+        CaseSearchResult caseSearchResultTrial = servicePersistenceClient.customSearchCases(caseTypeId,
+            jsonSearchRequest);
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())
