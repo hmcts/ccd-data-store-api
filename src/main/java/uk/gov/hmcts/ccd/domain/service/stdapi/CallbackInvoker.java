@@ -122,7 +122,7 @@ public class CallbackInvoker {
                                                                                final CaseDetails caseDetails) {
         // Decentralised case types manage their own event submission
         if (persistenceStrategyResolver.isDecentralised(caseDetails)) {
-            return ResponseEntity.ok(new AfterSubmitCallbackResponse());
+            return ResponseEntity.ok(caseDetails.getAfterSubmitCallbackResponse());
         }
 
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
