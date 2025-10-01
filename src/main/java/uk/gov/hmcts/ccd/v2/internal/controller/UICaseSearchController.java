@@ -13,6 +13,7 @@ import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,6 +62,7 @@ public class UICaseSearchController {
     private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
     private final ElasticsearchSortService elasticsearchSortService;
     private final ServicePersistenceClient servicePersistenceClient;
+    private final boolean decentralisedSearch;
 
     @Autowired
     @SuppressWarnings("checkstyle:LineLength") //don't want to break message
@@ -70,12 +72,14 @@ public class UICaseSearchController {
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
         ElasticsearchSortService elasticsearchSortService,
-        ServicePersistenceClient servicePersistenceClient) {
+        ServicePersistenceClient servicePersistenceClient,
+        @Value("${decentralised-search}") boolean decentralisedSearch) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
         this.elasticsearchSortService = elasticsearchSortService;
         this.servicePersistenceClient = servicePersistenceClient;
+        this.decentralisedSearch = decentralisedSearch;
     }
 
     @PostMapping(path = "")
@@ -154,10 +158,7 @@ public class UICaseSearchController {
                                      @RequestParam(value = "use_case", required = false) final String useCase,
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
-
-        CaseSearchResult caseSearchResultTrial = servicePersistenceClient.customSearchCases(caseTypeId,
-            jsonSearchRequest);
-
+        
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())
                 ? null : useCase.toUpperCase(Locale.ENGLISH);
@@ -173,9 +174,16 @@ public class UICaseSearchController {
             .withSearchRequest(searchRequest)
             .build();
 
-        CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
+        CaseSearchResult caseSearchResult;
+        if (decentralisedSearch) {
+            caseSearchResult = servicePersistenceClient.customSearchCases(caseTypeId,
+                jsonSearchRequest);
+        } else {
+            caseSearchResult = caseSearchOperation.execute(request, false);
+        }
+
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
-            .execute(caseTypeId, caseSearchResultTrial, useCaseUppercase, requestedFields);
+            .execute(caseTypeId, caseSearchResult, useCaseUppercase, requestedFields);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());
