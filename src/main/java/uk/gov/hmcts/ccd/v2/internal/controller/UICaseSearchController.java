@@ -175,7 +175,7 @@ public class UICaseSearchController {
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
-            .execute(caseTypeId, caseSearchResult, useCaseUppercase, requestedFields);
+            .execute(caseTypeId, caseSearchResultTrial, useCaseUppercase, requestedFields);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());

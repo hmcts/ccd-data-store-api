@@ -113,8 +113,7 @@ public class ServicePersistenceClient {
     }
 
     public CaseSearchResult customSearchCases(String caseTypeId, String jsonSearchRequest) {
-        api.customSearchCases(URI.create("http://localhost:3206"), jsonSearchRequest);
-        return null;
+        return api.customSearchCases(URI.create("http://localhost:3206"), jsonSearchRequest);
     }
 
     private void validateCaseDetails(CaseDetails casePointer, DecentralisedCaseDetails details) {
