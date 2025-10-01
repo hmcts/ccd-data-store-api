@@ -41,6 +41,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -69,6 +70,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
+    private final IdempotencyKeyHolder idempotencyKeyHolder;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -90,7 +92,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                       SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
                                       final CaseLinkService caseLinkService,
-                                      final TimeToLiveService timeToLiveService) {
+                                      final TimeToLiveService timeToLiveService,
+                                      final IdempotencyKeyHolder idempotencyKeyHolder) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -108,6 +111,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.supplementaryDataValidator = supplementaryDataValidator;
         this.caseLinkService = caseLinkService;
         this.timeToLiveService = timeToLiveService;
+        this.idempotencyKeyHolder = idempotencyKeyHolder;
     }
 
     @Transactional
@@ -142,6 +146,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseEventDefinition,
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition);
+        idempotencyKeyHolder.computeAndSetKeyToRequestContext(token);
 
         validateCaseFieldsOperation.validateCaseDetails(new OperationContext(caseTypeId, caseDataContent));
 
