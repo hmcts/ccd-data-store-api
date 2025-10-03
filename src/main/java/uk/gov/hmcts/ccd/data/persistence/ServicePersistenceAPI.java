@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)
@@ -67,4 +68,9 @@ interface ServicePersistenceAPI {
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
                                    @PathVariable("case-ref") Long caseReference,
                                    @PathVariable("event-id") Long eventId);
+
+    @PostMapping(value = "/customSearchCases",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    CaseSearchResult customSearchCases(URI baseURI, @RequestBody String json);
 }
