@@ -135,19 +135,19 @@ BEGIN
     AS $body$
     BEGIN
         BEGIN
-            DROP TABLE IF EXISTS tmp_case_data_ids;
+            DROP TABLE IF EXISTS case_ids_to_remove;
         EXCEPTION WHEN OTHERS THEN
-            RAISE NOTICE 'Error dropping tmp_case_data_ids: %', SQLERRM;
+            RAISE NOTICE 'Error dropping case_ids_to_remove: %', SQLERRM;
         END;
 
-        CREATE TEMP TABLE tmp_case_data_ids AS
+        CREATE TEMP TABLE case_ids_to_remove AS
         SELECT id
         FROM case_data
         WHERE last_modified <= now() - INTERVAL '3 MONTH'
         ORDER BY id ASC;
 
-        RAISE NOTICE 'Created tmp_case_data_ids with % rows',
-            (SELECT COUNT(*) FROM tmp_case_data_ids);
+        RAISE NOTICE 'Created case_ids_to_remove with % rows',
+            (SELECT COUNT(*) FROM case_ids_to_remove);
     END;
     $body$;
     $fn$;
@@ -162,9 +162,9 @@ BEGIN
     AS $body$
     BEGIN
         BEGIN
-            DROP TABLE IF EXISTS tmp_case_data_ids;
+            DROP TABLE IF EXISTS case_ids_to_remove;
         EXCEPTION WHEN OTHERS THEN
-            RAISE NOTICE 'Error dropping tmp_case_data_ids: %', SQLERRM;
+            RAISE NOTICE 'Error dropping case_ids_to_remove: %', SQLERRM;
         END;
     END;
     $body$;
@@ -180,102 +180,102 @@ BEGIN
     AS $body$
     BEGIN
         -- case_users_audit
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_users_audit',
                 'case_data_id',
-                'case_data_id IN (SELECT id FROM tmp_case_data_ids)',
+                'case_data_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_users_audit: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_users_audit: case_ids_to_remove empty';
         END IF;
 
         -- case_users
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_users',
                 'case_data_id',
-                'case_data_id IN (SELECT id FROM tmp_case_data_ids)',
+                'case_data_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_users: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_users: case_ids_to_remove empty';
         END IF;
 
         -- case_event_significant_items
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_event_significant_items',
                 'case_event_id',
                 'case_event_id IN (
                     SELECT id FROM case_event
-                    WHERE case_data_id IN (SELECT id FROM tmp_case_data_ids)
+                    WHERE case_data_id IN (SELECT id FROM case_ids_to_remove)
                 )',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_event_significant_items: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_event_significant_items: case_ids_to_remove empty';
         END IF;
 
         -- case_event
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_event',
                 'case_data_id',
-                'case_data_id IN (SELECT id FROM tmp_case_data_ids)',
+                'case_data_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_event: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_event: case_ids_to_remove empty';
         END IF;
 
         -- all_events
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'all_events',
                 'case_id',
-                'case_id IN (SELECT id FROM tmp_case_data_ids)',
+                'case_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping all_events: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping all_events: case_ids_to_remove empty';
         END IF;
 
         -- case_link (by case_id)
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_link',
                 'case_id',
-                'case_id IN (SELECT id FROM tmp_case_data_ids)',
+                'case_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_link by case_id: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_link by case_id: case_ids_to_remove empty';
         END IF;
 
         -- case_link (by linked_case_id)
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_link',
                 'linked_case_id',
-                'linked_case_id IN (SELECT id FROM tmp_case_data_ids)',
+                'linked_case_id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_link by linked_case_id: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_link by linked_case_id: case_ids_to_remove empty';
         END IF;
 
         -- case_data
-        IF EXISTS (SELECT 1 FROM tmp_case_data_ids) THEN
+        IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
             PERFORM safe_delete_where(
                 'case_data',
                 'id',
-                'id IN (SELECT id FROM tmp_case_data_ids)',
+                'id IN (SELECT id FROM case_ids_to_remove)',
                 batch_size
             );
         ELSE
-            RAISE NOTICE 'Skipping case_data: tmp_case_data_ids empty';
+            RAISE NOTICE 'Skipping case_data: case_ids_to_remove empty';
         END IF;
     END;
     $body$;
