@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -175,8 +176,9 @@ public class ServicePersistenceClient {
     public CaseSearchResult customSearchCases(String caseTypeId, String jsonSearchRequest) {
 
         URI uri = null;
-        if (resolver.getCaseTypeServiceUrl("PCS").isPresent()) {
-            uri = resolver.getCaseTypeServiceUrl("PCS").get();
+        Optional<URI> maybeUri = resolver.getCaseTypeServiceUrl("PCS");
+        if(maybeUri.isPresent()){
+            uri = maybeUri.get();
         }
 
         return api.customSearchCases(uri, jsonSearchRequest);
