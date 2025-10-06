@@ -105,7 +105,7 @@ BEGIN
     ORDER BY id ASC;
 
     RAISE NOTICE 'Created temp table case_ids_to_remove with % rows',
-        (SELECT COUNT(*) FROM case_type_ids_to_remove);
+        (SELECT COUNT(*) FROM case_ids_to_remove);
 
 END;
 $$ LANGUAGE plpgsql;
