@@ -97,6 +97,14 @@ BEGIN
         -- ignore error
     END;
 
+    -- Create log output table if not exists
+	CREATE TABLE IF NOT EXISTS ddl_log (
+	    log_time TIMESTAMP DEFAULT now(),
+	    action TEXT,
+	    table_name TEXT,
+	    message TEXT
+	);
+
     -- Create temp table of case_type IDs to remove
     CREATE TEMP TABLE case_ids_to_remove AS
     SELECT id
