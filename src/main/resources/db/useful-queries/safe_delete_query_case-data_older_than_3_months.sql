@@ -301,6 +301,6 @@ SELECT run_safe_deletes(1000);
 SELECT drop_cleanup_temp_tables();
 
 DROP FUNCTION IF EXISTS safe_delete_where(regclass, text, text, int4);
-DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables();
+DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables(3);
 DROP FUNCTION IF EXISTS drop_cleanup_temp_tables();
 DROP FUNCTION IF EXISTS run_safe_deletes(int4);
