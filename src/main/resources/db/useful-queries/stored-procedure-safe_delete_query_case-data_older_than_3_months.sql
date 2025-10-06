@@ -1,4 +1,5 @@
-CREATE OR REPLACE PROCEDURE cleanup_case_data(batch_size int DEFAULT 1000)
+CREATE OR REPLACE PROCEDURE cleanup_case_data(batch_size int DEFAULT 1000,
+    older_than_months int DEFAULT 3)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -129,7 +130,7 @@ BEGIN
     -- prepare_cleanup_temp_tables
     ----------------------------------------------------------------------
     EXECUTE $fn$
-    CREATE OR REPLACE FUNCTION prepare_cleanup_temp_tables()
+    CREATE OR REPLACE FUNCTION prepare_cleanup_temp_tables(older_than_months int)
     RETURNS void
     LANGUAGE plpgsql
     AS $body$
@@ -148,14 +149,19 @@ BEGIN
     	    message TEXT
     	);
         
-        CREATE TEMP TABLE case_ids_to_remove AS
-        SELECT id
-        FROM case_data
-        WHERE last_modified <= now() - INTERVAL '3 MONTH'
-        ORDER BY id ASC;
-
-        RAISE NOTICE 'Created case_ids_to_remove with % rows',
-            (SELECT COUNT(*) FROM case_ids_to_remove);
+       
+       	EXECUTE format(
+            'CREATE TEMP TABLE tmp_case_data_ids AS
+             SELECT id
+             FROM case_data
+             WHERE last_modified <= now() - INTERVAL ''%s MONTH''
+             ORDER BY id ASC',
+            older_than_months::text
+        );
+		
+       	RAISE NOTICE 'Created case_ids_to_remove (older than % months) with %% rows',
+            older_than_months, (SELECT COUNT(*) FROM tmp_case_data_ids);
+           
     END;
     $body$;
     $fn$;
@@ -292,7 +298,7 @@ BEGIN
     ----------------------------------------------------------------------
     -- 2. RUN PIPELINE
     ----------------------------------------------------------------------
-    PERFORM prepare_cleanup_temp_tables();
+    PERFORM prepare_cleanup_temp_tables(older_than_months);
     PERFORM run_safe_deletes(batch_size);
     PERFORM drop_cleanup_temp_tables();
 
