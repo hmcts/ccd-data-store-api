@@ -86,7 +86,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION prepare_cleanup_temp_tables()
+CREATE OR REPLACE FUNCTION prepare_cleanup_temp_tables(older_than_months int DEFAULT 3)
 RETURNS void AS
 $$
 BEGIN
@@ -105,15 +105,18 @@ BEGIN
 	    message TEXT
 	);
 
-    -- Create temp table of case_type IDs to remove
-    CREATE TEMP TABLE case_ids_to_remove AS
-    SELECT id
-    FROM case_data
-    WHERE last_modified <= now() - INTERVAL '3 MONTH'
-    ORDER BY id ASC;
+	-- Create temp table of case_type IDs to remove
+	EXECUTE format(
+        'CREATE TEMP TABLE case_ids_to_remove AS
+         SELECT id
+         FROM case_data
+         WHERE last_modified <= now() - INTERVAL ''%s MONTH''
+         ORDER BY id ASC',
+         older_than_months
+    );
 
-    RAISE NOTICE 'Created temp table case_ids_to_remove with % rows',
-        (SELECT COUNT(*) FROM case_ids_to_remove);
+	RAISE NOTICE 'Created temp table case_ids_to_remove for records older than % months with % rows',
+        older_than_months, (SELECT COUNT(*) FROM case_ids_to_remove);
 
 END;
 $$ LANGUAGE plpgsql;
