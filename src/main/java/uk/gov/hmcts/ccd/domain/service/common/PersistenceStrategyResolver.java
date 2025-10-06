@@ -111,7 +111,7 @@ public class PersistenceStrategyResolver {
      * @return An {@link Optional} containing the {@link URI} if a single, unambiguous prefix match is found.
      * @throws IllegalStateException if more than one configured case type matches the given caseTypeId.
      */
-    private Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
+    public Optional<URI> getCaseTypeServiceUrl(String caseTypeId) {
         if (caseTypeId == null || caseTypeId.isBlank()) {
             log.debug("Cannot resolve persistence strategy for null or blank case type ID.");
             return Optional.empty();

@@ -173,6 +173,12 @@ public class ServicePersistenceClient {
     }
 
     public CaseSearchResult customSearchCases(String caseTypeId, String jsonSearchRequest) {
-        return api.customSearchCases(URI.create("http://localhost:3206"), jsonSearchRequest);
+
+        String url = "";
+        if (resolver.getCaseTypeServiceUrl("PCS").isPresent()) {
+            url = String.valueOf(resolver.getCaseTypeServiceUrl("PCS").get());
+        }
+
+        return api.customSearchCases(URI.create(url), jsonSearchRequest);
     }
 }
