@@ -140,6 +140,14 @@ BEGIN
             RAISE NOTICE 'Error dropping case_ids_to_remove: %', SQLERRM;
         END;
 
+        -- Create log output table if not exists
+    	CREATE TABLE IF NOT EXISTS ddl_log (
+    	    log_time TIMESTAMP DEFAULT now(),
+    	    action TEXT,
+    	    table_name TEXT,
+    	    message TEXT
+    	);
+        
         CREATE TEMP TABLE case_ids_to_remove AS
         SELECT id
         FROM case_data
