@@ -294,13 +294,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 --create the various temp tables which form the bulk of the data to clean but ensuring base types are not included
-SELECT prepare_cleanup_temp_tables();
+SELECT prepare_cleanup_temp_tables(3);
 --deletions based on the temp tables created, in batches of 1000
 SELECT run_safe_deletes(1000);
 --destroy temp tables created as part of this script
 SELECT drop_cleanup_temp_tables();
 
 DROP FUNCTION IF EXISTS safe_delete_where(regclass, text, text, int4);
-DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables(3);
+DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables(int);
 DROP FUNCTION IF EXISTS drop_cleanup_temp_tables();
 DROP FUNCTION IF EXISTS run_safe_deletes(int4);
