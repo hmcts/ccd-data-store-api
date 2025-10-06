@@ -134,6 +134,8 @@ BEGIN
     RETURNS void
     LANGUAGE plpgsql
     AS $body$
+    	DECLARE
+    	row_count int;
     BEGIN
         BEGIN
             DROP TABLE IF EXISTS case_ids_to_remove;
@@ -312,7 +314,8 @@ BEGIN
     EXECUTE 'DROP FUNCTION IF EXISTS drop_cleanup_temp_tables()';
     EXECUTE 'DROP FUNCTION IF EXISTS run_safe_deletes(int4)';
 
-    RAISE NOTICE 'cleanup_case_data procedure finished successfully with batch_size=%', batch_size;
+   	RAISE NOTICE 'cleanup_case_data procedure finished successfully for data older than % months (batch_size=%)',
+    older_than_months, batch_size;
 
 END;
 $$;
