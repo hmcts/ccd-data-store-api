@@ -177,7 +177,7 @@ public class ServicePersistenceClient {
 
         URI uri = null;
         Optional<URI> maybeUri = resolver.getCaseTypeServiceUrl("PCS");
-        if(maybeUri.isPresent()){
+        if (maybeUri.isPresent()) {
             uri = maybeUri.get();
         }
 
