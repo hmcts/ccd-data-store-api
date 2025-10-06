@@ -298,8 +298,8 @@ BEGIN
     ----------------------------------------------------------------------
     -- 2. RUN PIPELINE
     ----------------------------------------------------------------------
-    PERFORM prepare_cleanup_temp_tables(older_than_months);
-    PERFORM run_safe_deletes(batch_size);
+    PERFORM prepare_cleanup_temp_tables(3);
+    PERFORM run_safe_deletes(1000);
     PERFORM drop_cleanup_temp_tables();
 
     ----------------------------------------------------------------------
