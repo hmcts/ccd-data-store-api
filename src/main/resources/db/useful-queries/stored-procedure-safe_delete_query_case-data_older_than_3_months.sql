@@ -307,7 +307,7 @@ BEGIN
     ----------------------------------------------------------------------
     EXECUTE 'DROP FUNCTION IF EXISTS safe_delete_query(text, regclass, text, int4)';
     EXECUTE 'DROP FUNCTION IF EXISTS safe_delete_where(regclass, text, text, int4)';
-    EXECUTE 'DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables()';
+    EXECUTE 'DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables(int4)';
     EXECUTE 'DROP FUNCTION IF EXISTS drop_cleanup_temp_tables()';
     EXECUTE 'DROP FUNCTION IF EXISTS run_safe_deletes(int4)';
 
