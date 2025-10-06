@@ -174,11 +174,12 @@ public class ServicePersistenceClient {
     }
 
     public CaseSearchResult customSearchCases(String caseTypeId, String jsonSearchRequest) {
-
+        log.error("custom search cases called");
         URI uri = null;
         Optional<URI> maybeUri = resolver.getCaseTypeServiceUrl("PCS");
         if (maybeUri.isPresent()) {
             uri = maybeUri.get();
+            log.error(uri.getHost());
         }
 
         return api.customSearchCases(uri, jsonSearchRequest);
