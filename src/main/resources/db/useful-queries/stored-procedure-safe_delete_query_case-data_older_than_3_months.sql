@@ -317,5 +317,17 @@ BEGIN
    	RAISE NOTICE 'cleanup_case_data procedure finished successfully for data older than % months (batch_size=%)',
     older_than_months, batch_size;
 
+	INSERT INTO ddl_log(action, table_name, message)
+	VALUES (
+	    'SUMMARY',
+	    'cleanup_case_data',
+	    format(
+	        'Procedure completed with batch_size = %s, data_older_than = %s, at %s',
+	        batch_size,
+	        older_than_months,
+	        now()
+	    )
+	);
+
 END;
 $$;
