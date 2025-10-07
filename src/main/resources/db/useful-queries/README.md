@@ -20,7 +20,7 @@ This file provides a **semi-automated cleanup** process.
 
 ---
 
-### 3. `stored-procedure-safe_delete_query_case-data_older_than_3_months.sql`
+### 2. `stored-procedure-safe_delete_query_case-data_older_than_3_months.sql`
 
 This file defines a **stored procedure** (`cleanup_case_data(batch_size int DEFAULT 1000,
     older_than_months int DEFAULT 3)`) for automated clean-up.
