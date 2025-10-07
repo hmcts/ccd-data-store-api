@@ -67,6 +67,11 @@
           "case_id": "${[scenarioContext][parentContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][testData][users][testUser][id]}",
           "case_role": "[CREATOR]"
+        },
+        {
+          "case_id": "${}${[scenarioContext][parentContext][childContexts][F-1018_CreateCaseWithStandardCaseLinksByCitizen][childContexts][CaseLinkedToRemoveFromStandardCaseLinksField][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][testUser][id]}",
+          "case_role": "[CREATOR]"
         }
       ]
     }
