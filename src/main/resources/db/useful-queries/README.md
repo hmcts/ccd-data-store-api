@@ -54,3 +54,9 @@ This file defines a **stored procedure** (`cleanup_case_data(batch_size int DEFA
 
 **Recommendation:**  
 Use **Script 2** for production or regular maintenance, as it is idempotent, batched, and safe for repeat execution.
+
+# 🧹 CCD Data Store Database Cleanup Process
+1. Execute `CALL cleanup_case_data(2000, 3);` (batches of 2000, data older than 3 months)
+2. Delete all ES indexes
+3. Login into cwd-admin-web and trigger ES re-indexing (this will create the static indexes)
+4. Copy and run the script `logstash_re_indexing_query.sql` (this will mark all cases as logstash_enabled=false, which in turn will trigger the indexing process)
