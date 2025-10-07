@@ -1,7 +1,9 @@
-CREATE OR REPLACE PROCEDURE cleanup_case_data(batch_size int DEFAULT 1000,
-    older_than_months int DEFAULT 3)
+CREATE OR REPLACE PROCEDURE public.cleanup_case_data(
+    IN batch_size integer DEFAULT 1000,
+    IN older_than_months integer DEFAULT 3
+)
 LANGUAGE plpgsql
-AS $$
+AS $procedure$
 BEGIN
     ----------------------------------------------------------------------
     -- 1. CREATE ALL REQUIRED FUNCTIONS
@@ -29,7 +31,7 @@ BEGIN
     BEGIN
         SELECT regexp_matches(
                  delete_sql,
-                 '^DELETE\s+FROM\s+("?[\w]+"?)(?:\s+([A-Za-z_][A-Za-z0-9_]*))?(.*)$',
+                 '^DELETE\\s+FROM\\s+("?[\w]+"?)(?:\\s+([A-Za-z_][A-Za-z0-9_]*))?(.*)$',
                  'i'
                )
           INTO m;
@@ -71,7 +73,6 @@ BEGIN
             GET DIAGNOSTICS rows_deleted = ROW_COUNT;
             EXIT WHEN rows_deleted = 0;
             total_deleted := total_deleted + rows_deleted;
-
             RAISE NOTICE 'Batch deleted % rows from %', rows_deleted, full_tbl_name;
         END LOOP;
 
@@ -134,8 +135,8 @@ BEGIN
     RETURNS void
     LANGUAGE plpgsql
     AS $body$
-    	DECLARE
-    	row_count int;
+    DECLARE
+        row_count int;
     BEGIN
         BEGIN
             DROP TABLE IF EXISTS case_ids_to_remove;
@@ -143,28 +144,26 @@ BEGIN
             RAISE NOTICE 'Error dropping case_ids_to_remove: %', SQLERRM;
         END;
 
-        -- Create log output table if not exists
-    	CREATE TABLE IF NOT EXISTS ddl_log (
-    	    log_time TIMESTAMP DEFAULT now(),
-    	    action TEXT,
-    	    table_name TEXT,
-    	    message TEXT
-    	);
-        
+        CREATE TABLE IF NOT EXISTS ddl_log (
+            log_time TIMESTAMP DEFAULT now(),
+            action TEXT,
+            table_name TEXT,
+            message TEXT
+        );
+
         EXECUTE format(
-	        'CREATE TEMP TABLE case_ids_to_remove AS
-	         SELECT id
-	         FROM case_data
-	         WHERE last_modified <= now() - INTERVAL ''%s MONTH''
-	         ORDER BY id ASC;',
-	        older_than_months
-	    );
+            'CREATE TEMP TABLE case_ids_to_remove AS
+             SELECT id
+             FROM case_data
+             WHERE last_modified <= now() - INTERVAL ''%s MONTH''
+             ORDER BY id ASC;',
+            older_than_months
+        );
 
-    	EXECUTE 'SELECT COUNT(*) FROM case_ids_to_remove' INTO row_count;
+        EXECUTE 'SELECT COUNT(*) FROM case_ids_to_remove' INTO row_count;
 
-    	RAISE NOTICE 'Created temp table case_ids_to_remove for records older than % months with % rows',
-        	older_than_months, row_count;
-           
+        RAISE NOTICE 'Created temp table case_ids_to_remove for records older than % months with % rows',
+            older_than_months, row_count;
     END;
     $body$;
     $fn$;
@@ -186,6 +185,46 @@ BEGIN
     END;
     $body$;
     $fn$;
+   	
+	----------------------------------------------------------------------
+	-- safe_delete_with_commit
+	----------------------------------------------------------------------
+	EXECUTE $fn$
+	CREATE OR REPLACE PROCEDURE safe_delete_with_commit(
+	    tbl          regclass,
+	    pk_column    text,
+	    where_clause text,
+	    batch_size   int DEFAULT 1000
+	)
+	LANGUAGE plpgsql
+	AS $body$
+	DECLARE
+	    rows_deleted int;
+	BEGIN
+	    <<batch_loop>>
+	    LOOP
+	        -- Call the original function to delete a batch
+	        PERFORM safe_delete_where(tbl, pk_column, where_clause, batch_size);
+	
+	        -- Get how many rows were affected in the last delete
+	        GET DIAGNOSTICS rows_deleted = ROW_COUNT;
+	
+	        EXIT WHEN rows_deleted = 0;
+	
+	        -- ✅ Commit the current batch so it’s persisted immediately
+	        COMMIT;
+	
+	        -- ✅ Start a fresh transaction for the next batch
+	        START TRANSACTION;
+	
+	        RAISE NOTICE 'Committed batch of % rows for %', rows_deleted, tbl;
+	    END LOOP;
+	
+	    COMMIT;  -- ✅ Final commit
+	    RAISE NOTICE 'All batches committed for %', tbl;
+	END;
+	$body$;
+	$fn$;
 
     ----------------------------------------------------------------------
     -- run_safe_deletes
@@ -196,9 +235,10 @@ BEGIN
     LANGUAGE plpgsql
     AS $body$
     BEGIN
+ 
         -- case_users_audit
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_users_audit',
                 'case_data_id',
                 'case_data_id IN (SELECT id FROM case_ids_to_remove)',
@@ -210,7 +250,7 @@ BEGIN
 
         -- case_users
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_users',
                 'case_data_id',
                 'case_data_id IN (SELECT id FROM case_ids_to_remove)',
@@ -222,7 +262,7 @@ BEGIN
 
         -- case_event_significant_items
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_event_significant_items',
                 'case_event_id',
                 'case_event_id IN (
@@ -237,7 +277,7 @@ BEGIN
 
         -- case_event
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_event',
                 'case_data_id',
                 'case_data_id IN (SELECT id FROM case_ids_to_remove)',
@@ -249,7 +289,7 @@ BEGIN
 
         -- all_events
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'all_events',
                 'case_id',
                 'case_id IN (SELECT id FROM case_ids_to_remove)',
@@ -261,7 +301,7 @@ BEGIN
 
         -- case_link (by case_id)
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_link',
                 'case_id',
                 'case_id IN (SELECT id FROM case_ids_to_remove)',
@@ -273,7 +313,7 @@ BEGIN
 
         -- case_link (by linked_case_id)
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_link',
                 'linked_case_id',
                 'linked_case_id IN (SELECT id FROM case_ids_to_remove)',
@@ -285,7 +325,7 @@ BEGIN
 
         -- case_data
         IF EXISTS (SELECT 1 FROM case_ids_to_remove) THEN
-            PERFORM safe_delete_where(
+            PERFORM safe_delete_with_commit(
                 'case_data',
                 'id',
                 'id IN (SELECT id FROM case_ids_to_remove)',
@@ -294,16 +334,25 @@ BEGIN
         ELSE
             RAISE NOTICE 'Skipping case_data: case_ids_to_remove empty';
         END IF;
+       
     END;
     $body$;
     $fn$;
 
     ----------------------------------------------------------------------
-    -- 2. RUN PIPELINE
+    -- 2. RUN PIPELINE (with commits between steps)
     ----------------------------------------------------------------------
+    RAISE NOTICE 'Step 1: Preparing temp tables...';
     PERFORM prepare_cleanup_temp_tables(older_than_months);
+    COMMIT;  -- ✅ commit after temp tables are prepared
+
+    RAISE NOTICE 'Step 2: Running safe deletes...';
     PERFORM run_safe_deletes(batch_size);
+    COMMIT;  -- ✅ commit deletes immediately
+
+    RAISE NOTICE 'Step 3: Dropping temp tables...';
     PERFORM drop_cleanup_temp_tables();
+    COMMIT;  -- ✅ ensure cleanup is persisted
 
     ----------------------------------------------------------------------
     -- 3. DROP HELPERS (cleanup)
@@ -313,21 +362,10 @@ BEGIN
     EXECUTE 'DROP FUNCTION IF EXISTS prepare_cleanup_temp_tables(int4)';
     EXECUTE 'DROP FUNCTION IF EXISTS drop_cleanup_temp_tables()';
     EXECUTE 'DROP FUNCTION IF EXISTS run_safe_deletes(int4)';
+    COMMIT;  -- ✅ ensure helper drops are persisted
 
-   	RAISE NOTICE 'cleanup_case_data procedure finished successfully for data older than % months (batch_size=%)',
-    older_than_months, batch_size;
-
-	INSERT INTO ddl_log(action, table_name, message)
-	VALUES (
-	    'SUMMARY',
-	    'cleanup_case_data',
-	    format(
-	        'Procedure completed with batch_size = %s, data_older_than = %s, at %s',
-	        batch_size,
-	        older_than_months,
-	        now()
-	    )
-	);
+    RAISE NOTICE 'cleanup_case_data procedure finished successfully for data older than % months (batch_size=%)',
+        older_than_months, batch_size;
 
 END;
-$$;
+$procedure$;
