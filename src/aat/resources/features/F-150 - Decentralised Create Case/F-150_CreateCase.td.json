@@ -38,30 +38,29 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
-      "Content-Length": "[[ANY_NULLABLE]]",
+      "Content-Length": "738",
       "Content-Encoding": "[[ANY_NULLABLE]]",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
-      "Connection": "[[ANY_NULLABLE]]",
-      "Keep-Alive": "[[ANY_NULLABLE]]",
-      "Transfer-Encoding": "[[ANY_NULLABLE]]",
-      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+      "Connection": "keep-alive",
+      "Keep-Alive": "timeout=60"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "[[ANYTHING_PRESENT]]"
+          "href": "{{TEST_URL}}/case-types/FT_Decentralisation/cases{?ignore-warning}"
         }
       },
-      "id": "[[ANYTHING_PRESENT]]",
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
       "jurisdiction": "BEFTA_MASTER",
       "case_type": "FT_Decentralisation",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "state": "CaseCreated",
       "security_classification": "PUBLIC",
       "data": {
-        "TextField": "Decentralised case"
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
       },
       "data_classification": {
         "TextField": "PUBLIC"

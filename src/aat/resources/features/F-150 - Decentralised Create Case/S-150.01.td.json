@@ -3,6 +3,7 @@
   "_extends_": "F-150_CreateCase",
   "title": "Create decentralised case via external API",
   "specs": [
+    "As a prerequisite",
     "an active profile in CCD",
     "contains HTTP 201 Created",
     "returns HTTP 201 with created case payload",
@@ -14,6 +15,9 @@
       "data": {
         "TextField": "Decentralised case",
         "_stubProcessedBy": "ccd-test-stubs-service"
+      },
+      "data_classification": {
+        "TextField": "PUBLIC"
       }
     }
   }

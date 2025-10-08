@@ -1,8 +1,18 @@
-[ {
-  "LiveFrom" : "01/01/2017",
-  "LiveTo" : "",
-  "CaseTypeID" : "FT_Decentralisation",
-  "CaseFieldID" : "TextField",
-  "UserRole" : "caseworker-befta_master",
-  "CRUD" : "CRUD"
-} ]
+[
+  {
+    "LiveFrom" : "01/01/2017",
+    "LiveTo" : "",
+    "CaseTypeID" : "FT_Decentralisation",
+    "CaseFieldID" : "TextField",
+    "UserRole" : "caseworker-befta_master",
+    "CRUD" : "CRUD"
+  },
+  {
+    "LiveFrom" : "01/01/2017",
+    "LiveTo" : "",
+    "CaseTypeID" : "FT_Decentralisation",
+    "CaseFieldID" : "_stubProcessedBy",
+    "UserRole" : "caseworker-befta_master",
+    "CRUD" : "R"
+  }
+]

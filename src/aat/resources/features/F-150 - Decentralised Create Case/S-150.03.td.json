@@ -1,0 +1,67 @@
+{
+  "_guid_": "S-150.03",
+  "_extends_": "F-116_Test_Data_Base",
+  "title": "Retrieve decentralised audit history after creation",
+  "prerequisites": [
+    {
+      "F-150_CreateCase_Token_Creation": "F-150_CreateCase_Token_Creation"
+    },
+    {
+      "S-150.01_Prereq": "S-150.01_Prereq"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains the case reference of the case just created",
+    "Retrieve audit events by case ID",
+    "contains all audit event details under the case"
+  ],
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-events.v2+json;charset=UTF-8",
+      "Content-Length": "680"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}/events"
+        }
+      },
+      "auditEvents": [
+        {
+          "id": "createCase",
+          "event_name": "Create a case",
+          "created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+          "case_type_id": "FT_Decentralisation",
+          "case_type_version": 1,
+          "state_id": "CaseCreated",
+          "summary": "[[ANY_NULLABLE]]",
+          "description": "[[ANY_NULLABLE]]",
+          "user_id": "[[ANY_NULLABLE]]",
+          "user_last_name": "[[ANY_NULLABLE]]",
+          "user_first_name": "[[ANY_NULLABLE]]",
+          "state_name": "[[ANY_NULLABLE]]",
+          "data": {
+            "TextField": "Decentralised case",
+            "_stubProcessedBy": "ccd-test-stubs-service"
+          },
+          "data_classification": null,
+          "security_classification": "PUBLIC",
+          "significant_item": "[[ANY_NULLABLE]]",
+          "proxied_by": "[[ANY_NULLABLE]]",
+          "proxied_by_last_name": "[[ANY_NULLABLE]]",
+          "proxied_by_first_name": "[[ANY_NULLABLE]]"
+        }
+      ]
+    }
+  }
+}
