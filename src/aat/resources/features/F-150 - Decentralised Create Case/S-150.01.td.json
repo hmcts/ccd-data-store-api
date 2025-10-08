@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-150.01",
+  "_extends_": "F-150_CreateCase",
+  "title": "Create decentralised case via external API",
+  "specs": [
+    "an active profile in CCD",
+    "contains HTTP 201 Created",
+    "returns HTTP 201 with created case payload",
+    "uses the FT_Decentralisation case type"
+  ],
+  "expectedResponse": {
+    "body": {
+      "state": "CaseCreated",
+      "data": {
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
+      }
+    }
+  }
+}

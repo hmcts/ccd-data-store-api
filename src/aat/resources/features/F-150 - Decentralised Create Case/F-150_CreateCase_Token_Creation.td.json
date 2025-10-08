@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-150_CreateCase_Token_Creation",
+  "_extends_": "F-138_CreateCase_Token_Creation",
+  "uri": "/case-types/FT_Decentralisation/event-triggers/{etid}",
+  "request": {
+    "pathVariables": {
+      "etid": "createCase"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "case_type_id": "FT_Decentralisation"
+      },
+      "event_id": "createCase"
+    },
+    "headers": {
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  },
+  "specs": [
+    "to start decentralised case creation"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  }
+}

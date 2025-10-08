@@ -1,0 +1,40 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "ID": "TextField",
+    "Label": "Text Field",
+    "HintText": "",
+    "FieldType": "Text",
+    "CategoryID": "",
+    "FieldTypeParameter": "",
+    "RegularExpression": "",
+    "SecurityClassification": "Public",
+    "Min": "",
+    "Max": "",
+    "DefaultHidden": "No",
+    "Searchable": "",
+    "FieldShowCondition": "",
+    "TabShowCondition": ""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "ID": "_stubProcessedBy",
+    "Label": "Stub Processor",
+    "HintText": "Marker injected by stubs",
+    "FieldType": "Text",
+    "CategoryID": "",
+    "FieldTypeParameter": "",
+    "RegularExpression": "",
+    "SecurityClassification": "Public",
+    "Min": "",
+    "Max": "",
+    "DefaultHidden": "Yes",
+    "Searchable": "",
+    "FieldShowCondition": "",
+    "TabShowCondition": ""
+  }
+]
