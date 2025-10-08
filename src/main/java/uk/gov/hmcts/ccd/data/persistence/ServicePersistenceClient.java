@@ -130,6 +130,10 @@ public class ServicePersistenceClient {
                 + casePointer.getReference());
         }
         var returnedCaseDetails = details.getCaseDetails();
+        if (returnedCaseDetails.getVersion() == null) {
+            throw new ServiceException("Downstream service failed to return a version for case reference "
+                + casePointer.getReference());
+        }
         if (!Objects.equals(casePointer.getReference(), returnedCaseDetails.getReference())
             || !Objects.equals(casePointer.getCaseTypeId(), returnedCaseDetails.getCaseTypeId())
             || !Objects.equals(casePointer.getJurisdiction(), returnedCaseDetails.getJurisdiction())) {

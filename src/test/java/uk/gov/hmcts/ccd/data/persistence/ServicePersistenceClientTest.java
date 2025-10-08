@@ -82,6 +82,7 @@ public class ServicePersistenceClientTest {
         caseDetails.setJurisdiction(JURISDICTION);
         caseDetails.setCaseTypeId(CASE_TYPE);
         caseDetails.setState(CASE_STATE);
+        caseDetails.setVersion(1);
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         return caseDetails;
@@ -95,6 +96,7 @@ public class ServicePersistenceClientTest {
         caseDetails.setCaseTypeId(CASE_TYPE);
         caseDetails.setState(CASE_STATE);
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+        caseDetails.setVersion(1);
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         return caseDetails;
     }
@@ -156,6 +158,7 @@ public class ServicePersistenceClientTest {
 
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
+        mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
@@ -174,6 +177,7 @@ public class ServicePersistenceClientTest {
 
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
+        mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
@@ -192,10 +196,30 @@ public class ServicePersistenceClientTest {
 
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
+        mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
             .thenReturn(List.of(mismatchedDetails));
+
+        assertThrows(
+            ServiceException.class,
+            () -> servicePersistenceClient.getCase(casePointer)
+        );
+    }
+
+    @Test
+    public void getCase_shouldThrowServiceException_whenVersionMissing() {
+        CaseDetails noVersionCaseDetails = createCaseDetails();
+        noVersionCaseDetails.setVersion(null);
+
+        DecentralisedCaseDetails detailsMissingVersion = new DecentralisedCaseDetails();
+        detailsMissingVersion.setCaseDetails(noVersionCaseDetails);
+        detailsMissingVersion.setRevision(1L);
+
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
+        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+            .thenReturn(List.of(detailsMissingVersion));
 
         assertThrows(
             ServiceException.class,
@@ -340,6 +364,26 @@ public class ServicePersistenceClientTest {
 
         assertThat(exception.getMessage(),
             is("Downstream service returned mismatched case details for case reference " + CASE_REFERENCE));
+    }
+
+    @Test
+    public void createEvent_shouldThrowServiceException_whenResponseHasMissingVersion() {
+        CaseDetails noVersionCaseDetails = createCaseDetails();
+        noVersionCaseDetails.setVersion(null);
+
+        DecentralisedCaseDetails noVersionDecentralisedCaseDetails = new DecentralisedCaseDetails();
+        noVersionDecentralisedCaseDetails.setCaseDetails(noVersionCaseDetails);
+        noVersionDecentralisedCaseDetails.setRevision(1L);
+
+        DecentralisedSubmitEventResponse responseMissingVersion = new DecentralisedSubmitEventResponse();
+        responseMissingVersion.setCaseDetails(noVersionDecentralisedCaseDetails);
+
+        when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
+        when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
+        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+            .thenReturn(responseMissingVersion);
+
+        assertThrows(ServiceException.class, () -> servicePersistenceClient.createEvent(caseEvent));
     }
 
     @Test

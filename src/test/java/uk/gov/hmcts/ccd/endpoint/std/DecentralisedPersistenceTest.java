@@ -109,6 +109,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
                     "case_type_id": "{{jsonPath request.body '$.case_details.case_type_id'}}",
                     "jurisdiction": "{{jsonPath request.body '$.case_details.jurisdiction'}}",
                     "state": "{{jsonPath request.body '$.case_details.state'}}",
+                    "version": 1,
                     "security_classification": "PUBLIC",
                     "case_data": {
                       "PersonLastName": "Last Name",
@@ -186,6 +187,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
                         "case_type_id": "PCS",
                         "jurisdiction": "PROBATE",
                         "state": "CaseCreated",
+                        "version": 1,
                         "security_classification": "PUBLIC",
                         "case_data": {
                             "PersonLastName": "Last Name",
