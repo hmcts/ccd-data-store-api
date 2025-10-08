@@ -134,6 +134,10 @@ public class ServicePersistenceClient {
             throw new ServiceException("Downstream service failed to return a version for case reference "
                 + casePointer.getReference());
         }
+        if (returnedCaseDetails.getSecurityClassification() == null) {
+            throw new ServiceException("Downstream service failed to return a security classification for case "
+                + casePointer.getReference());
+        }
         if (!Objects.equals(casePointer.getReference(), returnedCaseDetails.getReference())
             || !Objects.equals(casePointer.getCaseTypeId(), returnedCaseDetails.getCaseTypeId())
             || !Objects.equals(casePointer.getJurisdiction(), returnedCaseDetails.getJurisdiction())) {
