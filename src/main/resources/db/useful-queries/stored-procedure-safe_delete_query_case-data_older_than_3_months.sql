@@ -49,7 +49,10 @@ BEGIN
                 rows_deleted, full_tbl_name, total_deleted;
         END LOOP;
 
-        RAISE NOTICE 'Total deleted from %: % rows', full_tbl_name, total_deleted;
+        IF total_deleted > 0 THEN
+            RAISE NOTICE 'Total deleted from %: % rows', full_tbl_name, total_deleted;
+        END IF;
+        
         RETURN total_deleted;
     END;
     $body$;
