@@ -40,8 +40,9 @@ java:
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
-    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-pr-374-java"
-    CCD_DECENTRALISED_CASE_TYPE_SERVICE_URLS_FT_DECENTRALISATION: "http://ccd-test-stubs-service-pr-374-java"
+    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-pr-374-java/"
+    SPRING_APPLICATION_JSON: |
+      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-pr-374-java/"}}}}
   postgresql:
     enabled: true
 
