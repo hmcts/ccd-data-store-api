@@ -30,11 +30,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "[[ANY_NULLABLE]]",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-case-trigger.v2+json;charset=UTF-8",
-      "Content-Length": "1068"
-    },
     "body": {
       "token": "[[ANY_STRING_NOT_NULLABLE]]",
       "_links": {

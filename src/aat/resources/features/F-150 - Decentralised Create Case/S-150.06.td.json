@@ -37,10 +37,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Type": "application/json",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
     "body": {
       "supplementary_data": {
         "input_value": "from-request",

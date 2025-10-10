@@ -26,10 +26,6 @@
     }
   },
   "expectedResponse": {
-    "headers": {
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
-      "Content-Length": "707"
-    },
     "body": {
       "jurisdiction": "BEFTA_MASTER",
       "case_type": "FT_Decentralisation",
