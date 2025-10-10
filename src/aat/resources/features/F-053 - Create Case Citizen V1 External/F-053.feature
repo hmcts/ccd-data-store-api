@@ -175,5 +175,7 @@ Scenario: must create and update successfully the respective fields with ACL per
       And the response has all other details as expected,
       And another successful call [to get an update event token for the case just created] as in [S-578-Prerequisite_Citizen_Token_For_Update_Case],
       And a call [to update the DocumentField4 of same case by Citizen who doesn't have privilege to update DocumentField4] will get the expected response as in [S-578_Later_Case_Update_By_Citizen].
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-053_578_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
