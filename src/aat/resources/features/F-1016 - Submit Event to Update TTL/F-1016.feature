@@ -1172,6 +1172,8 @@ Feature: F-1016: Submit Event to Update TTL
 
     Then a negative response is received
     And the response has all other details as expected
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1016_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.92 #CCD-3510
   Scenario: Set TTL Override (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -1186,6 +1188,8 @@ Feature: F-1016: Submit Event to Update TTL
 
     Then a positive response is received
     And the response has all other details as expected
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1016_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.93 #CCD-3510
   Scenario: Set TTL Override and Suspend=Yes (TTL Guard pass) for first time when TTL data not present in case data and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -1201,6 +1205,8 @@ Feature: F-1016: Submit Event to Update TTL
 
     Then a positive response is received
     And the response has all other details as expected
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1016_Remove_Case_Assigned_User_role_for_Case].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1227,6 +1233,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [contains the TTL.OverrideTTL from the previouse data]
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.102 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -1249,6 +1257,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.103 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -1271,6 +1281,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
 
   @S-1016.105 #CCD-3562
@@ -1329,6 +1341,8 @@ Feature: F-1016: Submit Event to Update TTL
       Then a positive response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.111.VerifyCaseDetails]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_72_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.112 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -1350,6 +1364,8 @@ Feature: F-1016: Submit Event to Update TTL
       Then a positive response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.112.VerifyCaseDetails]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_72_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.113 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -1371,6 +1387,8 @@ Feature: F-1016: Submit Event to Update TTL
       Then a positive response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.113.VerifyCaseDetails]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_72_Remove_Case_Assigned_User_role_for_Case].
 
 
   @S-1016.115 #CCD-3562
@@ -1388,6 +1406,8 @@ Feature: F-1016: Submit Event to Update TTL
       Then a positive response is received
       And the response has all other details as expected
       And another call [to verify that the TTL data has changed] will get the expected response as in [S-1016.115.VerifyCaseDetails]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_71_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.116 #CCD-3562
   Scenario: Trigger a submit event callback that changes TTL set to null. Submit event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -1404,6 +1424,8 @@ Feature: F-1016: Submit Event to Update TTL
       Then a negative response is received
       And the response has all other details as expected
       And the response [contains the error message indicating unauthorised change to the TTL values]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_71_Remove_Case_Assigned_User_role_for_Case].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1430,6 +1452,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [contains the TTL.OverrideTTL from the previouse data]
       And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.122 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (No -> NO). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -1452,6 +1476,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
       And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1016.123 #CCD-3535
   Scenario: Trigger a submit event callback that changes TTL.Suspended (Yes -> YES). Submit event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -1474,6 +1500,8 @@ Feature: F-1016: Submit Event to Update TTL
       And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
       And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
       And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1016_52_Remove_Case_Assigned_User_role_for_Case].
 
 
   @S-1016.125 #CCD-3562
