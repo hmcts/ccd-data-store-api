@@ -173,7 +173,7 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_shell_case.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_pointer.sql"})
     public void testGetCase() throws Exception {
         String caseId = "1644062237356399";
         final String URL = "/cases/" + caseId;
