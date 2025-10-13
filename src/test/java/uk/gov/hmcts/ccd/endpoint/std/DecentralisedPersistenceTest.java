@@ -217,9 +217,9 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         Assertions.assertEquals(200, mvcResult.getResponse().getStatus(), mvcResult.getResponse().getContentAsString());
         String content = mvcResult.getResponse().getContentAsString();
         Assertions.assertNotNull(content, "Content Should not be null");
-        Map m = mapper.readValue(content, Map.class);
-        var data = (Map) m.get("data");
-        assertEquals(data.get("PersonLastName"), "Last Name");
+        Map<?, ?> responseBody = mapper.readValue(content, Map.class);
+        Map<?, ?> responseData = (Map<?, ?>) responseBody.get("data");
+        assertEquals("Last Name", responseData.get("PersonLastName"));
 
     }
 

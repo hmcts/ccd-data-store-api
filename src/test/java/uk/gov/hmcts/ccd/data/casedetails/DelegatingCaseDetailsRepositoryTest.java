@@ -78,8 +78,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     public void set_shouldThrowUnsupportedOperationException_whenCaseIsDecentralized() {
         when(resolver.isDecentralised(decentralizedCaseDetails)).thenReturn(true);
 
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
-            () -> repository.set(decentralizedCaseDetails));
+        assertThrows(UnsupportedOperationException.class, () -> repository.set(decentralizedCaseDetails));
 
         verify(localRepository, never()).set(any());
     }
@@ -230,8 +229,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     public void findByReference_deprecated_shouldThrowResourceNotFoundException_whenCaseNotFound() {
         when(localRepository.findByReference(null, CASE_REFERENCE)).thenReturn(Optional.empty());
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> repository.findByReference(CASE_REFERENCE));
+        assertThrows(ResourceNotFoundException.class, () -> repository.findByReference(CASE_REFERENCE));
     }
 
     @Test

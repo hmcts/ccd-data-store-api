@@ -76,31 +76,31 @@ public class ServicePersistenceClientTest {
     }
 
     private CaseDetails createCasePointer() {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_ID);
-        caseDetails.setReference(CASE_REFERENCE);
-        caseDetails.setJurisdiction(JURISDICTION);
-        caseDetails.setCaseTypeId(CASE_TYPE);
-        caseDetails.setState(CASE_STATE);
-        caseDetails.setVersion(1);
-        caseDetails.setSecurityClassification(uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC);
-        caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
-        caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        return caseDetails;
+        CaseDetails pointer = new CaseDetails();
+        pointer.setId(CASE_ID);
+        pointer.setReference(CASE_REFERENCE);
+        pointer.setJurisdiction(JURISDICTION);
+        pointer.setCaseTypeId(CASE_TYPE);
+        pointer.setState(CASE_STATE);
+        pointer.setVersion(1);
+        pointer.setSecurityClassification(uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC);
+        pointer.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+        pointer.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        return pointer;
     }
 
     private CaseDetails createCaseDetails() {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_ID);
-        caseDetails.setReference(CASE_REFERENCE);
-        caseDetails.setJurisdiction(JURISDICTION);
-        caseDetails.setCaseTypeId(CASE_TYPE);
-        caseDetails.setState(CASE_STATE);
-        caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
-        caseDetails.setVersion(1);
-        caseDetails.setSecurityClassification(uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC);
-        caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        return caseDetails;
+        CaseDetails details = new CaseDetails();
+        details.setId(CASE_ID);
+        details.setReference(CASE_REFERENCE);
+        details.setJurisdiction(JURISDICTION);
+        details.setCaseTypeId(CASE_TYPE);
+        details.setState(CASE_STATE);
+        details.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+        details.setVersion(1);
+        details.setSecurityClassification(uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC);
+        details.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        return details;
     }
 
     private DecentralisedCaseEvent createDecentralisedCaseEvent() {
