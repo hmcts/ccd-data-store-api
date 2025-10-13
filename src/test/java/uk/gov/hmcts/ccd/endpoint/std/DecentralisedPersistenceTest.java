@@ -32,7 +32,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.auditlog.AuditInterceptor.REQUEST_ID;
@@ -153,8 +153,9 @@ public class DecentralisedPersistenceTest extends WireMockBaseTest {
         final var expectedResponseDataNode = mapper.readTree(DATA_JSON_STRING);
         final var expectedResponseData = JacksonUtils.convertJsonNode(expectedResponseDataNode);
 
-        assertThat("Response should contain case data from decentralised service (only readable fields)",
-            actualResponseData.entrySet(), equalTo(expectedResponseData.entrySet()));
+        assertThat(actualResponseData.entrySet())
+            .as("Response should contain case data from decentralised service (only readable fields)")
+            .isEqualTo(expectedResponseData.entrySet());
 
         // AND: The ServicePersistenceAPI should have been called exactly once
         verify(1, postRequestedFor(urlEqualTo(SERVICE_PERSISTENCE_API_PATH))
