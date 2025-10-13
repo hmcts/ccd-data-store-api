@@ -74,8 +74,13 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
         );
     }
 
+    /**
+     * Legacy overload that only receives a case ID.
+     *
+     * @deprecated since 2018-04-04. Use {@link #findByReference(String, Long)} instead.
+     */
     @Override
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     public CaseDetails findById(Long id) {
         return findById(null, id).orElse(null);
     }
@@ -98,14 +103,24 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
         return findByReference(null, Long.parseLong(caseReference));
     }
 
+    /**
+     * Legacy overload that only receives a case reference.
+     *
+     * @deprecated since 2018-04-04. Use {@link #findByReference(String, Long)} instead.
+     */
     @Override
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     public CaseDetails findByReference(Long caseReference) {
         return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
+    /**
+     * Legacy overload that only receives a jurisdiction and string reference.
+     *
+     * @deprecated since 2018-04-04. Use {@link #findByReference(String, String)} instead.
+     */
     @Override
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     public CaseDetails findUniqueCase(String jurisdiction, String caseTypeId, String reference) {
         return findByReference(jurisdiction, Long.parseLong(reference)).orElse(null);
     }
