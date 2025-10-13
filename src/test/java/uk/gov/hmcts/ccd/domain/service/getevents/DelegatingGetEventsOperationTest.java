@@ -3,8 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 class DelegatingGetEventsOperationTest {
 
     private static final Long CASE_ID = 123L;
@@ -51,12 +53,8 @@ class DelegatingGetEventsOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_ID));
-
-        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
         listEventsOperation = new DelegatingGetEventsOperation(resolver, decentralisedAuditEventLoader,
             new LocalAuditEventLoader(auditEventRepository), getCaseOperation, uidService);
@@ -66,6 +64,8 @@ class DelegatingGetEventsOperationTest {
     @Test
     @DisplayName("should retrieve events from repository")
     void shouldDelegateCallToRepository() {
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
+
         final List<AuditEvent> events = listEventsOperation.getEvents(caseDetails);
 
         assertAll(
@@ -79,6 +79,7 @@ class DelegatingGetEventsOperationTest {
     void shouldFindCaseDetailsAndDelegateCallToRepository() {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
         final List<AuditEvent> events = listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
@@ -93,6 +94,7 @@ class DelegatingGetEventsOperationTest {
     void shouldFindCaseDetailsAndGetEventsForCaseReference() {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
         final List<AuditEvent> events = listEventsOperation.getEvents(CASE_REFERENCE);
 

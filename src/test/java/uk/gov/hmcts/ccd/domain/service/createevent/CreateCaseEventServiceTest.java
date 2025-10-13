@@ -35,7 +35,6 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
-import uk.gov.hmcts.ccd.domain.service.createevent.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
