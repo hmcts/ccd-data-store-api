@@ -195,9 +195,7 @@ public class CaseAccessOperation {
             }
         );
 
-        newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
-            updateOrgsAssignedUsersCount(caseReference, orgNewUserCountMap)
-        );
+        newUserCounts.forEach(this::updateOrgsAssignedUsersCount);
     }
 
     @Transactional
