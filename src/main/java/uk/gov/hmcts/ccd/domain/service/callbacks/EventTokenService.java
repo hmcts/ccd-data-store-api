@@ -143,14 +143,7 @@ public class EventTokenService {
             if (eventTokenProperties.getEntityVersion() != null) {
                 caseDetails.setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
             }
-            String revisionClaim = eventTokenProperties.getCaseRevision();
-            if (revisionClaim != null) {
-                caseDetails.setRevision(Long.parseLong(revisionClaim));
-            } else if (revisionRequired) {
-                // Old start-event tokens (minted before we added the revision claim) cannot safely
-                // participate in decentralised optimistic locking, so ask the caller to restart.
-                throw new BadRequestException("Start trigger token has expired. Please restart the event.");
-            }
+            applyRevision(eventTokenProperties.getCaseRevision(), caseDetails, revisionRequired);
         } catch (EventTokenException e) {
             throw new SecurityException("Token is not valid");
         }
@@ -168,5 +161,17 @@ public class EventTokenService {
         }
 
         return object.toString();
+    }
+
+    private void applyRevision(String revisionClaim,
+                               CaseDetails caseDetails,
+                               boolean revisionRequired) {
+        if (revisionClaim != null) {
+            caseDetails.setRevision(Long.parseLong(revisionClaim));
+        } else if (revisionRequired) {
+            // Old start-event tokens (minted before we added the revision claim) cannot safely
+            // participate in decentralised optimistic locking, so ask the caller to restart.
+            throw new BadRequestException("Start trigger token has expired. Please restart the event.");
+        }
     }
 }
