@@ -125,10 +125,6 @@ public class EventTokenService {
         }
 
         try {
-            if (revisionRequired) {
-                caseDetails.setRevision(null);
-            }
-
             final EventTokenProperties eventTokenProperties = parseToken(token);
 
             if (!(eventTokenProperties.getEventId() == null
