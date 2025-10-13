@@ -1,0 +1,26 @@
+{
+  "feature": {
+    "network": {
+      "incoming": "mirror",
+      "outgoing": true
+    },
+    "fs": "read",
+    "env": {
+      "override": {
+        "REFERENCE_DATABASE_MIGRATION": "false"
+      }
+    }
+  },
+  "target": {
+    "path": {
+      "pod": "xui-mo-webapp-pr-1367-ccd-data-store-api-577c5f4498-4c7bh"
+    },
+    "namespace": "xui"
+  },
+  "operator": false,
+  "agent": {
+    "flush_connections": false,
+    "startup_timeout": 300,
+    "namespace": "xui"
+  }
+}
