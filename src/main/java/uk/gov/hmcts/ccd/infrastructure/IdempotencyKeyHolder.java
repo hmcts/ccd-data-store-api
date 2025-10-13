@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.infrastructure;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -15,12 +15,15 @@ import org.springframework.web.context.annotation.RequestScope;
  */
 @Component
 @RequestScope
-@Data
+@Getter
 public class IdempotencyKeyHolder {
 
     private UUID key;
 
     public void computeAndSetKeyToRequestContext(final String digest) {
+        if (this.key != null) {
+            throw new IllegalStateException("Idempotency key has already been initialised for this request");
+        }
         this.key = UUID.nameUUIDFromBytes(digest.getBytes(StandardCharsets.UTF_8));
     }
 }
