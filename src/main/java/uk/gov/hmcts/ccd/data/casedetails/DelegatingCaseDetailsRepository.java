@@ -63,20 +63,6 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
         );
     }
 
-    /**
-     * Centralised delegation logic; route to the local repository first,
-     * then delegate to the decentralised service if the case type is decentralised.
-     */
-    private Optional<CaseDetails> findAndDelegate(Supplier<Optional<CaseDetails>> localCaseFinder,
-                                                  Function<CaseDetails, CaseDetails> decentralisedFinder) {
-        return localCaseFinder.get().map(casePointer -> {
-            if (resolver.isDecentralised(casePointer)) {
-                return decentralisedFinder.apply(casePointer);
-            }
-            return casePointer;
-        });
-    }
-
     // Overloaded and Deprecated methods
     // These delegate to the primary methods above.
 
@@ -154,5 +140,19 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
                                                               Map<String, String> dataSearchParams) {
         return localRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
+    }
+
+    /**
+     * Centralised delegation logic; route to the local repository first,
+     * then delegate to the decentralised service if the case type is decentralised.
+     */
+    private Optional<CaseDetails> findAndDelegate(Supplier<Optional<CaseDetails>> localCaseFinder,
+                                                  Function<CaseDetails, CaseDetails> decentralisedFinder) {
+        return localCaseFinder.get().map(casePointer -> {
+            if (resolver.isDecentralised(casePointer)) {
+                return decentralisedFinder.apply(casePointer);
+            }
+            return casePointer;
+        });
     }
 }
