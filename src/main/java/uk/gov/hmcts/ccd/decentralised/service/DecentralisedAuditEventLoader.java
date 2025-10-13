@@ -1,13 +1,14 @@
-package uk.gov.hmcts.ccd.domain.service.getevents;
+package uk.gov.hmcts.ccd.decentralised.service;
 
 import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
+import uk.gov.hmcts.ccd.decentralised.client.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.getevents.AuditEventLoader;
 
 @Service
 @RequiredArgsConstructor

@@ -18,9 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.decentralised.client.ServicePersistenceClient;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;

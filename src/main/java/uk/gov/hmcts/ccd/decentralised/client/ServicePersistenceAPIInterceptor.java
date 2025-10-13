@@ -1,6 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence;
-
-
+package uk.gov.hmcts.ccd.decentralised.client;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;

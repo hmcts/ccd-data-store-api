@@ -1,11 +1,11 @@
-package uk.gov.hmcts.ccd.domain.service.createevent;
+package uk.gov.hmcts.ccd.decentralised.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import javax.persistence.EntityManager;

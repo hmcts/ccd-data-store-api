@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence;
+package uk.gov.hmcts.ccd.decentralised.client;
 
 import java.net.URI;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedAuditEvent;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedSubmitEventResponse;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedUpdateSupplementaryDataResponse;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 
 @FeignClient(name = "servicePersistenceAPI", configuration = ServicePersistenceAPIInterceptor.class)

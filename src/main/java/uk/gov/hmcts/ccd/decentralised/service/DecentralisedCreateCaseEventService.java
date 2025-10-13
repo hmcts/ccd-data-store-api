@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.createevent;
+package uk.gov.hmcts.ccd.decentralised.service;
 
 import java.util.Optional;
 
@@ -6,10 +6,10 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
-import uk.gov.hmcts.ccd.data.persistence.ServicePersistenceClient;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedEventDetails;
+import uk.gov.hmcts.ccd.decentralised.client.ServicePersistenceClient;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedEventDetails;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;

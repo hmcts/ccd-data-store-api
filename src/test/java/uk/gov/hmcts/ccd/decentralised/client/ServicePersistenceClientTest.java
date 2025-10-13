@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence;
+package uk.gov.hmcts.ccd.decentralised.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
@@ -7,12 +7,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedAuditEvent;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseDetails;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedEventDetails;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedSubmitEventResponse;
-import uk.gov.hmcts.ccd.data.persistence.dto.DecentralisedUpdateSupplementaryDataResponse;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedAuditEvent;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedEventDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedSubmitEventResponse;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedUpdateSupplementaryDataResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;

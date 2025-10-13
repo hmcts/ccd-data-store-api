@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence;
+package uk.gov.hmcts.ccd.decentralised.client;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;

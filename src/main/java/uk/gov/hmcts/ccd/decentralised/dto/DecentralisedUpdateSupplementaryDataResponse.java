@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.persistence.dto;
+package uk.gov.hmcts.ccd.decentralised.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
