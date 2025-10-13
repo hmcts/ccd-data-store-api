@@ -32,7 +32,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -128,7 +127,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void getCase_shouldReturnCaseDetailsWithInternalId() {
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(decentralisedCaseDetails));
 
         CaseDetails result = servicePersistenceClient.getCase(casePointer);
@@ -144,7 +143,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void getCase_shouldThrowCaseNotFoundException_whenNoCasesReturned() {
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of());
 
         assertThrows(
@@ -163,7 +162,7 @@ public class ServicePersistenceClientTest {
         mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(mismatchedDetails));
 
         assertThrows(
@@ -182,7 +181,7 @@ public class ServicePersistenceClientTest {
         mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(mismatchedDetails));
 
         assertThrows(
@@ -201,7 +200,7 @@ public class ServicePersistenceClientTest {
         mismatchedDetails.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(mismatchedDetails));
 
         assertThrows(
@@ -220,7 +219,7 @@ public class ServicePersistenceClientTest {
         detailsMissingVersion.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(detailsMissingVersion));
 
         assertThrows(
@@ -239,7 +238,7 @@ public class ServicePersistenceClientTest {
         detailsMissingSecurity.setRevision(1L);
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
-        when(api.getCases(eq(SERVICE_URI), eq(List.of(CASE_REFERENCE))))
+        when(api.getCases(SERVICE_URI, List.of(CASE_REFERENCE)))
             .thenReturn(List.of(detailsMissingSecurity));
 
         assertThrows(
@@ -252,7 +251,7 @@ public class ServicePersistenceClientTest {
     public void createEvent_shouldReturnCaseDetailsWithInternalId() {
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(submitEventResponse);
 
         DecentralisedCaseDetails result = servicePersistenceClient.createEvent(caseEvent);
@@ -285,7 +284,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(errorResponse);
 
         ApiException exception = assertThrows(
@@ -306,7 +305,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(warningResponse);
 
         ApiException exception = assertThrows(
@@ -327,7 +326,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(warningResponse);
 
         DecentralisedCaseDetails result = servicePersistenceClient.createEvent(caseEvent);
@@ -349,7 +348,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(mismatchedResponse);
 
         ServiceException exception = assertThrows(
@@ -375,7 +374,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(mismatchedResponse);
 
         ServiceException exception = assertThrows(
@@ -401,7 +400,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(responseMissingVersion);
 
         assertThrows(ServiceException.class, () -> servicePersistenceClient.createEvent(caseEvent));
@@ -421,7 +420,7 @@ public class ServicePersistenceClientTest {
 
         when(resolver.resolveUriOrThrow(casePointer)).thenReturn(SERVICE_URI);
         when(idempotencyKeyHolder.getKey()).thenReturn(IDEMPOTENCY_KEY);
-        when(api.submitEvent(eq(SERVICE_URI), eq(IDEMPOTENCY_KEY.toString()), eq(caseEvent)))
+        when(api.submitEvent(SERVICE_URI, IDEMPOTENCY_KEY.toString(), caseEvent))
             .thenReturn(responseMissingSecurity);
 
         assertThrows(ServiceException.class, () -> servicePersistenceClient.createEvent(caseEvent));
@@ -437,7 +436,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(expectedEvent);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
+        when(api.getCaseHistory(SERVICE_URI, CASE_REFERENCE))
             .thenReturn(List.of(auditEvent));
 
         List<AuditEvent> result = servicePersistenceClient.getCaseHistory(caseDetails);
@@ -463,7 +462,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(expectedEvent);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
+        when(api.getCaseHistoryEvent(SERVICE_URI, CASE_REFERENCE, eventId))
             .thenReturn(auditEvent);
 
         AuditEvent result = servicePersistenceClient.getCaseHistoryEvent(caseDetails, eventId);
@@ -483,7 +482,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(new AuditEvent());
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
+        when(api.getCaseHistory(SERVICE_URI, CASE_REFERENCE))
             .thenReturn(List.of(auditEvent));
 
         assertThrows(ServiceException.class, () -> servicePersistenceClient.getCaseHistory(caseDetails));
@@ -499,7 +498,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(event);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistory(eq(SERVICE_URI), eq(CASE_REFERENCE)))
+        when(api.getCaseHistory(SERVICE_URI, CASE_REFERENCE))
             .thenReturn(List.of(auditEvent));
 
         assertThrows(ServiceException.class, () -> servicePersistenceClient.getCaseHistory(caseDetails));
@@ -516,7 +515,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(event);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
+        when(api.getCaseHistoryEvent(SERVICE_URI, CASE_REFERENCE, eventId))
             .thenReturn(auditEvent);
 
         assertThrows(ServiceException.class,
@@ -535,7 +534,7 @@ public class ServicePersistenceClientTest {
         auditEvent.setEvent(event);
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
-        when(api.getCaseHistoryEvent(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(eventId)))
+        when(api.getCaseHistoryEvent(SERVICE_URI, CASE_REFERENCE, eventId))
             .thenReturn(auditEvent);
 
         assertThrows(ServiceException.class,
@@ -550,7 +549,7 @@ public class ServicePersistenceClientTest {
         JsonNode expectedData = null;
 
         when(resolver.resolveUriOrThrow(CASE_REFERENCE)).thenReturn(SERVICE_URI);
-        when(api.updateSupplementaryData(eq(SERVICE_URI), eq(CASE_REFERENCE), eq(request)))
+        when(api.updateSupplementaryData(SERVICE_URI, CASE_REFERENCE, request))
             .thenReturn(response);
         when(response.getSupplementaryData()).thenReturn(expectedData);
 
