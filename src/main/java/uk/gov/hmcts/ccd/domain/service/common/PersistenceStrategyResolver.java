@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Determines whether a case's mutable data is handled by the
@@ -121,7 +120,7 @@ public class PersistenceStrategyResolver {
 
         List<String> matchingPrefixes = caseTypeServiceUrls.keySet().stream()
             .filter(lowerCaseTypeId::startsWith)
-            .collect(Collectors.toList());
+            .toList();
 
         if (matchingPrefixes.size() > 1) {
             String conflictingPrefixes = String.join(", ", matchingPrefixes);
