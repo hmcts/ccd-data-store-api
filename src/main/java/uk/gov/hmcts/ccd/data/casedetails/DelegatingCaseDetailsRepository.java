@@ -15,8 +15,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * A delegating repository that acts as a router between the local (Postgres)
@@ -162,12 +162,10 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
      * then delegate to the decentralised service if the case type is decentralised.
      */
     private Optional<CaseDetails> findAndDelegate(Supplier<Optional<CaseDetails>> localCaseFinder,
-                                                  Function<CaseDetails, CaseDetails> decentralisedFinder) {
-        return localCaseFinder.get().map(casePointer -> {
-            if (resolver.isDecentralised(casePointer)) {
-                return decentralisedFinder.apply(casePointer);
-            }
-            return casePointer;
-        });
+                                                  UnaryOperator<CaseDetails> decentralisedFinder) {
+        return localCaseFinder.get()
+            .map(casePointer -> resolver.isDecentralised(casePointer)
+                ? decentralisedFinder.apply(casePointer)
+                : casePointer);
     }
 }
