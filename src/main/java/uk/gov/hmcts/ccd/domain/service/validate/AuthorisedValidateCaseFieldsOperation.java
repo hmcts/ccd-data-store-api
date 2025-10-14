@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -34,7 +33,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private final CaseAccessService caseAccessService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final ConditionalFieldRestorer conditionalFieldRestorer;
-    private final ApplicationParams applicationParams;
 
     public AuthorisedValidateCaseFieldsOperation(AccessControlService accessControlService,
                                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -42,14 +40,12 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
                                                  CaseAccessService caseAccessService,
                                                  @Qualifier(ClassifiedValidateCaseFieldsOperation.QUALIFIER)
                                                  ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                                 ConditionalFieldRestorer conditionalFieldRestorer,
-                                                 ApplicationParams applicationParams) {
+                                                 ConditionalFieldRestorer conditionalFieldRestorer) {
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.conditionalFieldRestorer = conditionalFieldRestorer;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -58,12 +54,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         CaseDataContent content = operationContext.content();
         String caseTypeId = operationContext.caseTypeId();
-
-        if (applicationParams.getExcludeVerifyAccessCaseTypesForValidate()
-            .stream()
-            .anyMatch(c -> c.equalsIgnoreCase(caseTypeId))) {
-            return content.getData();
-        }
 
         Set<AccessProfile> accessProfiles = determineAccessProfiles(caseTypeId, content);
         Map<String, JsonNode> classifiedData = createClassifiedData(content);
