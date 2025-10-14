@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -44,6 +46,8 @@ import static uk.gov.hmcts.ccd.auditlog.AuditInterceptor.REQUEST_ID;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.v2.V2.EXPERIMENTAL_HEADER;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.userRoleAssignmentJson;
 
 /**
  * Integration test for decentralised data persistence feature.
@@ -88,6 +92,8 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication,
             MockUtils.ROLE_TEST_PUBLIC,
             MockUtils.ROLE_CASEWORKER_PUBLIC);
+
+        stubUserInfo(USER_ID);
 
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -401,6 +407,65 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_pointer.sql"})
+    public void shouldReturnDecentralisedEventsForCaseworker() throws Exception {
+        final String caseReference = "1644062237356399";
+        final String url = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%s/events",
+            USER_ID, JURISDICTION_ID, DECENTRALISED_CASE_TYPE_ID, caseReference);
+
+        stubRoleAssignments(caseReference);
+
+        final Long caseReferenceId = Long.valueOf(caseReference);
+        final JsonNode existingCaseData = buildLegacyPersonData();
+
+        wireMockServer.stubFor(WireMock.get(urlPathEqualTo("/ccd-persistence/cases"))
+            .withQueryParam("case-refs", equalTo(caseReference))
+            .willReturn(okJson(mapper.writeValueAsString(
+                List.of(remoteCaseDetails(caseReferenceId, existingCaseData, 1, "CaseCreated"))))));
+
+        final ArrayNode historyPayload = mapper.createArrayNode();
+        final ObjectNode eventWrapper = historyPayload.addObject();
+        eventWrapper.put("id", 99L);
+        eventWrapper.put("case_reference", caseReferenceId);
+        final ObjectNode eventNode = eventWrapper.putObject("event");
+        eventNode.put("event_name", "Create Case");
+        eventNode.put("summary", "Decentralised case created");
+        eventNode.put("description", "Remote service created the case");
+        eventNode.put("state_id", "CaseCreated");
+        eventNode.put("state_name", "CaseCreated");
+        eventNode.put("case_type_id", DECENTRALISED_CASE_TYPE_ID);
+        eventNode.put("created_date", "2024-06-15T10:15:30");
+        eventNode.put("security_classification", "PUBLIC");
+        eventNode.put("id", "CREATE-CASE");
+
+        wireMockServer.stubFor(WireMock.get(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history"))
+            .willReturn(okJson(mapper.writeValueAsString(historyPayload)).withStatus(200)));
+
+        final MvcResult mvcResult = mockMvc.perform(get(url)
+            .contentType(JSON_CONTENT_TYPE))
+            .andReturn();
+
+        assertEquals("Expected decentralised events to be returned", 200, mvcResult.getResponse().getStatus());
+
+        final AuditEvent[] events =
+            mapper.readValue(mvcResult.getResponse().getContentAsString(), AuditEvent[].class);
+
+        assertThat(events)
+            .as("Decentralised events response should surface the remote audit entry")
+            .hasSize(1);
+
+        final AuditEvent event = events[0];
+        assertThat(event.getEventName()).isEqualTo("Create Case");
+        assertThat(event.getEventId()).isEqualTo("CREATE-CASE");
+        assertThat(event.getCaseTypeId()).isEqualTo(DECENTRALISED_CASE_TYPE_ID);
+        assertThat(event.getStateId()).isEqualTo("CaseCreated");
+
+        verify(getRequestedFor(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history")));
+
+        wireMockServer.resetAll();
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_pointer.sql"})
     public void shouldReturn422WhenDecentralisedServiceReturnsErrors() throws Exception {
         final String caseId = "1644062237356399";
         final Long caseReference = Long.valueOf(caseId);
@@ -536,6 +601,17 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         assertThat(versionAfterSecondSubmit).isEqualTo(expectedRevision);
 
         wireMockServer.resetAll();
+    }
+
+    private void stubRoleAssignments(String caseReference) {
+        final String responseJson = roleAssignmentResponseJson(
+            userRoleAssignmentJson(USER_ID, MockUtils.ROLE_CASEWORKER_PUBLIC, caseReference,
+                DECENTRALISED_CASE_TYPE_ID),
+            userRoleAssignmentJson(USER_ID, MockUtils.ROLE_TEST_PUBLIC, caseReference,
+                DECENTRALISED_CASE_TYPE_ID));
+
+        stubFor(WireMock.get(urlEqualTo("/am/role-assignments/actors/" + USER_ID))
+            .willReturn(okJson(responseJson).withStatus(200)));
     }
 
     private ObjectNode submitResponseBody(Long caseReference, int revision, JsonNode caseData) {
