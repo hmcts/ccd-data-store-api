@@ -107,6 +107,41 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    void testSearchCaseDetails_usingGlobal() throws Exception {
+
+        final long referenceId = 1535450291607660L;
+        String caseDetailElastic = create1CaseDetailsElastic(referenceId);
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
+
+        String searchRequest = "{\"query\": {\"match_all\": {}}}";
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+                .contentType(JSON_CONTENT_TYPE)
+                .param("ctid", "TestAddressBookCase")
+                .param("global", "true")
+                .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
+            CaseSearchResult.class);
+
+        List<CaseDetails> caseDetails = caseSearchResults.getCases();
+        assertThat(caseDetails, hasSize(1));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(referenceId))));
+        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
+        assertThat(caseDetails, hasItem(hasProperty("caseTypeId",
+            equalTo("TestAddressBookCase"))));
+        assertThat(caseDetails, hasItem(hasProperty("lastModified",
+            equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
+        assertThat(caseDetails, hasItem(hasProperty("createdDate",
+            equalTo(LocalDateTime.parse("2018-08-28T09:58:11.627")))));
+        assertThat(caseDetails, hasItem(hasProperty("state", equalTo("TODO"))));
+        assertThat(caseDetails, hasItem(hasProperty("securityClassification",
+            equalTo(SecurityClassification.PUBLIC))));
+    }
+
+    @Test
     void shouldAuditLogSearchCases() throws Exception {
 
         final long reference1 = 1535450291607660L;
@@ -120,6 +155,44 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .param("ctid", "TestAddressBookCase", "TestAddressBookCase4")
             .content(searchRequest))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String responseAsString = result.getResponse().getContentAsString();
+        CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
+            CaseSearchResult.class);
+
+        List<CaseDetails> caseDetails = caseSearchResults.getCases();
+        assertThat(caseDetails, hasSize(2));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is("1535450291607660,1535450291607670"));
+        assertThat(captor.getValue().getIdamId(), is("123"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
+    }
+
+    @Test
+    void shouldAuditLogSearchCases_usingGlobalIndex() throws Exception {
+
+        final long reference1 = 1535450291607660L;
+        final long reference2 = 1535450291607670L;
+        String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
+
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
+
+        String searchRequest = "{\"query\": {\"match_all\": {}}}";
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+                .contentType(JSON_CONTENT_TYPE)
+                .param("ctid", "TestAddressBookCase", "TestAddressBookCase4")
+                .param("global", "true")
+                .content(searchRequest))
             .andExpect(status().is(200))
             .andReturn();
 
