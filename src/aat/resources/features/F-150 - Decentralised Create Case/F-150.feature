@@ -24,6 +24,16 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains an HTTP 409 'Conflict'],
     And the response has all other details as expected.
 
+  @S-150.08
+  Scenario: must surface validation errors when decentralised case create is rejected
+    Given a successful call [to start decentralised case creation] as in [F-150_CreateCase_ValidationError_Token_Creation],
+    And a user with [an active profile in CCD],
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [external create case] operation of [CCD Data Store],
+    Then a negative response is received,
+    And the response [contains an HTTP 422 'Unprocessable Entity'],
+    And the response has all other details as expected.
+
   @S-150.02
   Scenario: must return 200 when retrieving a decentralised case after creation
     Given a user with [an active profile in CCD],
