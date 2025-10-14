@@ -22,4 +22,28 @@
   "EndButtonLabel" : "",
   "Publish" : "",
   "TTLIncrement" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_Decentralisation",
+  "ID" : "simulateDecentralisedConflict",
+  "Name" : "Simulate decentralised clash",
+  "Description" : "Triggers the decentralised conflict stub path",
+  "DisplayOrder" : 2,
+  "PreConditionState(s)" : "",
+  "PostConditionState" : "CaseCreated",
+  "EventEnablingCondition" : "",
+  "CallBackURLAboutToStartEvent" : "",
+  "RetriesTimeoutAboutToStartEvent" : "",
+  "CallBackURLAboutToSubmitEvent" : "",
+  "RetriesTimeoutURLAboutToSubmitEvent" : "",
+  "CallBackURLSubmittedEvent" : "",
+  "RetriesTimeoutURLSubmittedEvent" : "",
+  "SecurityClassification" : "Public",
+  "ShowSummary" : "Y",
+  "ShowEventNotes" : "",
+  "CanSaveDraft" : "N",
+  "EndButtonLabel" : "",
+  "Publish" : "",
+  "TTLIncrement" : ""
 } ]
