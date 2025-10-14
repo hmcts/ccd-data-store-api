@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -47,6 +48,7 @@ public class ServicePersistenceClient {
         validateCaseDetails(casePointer, first);
         var returnedCaseDetails = first.getCaseDetails();
         returnedCaseDetails.setRevision(first.getRevision());
+        initialiseCaseData(returnedCaseDetails);
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
         returnedCaseDetails.setId(casePointer.getId());
@@ -98,10 +100,12 @@ public class ServicePersistenceClient {
 
         validateCaseDetails(casePointer, details);
 
-        details.getCaseDetails().setRevision(details.getRevision());
+        var returnedCaseDetails = details.getCaseDetails();
+        returnedCaseDetails.setRevision(details.getRevision());
+        initialiseCaseData(returnedCaseDetails);
 
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
-        details.getCaseDetails().setId(casePointer.getId());
+        returnedCaseDetails.setId(casePointer.getId());
         return details;
     }
 
@@ -176,5 +180,14 @@ public class ServicePersistenceClient {
         }
 
         return event;
+    }
+
+    private void initialiseCaseData(CaseDetails caseDetails) {
+        if (caseDetails.getData() == null) {
+            caseDetails.setData(new HashMap<String, JsonNode>());
+        }
+        if (caseDetails.getDataClassification() == null) {
+            caseDetails.setDataClassification(new HashMap<String, JsonNode>());
+        }
     }
 }
