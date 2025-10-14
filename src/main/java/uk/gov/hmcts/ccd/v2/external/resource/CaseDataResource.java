@@ -29,6 +29,6 @@ public class CaseDataResource extends RepresentationModel<RepresentationModel<?>
     }
 
     private void copyProperties(CaseDataContent caseData) {
-        this.data = JacksonUtils.convertValueJsonNode(caseData.getData().get(JacksonUtils.DATA));
+        this.data = JacksonUtils.convertValueJsonNode(caseData.getData().get("data"));
     }
 }
