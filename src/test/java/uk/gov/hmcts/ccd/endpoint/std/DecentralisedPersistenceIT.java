@@ -615,15 +615,6 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         ).andReturn();
     }
 
-    private void stubServicePersistenceResponse(int status, String body) {
-        stubFor(WireMock.post(urlEqualTo(SERVICE_PERSISTENCE_API_PATH))
-            .withHeader("Idempotency-Key", matching(".*"))
-            .willReturn(aResponse()
-                .withStatus(status)
-                .withHeader("Content-Type", "application/json")
-                .withBody(body)));
-    }
-
     private void stubSuccessfulBeforeStartCallback() {
         wireMockServer.stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson("""

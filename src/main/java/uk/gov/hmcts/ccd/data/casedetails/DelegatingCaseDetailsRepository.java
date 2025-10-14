@@ -81,6 +81,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
      */
     @Override
     @Deprecated(since = "2018-04-04")
+    @SuppressWarnings("java:S1133") // keep legacy API for backward compatibility
     public CaseDetails findById(Long id) {
         return findById(null, id).orElse(null);
     }
@@ -110,6 +111,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
      */
     @Override
     @Deprecated(since = "2018-04-04")
+    @SuppressWarnings("java:S1133") // keep legacy API for backward compatibility
     public CaseDetails findByReference(Long caseReference) {
         return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
@@ -121,6 +123,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
      */
     @Override
     @Deprecated(since = "2018-04-04")
+    @SuppressWarnings("java:S1133") // keep legacy API for backward compatibility
     public CaseDetails findUniqueCase(String jurisdiction, String caseTypeId, String reference) {
         return findByReference(jurisdiction, Long.parseLong(reference)).orElse(null);
     }

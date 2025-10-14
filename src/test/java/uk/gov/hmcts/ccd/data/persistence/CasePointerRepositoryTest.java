@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -78,8 +79,12 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         assertThat(originalCaseDetails.getResolvedTTL(), is(nullValue()));
 
         // And: The case pointer should be persisted in the database
-        CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(originalCaseDetails.getId()));
-        assertThat("Case pointer should exist in database", pointer, is(notNullValue()));
+        Optional<CaseDetails> pointerOptional = caseDetailsRepository.findById(
+            JURISDICTION,
+            Long.valueOf(originalCaseDetails.getId())
+        );
+        assertThat("Case pointer should exist in database", pointerOptional.isPresent(), is(true));
+        CaseDetails pointer = pointerOptional.orElseThrow();
         LocalDate expectedDanglingPointerExpiry = LocalDate.now().plusYears(1);
         assertAll("Case pointer should have expected properties",
             () -> assertThat(pointer.getId(), is(originalCaseDetails.getId())),
@@ -108,7 +113,10 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
         casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
 
-        CaseDetails pointer = caseDetailsRepository.findById(Long.valueOf(originalCaseDetails.getId()));
+        CaseDetails pointer = caseDetailsRepository.findById(
+            JURISDICTION,
+            Long.valueOf(originalCaseDetails.getId())
+        ).orElse(null);
 
         assertThat(pointer, is(notNullValue()));
         assertThat(pointer.getResolvedTTL(), is(existingTtl));

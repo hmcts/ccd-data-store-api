@@ -168,6 +168,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findById_deprecated_shouldReturnNull_whenCaseNotFound() {
         when(localRepository.findById(null, CASE_ID)).thenReturn(Optional.empty());
 
@@ -177,6 +178,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findById_deprecated_shouldReturnCase_whenCaseFound() {
         when(localRepository.findById(null, CASE_ID)).thenReturn(Optional.of(centralizedCaseDetails));
         when(resolver.isDecentralised(centralizedCaseDetails)).thenReturn(false);
@@ -226,6 +228,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findByReference_deprecated_shouldThrowResourceNotFoundException_whenCaseNotFound() {
         when(localRepository.findByReference(null, CASE_REFERENCE)).thenReturn(Optional.empty());
 
@@ -233,6 +236,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findByReference_deprecated_shouldReturnCase_whenCaseFound() {
         when(localRepository.findByReference(null, CASE_REFERENCE))
             .thenReturn(Optional.of(centralizedCaseDetails));
@@ -244,6 +248,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findUniqueCase_deprecated_shouldReturnNull_whenCaseNotFound() {
         when(localRepository.findByReference(JURISDICTION, CASE_REFERENCE)).thenReturn(Optional.empty());
 
@@ -253,6 +258,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings({"deprecation", "java:S1874"})
     public void findUniqueCase_deprecated_shouldReturnCase_whenCaseFound() {
         when(localRepository.findByReference(JURISDICTION, CASE_REFERENCE))
             .thenReturn(Optional.of(centralizedCaseDetails));
