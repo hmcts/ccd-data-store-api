@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -102,6 +103,11 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         // Stub the case type definition API to return our decentralised case type
         stubFor(WireMock.get(urlMatching("/api/data/case-type/" + DECENTRALISED_CASE_TYPE_ID))
             .willReturn(okJson(getTestDefinition(wiremockPort, DECENTRALISED_CASE_TYPE_ID)).withStatus(200)));
+    }
+
+    @After
+    public void tearDown() {
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -402,7 +408,6 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         );
         assertEquals("Decentralised pointer should not store mutable case data", "{}", storedData);
 
-        wireMockServer.resetAll();
     }
 
     @Test
@@ -423,19 +428,16 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
                 List.of(remoteCaseDetails(caseReferenceId, existingCaseData, 1, "CaseCreated"))))));
 
         final ArrayNode historyPayload = mapper.createArrayNode();
-        final ObjectNode eventWrapper = historyPayload.addObject();
-        eventWrapper.put("id", 99L);
-        eventWrapper.put("case_reference", caseReferenceId);
-        final ObjectNode eventNode = eventWrapper.putObject("event");
-        eventNode.put("event_name", "Create Case");
-        eventNode.put("summary", "Decentralised case created");
-        eventNode.put("description", "Remote service created the case");
-        eventNode.put("state_id", "CaseCreated");
-        eventNode.put("state_name", "CaseCreated");
-        eventNode.put("case_type_id", DECENTRALISED_CASE_TYPE_ID);
-        eventNode.put("created_date", "2024-06-15T10:15:30");
-        eventNode.put("security_classification", "PUBLIC");
-        eventNode.put("id", "CREATE-CASE");
+        historyPayload.add(decentralisedAuditEvent(
+            caseReferenceId,
+            99L,
+            "Create Case",
+            "CREATE-CASE",
+            "Decentralised case created",
+            "Remote service created the case",
+            "CaseCreated",
+            "CaseCreated",
+            "2024-06-15T10:15:30"));
 
         wireMockServer.stubFor(WireMock.get(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history"))
             .willReturn(okJson(mapper.writeValueAsString(historyPayload)).withStatus(200)));
@@ -461,7 +463,65 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
 
         verify(getRequestedFor(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history")));
 
-        wireMockServer.resetAll();
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_pointer.sql"})
+    public void shouldReturnDecentralisedEventHistoryForCaseworker() throws Exception {
+        final String caseReference = "1644062237356399";
+        final Long caseReferenceId = Long.valueOf(caseReference);
+        final long eventId = 99L;
+        final String url = String.format(
+            "/aggregated/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%s/events/%d/case-history",
+            USER_ID, JURISDICTION_ID, DECENTRALISED_CASE_TYPE_ID, caseReference, eventId);
+
+        stubRoleAssignments(caseReference);
+
+        final JsonNode existingCaseData = buildLegacyPersonData();
+
+        wireMockServer.stubFor(WireMock.get(urlPathEqualTo("/ccd-persistence/cases"))
+            .withQueryParam("case-refs", equalTo(caseReference))
+            .willReturn(okJson(mapper.writeValueAsString(
+                List.of(remoteCaseDetails(caseReferenceId, existingCaseData, 1, "CaseCreated"))))));
+
+        final ObjectNode eventPayload = decentralisedAuditEvent(
+            caseReferenceId,
+            eventId,
+            "Create Case",
+            "CREATE-CASE",
+            "Decentralised case created",
+            "Remote service created the case",
+            "CaseCreated",
+            "CaseCreated",
+            "2024-06-15T10:45:00");
+
+        wireMockServer.stubFor(WireMock.get(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history/"
+            + eventId))
+            .willReturn(okJson(mapper.writeValueAsString(eventPayload)).withStatus(200)));
+
+        final MvcResult mvcResult = mockMvc.perform(get(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(EXPERIMENTAL_HEADER, "experimental"))
+            .andReturn();
+
+        final int status = mvcResult.getResponse().getStatus();
+        assertEquals("Expected decentralised case history view to be returned", 200, status);
+
+        final JsonNode response = mapper.readTree(mvcResult.getResponse().getContentAsString());
+        assertThat(response.get("case_id").asText())
+            .as("Response should include original case reference")
+            .isEqualTo(caseReference);
+
+        final JsonNode responseEvent = response.get("event");
+        assertThat(responseEvent.get("id").asLong())
+            .as("Case history view should include decentralised event id")
+            .isEqualTo(eventId);
+        assertThat(responseEvent.get("event_name").asText()).isEqualTo("Create Case");
+        assertThat(responseEvent.get("event_id").asText()).isEqualTo("CREATE-CASE");
+        assertThat(responseEvent.get("state_id").asText()).isEqualTo("CaseCreated");
+
+        verify(getRequestedFor(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history/" + eventId)));
+
     }
 
     @Test
@@ -528,7 +588,6 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         );
         assertEquals("Pointer should remain as metadata-only shell after failure", "{}", storedData);
 
-        wireMockServer.resetAll();
     }
 
     @Test
@@ -599,8 +658,6 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
             caseReference
         );
         assertThat(versionAfterSecondSubmit).isEqualTo(expectedRevision);
-
-        wireMockServer.resetAll();
     }
 
     private void stubRoleAssignments(String caseReference) {
@@ -631,7 +688,34 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
     }
 
     private String getTestDefinition(int port, String caseTypeId) {
-        return CallbackTestData.getTestDefinition(port).replace("CallbackCase", caseTypeId);
+        return CallbackTestData.getTestDefinition(port)
+            .replace("CallbackCase", caseTypeId)
+            .replace("\"id\": \"TEST\"", "\"id\": \"" + JURISDICTION_ID + "\"");
+    }
+
+    private ObjectNode decentralisedAuditEvent(Long caseReferenceId,
+                                               long eventId,
+                                               String eventName,
+                                               String eventIdentifier,
+                                               String summary,
+                                               String description,
+                                               String stateId,
+                                               String stateName,
+                                               String createdDate) {
+        final ObjectNode eventWrapper = mapper.createObjectNode();
+        eventWrapper.put("id", eventId);
+        eventWrapper.put("case_reference", caseReferenceId);
+        final ObjectNode eventNode = eventWrapper.putObject("event");
+        eventNode.put("event_name", eventName);
+        eventNode.put("summary", summary);
+        eventNode.put("description", description);
+        eventNode.put("state_id", stateId);
+        eventNode.put("state_name", stateName);
+        eventNode.put("case_type_id", DECENTRALISED_CASE_TYPE_ID);
+        eventNode.put("created_date", createdDate);
+        eventNode.put("security_classification", "PUBLIC");
+        eventNode.put("id", eventIdentifier);
+        return eventWrapper;
     }
 
     private Map<String, Object> extractCaseDataFromResponse(MvcResult mvcResult) throws Exception {
