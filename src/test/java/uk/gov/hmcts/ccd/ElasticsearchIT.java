@@ -291,6 +291,32 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        void shouldReturnAllCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(boolQuery()
+                    .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
+                    .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
+                    .must(matchQuery(caseData(TEXT_FIELD), TEXT_VALUE)) // ES Text
+                    .must(matchQuery(caseData(DATE_FIELD), DATE_VALUE)) // ES Date
+                    .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE)) // ES Phone
+                    .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
+                    .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
+                    .must(matchQuery(STATE, STATE_VALUE))) // Metadata
+                .build();
+
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null, true);
+
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
+            assertAll(
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
+                () -> assertExampleCaseData(caseDetails.getFields(), false),
+                () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
+            );
+        }
+
+        @Test
         void shouldReturnAllCaseDetailsForPhoneValueWithSpace() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(boolQuery()
@@ -419,7 +445,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
         }
-
 
         @Test
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
@@ -814,8 +839,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest,
                                                             String caseTypeParam, String useCase) throws Exception {
+            return executeRequest(searchRequest, caseTypeParam, useCase, false);
+        }
+
+        private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest,
+                                                            String caseTypeParam, String useCase, boolean global)
+            throws Exception {
             MockHttpServletRequestBuilder postRequest =
-                createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase);
+                createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase, global);
 
             return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc,
                 CaseSearchResultViewResource.class);
@@ -825,8 +856,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                                              String caseTypeParam,
                                              String useCase,
                                              int expectedErrorCode) throws Exception {
+            return executeErrorRequest(searchRequest, caseTypeParam, useCase, false, expectedErrorCode);
+        }
+
+        private JsonNode executeErrorRequest(ElasticsearchTestRequest searchRequest,
+                                             String caseTypeParam,
+                                             String useCase,
+                                             boolean global,
+                                             int expectedErrorCode) throws Exception {
             MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest,
-                caseTypeParam, useCase);
+                caseTypeParam, useCase, global);
 
             return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc,
                 JsonNode.class);
