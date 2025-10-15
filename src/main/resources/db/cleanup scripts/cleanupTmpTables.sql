@@ -15,7 +15,7 @@
 --	•	min_age_days (e.g., 30, 90, …)
 --	•	only_my_tables to restrict to your own objects.
 --	•	schema_whitelist if you want to target specific schemas only.
---	3.	To actually drop, set dry_run := FALSE and rerun the whole block.
+--	3.	To actually drop, set dry_run := FALSE (i.e.TRUE::bool AS dry_run) and rerun the whole block.
 
 DROP TABLE IF EXISTS tmp_drop_targets;
 
@@ -28,7 +28,7 @@ params AS (
     TRUE::bool   AS dry_run,             -- TRUE = preview only; set FALSE to drop
     TRUE::bool   AS only_my_tables,      -- restrict to current_user’s tables
     FALSE::bool  AS use_cascade,         -- drop ... CASCADE ?
-    ARRAY[]::text[] AS schema_whitelist, -- empty = any user schema
+    ARRAY['public']::text[] AS schema_whitelist, -- only tables from the public schema are considered
     ARRAY[
       -- exact/short names
       'aug_latest',
