@@ -91,7 +91,7 @@ class DefaultCreateEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();

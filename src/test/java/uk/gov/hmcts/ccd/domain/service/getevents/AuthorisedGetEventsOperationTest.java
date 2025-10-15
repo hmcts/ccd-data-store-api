@@ -32,8 +32,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.anyListOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
@@ -83,7 +83,7 @@ class AuthorisedGetEventsOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseType = new CaseTypeDefinition();
         List<CaseEventDefinition> eventsDefinition = new ArrayList<>();
@@ -278,7 +278,7 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
-            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class),
+            .filterCaseAuditEventsByReadAccess(anyList(), anyList(),
                 eq(CASE_USER_ROLES));
 
         Optional<AuditEvent> optionalAuditEvent =
@@ -295,7 +295,7 @@ class AuthorisedGetEventsOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService)
-                .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()),
+                .filterCaseAuditEventsByReadAccess(anyList(), eq(caseType.getEvents()),
                     eq(CASE_USER_ROLES)),
             () -> assertThat(output, is(event))
         );

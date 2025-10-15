@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;

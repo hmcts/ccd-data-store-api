@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

@@ -24,7 +24,7 @@ class DefaultCaseAssignedUserRolesOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseAssignedUserRolesOperation = new DefaultCaseAssignedUserRolesOperation(caseAccessOperation);
     }
