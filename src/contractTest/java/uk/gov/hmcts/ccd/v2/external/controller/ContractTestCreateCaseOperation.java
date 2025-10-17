@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdate
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @Service
 @Qualifier("authorised")
@@ -57,11 +59,14 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                            @Qualifier("default")
                                                SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                            SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
-                                           CaseLinkService caseLinkService) {
+                                           CaseLinkService caseLinkService,
+                                           TimeToLiveService timeToLiveService,
+                                           final IdempotencyKeyHolder idempotencyKeyHolder) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
             submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
             casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
-            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService);
+            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService,
+            idempotencyKeyHolder);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 

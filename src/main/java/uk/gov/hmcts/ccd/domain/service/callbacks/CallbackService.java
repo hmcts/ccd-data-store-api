@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
@@ -51,18 +51,21 @@ public class CallbackService {
     private final ApplicationParams applicationParams;
     private final AppInsights appinsights;
     private final HttpServletRequest request;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            @Qualifier("restTemplate") final RestTemplate restTemplate,
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
-                           HttpServletRequest request) {
+                           HttpServletRequest request,
+                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.appinsights = appinsights;
         this.request = request;
+        this.objectMapper = objectMapper;
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -146,11 +149,12 @@ public class CallbackService {
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
-                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType, requestEntity);
+                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType,
+                    printCallbackDetails(requestEntity));
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (logCallbackDetails(url)) {
-                LOG.info("Callback {} response received: {}", url, responseEntity);
+                LOG.info("Callback {} response received: {}", url, printCallbackDetails(responseEntity));
             }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
@@ -169,6 +173,16 @@ public class CallbackService {
             Duration duration = Duration.between(startTime, Instant.now());
             appinsights.trackCallbackEvent(callbackType, url, String.valueOf(httpStatus), duration);
         }
+    }
+
+    private String printCallbackDetails(HttpEntity<?> callbackHttpEntity) {
+        try {
+            return objectMapper.writeValueAsString(callbackHttpEntity);
+        } catch (Exception ex) {
+            LOG.warn("Unexpected error while logging callback: {}", ex.getMessage());
+        }
+
+        return null;
     }
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
@@ -238,7 +252,7 @@ public class CallbackService {
 
     private boolean logCallbackDetails(final String url) {
         return (!applicationParams.getCcdCallbackLogControl().isEmpty()
-            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
+            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().getFirst())
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
     }
