@@ -181,10 +181,6 @@ public class CaseDataService {
     public Map<String, JsonNode> cloneDataMap(final Map<String, JsonNode> source) {
         final Map<String, JsonNode> clone = new HashMap<>();
 
-        if (source == null) {
-            return null;
-        }
-
         for (Map.Entry<String, JsonNode> entry : source.entrySet()) {
             clone.put(entry.getKey(), entry.getValue().deepCopy());
         }
