@@ -1,4 +1,3 @@
-
 /* ============================================================================
 File:        cleanup_temp_tables_detailed_summary_report.sql
 Created:     2025-10-17
@@ -18,6 +17,9 @@ Workflow
   3. Gather table metadata from pg_class, pg_namespace, and pg_roles.
   4. Attempt to parse embedded dates from table names in several formats:
          YYYYMMDD, DDMMYYYY, YYYY-MM-DD, DD-MM-YYYY.
+         YYYY_MM_DD, DD_MM_YYYY,
+         DD-MM-YY, DD_MM_YY,
+         DDMMYY
   5. Compute size metrics using pg_total_relation_size() and estimate age_days.
   6. Join with pg_stat_all_tables to add tuple-activity statistics.
   7. Produce a single unified result set (details + summaries).
@@ -114,7 +116,7 @@ WITH params AS (
 /* Base table list with size breakdowns */
 t AS (
   SELECT
-    c.oid                                   AS relid,
+    c.oid                                    AS relid,
     n.nspname                                AS schema_name,
     c.relname                                AS table_name,
     pg_catalog.pg_get_userbyid(c.relowner)   AS owner_name,
@@ -163,32 +165,51 @@ name_date AS (
     s.vacuum_count, s.autovacuum_count, s.analyze_count, s.autoanalyze_count,
 
     COALESCE(
-      /* YYYY-MM-DD or YYYY_MM_DD (unambiguous YMD) */
+      /* 1) YYYY-MM-DD or YYYY_MM_DD (YMD) */
       CASE WHEN m.rx='((?:19|20)\d{2})[_-]((?:0[1-9]|1[0-2]))[_-]((?:0[1-9]|[12]\d|3[01]))'
            THEN to_date(m.g1||m.g2||m.g3,'YYYYMMDD') END,
-      /* DD-MM-YYYY or DD_MM_YYYY (UK DMY) */
+      /* 2) DD-MM-YYYY or DD_MM_YYYY (DMY) — e.g., civil_tmp_26_08_2025 */
       CASE WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-]((?:19|20)\d{2})'
            THEN to_date(m.g3||m.g2||m.g1,'YYYYMMDD') END,
-      /* DDMMYYYY (compact UK DMY) — e.g., 02102024 */
+      /* 3) DDMMYYYY (compact DMY) */
       CASE WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))((?:19|20)\d{2})'
            THEN to_date(m.g3||m.g2||m.g1,'YYYYMMDD') END,
-      /* YYYYMMDD (compact YMD, unambiguous) */
+      /* 4) YYYYMMDD (compact YMD) — e.g., case_outcomes_temp_aat_20241212 */
       CASE WHEN m.rx='((?:19|20)\d{2})((?:0[1-9]|1[0-2]))((?:0[1-9]|[12]\d|3[01]))'
-           THEN to_date(m.g1||m.g2||m.g3,'YYYYMMDD') END
+           THEN to_date(m.g1||m.g2||m.g3,'YYYYMMDD') END,
+      /* 5) DD-MM-YY or DD_MM_YY (DMY, 2-digit year) */
+      CASE WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-](\d{2})'
+           THEN to_date(
+                  (CASE WHEN (m.g3)::int BETWEEN 70 AND 99
+                        THEN '19'||m.g3 ELSE '20'||lpad(m.g3,2,'0') END)
+                  || m.g2 || m.g1, 'YYYYMMDD') END,
+      /* 6) DDMMYY (compact DMY, 2-digit year) */
+      CASE WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))(\d{2})'
+           THEN to_date(
+                  (CASE WHEN (m.g3)::int BETWEEN 70 AND 99
+                        THEN '19'||m.g3 ELSE '20'||lpad(m.g3,2,'0') END)
+                  || m.g2 || m.g1, 'YYYYMMDD') END
+
     ) AS parsed_date
     ,
     CASE
-      /* YYYY-MM-DD or YYYY_MM_DD */
+      /* 1) YYYY[-_]MM[-_]DD */
       WHEN m.rx='((?:19|20)\d{2})[_-]((?:0[1-9]|1[0-2]))[_-]((?:0[1-9]|[12]\d|3[01]))'
         THEN (m.g1 || '-' || m.g2 || '-' || m.g3)
-      /* DD-MM-YYYY or DD_MM_YYYY (UK DMY) */
+      /* 2) DD[-_]MM[-_]YYYY */
       WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-]((?:19|20)\d{2})'
         THEN (m.g1 || '-' || m.g2 || '-' || m.g3)
-      /* DDMMYYYY (compact UK DMY) */
+      /* 3) DDMMYYYY */
       WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))((?:19|20)\d{2})'
         THEN (m.g1 || m.g2 || m.g3)
-      /* YYYYMMDD (compact YMD) */
+      /* 4) YYYYMMDD */
       WHEN m.rx='((?:19|20)\d{2})((?:0[1-9]|1[0-2]))((?:0[1-9]|[12]\d|3[01]))'
+        THEN (m.g1 || m.g2 || m.g3)
+      /* 5) DD[-_]MM[-_]YY */
+      WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-](\d{2})'
+        THEN (m.g1 || '-' || m.g2 || '-' || m.g3)
+      /* 6) DDMMYY */
+      WHEN m.rx='((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))(\d{2})'
         THEN (m.g1 || m.g2 || m.g3)
     END AS name_date_token
 
@@ -200,10 +221,13 @@ name_date AS (
            (regexp_match(t.table_name::text, rx))[2] AS g2,
            (regexp_match(t.table_name::text, rx))[3] AS g3
     FROM (VALUES
-      (1,'((?:19|20)\d{2})[_-]((?:0[1-9]|1[0-2]))[_-]((?:0[1-9]|[12]\d|3[01]))'),  -- YYYY-MM-DD
-      (2,'((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-]((?:19|20)\d{2})'),  -- DD-MM-YYYY (UK)
-      (3,'((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))((?:19|20)\d{2})'),          -- DDMMYYYY (UK)
-      (4,'((?:19|20)\d{2})((?:0[1-9]|1[0-2]))((?:0[1-9]|[12]\d|3[01]))')           -- YYYYMMDD
+      (1,'((?:19|20)\d{2})[_-]((?:0[1-9]|1[0-2]))[_-]((?:0[1-9]|[12]\d|3[01]))'),  -- YYYY[-_]MM[-_]DD
+      (2,'((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-]((?:19|20)\d{2})'),  -- DD[-_]MM[-_]YYYY
+      (3,'((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))((?:19|20)\d{2})'),          -- DDMMYYYY
+      (4,'((?:19|20)\d{2})((?:0[1-9]|1[0-2]))((?:0[1-9]|[12]\d|3[01]))'),          -- YYYYMMDD
+      (5,'((?:0[1-9]|[12]\d|3[01]))[_-]((?:0[1-9]|1[0-2]))[_-](\d{2})'),           -- DD[-_]MM[-_]YY
+      (6,'((?:0[1-9]|[12]\d|3[01]))((?:0[1-9]|1[0-2]))(\d{2})')                     -- DDMMYY
+
     ) AS c(ord, rx)
     WHERE t.table_name::text ~ rx
     ORDER BY ord
@@ -229,10 +253,9 @@ SELECT
   pg_size_pretty(d.index_bytes) AS index_size,
 
   d.est_rows,
-d.owner_name,
+  d.owner_name,
   d.size_mb,
   d.parsed_date,
-
   d.name_date_token,
 (CURRENT_DATE - d.parsed_date)::int AS age_days,
   /* table stats */
@@ -337,4 +360,3 @@ ORDER BY
 /* Optional tidy-up if you don't need the temp table after viewing results:  */
 /* DROP TABLE IF EXISTS __tmp_targets; */
 /* DROP TABLE IF EXISTS results; */
-
