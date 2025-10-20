@@ -28,7 +28,6 @@ class ClassifiedGetCaseOperationTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
-
     @Mock
     private SecurityClassificationServiceImpl classificationService;
 
