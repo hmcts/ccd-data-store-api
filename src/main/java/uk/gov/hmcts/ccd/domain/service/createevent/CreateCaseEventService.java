@@ -150,7 +150,7 @@ public class CreateCaseEventService {
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
                                   final CasePointerRepository pointerRepository,
-                                  final SynchronisedCaseProcessor synchronisedCaseProcessor) {
+                                  final SynchronisedCaseProcessor synchronisedCaseProcessor,
                                   final ConditionalFieldRestorer conditionalFieldRestorer,
                                   final CaseAccessService caseAccessService) {
 
