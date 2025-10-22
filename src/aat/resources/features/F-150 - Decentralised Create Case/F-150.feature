@@ -4,7 +4,7 @@ Feature: F-150: Decentralised case creation via V2 API
   Background: Load test context
     Given an appropriate test context as detailed in the test data source
 
-  @S-150.01 @Ignore
+  @S-150.01
   Scenario: must return 201 when creating a decentralised case succeeds
     Given a successful call [to start decentralised case creation] as in [F-150_CreateCase_Token_Creation],
     And a user with [an active profile in CCD],
@@ -14,7 +14,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains HTTP 201 Created],
     And the response has all other details as expected.
 
-  @S-150.07 @Ignore
+  @S-150.07
   Scenario: must return 409 when a decentralised case create conflicts
     Given a successful call [to start decentralised case creation] as in [F-150_CreateCase_Conflict_Token_Creation],
     And a user with [an active profile in CCD],
@@ -24,7 +24,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains an HTTP 409 'Conflict'],
     And the response has all other details as expected.
 
-  @S-150.08 @Ignore
+  @S-150.08
   Scenario: must surface validation errors when decentralised case create is rejected
     Given a successful call [to start decentralised case creation] as in [F-150_CreateCase_ValidationError_Token_Creation],
     And a user with [an active profile in CCD],
@@ -34,7 +34,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains an HTTP 422 'Unprocessable Entity'],
     And the response has all other details as expected.
 
-  @S-150.02 @Ignore
+  @S-150.02
   Scenario: must return 200 when retrieving a decentralised case after creation
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
@@ -43,8 +43,8 @@ Feature: F-150: Decentralised case creation via V2 API
     Then a positive response is received,
     And the response [contains the details of the case just created, along with an HTTP-200 OK],
     And the response has all other details as expected.
- 
-  @S-150.03 @Ignore
+
+  @S-150.03
   Scenario: must return audit history when retrieving decentralised case events
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
@@ -54,7 +54,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains all audit event details under the case],
     And the response has all other details as expected.
 
-  @S-150.04 @Ignore
+  @S-150.04
   Scenario: must return internal case view for decentralised case
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
@@ -64,7 +64,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains HTTP 200 Ok],
     And the response has all other details as expected.
 
-  @S-150.05 @Ignore
+  @S-150.05
   Scenario: must return decentralised event history when retrieving a specific event by id
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
@@ -74,7 +74,7 @@ Feature: F-150: Decentralised case creation via V2 API
     And the response [contains HTTP 200 Ok],
     And the response has all other details as expected.
 
-  @S-150.06 @Ignore
+  @S-150.06
   Scenario: must add stub value when updating decentralised supplementary data
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
