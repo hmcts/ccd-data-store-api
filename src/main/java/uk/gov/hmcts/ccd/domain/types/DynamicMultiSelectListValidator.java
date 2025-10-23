@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.ApplicationParams;
+
 import java.util.List;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -9,6 +12,11 @@ import javax.inject.Singleton;
 @Singleton
 public class DynamicMultiSelectListValidator extends DynamicListValidator {
     protected static final String TYPE_ID = "DynamicMultiSelectList";
+
+    @Inject
+    public DynamicMultiSelectListValidator(ApplicationParams applicationParams) {
+        super(applicationParams);
+    }
 
     @Override
     public BaseType getType() {
