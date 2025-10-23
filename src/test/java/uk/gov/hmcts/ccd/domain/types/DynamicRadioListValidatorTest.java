@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
@@ -27,6 +28,9 @@ class DynamicRadioListValidatorTest {
     @Mock
     private CaseDefinitionRepository definitionRepository;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     private DynamicRadioListValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
 
@@ -42,41 +46,46 @@ class DynamicRadioListValidatorTest {
         when(fixedListBaseType.getRegularExpression()).thenReturn(null);
         BaseType.register(fixedListBaseType);
 
-        validator = new DynamicRadioListValidator();
+        when(applicationParams.getValidationDynamicListCodeMaxLength()).thenReturn(150);
+        when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(500);
+
+        validator = new DynamicRadioListValidator(applicationParams);
 
         caseFieldDefinition = caseField().build();
     }
 
     @Test
     public void validValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"value\": {\n"
-            + "            \"code\": \"FixedList1\",\n"
-            + "            \"label\": \"Fixed List 1\"\n"
-            + "          },\n"
-            + "          \"list_items\": [{\n"
-            + "            \"code\": \"FixedList1\",\n"
-            + "            \"label\": \"Fixed List 1\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList2\",\n"
-            + "            \"label\": \"Fixed List 2\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList3\",\n"
-            + "            \"label\": \"Fixed List 3\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList4\",\n"
-            + "            \"label\": \"Fixed List 4\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList5\",\n"
-            + "            \"label\": \"Fixed List 5\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList6\",\n"
-            + "            \"label\": \"Fixed List 6\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList7\",\n"
-            + "            \"label\": \"Fixed List 7\"\n"
-            + "          }\n"
-            + "          ]\n"
-            + "        }");
+        JsonNode dataValue = new ObjectMapper().readTree("""
+            {
+                      "value": {
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      },
+                      "list_items": [{
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      }, {
+                        "code": "FixedList2",
+                        "label": "Fixed List 2"
+                      }, {
+                        "code": "FixedList3",
+                        "label": "Fixed List 3"
+                      }, {
+                        "code": "FixedList4",
+                        "label": "Fixed List 4"
+                      }, {
+                        "code": "FixedList5",
+                        "label": "Fixed List 5"
+                      }, {
+                        "code": "FixedList6",
+                        "label": "Fixed List 6"
+                      }, {
+                        "code": "FixedList7",
+                        "label": "Fixed List 7"
+                      }
+                      ]
+                    }""");
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
@@ -87,41 +96,130 @@ class DynamicRadioListValidatorTest {
     @Test
     @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     public void invalidValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
-            + "            \"code\": \"FixedList1\",\n"
-            + "            \"label\": \"Fixed List 1\"\n"
-            + "          },\n"
-            + "          \"list_items\": [{\n"
-            + "          \"code\": \"FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1"
-            + "            FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList\",\n"
-            + "            \"label\": \"Fixed List 1\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList2\",\n"
-            + "            \"label\": \"Fixed List 2\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList3\",\n"
-            + "            \"label\": \"Fixed List 3\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList4\",\n"
-            + "            \"label\": \"Fixed List 4\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList5\",\n"
-            + "            \"label\": \"Fixed List 5\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList6\",\n"
-            + "            \"label\": \"Fixed List 6\"\n"
-            + "          }, {\n"
-            + "            \"code\": \"FixedList7\",\n"
-            + "            \"label\": \"Fixed List 7\"\n"
-            + "          }\n"
-            + "          ]\n"
-            + "        }");
+        JsonNode dataValue = new ObjectMapper().readTree("""
+            {
+                      "default": {
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      },
+                      "list_items": [{
+                      "code": "FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1\
+                        FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList",
+                        "label": "Fixed List 1"
+                      }, {
+                        "code": "FixedList2",
+                        "label": "Fixed List 2"
+                      }, {
+                        "code": "FixedList3",
+                        "label": "Fixed List 3"
+                      }, {
+                        "code": "FixedList4",
+                        "label": "Fixed List 4"
+                      }, {
+                        "code": "FixedList5",
+                        "label": "Fixed List 5"
+                      }, {
+                        "code": "FixedList6",
+                        "label": "Fixed List 6"
+                      }, {
+                        "code": "FixedList7",
+                        "label": "Fixed List 7"
+                      }
+                      ]
+                    }""");
 
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
             caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
+    }
+
+    @Test
+    public void invalidCodeMaxLength() throws Exception {
+        when(applicationParams.getValidationDynamicListCodeMaxLength()).thenReturn(2);
+        when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(500);
+        validator = new DynamicRadioListValidator(applicationParams);
+
+        JsonNode dataValue = new ObjectMapper().readTree("""
+            {
+                      "value": {
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      },
+                      "list_items": [{
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      }, {
+                        "code": "FixedList2",
+                        "label": "Fixed List 2"
+                      }, {
+                        "code": "FixedList3",
+                        "label": "Fixed List 3"
+                      }, {
+                        "code": "FixedList4",
+                        "label": "Fixed List 4"
+                      }, {
+                        "code": "FixedList5",
+                        "label": "Fixed List 5"
+                      }, {
+                        "code": "FixedList6",
+                        "label": "Fixed List 6"
+                      }, {
+                        "code": "FixedList7",
+                        "label": "Fixed List 7"
+                      }
+                      ]
+                    }""");
+
+
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
+            dataValue,
+            caseFieldDefinition);
+        assertEquals(8, result01.size());
+    }
+
+    @Test
+    public void invalidValueMaxLength() throws Exception {
+        when(applicationParams.getValidationDynamicListCodeMaxLength()).thenReturn(150);
+        when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(5);
+        validator = new DynamicRadioListValidator(applicationParams);
+
+        JsonNode dataValue = new ObjectMapper().readTree("""
+            {
+                      "value": {
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      },
+                      "list_items": [{
+                        "code": "FixedList1",
+                        "label": "Fixed List 1"
+                      }, {
+                        "code": "FixedList2",
+                        "label": "Fixed List 2"
+                      }, {
+                        "code": "FixedList3",
+                        "label": "Fixed List 3"
+                      }, {
+                        "code": "FixedList4",
+                        "label": "Fixed List 4"
+                      }, {
+                        "code": "FixedList5",
+                        "label": "Fixed List 5"
+                      }, {
+                        "code": "FixedList6",
+                        "label": "Fixed List 6"
+                      }, {
+                        "code": "FixedList7",
+                        "label": "Fixed List 7"
+                      }
+                      ]
+                    }""");
+
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
+            dataValue,
+            caseFieldDefinition);
+        assertEquals(8, result01.size());
     }
 
     @Test

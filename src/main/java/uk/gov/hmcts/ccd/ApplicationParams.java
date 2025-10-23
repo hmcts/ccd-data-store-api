@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -240,6 +241,15 @@ public class ApplicationParams {
 
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
+
+    @Getter
+    @Value("${validation.dynamic-list.code-max-length}")
+    private Integer validationDynamicListCodeMaxLength;
+
+    @Getter
+    @Value("${validation.dynamic-list.value-max-length}")
+    private Integer validationDynamicListValueMaxLength;
+
 
     public static String encode(final String stringToEncode) {
         try {
