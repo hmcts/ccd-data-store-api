@@ -1,0 +1,9 @@
+{
+  "_guid_": "S-150.01_Prereq",
+  "_extends_": "S-150.01",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-150_CreateCase_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

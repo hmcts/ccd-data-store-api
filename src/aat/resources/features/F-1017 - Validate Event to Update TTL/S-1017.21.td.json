@@ -62,6 +62,10 @@
   "expectedResponse": {
     "body": {
       "data": {
+        "TTL": {
+          "SystemTTL": "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "OverrideTTL": "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        },
         "TextField" : "[[ANYTHING_PRESENT]]"
       }
     }

@@ -16,9 +16,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Service
-@Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
-    public static final String QUALIFIER = "default";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
@@ -37,12 +35,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     @Override
-    public final Map<String, JsonNode> validateCaseDetails(OperationContext operationContext) {
-        CaseDataContent content = operationContext.content();
+    public final Map<String, JsonNode> validateCaseDetails(String caseTypeId, CaseDataContent content) {
         if (content == null || content.getEvent() == null || content.getEventId() == null) {
             throw new ValidationException("Cannot validate case field because of event is not specified");
         }
-        String caseTypeId = operationContext.caseTypeId();
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
