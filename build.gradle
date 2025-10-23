@@ -171,6 +171,8 @@ tasks.withType(Test) {
 
 dependencies {
 
+    implementation("com.auth0:java-jwt:4.5.0")
+    
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     implementation('org.springframework.cloud:spring-cloud-starter-bootstrap') {
         version {
