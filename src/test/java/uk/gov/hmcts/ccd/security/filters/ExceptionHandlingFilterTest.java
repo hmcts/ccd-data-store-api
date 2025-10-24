@@ -67,7 +67,7 @@ public class ExceptionHandlingFilterTest {
     public void shouldReturn502ResponseWhenClientAbortExceptionThrown() throws ServletException, IOException {
         Mockito.doThrow(ClientAbortException.class)
             .when(filterChain)
-            .doFilter(Mockito.eq(request), Mockito.eq(response));
+            .doFilter(request, response);
         filter.doFilterInternal(request, response, filterChain);
 
         assertThat(response.getStatus()).isEqualTo(502);
@@ -79,7 +79,7 @@ public class ExceptionHandlingFilterTest {
         throws ServletException, IOException {
         Mockito.doThrow(NullPointerException.class)
             .when(filterChain)
-            .doFilter(Mockito.eq(request), Mockito.eq(response));
+            .doFilter(request, response);
         filter.doFilterInternal(request, response, filterChain);
 
         assertThat(response.getStatus()).isEqualTo(500);

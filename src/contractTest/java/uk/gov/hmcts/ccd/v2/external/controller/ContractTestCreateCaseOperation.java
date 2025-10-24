@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.createcase.DefaultCreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
@@ -25,9 +26,9 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
-import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @Service
 @Qualifier("authorised")
@@ -47,9 +48,8 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                            EventTokenService eventTokenService,
                                            CaseDataService caseDataService,
                                            SubmitCaseTransaction submitCaseTransaction,
-                                           CaseSanitiser caseSanitiser,
+                                           CaseSanitiser caseSanitiser, CaseTypeService caseTypeService,
                                            CallbackInvoker callbackInvoker,
-                                           @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
                                            ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                            CasePostStateService casePostStateService,
                                            @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway,
@@ -60,11 +60,13 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                                SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                            SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
                                            CaseLinkService caseLinkService,
-                                           TimeToLiveService timeToLiveService) {
+                                           TimeToLiveService timeToLiveService,
+                                           final IdempotencyKeyHolder idempotencyKeyHolder) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
-            submitCaseTransaction, caseSanitiser, callbackInvoker, validateCaseFieldsOperation,
+            submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
             casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
-            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService);
+            supplementaryDataUpdateOperation, supplementaryDataValidator, caseLinkService, timeToLiveService,
+            idempotencyKeyHolder);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 

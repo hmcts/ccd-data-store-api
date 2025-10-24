@@ -37,35 +37,33 @@ public class DCPTestHelper {
     }
 
     public static String validateContent() {
-        return """
-            {
-                "data": {
-                  "TextField": "Case 1 Text",
-                  "CollectionComplexDateTime": [
-                    {
-                      "id": "ID",
-                      "value": {
-                        "DateField": "07-05-1963",
-                        "DateTimeField": "2008-04-02T16:37",
-                        "StandardDate": "1999-08-19",
-                        "StandardDateTime": "2010-06-17T19:20:00.000",
-                        "NestedComplex": {
-                          "DateField": "02-1981",
-                          "DateTimeField": "2002-03-04",
-                          "StandardDate": "2020-02-19",
-                          "StandardDateTime": "2007-07-17T07:07:00.000"
-                        }
-                      }
-                    }
-                  ]
-                },
-                "event": {
-                  "id": "UPDATE",
-                  "summary": "",
-                  "description": ""
-                },
-                "case_reference": "1587051668000989"
-            }""";
+        return "{\n"
+            + "    \"data\": {\n"
+            + "      \"TextField\": \"Case 1 Text\",\n"
+            + "      \"CollectionComplexDateTime\": [\n"
+            + "        {\n"
+            + "          \"id\": \"ID\",\n"
+            + "          \"value\": {\n"
+            + "            \"DateField\": \"07-05-1963\",\n"
+            + "            \"DateTimeField\": \"2008-04-02T16:37\",\n"
+            + "            \"StandardDate\": \"1999-08-19\",\n"
+            + "            \"StandardDateTime\": \"2010-06-17T19:20:00.000\",\n"
+            + "            \"NestedComplex\": {\n"
+            + "              \"DateField\": \"02-1981\",\n"
+            + "              \"DateTimeField\": \"2002-03-04\",\n"
+            + "              \"StandardDate\": \"2020-02-19\",\n"
+            + "              \"StandardDateTime\": \"2007-07-17T07:07:00.000\"\n"
+            + "            }\n"
+            + "          }\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    },\n"
+            + "    \"event\": {\n"
+            + "      \"id\": \"UPDATE\",\n"
+            + "      \"summary\": \"\",\n"
+            + "      \"description\": \"\"\n"
+            + "    }\n"
+            + "}";
     }
 
     public static String invalidValidateContent() {
