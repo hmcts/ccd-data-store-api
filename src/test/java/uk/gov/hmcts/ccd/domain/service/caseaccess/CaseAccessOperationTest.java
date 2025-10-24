@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -55,6 +57,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -106,6 +109,9 @@ class CaseAccessOperationTest {
     @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
+    @Mock
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
 
@@ -113,6 +119,16 @@ class CaseAccessOperationTest {
     void setUp() {
         configureCaseRepository(JURISDICTION);
         when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(true);
+
+        doAnswer(invocation -> {
+            String caseReference = invocation.getArgument(0);
+            var updateRequest = invocation.getArgument(1,
+                uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest.class);
+            updateRequest.getOperationProperties(SupplementaryDataOperation.INC).forEach((path, value) ->
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, path, value)
+            );
+            return null;
+        }).when(supplementaryDataUpdateOperation).updateSupplementaryData(anyString(), any());
     }
 
 

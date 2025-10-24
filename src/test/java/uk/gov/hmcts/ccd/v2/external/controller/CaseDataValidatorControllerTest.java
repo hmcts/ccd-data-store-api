@@ -15,12 +15,10 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
-import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -42,6 +40,7 @@ class CaseDataValidatorControllerTest {
     private static final Map<String, JsonNode> DATA = newCaseData()
         .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.textNode("aValue")))
         .build();
+    private static final JsonNode DATA_NODE = JacksonUtils.convertValueJsonNode(DATA);
     public static final Map<String, JsonNode> UNWRAPPED_DATA = newCaseData()
         .withPair("aField", JSON_NODE_FACTORY.textNode("aValue"))
         .build();
@@ -61,9 +60,8 @@ class CaseDataValidatorControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, EVENT_DATA)))
-            .thenReturn(DATA);
-        when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA);
+        when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenReturn(DATA);
+        when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA_NODE);
     }
 
     @Nested
@@ -78,17 +76,17 @@ class CaseDataValidatorControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(Objects.requireNonNull(response.getBody()).getData(), is(UNWRAPPED_DATA_NODE))
+                () -> assertThat(response.getBody().getData(), is(UNWRAPPED_DATA_NODE))
             );
         }
 
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, EVENT_DATA, null)))
+            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA))
                 .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, null,
+            assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID,
                 EVENT_DATA));
         }
     }
