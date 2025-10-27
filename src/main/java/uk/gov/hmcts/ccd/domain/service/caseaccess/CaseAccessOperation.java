@@ -15,12 +15,14 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -44,7 +46,7 @@ public class CaseAccessOperation {
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
-    private final SupplementaryDataRepository supplementaryDataRepository;
+    private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final RoleAssignmentService roleAssignmentService;
     private final ApplicationParams applicationParams;
 
@@ -53,14 +55,14 @@ public class CaseAccessOperation {
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
-                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository,
+                               @Qualifier("default") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                RoleAssignmentService roleAssignmentService,
                                ApplicationParams applicationParams) {
 
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
-        this.supplementaryDataRepository = supplementaryDataRepository;
+        this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.roleAssignmentService = roleAssignmentService;
         this.applicationParams = applicationParams;
     }
@@ -193,12 +195,7 @@ public class CaseAccessOperation {
             }
         );
 
-        newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
-            orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
-            )
-        );
+        newUserCounts.forEach(this::updateOrgsAssignedUsersCount);
     }
 
     @Transactional
@@ -257,12 +254,30 @@ public class CaseAccessOperation {
         Map<String, Map<String, Long>> removeUserCounts
             = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
 
-        removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
+        removeUserCounts.forEach((caseReference, orgNewUserCountMap) -> {
+            Map<String, Long> decrements = new HashMap<>();
             orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
-            )
+                decrements.put(organisationId, Math.negateExact(removeUserCount))
+            );
+            updateOrgsAssignedUsersCount(caseReference, decrements);
+        });
+    }
+
+    private void updateOrgsAssignedUsersCount(String caseReference, Map<String, Long> organisationCounts) {
+        if (organisationCounts.isEmpty()) {
+            return;
+        }
+
+        Map<String, Object> increments = new HashMap<>();
+        organisationCounts.forEach((organisationId, delta) ->
+            increments.put(ORGS_ASSIGNED_USERS_PATH + organisationId, delta)
         );
+
+        Map<String, Map<String, Object>> requestData = new HashMap<>();
+        requestData.put(SupplementaryDataOperation.INC.getOperationName(), increments);
+
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(requestData);
+        supplementaryDataUpdateOperation.updateSupplementaryData(caseReference, updateRequest);
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(

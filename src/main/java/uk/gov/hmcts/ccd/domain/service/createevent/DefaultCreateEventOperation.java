@@ -14,9 +14,12 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
+import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -30,14 +33,17 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private final EventValidator eventValidator;
     private final CreateCaseEventService createEventService;
     private final CallbackInvoker callbackInvoker;
+    private final IdempotencyKeyHolder keyHolder;
 
     @Inject
     public DefaultCreateEventOperation(final EventValidator eventValidator,
                                        final CreateCaseEventService createEventService,
-                                       final CallbackInvoker callbackInvoker) {
+                                       final CallbackInvoker callbackInvoker,
+                                       final IdempotencyKeyHolder keyHolder) {
         this.createEventService = createEventService;
         this.eventValidator = eventValidator;
         this.callbackInvoker = callbackInvoker;
+        this.keyHolder = keyHolder;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -46,7 +52,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
-
+        keyHolder.computeAndSetKeyToRequestContext(content.getToken());
         final CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
 
         if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {
@@ -63,6 +69,11 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                              final String categoryId) {
         Event event = createDocumentUpdatedEvent();
         eventValidator.validate(event);
+
+        /**
+         * System events have no idempotency key; 'last write wins'.
+         */
+        keyHolder.computeAndSetKeyToRequestContext(UUID.randomUUID().toString());
 
         final CreateCaseEventResult caseEventResult = createEventService
             .createCaseSystemEvent(caseReference, attributePath, categoryId, event);
