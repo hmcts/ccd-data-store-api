@@ -81,7 +81,6 @@ public class CreateCaseEventService {
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDetailsRepository delegatingCaseDetailsRepository;
-    private final CaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final EventTriggerService eventTriggerService;
