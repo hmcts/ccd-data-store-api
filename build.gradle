@@ -53,7 +53,6 @@ ext {
 }
 
 dependencyUpdates.resolutionStrategy = {
-
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
@@ -63,6 +62,10 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
+    }
+
+    resolutionStrategy {
+        force 'net.bytebuddy:byte-buddy:1.17.2'
     }
 }
 
