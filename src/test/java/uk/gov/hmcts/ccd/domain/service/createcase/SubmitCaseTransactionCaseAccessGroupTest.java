@@ -37,13 +37,17 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -132,6 +136,17 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @Mock
     private ApplicationParams applicationParams;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+
+    @Mock
+    private PersistenceStrategyResolver resolver;
+
+    @Mock
+    private CasePointerRepository casePointerRepository;
+
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
 
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
@@ -164,7 +179,11 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
+            caseDocumentTimestampService,
+            decentralisedSubmitCaseTransaction,
+            resolver,
+            casePointerRepository,
+            synchronisedCaseProcessor
         );
 
         idamUser = buildIdamUser();
