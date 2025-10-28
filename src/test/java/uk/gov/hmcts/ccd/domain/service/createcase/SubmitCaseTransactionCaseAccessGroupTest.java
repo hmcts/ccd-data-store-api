@@ -136,6 +136,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @Mock
     private ApplicationParams applicationParams;
+
     @Mock
     private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
 
