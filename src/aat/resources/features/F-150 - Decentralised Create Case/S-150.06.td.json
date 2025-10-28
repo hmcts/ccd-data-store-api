@@ -1,0 +1,47 @@
+{
+  "_guid_": "S-150.06",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
+  "title": "Update decentralised supplementary data adds stub value",
+  "prerequisites": [
+    {
+      "F-150_CreateCase_Token_Creation": "F-150_CreateCase_Token_Creation"
+    },
+    {
+      "S-150.01_Prereq": "S-150.01_Prereq"
+    }
+  ],
+  "specs": [
+    "As a prerequisite",
+    "an active profile in CCD",
+    "contains the case reference of the case just created",
+    "Update Supplementary Data",
+    "returns stub-supplemented data"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$set": {
+          "input_value": "from-request",
+          "test_value": 0
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "supplementary_data": {
+        "input_value": "from-request",
+        "test_value": 10
+      }
+    }
+  }
+}
