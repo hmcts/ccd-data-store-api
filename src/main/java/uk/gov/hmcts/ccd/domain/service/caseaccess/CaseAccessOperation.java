@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -49,6 +50,7 @@ public class CaseAccessOperation {
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
+    private final SupplementaryDataRepository supplementaryDataRepository;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final RoleAssignmentService roleAssignmentService;
     private final ApplicationParams applicationParams;
@@ -58,6 +60,7 @@ public class CaseAccessOperation {
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
+                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository,
                                @Qualifier("default") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                RoleAssignmentService roleAssignmentService,
                                ApplicationParams applicationParams) {
@@ -65,6 +68,7 @@ public class CaseAccessOperation {
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
+        this.supplementaryDataRepository = supplementaryDataRepository;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.roleAssignmentService = roleAssignmentService;
         this.applicationParams = applicationParams;
@@ -273,8 +277,8 @@ public class CaseAccessOperation {
 
         Map<String, Object> increments = new HashMap<>();
         organisationCounts.forEach((organisationId, delta) -> {
-            increments.put(ORGS_ASSIGNED_USERS_PATH + organisationId, delta),
-                setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId)
+            increments.put(ORGS_ASSIGNED_USERS_PATH + organisationId, delta);
+            setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId);
         });
 
         Map<String, Map<String, Object>> requestData = new HashMap<>();
