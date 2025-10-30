@@ -16,7 +16,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryD
 import static uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation.SET;
 
 @Service
-@Qualifier("default")
+@Qualifier("db")
 public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDataUpdateOperation {
 
     private final SupplementaryDataRepository supplementaryDataRepository;

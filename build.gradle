@@ -21,7 +21,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '0.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.57'
-    id 'au.com.dius.pact' version '4.3.12'
+    id 'au.com.dius.pact' version '4.6.14'
     id "org.jsonschema2pojo" version "1.2.1"
 }
 
@@ -43,7 +43,6 @@ configurations {
 }
 
 dependencyUpdates.resolutionStrategy = {
-
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
@@ -53,6 +52,10 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
+    }
+
+    resolutionStrategy {
+        force 'net.bytebuddy:byte-buddy:1.17.2'
     }
 }
 
@@ -246,7 +249,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:8.5.13"
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.2'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
 
@@ -313,6 +316,7 @@ dependencies {
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
 
+    implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.2'
     testImplementation "org.flywaydb:flyway-core:8.5.13"
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
@@ -406,7 +410,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:32.1.2-jre'
 
         // CVE-2023-41080
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.108') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -704,14 +708,6 @@ compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-idea.project.settings {
-    compiler {
-        javac {
-            javacAdditionalOptions "-parameters"
-        }
-    }
-}
-
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
@@ -993,11 +989,11 @@ task runRemoteAAT(type: JavaExec) {
     }
 }
 
-rootProject.tasks.named("processAatResources") {
+tasks.named("processAatResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
