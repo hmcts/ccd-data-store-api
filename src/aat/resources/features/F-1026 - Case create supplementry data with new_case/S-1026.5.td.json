@@ -1,0 +1,114 @@
+{
+  "_guid_": "S-1026.5",
+  "_extends_": "F-1026_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST where case_data has multiple organisationProfile with newCase set to YES or NO",
+
+  "prerequisites" : [ {
+      "Token_Creation": "S-1026_GetCreateToken"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains some OrganisationPolicy fields with all correct values",
+    "is of caseType where case_data case data has Organisation.OrganisationID and multiple organisationProfile with newCase set to Yes or No",
+    "Submit case creation as Case worker",
+    "contains correctly configured values",
+    "contains updated values for case_data and data_classification"
+
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "OrganisationPolicyField": {
+          "newCase": "yes",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        },
+        "OrganisationPolicyField5": {
+          "newCase": "no",
+          "Organisation": {
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
+          }
+        },
+        "OrganisationPolicyField4": {
+          "Organisation": {
+            "OrganisationID": "orgID2a",
+            "OrganisationName": "orgName2a"
+          }
+        },
+        "OrganisationPolicyField3": {
+          "newCase": "Yes",
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        }
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_NewCaseSupplementry",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "OrganisationPolicyField" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID1",
+            "OrganisationName" : "orgName1"
+          }
+        },
+        "OrganisationPolicyField3" : {
+          "Organisation": {
+            "OrganisationID": "orgID3",
+            "OrganisationName": "orgName3"
+          }
+        },
+        "OrganisationPolicyField4" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2a",
+            "OrganisationName" : "orgName2a"
+          }
+        },
+        "OrganisationPolicyField5" : {
+          "Organisation" : {
+            "OrganisationID" : "orgID2",
+            "OrganisationName" : "orgName2"
+          }
+        }
+      },
+      "data_classification": {},
+      "supplementary_data": {
+        "new_case":
+          {
+            "orgID1" : true,
+            "orgID3" : true
+          }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
