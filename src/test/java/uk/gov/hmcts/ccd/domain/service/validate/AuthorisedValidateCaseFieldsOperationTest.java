@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
+import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
@@ -29,12 +30,14 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,6 +68,9 @@ class AuthorisedValidateCaseFieldsOperationTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private MidEventCallback midEventCallback;
+
     @InjectMocks
     private AuthorisedValidateCaseFieldsOperation authorisedValidateCaseFieldsOperation;
 
@@ -83,26 +89,28 @@ class AuthorisedValidateCaseFieldsOperationTest {
     void shouldSkipVerifyAccessWhenCaseTypeIdIsExcluded() {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
-
-
         Map<String, JsonNode> inputData = new HashMap<>();
         inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
         content.setData(inputData);
 
+        Map<String, JsonNode> midEventData = new HashMap<>();
+        midEventData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID)))
+            .thenReturn(midEventData);
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
-
         when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
             .thenReturn(List.of(CASE_TYPE_ID));
 
-
         Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
-
 
         assertAll(
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
-            () -> assertEquals(inputData, result),
-            () -> assertEquals("value1", result.get("field1").asText()),
+            () -> verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID),
+            () -> assertNotNull(result),
+            () -> assertNotEquals(inputData, result),
+            () -> assertTrue(result.containsKey("data")),
+            () -> assertEquals("value1", result.get("data").get("field1").asText()),
             () -> verify(caseAccessService, never()).getAccessProfilesByCaseReference(anyString()),
             () -> verify(caseDefinitionRepository, never()).getCaseType(anyString())
         );
@@ -295,6 +303,131 @@ class AuthorisedValidateCaseFieldsOperationTest {
         authorisedValidateCaseFieldsOperation.validateData(data, caseTypeDefinition, content);
 
         verify(validateCaseFieldsOperation).validateData(data, caseTypeDefinition, content);
+    }
+
+    @Test
+    @DisplayName("should invoke mid event callback and update content data")
+    void shouldInvokeMidEventCallbackAndUpdateContentData() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        Map<String, JsonNode> inputData = new HashMap<>();
+        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        content.setData(inputData);
+
+        Map<String, JsonNode> callbackResponseData = new HashMap<>();
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("updatedValue1"));
+        callbackResponseData.put("field2", JSON_NODE_FACTORY.textNode("value2"));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
+            .thenReturn(List.of(CASE_TYPE_ID));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID)))
+            .thenReturn(callbackResponseData);
+
+        Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertAll(
+            () -> verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID),
+            () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
+            () -> assertNotNull(result),
+            () -> assertTrue(result.containsKey("data")),
+            () -> assertEquals(2, result.get("data").size())
+        );
+    }
+
+    @Test
+    @DisplayName("should invoke mid event callback with empty page id")
+    void shouldInvokeMidEventCallbackWithEmptyPageId() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        Map<String, JsonNode> inputData = new HashMap<>();
+        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        content.setData(inputData);
+
+        Map<String, JsonNode> callbackResponseData = new HashMap<>();
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
+
+        when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
+            .thenReturn(List.of(CASE_TYPE_ID));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq("")))
+            .thenReturn(callbackResponseData);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, "");
+    }
+
+    @Test
+    @DisplayName("should invoke mid event callback with null page id")
+    void shouldInvokeMidEventCallbackWithNullPageId() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        Map<String, JsonNode> inputData = new HashMap<>();
+        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        content.setData(inputData);
+
+        Map<String, JsonNode> callbackResponseData = new HashMap<>();
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, null);
+
+        when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
+            .thenReturn(List.of(CASE_TYPE_ID));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(null)))
+            .thenReturn(callbackResponseData);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, null);
+    }
+
+    @Test
+    @DisplayName("should invoke mid event callback and preserve data when continuing verify access")
+    void shouldInvokeMidEventCallbackAndPreserveDataWhenContinuingVerifyAccess() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        Map<String, JsonNode> inputData = new HashMap<>();
+        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        content.setData(inputData);
+
+        Map<String, JsonNode> callbackResponseData = new HashMap<>();
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("callbackValue1"));
+        callbackResponseData.put("field2", JSON_NODE_FACTORY.textNode("callbackValue2"));
+
+        when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
+            .thenReturn(List.of("SomeOtherType"));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID)))
+            .thenReturn(callbackResponseData);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString()))
+            .thenReturn(Set.of(AccessProfile.builder().accessProfile(USER_ROLE_1).build()));
+        when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), any()))
+            .thenReturn(true);
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        filteredData.put("filtered_field1", "filtered_value1");
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertAll(
+            () -> verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID),
+            () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
+            () -> verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
+            () -> assertNotNull(result)
+        );
     }
 
     @AfterEach

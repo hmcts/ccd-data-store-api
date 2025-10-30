@@ -1,0 +1,129 @@
+{
+  "_guid_": "S-150.05",
+  "_extends_": "F-067_Test_Data_Base",
+  "title": "Retrieve decentralised event by case and event id",
+  "prerequisites": [
+    {
+      "F-150_CreateCase_Token_Creation": "F-150_CreateCase_Token_Creation"
+    },
+    {
+      "S-150.01_Prereq": "S-150.01_Prereq"
+    },
+    {
+      "S-150.05_CaseView": "S-150.05_CaseView"
+    }
+  ],
+  "specs": [
+    "As a prerequisite",
+    "an active profile in CCD",
+    "contains the case reference and event id obtained from the case view",
+    "contains HTTP 200 Ok",
+    "Retrieve a CaseView Event by case and event id for dynamic display",
+    "returns decentralised event history payload"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "experimental": true,
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}",
+      "eventId": "${[scenarioContext][childContexts][S-150.05_CaseView][testData][actualResponse][body][events][0][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "tabs": [
+        {
+          "id": "NameTab",
+          "label": "Details",
+          "order": 2,
+          "fields": [
+            {
+              "id": "TextField",
+              "label": "Text Field",
+              "hidden": false,
+              "value": "Decentralised case",
+              "metadata": false,
+              "hint_text": null,
+              "field_type": {
+                "id": "Text",
+                "type": "Text",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "validation_expr": null,
+              "security_label": "PUBLIC",
+              "order": 1,
+              "formatted_value": "Decentralised case",
+              "display_context": null,
+              "display_context_parameter": null,
+              "show_condition": null,
+              "show_summary_change_option": null,
+              "show_summary_content_option": null,
+              "retain_hidden_value": null,
+              "publish": null,
+              "publish_as": null,
+              "acls": [
+                {
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": true,
+                  "role": "caseworker-befta_master"
+                }
+              ]
+            }
+          ],
+          "role": null,
+          "show_condition": null
+        }
+      ],
+      "metadataFields": null,
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/internal/cases/${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}/events/${[scenarioContext][childContexts][S-150.05_CaseView][testData][actualResponse][body][events][0][id]}"
+        }
+      },
+      "case_id": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}",
+      "case_type": {
+        "id": "FT_Decentralisation",
+        "name": "FT-Decentralisation",
+        "description": "Minimal case type for decentralisation feature tests",
+        "jurisdiction": {
+          "id": "BEFTA_MASTER",
+          "name": "BEFTA Master",
+          "description": "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "event": {
+        "id": "${[scenarioContext][childContexts][S-150.05_CaseView][testData][actualResponse][body][events][0][id]}",
+        "timestamp": "${[scenarioContext][childContexts][S-150.05_CaseView][testData][actualResponse][body][events][0][timestamp]}",
+        "summary": null,
+        "comment": null,
+        "event_id": "createCase",
+        "event_name": "Create a case",
+        "user_id": null,
+        "user_last_name": null,
+        "user_first_name": null,
+        "state_name": null,
+        "state_id": "CaseCreated",
+        "significant_item": null,
+        "proxied_by": null,
+        "proxied_by_last_name": null,
+        "proxied_by_first_name": null
+      }
+    }
+  }
+}

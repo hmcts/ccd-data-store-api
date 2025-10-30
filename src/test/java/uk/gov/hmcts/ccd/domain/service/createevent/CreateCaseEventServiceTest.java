@@ -18,9 +18,9 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -31,15 +31,17 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -55,9 +57,10 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -77,6 +80,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -149,8 +153,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
     @Mock
-    private HttpServletRequest request;
-    @Mock
     private SecurityClassificationServiceImpl securityClassificationService;
     @Mock
     private TimeToLiveService timeToLiveService;
@@ -159,11 +161,21 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private ApplicationParams applicationParams;
     @Mock
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    @Mock
     private UserRepository userRepository;
     @Mock
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private CasePointerRepository pointerRepository;
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
     @Mock
     private ConditionalFieldRestorer conditionalFieldRestorer;
     @Mock
@@ -255,6 +267,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
 
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
+        when(resolver.isDecentralised(any(CaseDetails.class))).thenReturn(false);
+        when(resolver.isDecentralised(anyLong())).thenReturn(false);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(emptySet());
     }
 
