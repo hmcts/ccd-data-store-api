@@ -14,7 +14,7 @@ import java.util.List;
 public class TextValidator implements BaseTypeValidator {
     public static final String TYPE_ID = "Text";
 
-    private static final int FIELD_VALUE_SUMMARY_MAX_LENGTH = 80;
+    private static final int FIELD_VALUE_SUMMARY_MAX_LENGTH = 50;
 
     @Override
     public BaseType getType() {

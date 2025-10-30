@@ -96,7 +96,7 @@ class TextValidatorTest {
 
         assertThat("Max not caught", validationList, hasSize(1));
         assertThat(validationList, hasItem(hasProperty("errorMessage",
-                equalTo("\"Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test ...\""
+                equalTo("\"Test Test Test Test Test Test Test Test Test Test ...\""
                     + " (100 characters) exceeds the maximum length of 10"))));
         assertThat(validationList, hasItem(hasProperty("fieldId", equalTo(FIELD_ID))));
     }
