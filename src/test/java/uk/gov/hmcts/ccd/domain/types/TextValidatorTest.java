@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
 @DisplayName("TextValidator")
+@ExtendWith(MockitoExtension.class)
 class TextValidatorTest {
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
@@ -32,7 +34,7 @@ class TextValidatorTest {
     @Mock
     private BaseType textBaseType;
 
-    @Mock
+    @Mock(lenient = true)
     private CaseDefinitionRepository definitionRepository;
 
     private TextValidator validator;
@@ -40,8 +42,6 @@ class TextValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
@@ -75,15 +75,30 @@ class TextValidatorTest {
         final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
 
         assertAll(
-            () -> assertThat("Min not catched", validMinResults, hasSize(1)),
-            () -> assertThat("Max not catched", validMaxResults, hasSize(1)),
+            () -> assertThat("Min not caught", validMinResults, hasSize(1)),
+            () -> assertThat("Max not caught", validMaxResults, hasSize(1)),
             () -> assertThat(validMinResults, hasItem(
-                hasProperty("errorMessage", equalTo("Test require minimum length 5")))),
+                hasProperty("errorMessage",
+                    equalTo("\"Test\" (4 characters) requires a minimum length of 5")))),
             () -> assertThat(validMinResults, hasItem(hasProperty("fieldId", equalTo(FIELD_ID)))),
             () -> assertThat(validMaxResults, hasItem(
-                hasProperty("errorMessage", equalTo("Test Test Test exceed maximum length 10")))),
+                hasProperty("errorMessage",
+                    equalTo("\"Test Test Test\" (14 characters) exceeds the maximum length of 10")))),
             () -> assertThat(validMaxResults, hasItem(hasProperty("fieldId", equalTo(FIELD_ID))))
         );
+    }
+
+    @Test
+    @DisplayName("should truncate field value in error when very long")
+    void textFieldValueTruncatedForInvalidMax() {
+        final JsonNode invalidMax = NODE_FACTORY.textNode("Test ".repeat(20));
+        final List<ValidationResult> validationList = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
+
+        assertThat("Max not caught", validationList, hasSize(1));
+        assertThat(validationList, hasItem(hasProperty("errorMessage",
+                equalTo("\"Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test ...\""
+                    + " (100 characters) exceeds the maximum length of 10"))));
+        assertThat(validationList, hasItem(hasProperty("fieldId", equalTo(FIELD_ID))));
     }
 
     @Test
