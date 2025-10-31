@@ -1,19 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -57,15 +43,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.hamcrest.core.IsInstanceOf;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -77,7 +78,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -163,7 +164,7 @@ class DefaultCreateCaseOperationTest {
 
     @BeforeEach
     void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         timeToLiveService = new TimeToLiveService(objectMapper, applicationParams, caseDataService);
         defaultCreateCaseOperation = new DefaultCreateCaseOperation(userRepository,
                                                                     caseDefinitionRepository,
@@ -192,7 +193,7 @@ class DefaultCreateCaseOperationTest {
         CASE_TYPE = buildCaseType();
 
         SupplementaryData supplementaryData = new SupplementaryData();
-        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any()))
             .thenReturn(supplementaryData);
     }
 
@@ -570,7 +571,7 @@ class DefaultCreateCaseOperationTest {
                 same(IGNORE_WARNING),
                 any()),
             () -> order.verify(draftGateway).delete(DRAFT_ID),
-            () -> verifyZeroInteractions(callbackInvoker),
+            () -> verifyNoInteractions(callbackInvoker),
             () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
             () -> assertThat(caseDetails, is(savedCaseType))
         );
@@ -630,7 +631,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
@@ -654,7 +655,7 @@ class DefaultCreateCaseOperationTest {
                                                       savedCaseType)).willReturn(response);
         given(response.hasBody()).willReturn(true);
         given(response.getBody()).willReturn(responseBody);
-        given(response.getStatusCodeValue()).willReturn(200);
+        given(response.getStatusCode()).willReturn(HttpStatus.valueOf(200));
         given(savedCaseType.getCaseTypeId()).willReturn(mockCaseTypeId);
         given(validateCaseFieldsOperation.validateCaseDetails(new OperationContext(CASE_TYPE_ID, eventData)))
             .willReturn(data);
@@ -695,7 +696,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
@@ -721,7 +722,7 @@ class DefaultCreateCaseOperationTest {
             savedCaseType)).willReturn(response);
         given(response.hasBody()).willReturn(true);
         given(response.getBody()).willReturn(responseBody);
-        given(response.getStatusCodeValue()).willReturn(200);
+        given(response.getStatusCode()).willReturn(HttpStatus.valueOf(200));
         given(savedCaseType.getCaseTypeId()).willReturn(CASE_TYPE_ID);
         given(savedCaseType.getId()).willReturn(CASE_ID);
         given(savedCaseType.getData()).willReturn(data);
@@ -763,7 +764,7 @@ class DefaultCreateCaseOperationTest {
                 any(CaseDetails.class),
                 same(IGNORE_WARNING),
                 any()),
-            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
             () -> order.verify(caseLinkService).updateCaseLinks(caseDetails, CASE_TYPE.getCaseFieldDefinitions()),

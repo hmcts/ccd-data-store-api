@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @ExtendWith(MockitoExtension.class)
 class DelegatingGetEventsOperationTest {
@@ -54,6 +55,8 @@ class DelegatingGetEventsOperationTest {
 
     @BeforeEach
     void setUp() {
+        openMocks(this);
+
         caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(CASE_ID));
 

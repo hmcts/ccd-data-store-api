@@ -75,7 +75,7 @@ class MidEventCallbackTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = new Event();
         event.setEventId("createCase");

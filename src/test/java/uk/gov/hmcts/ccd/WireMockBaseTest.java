@@ -11,9 +11,8 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+
 import org.apache.http.HttpHeaders;
-import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,8 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -40,6 +40,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
@@ -71,7 +72,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     public static final String CASE_02_TYPE = "TestAddressBookCase";
     public static final String CASE_03_TYPE = "TestAddressBookCase";
     public static final int NUMBER_OF_CASES = 25;
-    public static final JSONObject responseJson1 = new JSONObject("""
+    public static final String responseJson1 = """
         {
             "user_task": {
                 "task_data": {
@@ -81,8 +82,8 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
                 "complete_task": "false"
             }
         }
-        """);
-    public static final JSONObject responseJson2 = new JSONObject("""
+        """;
+    public static final String responseJson2 = """
         {
             "user_task": {
                 "task_data": {
@@ -92,7 +93,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
                 "complete_task": "true"
             }
         }
-        """);
+        """;
     private static final String BEARER = "Bearer ";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9"
@@ -110,7 +111,6 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     @Inject
     protected WireMockServer wireMockServer;
 
-    @Before
     @BeforeEach
     public void initMock() throws IOException {
         super.initMock();

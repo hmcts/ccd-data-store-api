@@ -37,7 +37,7 @@ class DefaultGetCaseOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 

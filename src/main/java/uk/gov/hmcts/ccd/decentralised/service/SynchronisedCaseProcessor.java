@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.decentralised.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.function.Consumer;
 
 /**

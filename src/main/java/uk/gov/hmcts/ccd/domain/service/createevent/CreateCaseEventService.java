@@ -61,7 +61,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;

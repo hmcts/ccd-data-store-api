@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
 import java.util.Optional;

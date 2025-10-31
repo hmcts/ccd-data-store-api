@@ -1,16 +1,18 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
 
 @Entity
 @Table(name = "case_users_audit")
@@ -21,7 +23,10 @@ public class CaseUserAuditEntity {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_users_audit_id_seq_generator")
+    @SequenceGenerator(name = "case_users_audit_id_seq_generator", 
+        sequenceName = "case_users_audit_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = "case_data_id")
     private long caseDataId;
@@ -32,7 +37,7 @@ public class CaseUserAuditEntity {
     @Column(name = "changed_by_id")
     private String changedById;
     @Column(name = "changed_at")
-    @CreationTimestamp
+    @CreationTimestamp(source = SourceType.DB)
     private LocalDateTime changedAt;
     @Enumerated(EnumType.STRING)
     private Action action;

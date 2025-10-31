@@ -1,24 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.EnumUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -55,23 +36,43 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 @RestController
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/", description = "Standard case API")
+@Tag(name = "Standard case API")
 public class CaseDetailsEndpoint {
 
     private final GetCaseOperation getCaseOperation;
@@ -110,22 +111,20 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
-    @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid case ID"),
-        @ApiResponse(code = 404, message = "No case found for the given ID")
-    })
+    @Operation(summary = "Get case", description = "Retrieve an existing case with its state and data")
+    @ApiResponse(responseCode = "200", description = "Case found for the given ID")
+    @ApiResponse(responseCode = "400", description = "Invalid case ID")
+    @ApiResponse(responseCode = "404", description = "No case found for the given ID")
     @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCaseworker(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
         final Instant start = Instant.now();
@@ -137,22 +136,22 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
-    @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
+    @Operation(summary = "Get case", description = "Retrieve an existing case with its state and data")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid case ID"),
-        @ApiResponse(code = 404, message = "No case found for the given ID")
+        @ApiResponse(responseCode = "200", description = "Case found for the given ID"),
+        @ApiResponse(responseCode = "400", description = "Invalid case ID"),
+        @ApiResponse(responseCode = "404", description = "No case found for the given ID")
     })
     @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#caseId", jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId")
     public CaseDetails findCaseDetailsForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
@@ -161,94 +160,102 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start event creation as Case worker",
-                  notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+    @Operation(
+        summary = "Start event creation as Case worker",
+        description = "Start the event creation process for an existing case. Triggers `AboutToStart` callback."
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Event creation process started"),
-        @ApiResponse(code = 404, message = "No case found for the given ID"),
-        @ApiResponse(code = 422, message = "Process could not be started")
+        @ApiResponse(responseCode = "200", description = "Event creation process started"),
+        @ApiResponse(responseCode = "404", description = "No case found for the given ID"),
+        @ApiResponse(responseCode = "422", description = "Process could not be started")
     })
     public StartEventResult startEventForCaseworker(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start event creation as Citizen", notes = "Start the event creation process for an existing "
-        + "case. Triggers `AboutToStart` callback.")
+    @Operation(
+        summary = "Start event creation as Citizen", 
+        description = "Start the event creation process for an existing case. Triggers `AboutToStart` callback."
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Event creation process started"),
-        @ApiResponse(code = 404, message = "No case found for the given ID"),
-        @ApiResponse(code = 422, message = "Process could not be started")
+        @ApiResponse(responseCode = "200", description = "Event creation process started"),
+        @ApiResponse(responseCode = "404", description = "No case found for the given ID"),
+        @ApiResponse(responseCode = "422", description = "Process could not be started")
     })
     public StartEventResult startEventForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start case creation as Case worker", notes = "Start the case creation process for a new "
-        + "case. Triggers `AboutToStart` callback.")
+    @Operation(
+        summary = "Start case creation as Case worker", 
+        description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case creation process started"),
-        @ApiResponse(code = 422, message = "Process could not be started")
+        @ApiResponse(responseCode = "200", description = "Case creation process started"),
+        @ApiResponse(responseCode = "422", description = "Process could not be started")
     })
     public StartEventResult startCaseForCaseworker(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start case creation as Citizen", notes = "Start the case creation process for a new case. "
-        + "Triggers `AboutToStart` callback.")
+    @Operation(
+        summary = "Start case creation as Citizen", 
+        description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
+    )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case creation process started"),
-        @ApiResponse(code = 422, message = "Process could not be started")
+        @ApiResponse(responseCode = "200", description = "Case creation process started"),
+        @ApiResponse(responseCode = "422", description = "Process could not be started")
     })
     public StartEventResult startCaseForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
@@ -256,26 +263,26 @@ public class CaseDetailsEndpoint {
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-        value = "Submit case creation as Case worker",
-        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by"
-            + " `startCaseForCaseworker`."
+    @Operation(
+        summary = "Submit case creation as Case worker",
+        description = "Complete the case creation process. This requires a valid event token to be provided, "
+            + "as generated by `startCaseForCaseworker`."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case created"),
-        @ApiResponse(code = 422, message = "Case submission failed"),
-        @ApiResponse(code = 409, message = "Case reference not unique")
+        @ApiResponse(responseCode = "201", description = "Case created"),
+        @ApiResponse(responseCode = "422", description = "Case submission failed"),
+        @ApiResponse(responseCode = "409", description = "Case reference not unique")
     })
     @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
         jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCaseWorker(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
@@ -284,26 +291,26 @@ public class CaseDetailsEndpoint {
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-        value = "Submit case creation as Citizen",
-        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by"
-            + " `startCaseForCitizen`."
+    @Operation(
+        summary = "Submit case creation as Citizen",
+        description = "Complete the case creation process. This requires a valid event token to be provided, "
+            + "as generated by `startCaseForCitizen`."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case created"),
-        @ApiResponse(code = 422, message = "Case submission failed"),
-        @ApiResponse(code = 409, message = "Case reference not unique")
+        @ApiResponse(responseCode = "201", description = "Case created"),
+        @ApiResponse(responseCode = "422", description = "Case submission failed"),
+        @ApiResponse(responseCode = "409", description = "Case reference not unique")
     })
     @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseId = "#result.reference",
         jurisdiction = "#result.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails saveCaseDetailsForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
@@ -313,23 +320,23 @@ public class CaseDetailsEndpoint {
     @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
         "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-        value = "Validate a set of fields as Case worker",
-        notes = "Validate the case data entered during the case/event creation process."
+    @Operation(
+        summary = "Validate a set of fields as Case worker",
+        description = "Validate the case data entered during the case/event creation process."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Validation OK"),
-        @ApiResponse(code = 422, message = "Field validation failed"),
-        @ApiResponse(code = 409, message = "Case reference not unique")
+        @ApiResponse(responseCode = "200", description = "Validation OK"),
+        @ApiResponse(responseCode = "422", description = "Field validation failed"),
+        @ApiResponse(responseCode = "409", description = "Case reference not unique")
     })
     public JsonNode validateCaseDetails(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Page ID")
+        @Parameter(name = "Page ID")
         @RequestParam(required = false) final String pageId,
         @RequestBody final CaseDataContent content) {
 
@@ -339,26 +346,26 @@ public class CaseDetailsEndpoint {
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-        value = "Submit event creation as Case worker",
-        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by"
-            + " `startEventForCaseworker`."
+    @Operation(
+        summary = "Submit event creation as Case worker",
+        description = "Complete the event creation process. This requires a valid event token to be provided, "
+            + "as generated by `startEventForCaseworker`."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case event created"),
-        @ApiResponse(code = 409, message = "Case altered outside of transaction"),
-        @ApiResponse(code = 422, message = "Event submission failed")
+        @ApiResponse(responseCode = "201", description = "Case event created"),
+        @ApiResponse(responseCode = "409", description = "Case altered outside of transaction"),
+        @ApiResponse(responseCode = "422", description = "Event submission failed")
     })
     @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCaseWorker(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
@@ -367,26 +374,26 @@ public class CaseDetailsEndpoint {
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-        value = "Submit event creation as Citizen",
-        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by"
-            + " `startEventForCitizen`."
+    @Operation(
+        summary = "Submit event creation as Citizen",
+        description = "Complete the event creation process. This requires a valid event token to be provided, "
+            + "as generated by `startEventForCitizen`."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case event created"),
-        @ApiResponse(code = 409, message = "Case altered outside of transaction"),
-        @ApiResponse(code = 422, message = "Event submission failed")
+        @ApiResponse(responseCode = "201", description = "Case event created"),
+        @ApiResponse(responseCode = "409", description = "Case altered outside of transaction"),
+        @ApiResponse(responseCode = "422", description = "Event submission failed")
     })
     @LogAudit(operationType = AuditOperationType.UPDATE_CASE, caseId = "#caseId", jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public CaseDetails createCaseEventForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
@@ -394,9 +401,9 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
-    @ApiOperation(value = "Get a list of printable documents for the given case id ")
+    @Operation(summary = "Get a list of printable documents for the given case id ")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Documents list for the given case id")
+        @ApiResponse(responseCode = "200", description = "Documents list for the given case id")
     })
     public List<Document> getDocumentsForCase(
         @PathVariable("uid") final String uid,
@@ -412,28 +419,29 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
-    @ApiOperation(value = "Get case data for a given case type")
+    @Operation(summary = "Get case data for a given case type")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+        @ApiResponse(responseCode = "200", description = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCaseWorkers(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Query Parameters, valid options: created_date, last_modified_date, "
+        @Parameter(name = "Query Parameters", 
+            description = "Query Parameters, valid options: created_date, last_modified_date, "
             + "state, case_reference", required = false)
         @RequestParam(required = false) Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
-    @ApiOperation(value = "Get case data for a given case type")
+    @Operation(summary = "Get case data for a given case type")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
+        @ApiResponse(responseCode = "200", description = "List of case data for the given search criteria")})
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
@@ -455,9 +463,9 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
-    @ApiOperation(value = "Get the pagination metadata for a case data search")
+    @Operation(summary = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+        @ApiResponse(responseCode = "200", description = "Pagination metadata for the given search criteria")})
     public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("uid") final String uid,
                                                                      @PathVariable("jid") final String jurisdictionId,
                                                                      @PathVariable("ctid") final String caseTypeId,
@@ -467,9 +475,9 @@ public class CaseDetailsEndpoint {
     }
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
-    @ApiOperation(value = "Get the pagination metadata for a case data search")
+    @Operation(summary = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+        @ApiResponse(responseCode = "200", description = "Pagination metadata for the given search criteria")})
     public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("uid") final String uid,
                                                                   @PathVariable("jid") final String jurisdictionId,
                                                                   @PathVariable("ctid") final String caseTypeId,
