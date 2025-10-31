@@ -24,14 +24,15 @@ java:
   environment:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-    DATA_STORE_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    DATA_STORE_DB_NAME: data-store
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575-java/
-    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-399-java/
-    ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
+    DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
+    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
@@ -45,9 +46,109 @@ java:
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
     enabled: true
+    primary:
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
+ccd:
+  enabled: true
+  ccd:
+    s2s:
+      enabled: false
+    dataStore:
+      enabled: false
+    adminWeb:
+      enabled: false
+    definitionImporter:
+      enabled: false
+    userProfileImporter:
+      enabled: false
+    apiGatewayWeb:
+      enabled: false
+    ras:
+      enabled: true
+    elastic:
+      enabled: false
+    postgresql:
+      enabled: false
+
+  ingressHost: ${SERVICE_FQDN}
+
+  global:
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
+    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    enableKeyVaults: true
+    devMode: true
+
+  ccd-definition-store-api:
+    java:
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      imagePullPolicy: Always
+      devmemoryRequests: 2048Mi
+      devcpuRequests: 2000m
+      devmemoryLimits: 4096Mi
+      devcpuLimits: 4000m
+      environment:
+        DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
+        DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        DEFINITION_STORE_DB_OPTIONS: ""
+        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
+      secrets:
+        DEFINITION_STORE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
+
+  ccd-user-profile-api:
+    java:
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      imagePullPolicy: Always
+      environment:
+        USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
+        USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        USER_PROFILE_DB_OPTIONS: ""
+      secrets:
+        USER_PROFILE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
+
+  am-role-assignment-service:
+    java:
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      environment:
+        ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
+        ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
+      secrets:
+        ROLE_ASSIGNMENT_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
+      devmemoryRequests: 1024Mi
+      devcpuRequests: 250m
+      devmemoryLimits: 2048Mi
+      devcpuLimits: 1500m
 
 elastic:
-  enabled: true # enable whenever required on a particular PR
+  enabled: true
 
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
@@ -109,7 +210,7 @@ logstash:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
+          jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
           jdbc_user => "javapostgres"
           jdbc_password => "javapassword"
           jdbc_validate_connection => true
