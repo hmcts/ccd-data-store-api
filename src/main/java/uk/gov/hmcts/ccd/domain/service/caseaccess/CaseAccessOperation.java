@@ -203,6 +203,8 @@ public class CaseAccessOperation {
         );
 
         newUserCounts.forEach(this::updateOrgsAssignedUsersCount);
+        //separate loop to ensure newcase flags are set to false
+        newUserCounts.forEach(this::setNewCaseAssignedUsers);
     }
 
     @Transactional
@@ -278,7 +280,6 @@ public class CaseAccessOperation {
         Map<String, Object> increments = new HashMap<>();
         organisationCounts.forEach((organisationId, delta) -> {
             increments.put(ORGS_ASSIGNED_USERS_PATH + organisationId, delta);
-            setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId);
         });
 
         Map<String, Map<String, Object>> requestData = new HashMap<>();
@@ -286,6 +287,17 @@ public class CaseAccessOperation {
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(requestData);
         supplementaryDataUpdateOperation.updateSupplementaryData(caseReference, updateRequest);
+    }
+
+    private void setNewCaseAssignedUsers(String caseReference, Map<String, Long> organisationCounts) {
+        if (organisationCounts.isEmpty()) {
+            return;
+        }
+
+        Map<String, Object> increments = new HashMap<>();
+        organisationCounts.forEach((organisationId, delta) -> {
+            setUserAssignedNewCaseForOrganisationIdToFalse(caseReference, organisationId);
+        });
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
