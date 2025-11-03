@@ -212,7 +212,6 @@ dependencies {
         }
     }
 
-
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
 
@@ -305,6 +304,16 @@ dependencies {
 
     configurations.all {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
+
+        resolutionStrategy {
+            eachDependency { details ->
+                if (details.requested.group == 'commons-beanutils' &&
+                    details.requested.name == 'commons-beanutils') {
+                    details.useVersion '1.11.0'
+                    details.because 'CVE-2025-48734 requires BeanUtils>=1.11.0'
+                }
+            }
+        }
     }
     testImplementation group: 'org.json', name: 'json', version: '20211205'
 
