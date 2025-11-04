@@ -38,5 +38,14 @@ java:
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
-    SPRING_APPLICATION_JSON: |
-      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
+    SPRING_APPLICATION_JSON: >
+      {
+        "ccd": {
+          "decentralised": {
+            "case-type-service-urls": {
+              "FT_Decentralisation": "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/",
+              "PCS": "http://pcs-api-aat.service.core-compute-aat.internal/"
+            }
+          }
+        }
+      }
