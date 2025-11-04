@@ -280,7 +280,7 @@ dependencies {
     // CVE-2021-28170
     implementation "org.glassfish:jakarta.el:4.0.1"
 
-    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
     // use the latest org.springframework.security
