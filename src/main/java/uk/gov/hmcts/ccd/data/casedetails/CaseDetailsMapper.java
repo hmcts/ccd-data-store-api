@@ -30,6 +30,9 @@ public class CaseDetailsMapper {
         caseDetails.setState(caseDetailsEntity.getState());
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
         caseDetails.setVersion(caseDetailsEntity.getVersion());
+        if (caseDetailsEntity.getVersion() != null) {
+            caseDetails.setRevision(caseDetailsEntity.getVersion().longValue());
+        }
         if (caseDetailsEntity.getData() != null) {
             caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
             caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));
