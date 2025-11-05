@@ -73,6 +73,12 @@ public class ApplicationParams {
     @Value("${ccd.user-profile.host}")
     private String userProfileHost;
 
+    @Value("${case_document_am.url}")
+    private String caseDocumentAmUrl;
+
+    @Value("${document.sanitiser.case-document-am-api.enabled}")
+    private boolean documentSanitiserCaseDocumentAMEnabled;
+
     @Value("${ccd.document.url.pattern}")
     private String documentURLPattern;
 
@@ -235,6 +241,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
+    @Value("#{'${case.data.exclude.verifyaccess.casetype.validate}'.split(',')}")
+    private List<String> excludeVerifyAccessCaseTypesForValidate;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -383,6 +392,14 @@ public class ApplicationParams {
 
     public List<Integer> getCallbackRetries() {
         return callbackRetries;
+    }
+
+    public String getCaseDocumentAmUrl() {
+        return caseDocumentAmUrl;
+    }
+
+    public boolean isDocumentSanitiserCaseDocAMEnable() {
+        return documentSanitiserCaseDocumentAMEnabled;
     }
 
     public String getDocumentURLPattern() {
@@ -628,5 +645,9 @@ public class ApplicationParams {
 
     public List<String> getUploadTimestampFeaturedCaseTypes() {
         return uploadTimestampFeaturedCaseTypes;
+    }
+
+    public List<String> getExcludeVerifyAccessCaseTypesForValidate() {
+        return excludeVerifyAccessCaseTypesForValidate;
     }
 }

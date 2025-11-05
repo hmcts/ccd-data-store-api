@@ -554,7 +554,8 @@ public class CallbackTest extends WireMockBaseTest {
         Map actualData =
             mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
-        assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(0));
+        // This user can access 3 fields; they only have CU on the user first name.
+        assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(3));
         String actualDataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification").toString();
         JSONAssert.assertEquals(EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING, actualDataClassification,
