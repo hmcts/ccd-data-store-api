@@ -138,7 +138,9 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        //env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        def definitionStoreDevelopPr = "PR-1529"  
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
