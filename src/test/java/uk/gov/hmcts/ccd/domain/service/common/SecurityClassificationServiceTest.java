@@ -76,6 +76,9 @@ public class SecurityClassificationServiceTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
+    @Mock
+    private PersistenceStrategyResolver resolver;
+
     private CaseDetails caseDetails;
 
     @BeforeEach
