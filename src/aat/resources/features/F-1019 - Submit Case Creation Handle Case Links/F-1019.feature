@@ -293,7 +293,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     //When both cases are updated at the same time
     //Then a deadlock may occur
     Given   a user with [an active profile in CCD]
-    And     a successful call [to create many cases to link to] as in [F-1019_CreateCaseLinkedViaStandardCases]
+    And     a successful call [to create many cases to link to] as in [F-1019_CreateCaseLinkedViaStandardCasesParent]
+    And     a successful call [to create many cases to link to] as in [F-1019_CreateCaseLinkedViaStandardCasesChild]
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
     And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
