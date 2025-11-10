@@ -35,7 +35,7 @@
           "CaseReference": "[[ANYTHING_PRESENT]]",
           "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateCaseLinkedViaStandardCases][testData][actualResponse][body][id]}",
           "CaseTypeId": "FT_MasterCaseType",
-          "StandardLink": false
+          "StandardLink": true
         },
         {
           "CaseReference": "[[ANYTHING_PRESENT]]",
