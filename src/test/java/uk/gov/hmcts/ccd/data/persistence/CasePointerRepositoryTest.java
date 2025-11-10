@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.persistence;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -120,5 +121,34 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
         assertThat(pointer, is(notNullValue()));
         assertThat(pointer.getResolvedTTL(), is(existingTtl));
+    }
+
+    @Test
+    public void persistCasePointer_shouldKeepMarkedByLogstashFlagTrue() {
+        casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        Boolean markedByLogstash = jdbcTemplate.queryForObject(
+            "SELECT marked_by_logstash FROM case_data WHERE reference = ?",
+            Boolean.class,
+            CASE_REFERENCE
+        );
+
+        assertThat(markedByLogstash, is(true));
+    }
+
+    @Test
+    public void persistRegularCase_shouldUnsetMarkedByLogstashFlag() {
+        // Simulate a standard case creation by reusing the original details directly
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        var persisted = caseDetailsRepository.set(originalCaseDetails);
+
+        Boolean markedByLogstash = jdbcTemplate.queryForObject(
+            "SELECT marked_by_logstash FROM case_data WHERE id = ?",
+            Boolean.class,
+            persisted.getId()
+        );
+
+        assertThat(markedByLogstash, is(false));
     }
 }
