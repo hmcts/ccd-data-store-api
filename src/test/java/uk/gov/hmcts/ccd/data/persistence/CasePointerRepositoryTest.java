@@ -4,7 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -16,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,8 +33,8 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
-    private static final Long CASE_REFERENCE = 7777777777777777L;
     private static final String CASE_STATE = "CaseCreated";
+    private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
     private CasePointerRepository casePointerRepository;
@@ -40,6 +44,9 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     private CaseDetailsRepository caseDetailsRepository;
 
     private CaseDetails originalCaseDetails;
+    private Long currentCaseReference;
+    @Inject
+    private PlatformTransactionManager transactionManager;
 
     @Before
     public void setUp() {
@@ -48,7 +55,8 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private CaseDetails createOriginalCaseDetails() {
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setReference(CASE_REFERENCE);
+        currentCaseReference = CASE_REFERENCE_SEQUENCE.getAndIncrement();
+        caseDetails.setReference(currentCaseReference);
         caseDetails.setJurisdiction(JURISDICTION);
         caseDetails.setCaseTypeId(CASE_TYPE_DECENTRALIZED);
         caseDetails.setState(CASE_STATE);
@@ -89,7 +97,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         LocalDate expectedDanglingPointerExpiry = LocalDate.now().plusYears(1);
         assertAll("Case pointer should have expected properties",
             () -> assertThat(pointer.getId(), is(originalCaseDetails.getId())),
-            () -> assertThat(pointer.getReference(), is(CASE_REFERENCE)),
+            () -> assertThat(pointer.getReference(), is(currentCaseReference)),
             () -> assertThat(pointer.getJurisdiction(), is(JURISDICTION)),
             () -> assertThat(pointer.getCaseTypeId(), is(CASE_TYPE_DECENTRALIZED)),
 
@@ -131,7 +139,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         Boolean markedByLogstash = jdbcTemplate.queryForObject(
             "SELECT marked_by_logstash FROM case_data WHERE reference = ?",
             Boolean.class,
-            CASE_REFERENCE
+            currentCaseReference
         );
 
         assertThat(markedByLogstash, is(true));
@@ -150,5 +158,33 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         );
 
         assertThat(markedByLogstash, is(false));
+    }
+
+    @Test
+    public void constraintShouldPreventUnmarkingCasePointer() {
+        casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        Long pointerId = Long.valueOf(originalCaseDetails.getId());
+
+        // Run the raw update in its own transaction so an expected constraint failure does not poison
+        // the outer test transaction that the tests run in.
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        boolean constraintViolated = false;
+        try {
+            transactionTemplate.execute(status -> {
+                jdbcTemplate.update(
+                    "UPDATE case_data SET marked_by_logstash = false WHERE id = ?",
+                    pointerId
+                );
+                return null;
+            });
+        } catch (RuntimeException expected) {
+            constraintViolated = true;
+        }
+
+        assertThat("Constraint should prevent unmarking a case pointer", constraintViolated, is(true));
     }
 }
