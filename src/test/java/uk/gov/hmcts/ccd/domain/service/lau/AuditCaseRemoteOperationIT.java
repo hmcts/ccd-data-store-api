@@ -100,6 +100,10 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final int SEARCH_AUDIT_HTTP_STATUS = 201;
     private static final int ACTION_AUDIT_HTTP_STATUS = 201;
     private static final int AUDIT_UNAUTHORISED_HTTP_STATUS = 401;
+    private static final int AUDIT_FORBIDDEN_HTTP_STATUS = 403;
+
+    private static final int AUDIT_BAD_GATEWAY_HTTP_STATUS = 502;
+    private static final int AUDIT_GATEWAY_TIMEOUT_HTTP_STATUS = 504;
 
     private static final String SEARCH_LOG_USER_ID = IDAM_ID;
     private static final String SEARCH_LOG_CASE_REFS = CASE_ID;
@@ -242,7 +246,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
 
@@ -271,6 +274,102 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
         verifyWireMock(3, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
+    }
+
+    public void shouldRetryIf403StatusFromLAU()
+        throws JsonProcessingException, InterruptedException {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CASE_ACCESSED)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        CaseActionPostRequest caseActionPostRequest = new CaseActionPostRequest(
+            new ActionLog(
+                ACTION_LOG_USER_ID,
+                ACTION_LOG_CASE_ACTION,
+                ACTION_LOG_CASE_REF,
+                ACTION_LOG_CASE_JURISDICTION_ID,
+                ACTION_LOG_CASE_TYPE_ID,
+                LOG_TIMESTAMP)
+        );
+
+        stubFor(WireMock.post(urlMatching(ACTION_AUDIT_ENDPOINT))
+            .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseActionPostRequest)))
+            .willReturn(aResponse().withStatus(AUDIT_FORBIDDEN_HTTP_STATUS)));
+
+        auditService.audit(auditContext);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+
+        verifyWireMock(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
+    }
+
+    public void shouldRetryIfResponseStatus502()
+        throws JsonProcessingException, InterruptedException {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CASE_ACCESSED)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        CaseActionPostRequest caseActionPostRequest = new CaseActionPostRequest(
+            new ActionLog(
+                ACTION_LOG_USER_ID,
+                ACTION_LOG_CASE_ACTION,
+                ACTION_LOG_CASE_REF,
+                ACTION_LOG_CASE_JURISDICTION_ID,
+                ACTION_LOG_CASE_TYPE_ID,
+                LOG_TIMESTAMP)
+        );
+
+        stubFor(WireMock.post(urlMatching(ACTION_AUDIT_ENDPOINT))
+            .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseActionPostRequest)))
+            .willReturn(aResponse().withStatus(AUDIT_BAD_GATEWAY_HTTP_STATUS)));
+
+        auditService.audit(auditContext);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+
+        verifyWireMock(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
+    }
+
+    public void shouldRetryIfResponseStatus504()
+        throws JsonProcessingException, InterruptedException {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CASE_ACCESSED)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        CaseActionPostRequest caseActionPostRequest = new CaseActionPostRequest(
+            new ActionLog(
+                ACTION_LOG_USER_ID,
+                ACTION_LOG_CASE_ACTION,
+                ACTION_LOG_CASE_REF,
+                ACTION_LOG_CASE_JURISDICTION_ID,
+                ACTION_LOG_CASE_TYPE_ID,
+                LOG_TIMESTAMP)
+        );
+
+        stubFor(WireMock.post(urlMatching(ACTION_AUDIT_ENDPOINT))
+            .withHeader(SERVICE_AUTHORIZATION_HEADER, matching("Bearer .+"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(caseActionPostRequest)))
+            .willReturn(aResponse().withStatus(AUDIT_GATEWAY_TIMEOUT_HTTP_STATUS)));
+
+        auditService.audit(auditContext);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+
+        verifyWireMock(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
     private void waitForPossibleAuditResponse(String pathPrefix) throws InterruptedException {
