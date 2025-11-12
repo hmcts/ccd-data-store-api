@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-1019_CreateChildParentCasesCaseworker",
+  "_extends_": "F-1019_CreateCasePreRequisiteCaseworkerBase",
+
+  "specs": [
+    "to create parent and child case"
+  ],
+
+  "prerequisites" : [ {
+    "CaseLinkedViaStandardCaseLinksFieldParent": "F-1019_CreateCasePreRequisiteCaseworkerBase",
+    "CaseLinkedViaStandardCaseLinksFieldChild": "F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase"
+  } ]
+
+}

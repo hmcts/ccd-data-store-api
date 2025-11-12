@@ -1,6 +1,6 @@
 {
   "title": "should retrieve case links for a specified case reference",
-  "_guid_": "F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldA",
+  "_guid_": "F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldB",
   "_extends_": "Verify_Case_Links_Base",
 
   "specs": [
@@ -39,8 +39,8 @@
         },
         {
           "CaseReference": "[[ANYTHING_PRESENT]]",
-          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateChildParentCasesCaseworker][childContexts][CaseLinkedViaStandardCaseLinksFieldParent][testData][actualResponse][body][id]}",
-          "CaseTypeId": "FT_MasterCaseType",
+          "LinkedCaseReference": "${[scenarioContext][siblingContexts][F-1019_CreateChildParentCasesCaseworker][childContexts][CaseLinkedViaStandardCaseLinksFieldChild][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_Conditionals",
           "StandardLink": true
         }
       ]

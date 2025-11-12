@@ -35,7 +35,7 @@
         "_extends_": "F-1019-CaseDataWithStandardCaseLinksA"
       },
       "data_classification" : {
-        "_extends_": "F-1019-ClasificationsForCaseDataWithStandardCaseLinksA"
+        "_extends_": "F-1019-ClassificationsForCaseDataWithStandardCaseLinksA"
       }
     }
   }
