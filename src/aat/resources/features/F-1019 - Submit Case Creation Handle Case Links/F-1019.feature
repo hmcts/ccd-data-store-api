@@ -300,4 +300,5 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     Then    a positive response is received
     And     the response has all other details as expected
     And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldA]
+    And     a successful call [create link from Child to Parent] as in [F-1019_Create_Child_Link_To_Parent]
     And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldB]
