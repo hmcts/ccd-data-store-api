@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1019-ClassificationsForCaseDataWithStandardCaseLinksB",
+  "_guid_": "F-1019-ClassificationsForCaseDataWithStandardCaseLinksC",
 
   "CaseLinkField" : {
     "classification" : "PUBLIC",
@@ -20,13 +20,7 @@
         "value": {
           "CaseReference": "PUBLIC"
         },
-        "id": "d7e67a81-0000-CaseLinkedViaStandardCaseLinksFieldParent"
-      },
-      {
-        "value" : {
-          "CaseReference" : "PUBLIC"
-        },
-        "id" : "a285df66-e36a-4ed3-b5d0-8769f9e7217c"
+        "id": "d7e67a81-0000-CaseLinkedViaStandardCaseLinksField"
       }
     ]
   }

@@ -1,0 +1,55 @@
+{
+	"_guid_": "F-1019_Update_Case_Link_To_Case_Link",
+
+	"productName": "CCD Data Store",
+	"operationName": "submit event for an existing case (V2)",
+
+	"method": "POST",
+	"uri": "/cases/{cid}/events",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+			"experimental": true
+		},
+    "pathVariables": {
+        "cid": "${[scenarioContext][childContexts][F-1019_Create_Case_Link][testData][actualResponse][body][id]}"
+    },
+    "body": {
+        "data": {
+          "_extends_": "F-1019-CaseDataCaseLinkToCaseLink"
+        },
+        "event": {
+          "id": "createCaseCaseLinks",
+          "summary": "",
+          "description": ""
+        },
+        "security_classification": "PUBLIC",
+        "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+        "ignore_warning": true
+      }
+    },
+
+    "expectedResponse": {
+      "body" : {
+        "data" : {
+          "_extends_": "F-1019-CaseDataCaseLinkToCaseLink"
+        },
+        "data_classification" : {
+          "_extends_": "F-1019-ClassificationsForCaseDataWithStandardCaseLinksC"
+        }
+      }
+    },
+
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}
