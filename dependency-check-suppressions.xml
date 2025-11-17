@@ -16,7 +16,10 @@
         CVE-2025-48989 refer [https://tools.hmcts.net/jira/browse/CCD-6675]
         CVE-2025-55668 refer [https://tools.hmcts.net/jira/browse/CCD-6675]
     
-        CVE-2023-51074 refer [Ticket]</notes>
+        CVE-2023-51074 refer [Ticket]
+        CVE-2025-55754 refer [Ticket]
+        CVE-2025-55752 refer [Ticket]
+        CVE-2025-61795 refer [Ticket]</notes>
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2025-48734</cve>
     <cve>CVE-2024-22259</cve>
@@ -32,5 +35,8 @@
     <cve>CVE-2025-48989</cve>
     <cve>CVE-2025-55668</cve>
     <cve>CVE-2023-51074</cve>
+    <cve>CVE-2025-55754</cve>
+    <cve>CVE-2025-55752</cve>
+    <cve>CVE-2025-61795</cve>
   </suppress>
 </suppressions>
