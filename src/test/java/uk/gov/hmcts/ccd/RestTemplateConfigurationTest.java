@@ -82,24 +82,25 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     public void shouldBeAbleToUseMultipleTimes() throws Exception {
         stubResponse();
         final List<Future<Integer>> futures = new ArrayList<>();
-        final ExecutorService executorService = Executors.newFixedThreadPool(25);
         final int totalNumberOfCalls = 200;
 
-        for (int i = 0; i < totalNumberOfCalls; i++) {
-            futures.add(executorService.submit(() -> {
-                final RequestEntity<String>
-                    request =
-                    new RequestEntity<>(PUT, URI.create(hostUrl + URL));
-                final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
-                assertResponse(response);
-                return response.getStatusCode().value();
-            }));
-        }
+        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < totalNumberOfCalls; i++) {
+                futures.add(executorService.submit(() -> {
+                    final RequestEntity<String>
+                        request =
+                        new RequestEntity<>(PUT, URI.create(hostUrl + URL));
+                    final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
+                    assertResponse(response);
+                    return response.getStatusCode().value();
+                }));
+            }
 
-        assertThat(futures, hasSize(totalNumberOfCalls));
+            assertThat(futures, hasSize(totalNumberOfCalls));
 
-        for (Future<Integer> future: futures) {
-            assertThat(future.get(), is(SC_OK));
+            for (Future<Integer> future: futures) {
+                assertThat(future.get(), is(SC_OK));
+            }
         }
     }
 

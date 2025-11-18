@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 @Service
 @Slf4j
@@ -44,13 +45,18 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
+    private final ExecutorService virtualThreadPerTaskExecutor;
+
     @Autowired
     public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
                                     LogAndAuditFeignClient logAndAuditFeignClient,
-                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
+                                    final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration,
+                                    @Qualifier("virtualThreadPerTaskExecutor")
+                                        ExecutorService virtualThreadPerTaskExecutor) {
         this.securityUtils = securityUtils;
         this.logAndAuditFeignClient = logAndAuditFeignClient;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
+        this.virtualThreadPerTaskExecutor = virtualThreadPerTaskExecutor;
     }
 
     @Override
@@ -120,12 +126,14 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
                 || LAU_CASE_ACTION_VIEW.equals(activity)) {
                 CompletableFuture<ResponseEntity<CaseActionPostResponse>> future = CompletableFuture.supplyAsync(() ->
-                    logAndAuditFeignClient.postCaseAction(securityUtils.getServiceAuthorization(), capr));
+                    logAndAuditFeignClient.postCaseAction(securityUtils.getServiceAuthorization(), capr),
+                    virtualThreadPerTaskExecutor);
                 future.whenComplete((response, error) ->
                     handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             } else if ("SEARCH".equals(activity)) {
                 CompletableFuture<ResponseEntity<CaseSearchPostResponse>> future = CompletableFuture.supplyAsync(() ->
-                    logAndAuditFeignClient.postCaseSearch(securityUtils.getServiceAuthorization(), cspr));
+                    logAndAuditFeignClient.postCaseSearch(securityUtils.getServiceAuthorization(), cspr),
+                    virtualThreadPerTaskExecutor);
                 future.whenComplete((response, error) ->
                     handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             }
