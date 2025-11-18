@@ -307,8 +307,9 @@ Feature: F-1019: Submit Case Creation Handle Case Links
 
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
+
     #And     it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
-    And     it is submitted to call the [submit event for an existing case (V2)] operation of [CCD data store],
+    And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD Data Store],
     Then    a positive response is received
     And     the response has all other details as expected
     And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkField]

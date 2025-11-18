@@ -7,9 +7,15 @@
 	"method": "POST",
 	"uri": "/cases/{cid}/events",
 
-	"user": {
-		"_extends_": "Common_User_For_Request"
-	},
+  "prerequisites" : [{
+    "Token_Creation": "S-1019_GetCreateToken"
+  }],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
 
 	"request": {
 		"headers": {
@@ -22,7 +28,7 @@
     },
     "body": {
         "data": {
-          "_extends_": "F-1019-CaseDataCaseLinkToCaseLink"
+          "_extends_": "F-1019-CaseDataCaseLinkToCaseLinkUpdate"
         },
         "event": {
           "id": "createCaseCaseLinks",
@@ -38,7 +44,7 @@
     "expectedResponse": {
       "body" : {
         "data" : {
-          "_extends_": "F-1019-CaseDataCaseLinkToCaseLink"
+          "_extends_": "F-1019-CaseDataCaseLinkToCaseLinkUpdate"
         },
         "data_classification" : {
           "_extends_": "F-1019-ClassificationsForCaseDataWithStandardCaseLinksC"
