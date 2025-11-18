@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -845,6 +846,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @AutoConfigureWireMock(port = 0)
     @ActiveProfiles("test")
     @RunWith(SpringRunner.class)
+    @DirtiesContext
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @TestPropertySource(locations = "classpath:test.properties")
     @Nested
