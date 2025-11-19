@@ -4,6 +4,7 @@
   "CaseLinkField": {
     "CaseReference":  null
   },
+  "SearchCriteria" : { },
   "caseLinks": [
     {
       "id": "d7e67a81-0000-CaseLinkedViaStandardCaseLinksFieldChild",
