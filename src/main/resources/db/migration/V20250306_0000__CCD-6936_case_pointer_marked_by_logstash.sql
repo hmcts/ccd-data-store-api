@@ -1,3 +1,6 @@
+-- Limit how long this migration waits for locks to ensure we do not hang if long queries are active.
+SET LOCAL lock_timeout = '15s';
+
 CREATE OR REPLACE FUNCTION public.set_case_data_marked_by_logstash() RETURNS trigger
     LANGUAGE plpgsql
 AS $$
