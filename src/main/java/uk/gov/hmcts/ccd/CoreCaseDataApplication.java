@@ -27,7 +27,7 @@ public class CoreCaseDataApplication {
 
     @SuppressWarnings("checkstyle:CommentsIndentation") // commented out config predates
     public static void main(String[] args) {
-
+        System.out.println("Running Your New Code"); 
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {
 //          Configurator.setLevel(LOGGING_LEVEL_CCD,
 //                                Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
