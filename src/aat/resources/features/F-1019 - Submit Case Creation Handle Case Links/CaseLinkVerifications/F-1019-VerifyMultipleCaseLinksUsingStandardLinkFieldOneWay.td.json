@@ -32,14 +32,14 @@
           "__elementId__": "LinkedCaseReference"
         },
         {
-          "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+          "CaseReference": "[[ANYTHING_PRESENT]]",
           "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
           "CaseTypeId": "FT_MasterCaseType",
           "StandardLink": true
         },
         {
-          "CaseReference": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-          "LinkedCaseReference": "${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "CaseReference": "[[ANYTHING_PRESENT]]",
+          "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
           "CaseTypeId": "FT_Conditionals",
           "StandardLink": true
         }
