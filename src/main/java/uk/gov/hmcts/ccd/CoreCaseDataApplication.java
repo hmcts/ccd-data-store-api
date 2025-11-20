@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Clock;
 
-@Slf4j
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
@@ -28,7 +27,6 @@ public class CoreCaseDataApplication {
 
     @SuppressWarnings("checkstyle:CommentsIndentation") // commented out config predates
     public static void main(String[] args) {
-        log.error("New code running");
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {
 //          Configurator.setLevel(LOGGING_LEVEL_CCD,
 //                                Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
