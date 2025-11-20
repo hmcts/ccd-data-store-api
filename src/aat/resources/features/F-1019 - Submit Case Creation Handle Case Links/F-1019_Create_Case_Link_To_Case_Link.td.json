@@ -5,7 +5,7 @@
   "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
 
   "prerequisites" : [{
-    "Token_Creation": "S-1019_GetCreateToken"
+    "Token_Creation": "S-1019_Get_Update_Token_Another"
   }],
 
   "specs": [
