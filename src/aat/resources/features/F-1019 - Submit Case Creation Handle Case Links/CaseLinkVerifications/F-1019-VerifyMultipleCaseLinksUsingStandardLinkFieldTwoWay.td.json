@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldTwoWay",
   "title": "should retrieve case links for a specified case reference",
+  "_guid_": "F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldTwoWay",
   "_extends_": "Verify_Case_Links_Base",
 
   "specs": [
@@ -15,7 +15,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1019_Create_Case_Link][testData][actualResponse][body][id]}"
     }
   },
 
@@ -33,14 +33,20 @@
         },
         {
           "CaseReference": "[[ANYTHING_PRESENT]]",
-          "LinkedCaseReference": "${[scenarioContext][childContexts][F-1019_Create_Case_Link][testData][actualResponse][body][id]}",
+          "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][caseIdAsIntegerFrom_F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
           "CaseTypeId": "FT_MasterCaseType",
+          "StandardLink": false
+        },
+        {
+          "CaseReference": "[[ANYTHING_PRESENT]]",
+          "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][caseIdAsIntegerFrom_F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_Conditionals",
           "StandardLink": true
         },
         {
           "CaseReference": "[[ANYTHING_PRESENT]]",
-          "LinkedCaseReference": "${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-          "CaseTypeId": "FT_Conditionals",
+          "LinkedCaseReference": "${[scenarioContext][parentContext][childContexts][caseIdAsIntegerFrom_F-1019_Create_Case_Link][testData][actualResponse][body][id]}",
+          "CaseTypeId": "FT_MasterCaseType",
           "StandardLink": true
         }
       ]

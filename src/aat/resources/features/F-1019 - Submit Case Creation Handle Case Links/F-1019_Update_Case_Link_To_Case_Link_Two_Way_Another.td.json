@@ -7,15 +7,8 @@
 	"method": "POST",
 	"uri": "/cases/{cid}/events",
 
-  "specs": [
-    "an active profile in CCD",
-    "Update case two way another",
-    "contains the standard CaseLinks field with Case Reference values",
-    "As a prerequisite"
-  ],
-
   "prerequisites" : [{
-    "Token_Creation": "S-1019_Get_Update_TokenAnother"
+    "Token_Creation": "S-1019_Get_Update_Token"
   }],
 
   "users": {
@@ -31,7 +24,7 @@
 			"experimental": true
 		},
     "pathVariables": {
-        "cid": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${}${[scenarioContext][childContexts][F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
         "data": {

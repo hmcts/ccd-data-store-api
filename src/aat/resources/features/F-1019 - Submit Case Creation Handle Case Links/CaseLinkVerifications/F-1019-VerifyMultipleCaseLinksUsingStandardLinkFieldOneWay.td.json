@@ -15,7 +15,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1019_Create_Case_Link][testData][actualResponse][body][id]}"
     }
   },
 

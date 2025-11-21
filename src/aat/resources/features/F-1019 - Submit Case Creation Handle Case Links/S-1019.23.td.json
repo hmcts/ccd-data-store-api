@@ -6,7 +6,6 @@
 
   "specs": [
     "an active profile in CCD",
-    "create case to case link",
     "contains the standard CaseLinks field with Case Reference values",
     "As a prerequisite"
   ]
