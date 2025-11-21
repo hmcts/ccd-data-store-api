@@ -58,6 +58,7 @@ public class SecurityConfiguration {
         "/health/liveness",
         "/health/readiness",
         "/health",
+        "/thread-info",
         "/loggers/**",
         "/",
         "/status/health",
@@ -103,7 +104,7 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
             .formLogin(fl -> fl.disable())
             .logout(logout -> logout.disable())
-            .authorizeHttpRequests(auth -> 
+            .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/error")
                 .permitAll()
                 .anyRequest()
