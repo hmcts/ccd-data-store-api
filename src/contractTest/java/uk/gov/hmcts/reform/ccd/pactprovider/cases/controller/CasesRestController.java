@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd.pactprovider.cases.controller;
 
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -80,17 +80,17 @@ public class CasesRestController {
         path = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
         produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<StartEventResult> startEventForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false, defaultValue = "false") final Boolean ignoreWarning) {
 
         StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
@@ -112,15 +112,15 @@ public class CasesRestController {
     @GetMapping(path = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
         produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<StartEventResult> startCaseForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Event ID", required = true)
+        @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false, defaultValue = "false") final Boolean ignoreWarning) {
 
         StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId, eventId,
@@ -143,13 +143,13 @@ public class CasesRestController {
     @PostMapping(path = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
         produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<CaseDetails> createCaseEventForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Case ID", required = true)
+        @Parameter(name = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody(required = false) final CaseDataContent content) {
 
@@ -172,13 +172,13 @@ public class CasesRestController {
     @PostMapping(path = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
         produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<CaseDetails> saveCaseDetailsForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
+        @Parameter(name = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
+        @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
+        @Parameter(name = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false, defaultValue = "false") final Boolean ignoreWarning,
         @RequestBody(required = false) final CaseDataContent content) {
 

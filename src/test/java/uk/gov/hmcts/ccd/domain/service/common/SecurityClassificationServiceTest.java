@@ -83,7 +83,7 @@ public class SecurityClassificationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
 

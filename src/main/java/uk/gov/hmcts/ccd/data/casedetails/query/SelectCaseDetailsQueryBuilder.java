@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd.data.casedetails.query;
 
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 
 public class SelectCaseDetailsQueryBuilder extends CaseDetailsQueryBuilder<CaseDetailsEntity> {
 
