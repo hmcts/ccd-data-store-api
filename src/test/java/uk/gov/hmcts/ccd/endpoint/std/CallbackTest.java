@@ -1448,14 +1448,15 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
 
         // read from db using another thread / transaction
-        ExecutorService es = Executors.newSingleThreadExecutor();
-        Future<?> future = es.submit(() -> {
-            List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
-            CaseDetails savedCaseDetails = caseDetailsList.get(0);
-            assertEquals("CaseUpdated", savedCaseDetails.getState());
-            return null;
-        });
-        future.get(); // This will rethrow Exceptions and Errors as ExecutionException
+        try (ExecutorService es = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<?> future = es.submit(() -> {
+                List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
+                CaseDetails savedCaseDetails = caseDetailsList.get(0);
+                assertEquals("CaseUpdated", savedCaseDetails.getState());
+                return null;
+            });
+            future.get(); // This will rethrow Exceptions and Errors as ExecutionException
+        }
     }
 
     private void stubForErrorCallbackResponse(final String url) throws JsonProcessingException {

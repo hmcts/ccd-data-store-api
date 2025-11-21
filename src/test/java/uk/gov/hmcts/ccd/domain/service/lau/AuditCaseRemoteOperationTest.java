@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -66,6 +70,8 @@ class AuditCaseRemoteOperationTest {
     @Mock
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
+    private ExecutorService virtualThreadPerTaskExecutor;
+
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
@@ -91,11 +97,19 @@ class AuditCaseRemoteOperationTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
+        virtualThreadPerTaskExecutor = Executors.newVirtualThreadPerTaskExecutor();
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
         auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
-            auditCaseRemoteConfiguration);
+            auditCaseRemoteConfiguration, virtualThreadPerTaskExecutor);
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (virtualThreadPerTaskExecutor != null) {
+            virtualThreadPerTaskExecutor.close();
+        }
     }
 
     @Test
