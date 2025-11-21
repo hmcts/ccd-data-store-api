@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newConcurrentMap;
 import static org.springframework.http.HttpHeaders.ETAG;
 
 @Slf4j
@@ -60,7 +60,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private final RestTemplate restTemplate;
 
     // UserId as a key, Pair<ETag, RoleAssignmentResponse> as a value
-    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newHashMap();
+    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newConcurrentMap();
 
     public DefaultRoleAssignmentRepository(final ApplicationParams applicationParams,
                                            final SecurityUtils securityUtils,
