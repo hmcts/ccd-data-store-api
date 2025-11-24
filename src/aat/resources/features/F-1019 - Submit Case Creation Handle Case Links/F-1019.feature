@@ -349,3 +349,35 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And     the response has all other details as expected
     And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldOneWay]
 
+
+  @S-1019.25
+  Scenario: Simulate concurrent updates to linked cases
+  //Create a case - F-1019_CreateCasePreRequisiteCaseworkerBase
+  // Create a case - F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase
+  //and link to F-1019_CreateCasePreRequisiteCaseworkerBase
+    //update F-1019_CreateCasePreRequisiteCaseworkerBase case to link to F-1019_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase
+    //
+  //Then a deadlock may occur
+    Given a user with [an active profile in CCD]
+    # Create cases needed for linking
+    And   a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
+
+    # Create cases needed for linking
+    And   a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
+
+    #get event token to update F-1019_CreateAnotherCasePreRequisiteCaseworkerBase case
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_TokenForAnother],
+
+    # Create case link to F-1019_CreateCasePreRequisiteCaseworkerBase
+    And     a successful call [to update case to link a case] as in [S-1019_Update_Case_Link_CreateAnotherCasePreRequisiteCaseworker]
+
+   # get event token to update
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token],
+    When    a request is prepared with appropriate values
+    And     the request [contains the standard CaseLinks field with Case Reference values]
+
+    And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD Data Store],
+    When    a request is prepared with appropriate values
+    Then    a positive response is received
+    And     the response has all other details as expected
+    And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldOneWay]

@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1019.24",
+  "_guid_": "S-1019.25",
   "_extends_": "F-1019_Update_Case_Link_CreateCasePreRequisiteCaseworkerBase",
 
   "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",

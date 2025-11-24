@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-1019_Update_Case_Link_To_Case_Link_Two_Way",
+	"_guid_": "F-1019_Update_Case_Link_CreateAnotherCasePreRequisiteCaseworkerBase",
 
 	"productName": "CCD Data Store",
 	"operationName": "submit event for an existing case (V2)",
@@ -8,7 +8,7 @@
 	"uri": "/cases/{cid}/events",
 
   "prerequisites" : [{
-    "Token_Creation": "S-1019_Get_Update_Token"
+    "Token_Creation": "S-1019_Get_Update_TokenForAnother"
   }],
 
   "users": {
@@ -24,7 +24,7 @@
 			"experimental": true
 		},
     "pathVariables": {
-        "cid": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        "cid": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
         "data": {

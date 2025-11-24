@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-1019-LinkToF-1019_CreateCasePreRequisiteCaseworkerBase",
+
+  "CaseLinkField": {
+    "CaseReference":  "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+
+  },
+  "caseLinks": [
+    {
+      "id": "d7e67a81-0000-F-1019_CreateCasePreRequisiteCaseworkerBase",
+      "value": {
+        "CaseReference": "${}${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      }
+    }
+  ]
+}
