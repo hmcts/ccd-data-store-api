@@ -22,7 +22,7 @@ public class TestIdamConfiguration {
 
     private ClientRegistration clientRegistration() {
         return ClientRegistration.withRegistrationId("oidc")
-            .redirectUriTemplate("{baseUrl}/{action}/oauth2/code/{registrationId}")
+            .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .scope("read:user")
             .authorizationUri("http://idam/o/authorize")

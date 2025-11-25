@@ -44,7 +44,7 @@ class TextCaseReferenceCaseLinkValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);

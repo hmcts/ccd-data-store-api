@@ -29,7 +29,7 @@ class EventsEndpointTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         endpoint = new EventsEndpoint(getEventsOperation);
     }

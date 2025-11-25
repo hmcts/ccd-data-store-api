@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.authorisation.exceptions.ServiceException;
@@ -42,8 +43,8 @@ class IdamRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        Whitebox.setInternalState(idamRepository, "selfInstance", idamRepository);
+        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(idamRepository, "selfInstance", idamRepository);
     }
 
     @Test

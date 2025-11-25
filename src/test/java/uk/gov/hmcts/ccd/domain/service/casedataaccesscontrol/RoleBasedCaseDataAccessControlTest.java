@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import static java.util.Arrays.asList;
@@ -52,7 +52,7 @@ class RoleBasedCaseDataAccessControlTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -76,7 +76,7 @@ class RoleBasedCaseDataAccessControlTest {
 
         instance.grantAccess(caseDetails, IDAM_ID);
 
-        verifyZeroInteractions(caseUserRepository);
+        verifyNoInteractions(caseUserRepository);
     }
 
     @Test

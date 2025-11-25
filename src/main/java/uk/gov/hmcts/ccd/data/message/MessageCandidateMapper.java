@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.message;
 
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 @Named
 @Singleton
