@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,7 +40,7 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();

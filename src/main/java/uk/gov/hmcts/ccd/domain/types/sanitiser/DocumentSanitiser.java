@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
@@ -14,11 +8,18 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 @Singleton

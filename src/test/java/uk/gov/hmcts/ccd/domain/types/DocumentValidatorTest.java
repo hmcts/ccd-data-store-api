@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.types;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -101,7 +101,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         return new DocumentValidator(ap,dateTimeValidator, caseDefinitionRepository);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final FieldTypeDefinition documentFieldTypeDefinition = mock(FieldTypeDefinition.class);
         final FieldTypeDefinition dateTimeFieldTypeDefinition = mock(FieldTypeDefinition.class);

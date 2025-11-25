@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;

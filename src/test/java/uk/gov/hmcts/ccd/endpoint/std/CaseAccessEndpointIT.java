@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import org.hamcrest.MatcherAssert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,10 +54,10 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         super.initMock();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
