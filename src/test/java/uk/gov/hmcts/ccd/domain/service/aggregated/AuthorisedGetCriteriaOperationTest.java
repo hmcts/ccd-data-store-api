@@ -61,7 +61,7 @@ class AuthorisedGetCriteriaOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         testWorkbasketInputs = Arrays.asList(
             aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_1).build(),

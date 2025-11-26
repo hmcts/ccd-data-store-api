@@ -35,7 +35,6 @@ import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -103,7 +102,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = LocalDateTime.now();
@@ -148,7 +147,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         doReturn(caseTypeDefinition).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
-        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(any());
 
         doAnswer(invocation -> invocation.getArgument(0)).when(fieldProcessorService).processCaseViewField(any());
 

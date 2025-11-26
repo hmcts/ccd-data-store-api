@@ -6,14 +6,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -43,7 +45,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +92,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
     private static final String REQUEST_ID_VALUE = "1234567898765432";
     private static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
     private static String CUSTOM_CONTEXT = "";
+    private static JSONObject responseJsonObject1;
 
     @Inject
     private WebApplicationContext wac;
@@ -98,15 +101,16 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws JSONException {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+        responseJsonObject1 = new JSONObject(responseJson1);
     }
 
     @Test
@@ -268,7 +272,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
@@ -321,13 +325,14 @@ class CaseControllerTestIT extends WireMockBaseTest {
             .willReturn(okJson(jsonString).withStatus(200)));
 
         stubFor(WireMock.post(urlMatching("/callback/document"))
-            .willReturn(okJson(jsonString).withStatus(200).withHeader(CUSTOM_CONTEXT, responseJson2.toString())));
+            .willReturn(okJson(jsonString).withStatus(200)
+                .withHeader(CUSTOM_CONTEXT, new JSONObject(responseJson2).toString())));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(REQUEST_ID, REQUEST_ID_VALUE);
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
-        headers.add(CUSTOM_CONTEXT, responseJson1.toString());
+        headers.add(CUSTOM_CONTEXT, responseJsonObject1.toString());
 
         final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URL).headers(headers)
             .contentType(JSON_CONTENT_TYPE)
@@ -337,7 +342,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(201, mvcResult.getResponse().getStatus());
         assertTrue(mvcResult.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
         assertTrue(mvcResult.getResponse().getHeader(CUSTOM_CONTEXT).contains(
-            ClientContextUtil.encodeToBase64(responseJson2.toString())));
+            ClientContextUtil.encodeToBase64(new JSONObject(responseJson2).toString())));
     }
 
     @Test
@@ -373,7 +378,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -434,7 +439,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
@@ -492,7 +497,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -535,7 +540,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
             .header(REQUEST_ID, REQUEST_ID_VALUE)
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -588,7 +593,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(url)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .contentType(jsonContentV3CreateCase)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -620,7 +625,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andReturn();
@@ -807,7 +812,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
-            .header(CUSTOM_CONTEXT, responseJson1.toString())
+            .header(CUSTOM_CONTEXT, responseJsonObject1.toString())
             .header(REQUEST_ID, REQUEST_ID_VALUE)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsString(caseDetailsToSave))

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.endpoint.std;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -41,7 +41,7 @@ class DraftsEndpointTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftViewOperation, draftGateway);
     }
 

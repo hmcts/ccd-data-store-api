@@ -3,7 +3,8 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 public class CriteriaField implements Serializable, CommonDCPModel {
@@ -15,7 +16,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
     private String displayContextParameter = null;
     private String showCondition;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
         return caseFieldId;
@@ -25,7 +26,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.caseFieldId = caseFieldId;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("case_field_element_path")
     public String getCaseFieldPath() {
         return caseFieldPath;
@@ -35,7 +36,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.caseFieldPath = caseFieldPath;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -45,7 +46,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.label = label;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
@@ -55,7 +56,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("role")
     public String getRole() {
         return role;
@@ -65,7 +66,7 @@ public class CriteriaField implements Serializable, CommonDCPModel {
         this.role = role;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("display_context_parameter")
     public String getDisplayContextParameter() {
         return displayContextParameter;
