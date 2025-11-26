@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ExampleProperty;
-import io.swagger.annotations.Example;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.caselinking.GetLinkedCasesResponse;
@@ -444,65 +437,59 @@ public class CaseController {
     @PostMapping(
         path = "/cases/supplementary-data"
     )
-    @ApiOperation(
-        value = "Update Cases Supplementary Data"
-    )
+    @Operation(summary = "Update Cases Supplementary Data")
     @ApiResponses({
         @ApiResponse(
-            code = 200,
-            message = "Cases Updated",
-            response = SupplementaryDataResource.class
+            responseCode = "200",
+            description = "Cases Updated",
+            content = @Content(schema = @Schema(implementation = SupplementaryDataResource.class))
             ),
         @ApiResponse(
-            code = 400,
-            message = V2.Error.CASE_ID_INVALID
+            responseCode = "400",
+            description = V2.Error.CASE_ID_INVALID
             ),
         @ApiResponse(
-            code = 400,
-            message = V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID
+            responseCode = "400",
+            description = V2.Error.SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID
             ),
         @ApiResponse(
-            code = 400,
-            message = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
+            responseCode = "400",
+            description = V2.Error.MORE_THAN_ONE_NESTED_LEVEL
             ),
         @ApiResponse(
-            code = 404,
-            message = V2.Error.CASE_NOT_FOUND
+            responseCode = "404",
+            description = V2.Error.CASE_NOT_FOUND
             ),
         @ApiResponse(
-            code = 403,
-            message = V2.Error.NOT_AUTHORISED_UPDATE_CASES_SUPPLEMENTARY_DATA
+            responseCode = "403",
+            description = V2.Error.NOT_AUTHORISED_UPDATE_CASES_SUPPLEMENTARY_DATA
             )
     })
-    @ApiImplicitParams({
-        @ApiImplicitParam(
+    @Parameters({
+        @Parameter(
             name = "supplementaryDataCasesUpdateRequest",
-            dataTypeClass = SupplementaryDataCasesUpdateRequest.class,
-            examples = @Example(
-                value = {
-                    @ExampleProperty(
-                        value = """
-                            {
-                                "cases": [
-                                    "caseId value 1",
-                                    "caseId value 2"
-                                ],
-                                "supplementary_data_updates": {
-                                    "$inc": {
-                                        "orgs_assigned_users.OrgA": 1,
-                                        "orgs_assigned_users.OrgB": -1
-                                    },
-                                    "$set": {
-                                        "orgs_assigned_users.OrgZ": 34,
-                                        "new_case.OrgZ": false,
-                                        "processed": true
-                                    }
-                                }
+            content = @Content(schema = @Schema(implementation = SupplementaryDataCasesUpdateRequest.class)),
+            examples = @ExampleObject(
+                value = """
+                    {
+                        "cases": [
+                            "caseId value 1",
+                            "caseId value 2"
+                        ],
+                        "supplementary_data_updates": {
+                            "$inc": {
+                                "orgs_assigned_users.OrgA": 1,
+                                "orgs_assigned_users.OrgB": -1
+                            },
+                            "$set": {
+                                "orgs_assigned_users.OrgZ": 34,
+                                "new_case.OrgZ": false,
+                                "processed": true
                             }
-                            """,
-                        mediaType = "application/json"
-                        )
-                })
+                        }
+                    }
+                    """
+            )
             )
     })
     public ResponseEntity<SupplementaryCasesDataResource> updateCasesSupplementaryData(
