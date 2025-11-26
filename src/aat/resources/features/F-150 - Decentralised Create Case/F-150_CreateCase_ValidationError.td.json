@@ -1,0 +1,58 @@
+{
+  "_guid_": "F-150_CreateCase_ValidationError",
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+  "specs": [
+    "to surface decentralised validation errors during case creation"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true,
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8"
+    },
+    "pathVariables": {
+      "ctid": "FT_Decentralisation"
+    },
+    "body": {
+      "data": {
+        "TextField": "Decentralised case with validation error",
+        "TriggerValidationError": "Yes"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-150_CreateCase_ValidationError_Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "Decentralised case with validation error",
+        "TriggerValidationError": "Yes"
+      },
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ApiException",
+      "status": 422,
+      "error": "Unprocessable Entity",
+      "message": "Unable to proceed because there are one or more callback Errors or Warnings",
+      "path": "[[ANY_STRING_NOT_NULLABLE]]",
+      "details": null,
+      "callbackErrors": [
+        "Simulated decentralised validation error"
+      ],
+      "callbackWarnings": [
+        "Simulated decentralised validation warning"
+      ],
+      "timestamp": "[[ANY_STRING_NOT_NULLABLE]]"
+    }
+  }
+}

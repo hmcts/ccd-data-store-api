@@ -3,7 +3,7 @@ plugins {
     id 'jacoco'
     id 'idea'
     id 'eclipse'
-    id 'org.springframework.boot' version '3.5.5'
+    id 'org.springframework.boot' version '3.5.8'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '6.3.1.5724'
@@ -25,8 +25,8 @@ def versions = [
 
 ext {
     set('springCloudVersion', '2025.0.0')
-    set('spring-framework.version', '6.2.11')
-    set('spring-security.version', '6.5.3')
+    set('spring-framework.version', '6.2.14')
+    set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
     set('jackson.version', '2.16.0')
     set('snakeyaml.version', '2.2')
@@ -53,7 +53,6 @@ ext {
 }
 
 dependencyUpdates.resolutionStrategy = {
-
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
@@ -63,6 +62,10 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
+    }
+
+    resolutionStrategy {
+        force 'net.bytebuddy:byte-buddy:1.17.2'
     }
 }
 
@@ -204,6 +207,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer'
     implementation group: 'org.springframework.hateoas', name: 'spring-hateoas'
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -552,14 +556,6 @@ compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-idea.project.settings {
-    compiler {
-        javac {
-            javacAdditionalOptions "-parameters"
-        }
-    }
-}
-
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
@@ -843,11 +839,11 @@ task runRemoteAAT(type: JavaExec) {
     }
 }
 
-rootProject.tasks.named("processAatResources") {
+tasks.named("processAatResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 

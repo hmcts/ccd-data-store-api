@@ -361,6 +361,36 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
             && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
     }
 
+    /**
+     * Retrieves the subfield definition for the specified field name.
+     * If the field name corresponds to a subfield within the current field's
+     * complex fields or collection field type, the subfield definition is returned.
+     * If no match is found, an empty Optional is returned.
+     *
+     * @param fieldName The name of the subfield to retrieve.
+     * @return An Optional containing the matching subfield definition, or empty if no match is found.
+     */
+    public Optional<CaseFieldDefinition> getSubfieldDefinition(String fieldName) {
+        FieldTypeDefinition fieldType = this.getFieldTypeDefinition();
+
+        if (fieldType != null) {
+            Optional<CaseFieldDefinition> complexField = fieldType.getComplexFieldById(fieldName);
+            if (complexField.isPresent()) {
+                return complexField;
+            }
+
+            FieldTypeDefinition collectionFieldType = fieldType.getCollectionFieldTypeDefinition();
+            if (collectionFieldType != null) {
+                Optional<CaseFieldDefinition> collectionField = collectionFieldType.getComplexFieldById(fieldName);
+                if (collectionField.isPresent()) {
+                    return collectionField;
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
     @JsonIgnore
     @Override
     public CaseFieldDefinition createCopy() {

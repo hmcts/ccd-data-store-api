@@ -52,6 +52,16 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("version")
     private Integer version;
 
+    /**
+     * Always increments for each update to a case.
+     *
+     * <p>For centralised cases this is equivalent to version.
+     *
+     * <p>For decentralised cases this is issued by the owning service.
+     */
+    @JsonIgnore
+    private Long revision;
+
     private String jurisdiction;
 
     @JsonProperty("case_type_id")
@@ -152,6 +162,15 @@ public class CaseDetails implements Cloneable {
 
     public void setVersion(final Integer version) {
         this.version = version;
+    }
+
+    @JsonIgnore
+    public Long getRevision() {
+        return revision;
+    }
+
+    public void setRevision(Long revision) {
+        this.revision = revision;
     }
 
     public String getCaseTypeId() {
