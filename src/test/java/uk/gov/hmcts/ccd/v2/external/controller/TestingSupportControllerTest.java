@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,7 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.type.StringType;
+import org.hibernate.type.BasicTypeReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -67,7 +67,7 @@ class TestingSupportControllerTest {
             .thenReturn(session);
         when(session.createNativeQuery(anyString()))
             .thenReturn(nativeQuery);
-        when(nativeQuery.setParameterList(eq("caseTypeReferences"), anyList(), isA(StringType.class)))
+        when(nativeQuery.setParameterList(eq("caseTypeReferences"), anyList(), any(BasicTypeReference.class)))
             .thenReturn(nativeQuery);
         when(session.getTransaction())
             .thenReturn(transaction);

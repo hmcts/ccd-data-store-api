@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CriteriaFactoryTest {
 
@@ -26,7 +26,7 @@ public class CriteriaFactoryTest {
     Map<String, String> params = new HashMap<String, String>();
     private CriterionFactory subject;
 
-    @Before
+    @BeforeEach
     public void create() {
         subject = new CriterionFactory();
         params.clear();

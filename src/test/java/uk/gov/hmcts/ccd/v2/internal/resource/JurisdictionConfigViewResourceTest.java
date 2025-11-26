@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.util.Lists;
@@ -20,7 +21,7 @@ class JurisdictionConfigViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -34,7 +35,7 @@ class JurisdictionConfigViewResourceTest {
     @Test
     @DisplayName("should copy empty jurisdiction UI configs")
     void shouldCopyEmptyJurisdictionUIConfigList() {
-        List<JurisdictionUiConfigDefinition> emptyList = Lists.emptyList();
+        List<JurisdictionUiConfigDefinition> emptyList = Collections.emptyList();
         final JurisdictionConfigViewResource resource = new JurisdictionConfigViewResource(emptyList);
         assertAll(
             () -> assertThat(resource.getConfigs(), sameInstance(emptyList))
