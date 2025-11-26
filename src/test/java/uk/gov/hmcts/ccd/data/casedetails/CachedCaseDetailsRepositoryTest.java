@@ -51,7 +51,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseDetails = new CaseDetails();
         caseDetails.setId(valueOf(CASE_ID));
         caseDetails.setReference(CASE_REFERENCE);

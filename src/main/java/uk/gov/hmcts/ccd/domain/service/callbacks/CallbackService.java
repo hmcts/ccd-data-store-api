@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -159,14 +159,14 @@ public class CallbackService {
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
             responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
-            httpStatus = responseEntity.getStatusCodeValue();
+            httpStatus = responseEntity.getStatusCode().value();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
                 url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
-                httpStatus = ((HttpStatusCodeException) e).getRawStatusCode();
+                httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
             }
             return Optional.empty();
         } finally {

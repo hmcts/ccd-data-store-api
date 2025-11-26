@@ -75,7 +75,7 @@ class DefinitionBlockGeneratorTest {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         Map<String, String> mappings = newHashMap();
         mappings.put(TEXT, SIMPLE_TEXT_TYPE);

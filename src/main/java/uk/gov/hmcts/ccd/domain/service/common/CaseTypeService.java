@@ -13,9 +13,9 @@ import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

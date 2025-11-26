@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -42,28 +45,23 @@ public class CaseDataValidatorController {
             V2.MediaType.CASE_DATA_VALIDATE
         }
     )
-    @ApiOperation(
-        value = "Validate case data",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(summary = "Validate case data", description = V2.EXPERIMENTAL_WARNING)
+    @Parameters({
+        @Parameter(name = V2.EXPERIMENTAL_HEADER, description = "'true' to use this endpoint", in = ParameterIn.HEADER),
+    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseDataResource.class))
     )
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header")
-    })
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseDataResource.class
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Case type not found"
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "One of: Event trigger not provided, case type does not exist or case data validation failed"
-            )
-    })
+    @ApiResponse(
+        responseCode = "404",
+        description = "Case type not found"
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "One of: Event trigger not provided, case type does not exist or case data validation failed"
+    )
     public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
                                                      @RequestParam(required = false) final String pageId,
                                                      @RequestBody final CaseDataContent content) {

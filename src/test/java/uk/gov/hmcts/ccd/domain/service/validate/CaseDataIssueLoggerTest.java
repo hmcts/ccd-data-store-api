@@ -40,7 +40,7 @@ public class CaseDataIssueLoggerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(this.applicationParams.getCaseDataIssueLoggingJurisdictions())
             .thenReturn(singletonList(JURISDICTION_ID));
 

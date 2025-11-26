@@ -2,14 +2,14 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +31,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequestEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -95,13 +95,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private RequestContextListener listener;
     private ServletContext context;
 
-    @MockBean
+    @MockitoBean
     private UserAuthorisation userAuthorisation;
 
-    @MockBean
+    @MockitoBean
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
-    @MockBean
+    @MockitoBean
     private AccessControlService accessControlService;
 
 
@@ -112,7 +112,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         template = new JdbcTemplate(db);
 
@@ -128,7 +128,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         wireMockServer.resetToDefaultMappings();
     }
 
-    @After
+    @AfterEach
     public void clearDown() {
         listener.requestDestroyed(new ServletRequestEvent(context, request));
     }
@@ -310,7 +310,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(byMetaData.size(), is(0));
     }
 
-    @Test (expected = BadRequestException.class)
+    @Test
     public void sanitiseInputMainQuerySortOrderForCaseFieldID() {
         final String caseFieldId = "insert into case users values(1,2,3)";
 
@@ -329,10 +329,12 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .direction("DESC")
             .build());
 
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(BadRequestException.class, () -> 
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap())
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateInputMainQueryMetaDataFieldId() {
         final String notSoEvil = "[UNKNOWN_FIELD]";
 
@@ -353,7 +355,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
         // injection vulnerability
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(IllegalArgumentException.class, () -> 
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap()));
     }
 
     @Test
