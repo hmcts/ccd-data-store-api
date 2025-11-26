@@ -185,7 +185,7 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0' 
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.9.0'                // spring-hateoas
@@ -211,7 +211,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.2'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockito        // spring-boot-starter-test
-    
+
     // end::CVE Vulnerability dependency overrides
 
     // Lombok
@@ -244,8 +244,6 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.1'
-    // https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.41")
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
@@ -273,7 +271,7 @@ dependencies {
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
     implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
-    
+
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.6'
@@ -837,7 +835,7 @@ def getCheckedOutGitCommitHash() {
 //    include "uk/gov/hmcts/reform/**"
 //    include "uk/gov/hmcts/ccd/**"
 //}
-//
+
 //runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
