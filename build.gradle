@@ -671,7 +671,7 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = false
+    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
@@ -883,11 +883,11 @@ task runRemoteAAT(type: JavaExec) {
     }
 }
 
-rootProject.tasks.named("processAatResources") {
+tasks.named("processAatResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
