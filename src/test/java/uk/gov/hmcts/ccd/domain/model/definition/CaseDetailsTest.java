@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -13,6 +14,8 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_TYPE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
@@ -29,6 +32,7 @@ class CaseDetailsTest {
     private static final String CASE_DETAIL_FIELD = "dataTestField1";
 
     private uk.gov.hmcts.ccd.domain.model.definition.CaseDetails caseDetails;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setup() {
@@ -117,6 +121,28 @@ class CaseDetailsTest {
                 equalTo(caseDetails.getLastStateModifiedDate()));
         assertThat(allData.get(SECURITY_CLASSIFICATION.getReference()),
                 equalTo(caseDetails.getSecurityClassification()));
+    }
+
+    @Test
+    void shouldExposeCallbackErrorMessageViaGetter() {
+        CaseDetails caseDetails = new CaseDetails();
+
+        assertNull(caseDetails.getCallbackErrorMessage());
+
+        caseDetails.setCallbackErrorMessage("some error");
+
+        assertThat(caseDetails.getCallbackErrorMessage(), is("some error"));
+    }
+
+    @Test
+    void shouldSerialiseCallbackErrorMessageWithExpectedJsonProperty() throws Exception {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCallbackErrorMessage("callback failed");
+
+        String json = objectMapper.writeValueAsString(caseDetails);
+        JsonNode root = objectMapper.readTree(json);
+
+        assertThat(root.get("callback_error_message").asText(), is("callback failed"));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {

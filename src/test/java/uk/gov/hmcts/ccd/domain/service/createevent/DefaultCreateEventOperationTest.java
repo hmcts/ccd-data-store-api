@@ -174,7 +174,8 @@ class DefaultCreateEventOperationTest {
     @DisplayName("should return incomplete response status if remote endpoint is down")
     void shouldReturnIncomplete() {
         caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
-        doThrow(new CallbackException("Testing failure")).when(callbackInvoker)
+        String errorMessage = "Testing failure";
+        doThrow(new CallbackException(errorMessage)).when(callbackInvoker)
             .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
@@ -184,7 +185,8 @@ class DefaultCreateEventOperationTest {
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK")),
+            () -> assertThat(caseDetails.getCallbackErrorMessage(), is(errorMessage))
         );
     }
 
