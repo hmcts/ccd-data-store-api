@@ -162,7 +162,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @BeforeEach
     void setup() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();

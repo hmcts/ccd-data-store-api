@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.infrastructure;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 

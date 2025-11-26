@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.auditlog.aop;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.aop.framework.AopProxy;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
@@ -23,7 +23,7 @@ public class AuditAspectTest {
     private final AuditAspect aspect = new AuditAspect();
     private TestController controllerProxy;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         AspectJProxyFactory aspectJProxyFactory = new AspectJProxyFactory(new TestController());
         aspectJProxyFactory.addAspect(aspect);

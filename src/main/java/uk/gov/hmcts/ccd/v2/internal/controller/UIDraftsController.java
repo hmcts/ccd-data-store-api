@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -65,17 +65,13 @@ public class UIDraftsController {
         }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(
-        value = "Save draft as a caseworker."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Draft created"),
-        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize "
-            + "document for case field"),
-        @ApiResponse(code = 500, message = "Draft store is down.")
-    })
+    @Operation(summary = "Save draft as a caseworker.")
+    @ApiResponse(responseCode = "201", description = "Draft created")
+    @ApiResponse(responseCode = "422", description = "One of: cannot find event in requested case type or "
+        + "unable to sanitize document for case field")
+    @ApiResponse(responseCode = "500", description = "Draft store is down.")
     public ResponseEntity<DraftViewResource> saveDraft(
-        @ApiParam(value = "Case type ID", required = true)
+        @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDataContent caseDataContent) {
 
@@ -94,15 +90,11 @@ public class UIDraftsController {
         }
     )
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-        value = "Update draft as a caseworker."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Draft updated"),
-        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize "
-            + "document for case field"),
-        @ApiResponse(code = 500, message = "Draft store is down.")
-    })
+    @Operation(summary = "Update draft as a caseworker.")
+    @ApiResponse(responseCode = "200", description = "Draft updated")
+    @ApiResponse(responseCode = "422", description = "One of: cannot find event in requested case type or "
+        + "unable to sanitize document for case field")
+    @ApiResponse(responseCode = "500", description = "Draft store is down.")
     public ResponseEntity<DraftViewResource> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
         @PathVariable("did") final String draftId,
@@ -121,11 +113,9 @@ public class UIDraftsController {
             V2.MediaType.UI_DRAFT_READ
         })
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Fetch a draft for display")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A displayable draft"),
-        @ApiResponse(code = 500, message = "Draft store is down.")
-    })
+    @Operation(summary = "Fetch a draft for display")
+    @ApiResponse(responseCode = "200", description = "A displayable draft")
+    @ApiResponse(responseCode = "500", description = "Draft store is down.")
     public ResponseEntity<CaseViewResource> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
@@ -142,11 +132,9 @@ public class UIDraftsController {
             V2.MediaType.UI_DRAFT_DELETE
         })
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Delete a given draft")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A draft deleted successfully"),
-        @ApiResponse(code = 500, message = "Draft store is down.")
-    })
+    @Operation(summary = "Delete a given draft")
+    @ApiResponse(responseCode = "200", description = "A draft deleted successfully")
+    @ApiResponse(responseCode = "500", description = "Draft store is down.")
     public ResponseEntity<Void> deleteDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         draftGateway.delete(did);

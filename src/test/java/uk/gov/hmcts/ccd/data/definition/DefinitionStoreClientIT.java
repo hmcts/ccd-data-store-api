@@ -1,20 +1,23 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import java.net.URI;
 import java.util.Collections;
@@ -28,24 +31,29 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest
 @EnableRetry
-@AutoConfigureWireMock(port = 0)
-@TestPropertySource(locations = "classpath:test.properties")
-public class DefinitionStoreClientIT {
+@DirtiesContext
+public class DefinitionStoreClientIT extends WireMockBaseTest {
 
-    @MockBean(name = "definitionStoreRestTemplate")
+    @MockitoBean(name = "definitionStoreRestTemplate")
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private SecurityUtils securityUtils;
 
     @Autowired
     private DefinitionStoreClient definitionStoreClient;
 
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(definitionStoreClient, "restTemplate", restTemplate);
+        ReflectionTestUtils.setField(definitionStoreClient, "securityUtils", securityUtils);
+        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
+    }
+
     @Test
     public void testShouldInvokeGetRequestWithQueryParamsRetryAfterHttpServerErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpServerErrorException.class);
 
@@ -63,7 +71,6 @@ public class DefinitionStoreClientIT {
 
     @Test
     public void testShouldInvokeGetRequestRetryAfterHttpServerErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpServerErrorException.class);
 
@@ -81,7 +88,6 @@ public class DefinitionStoreClientIT {
 
     @Test
     public void testShouldInvokeGetRequestWithURIRetryAfterHttpServerErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(any(URI.class), any(), any(), ArgumentMatchers.<Class<Object>>any()))
             .thenThrow(HttpServerErrorException.class);
 
@@ -98,7 +104,6 @@ public class DefinitionStoreClientIT {
 
     @Test
     public void testShouldInvokeGetRequestWithQueryParamsNotRetryAfterHttpClientErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpClientErrorException.class);
 
@@ -116,7 +121,6 @@ public class DefinitionStoreClientIT {
 
     @Test
     public void testShouldInvokeGetRequestNotRetryAfterHttpClientErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap()))
             .thenThrow(HttpClientErrorException.class);
 
@@ -134,7 +138,6 @@ public class DefinitionStoreClientIT {
 
     @Test
     public void testShouldInvokeGetRequestWithURINotRetryAfterHttpClientErrorException() {
-        when(securityUtils.authorizationHeaders()).thenReturn(HttpHeaders.EMPTY);
         when(restTemplate.exchange(any(URI.class), any(), any(), ArgumentMatchers.<Class<Object>>any()))
             .thenThrow(HttpClientErrorException.class);
 

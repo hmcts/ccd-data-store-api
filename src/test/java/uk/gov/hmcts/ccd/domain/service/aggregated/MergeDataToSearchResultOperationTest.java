@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -106,7 +105,7 @@ class MergeDataToSearchResultOperationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         Map<String, JsonNode> dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4);
         ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
@@ -512,7 +511,7 @@ class MergeDataToSearchResultOperationTest {
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR));
 
-        Assert.assertThat(exception.getMessage(),
+        assertThat(exception.getMessage(),
             Matchers.is("CaseField " + FAMILY_DETAILS + " has no nested elements with code InvalidElement."));
     }
 

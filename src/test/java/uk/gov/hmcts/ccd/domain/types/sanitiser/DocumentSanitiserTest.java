@@ -78,7 +78,7 @@ class DocumentSanitiserTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(applicationParams.isDocumentSanitiserCaseDocAMEnable()).thenReturn(true);
         when(applicationParams.getCaseDocumentAmUrl()).thenReturn("");

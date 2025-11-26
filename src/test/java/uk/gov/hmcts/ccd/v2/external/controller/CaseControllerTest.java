@@ -123,7 +123,7 @@ class CaseControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseDetails.getReference()).thenReturn(Long.valueOf(CASE_REFERENCE));
 
@@ -294,8 +294,7 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
             Map<String, Object> data = createResponseData();
             SupplementaryData supplementaryData = new SupplementaryData(data);
-            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(),
-                any(SupplementaryDataUpdateRequest.class)))
+            when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), any()))
                 .thenReturn(supplementaryData);
 
             final ResponseEntity<SupplementaryDataResource> response =
