@@ -1,22 +1,22 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApiModel(description = "")
+@Schema
 public class WorkbasketInputFieldsDefinition implements Serializable, CommonDCPModel {
 
     private String caseTypeId = null;
     private List<WorkbasketInputField> fields = new ArrayList<>();
     private String displayContextParameter = null;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("case_type_id")
     public String getCaseTypeId() {
         return caseTypeId;
@@ -26,7 +26,7 @@ public class WorkbasketInputFieldsDefinition implements Serializable, CommonDCPM
         this.caseTypeId = caseTypeId;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("fields")
     public List<WorkbasketInputField> getFields() {
         return fields;
@@ -36,7 +36,7 @@ public class WorkbasketInputFieldsDefinition implements Serializable, CommonDCPM
         this.fields = fields;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("display_context_parameter")
     public String getDisplayContextParameter() {
         return displayContextParameter;

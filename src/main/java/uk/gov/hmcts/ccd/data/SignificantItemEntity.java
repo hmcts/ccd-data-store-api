@@ -3,17 +3,18 @@ package uk.gov.hmcts.ccd.data;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Table(name = "case_event_significant_items")
 @Entity
@@ -21,7 +22,10 @@ public class SignificantItemEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_event_significant_items_id_seq_generator")
+    @SequenceGenerator(name = "case_event_significant_items_id_seq_generator", 
+        sequenceName = "case_event_significant_items_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "type", nullable = false)

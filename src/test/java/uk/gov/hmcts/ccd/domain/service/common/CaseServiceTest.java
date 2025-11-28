@@ -73,7 +73,7 @@ class CaseServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         caseDetails = buildCaseDetails();
         caseDetails.setId(CASE_ID);

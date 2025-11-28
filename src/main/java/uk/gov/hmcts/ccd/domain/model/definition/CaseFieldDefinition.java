@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
@@ -19,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
-@ApiModel(description = "")
+@Schema
 public class CaseFieldDefinition implements Serializable, CommonField, Copyable<CaseFieldDefinition> {
 
     private static final long serialVersionUID = -4257574164546267919L;

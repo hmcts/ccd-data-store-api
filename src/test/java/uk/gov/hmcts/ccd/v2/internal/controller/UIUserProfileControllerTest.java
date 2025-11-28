@@ -36,7 +36,7 @@ class UIUserProfileControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(getUserProfileOperation.execute(AccessControlService.CAN_READ)).thenReturn(userProfile);
     }

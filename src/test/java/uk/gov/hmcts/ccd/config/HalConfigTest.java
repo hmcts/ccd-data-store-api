@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("HalConfig")
@@ -62,7 +62,7 @@ class HalConfigTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.initMocks(this);
+            MockitoAnnotations.openMocks(this);
 
             final List<HttpMessageConverter<?>> messageConverters = Arrays.asList(halConverter, otherConverter);
             when(restTemplateBean.getMessageConverters()).thenReturn(messageConverters);
@@ -81,7 +81,7 @@ class HalConfigTest {
             halProcessor.postProcessBeforeInitialization(otherBean, BEAN_NAME);
             halProcessor.postProcessAfterInitialization(otherBean, BEAN_NAME);
 
-            verifyZeroInteractions(otherBean);
+            verifyNoInteractions(otherBean);
         }
 
         @Test
@@ -89,7 +89,7 @@ class HalConfigTest {
         void shouldNotAlterRestTemplateBeansBeforeInit() {
             halProcessor.postProcessBeforeInitialization(restTemplateBean, BEAN_NAME);
 
-            verifyZeroInteractions(restTemplateBean);
+            verifyNoInteractions(restTemplateBean);
         }
 
         @Test
@@ -97,7 +97,7 @@ class HalConfigTest {
         void shouldNotAlterRequestAdapterBeansBeforeInit() {
             halProcessor.postProcessBeforeInitialization(requestAdapterBean, BEAN_NAME);
 
-            verifyZeroInteractions(requestAdapterBean);
+            verifyNoInteractions(requestAdapterBean);
         }
 
         @Test
@@ -121,7 +121,7 @@ class HalConfigTest {
         void shouldNotAlterRestTemplateOtherMessageConverters() {
             halProcessor.postProcessAfterInitialization(restTemplateBean, BEAN_NAME);
 
-            verifyZeroInteractions(otherConverter);
+            verifyNoInteractions(otherConverter);
         }
 
         @Test
@@ -129,7 +129,7 @@ class HalConfigTest {
         void shouldNotAlterRequestAdapterOtherMessageConverters() {
             halProcessor.postProcessAfterInitialization(requestAdapterBean, BEAN_NAME);
 
-            verifyZeroInteractions(otherConverter);
+            verifyNoInteractions(otherConverter);
         }
 
         private void verifyMediaTypes() {
