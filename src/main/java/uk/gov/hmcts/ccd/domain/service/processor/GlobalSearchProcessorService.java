@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -153,7 +152,7 @@ public class GlobalSearchProcessorService {
         List<SearchPartyValue> searchPartyValues = new ArrayList<>();
 
         String spCollectionFieldName = searchPartyDefinition.getSearchPartyCollectionFieldName();
-        if (!Strings.isNullOrEmpty(spCollectionFieldName)) {
+        if (spCollectionFieldName != null && !spCollectionFieldName.isEmpty()) {
             searchPartyValues = populateSearchPartyValuesFromCollection(searchPartyDefinition, data);
         } else {
             searchPartyValues.add(populateSearchPartyWithoutCollection(searchPartyDefinition, data));
