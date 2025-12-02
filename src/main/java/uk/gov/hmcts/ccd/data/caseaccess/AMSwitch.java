@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.Map;
 
 @Named

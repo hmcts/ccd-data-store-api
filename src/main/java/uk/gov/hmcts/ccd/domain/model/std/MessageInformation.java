@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
@@ -29,8 +30,10 @@ public class MessageInformation {
     @JsonProperty("NewStateId")
     private String newStateId;
     @JsonProperty("AdditionalData")
-    @ApiModelProperty("A JSON object (for future use) that contains additional case fields that have been configured "
-        + "to be included in the event information that is published.")
+    @Schema(
+        description = "A JSON object (for future use) that contains additional case fields that have been configured "
+        + "to be included in the event information that is published."
+    )
     private AdditionalMessageInformation data;
 
     public Long getId() {

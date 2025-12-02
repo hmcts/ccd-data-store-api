@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

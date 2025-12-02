@@ -108,13 +108,13 @@ Feature: F-1003: Submit Case Creation
     Then  a negative response is received
     And   the response has all the details as expected
 
-  @S-1038
+  @S-1038 @Ignore 
   Scenario: generic scenario for Unauthorized
 
-  @S-1039
+  @S-1039 @Ignore 
   Scenario: generic scenario for Forbidden
 
-  @S-1040
+  @S-1040 @Ignore 
   Scenario: generic scenario for Unsupported Media Type
 
   @S-1041

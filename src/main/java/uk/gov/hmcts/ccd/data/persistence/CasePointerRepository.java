@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
-
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.time.LocalDate;
 import java.util.Map;
 

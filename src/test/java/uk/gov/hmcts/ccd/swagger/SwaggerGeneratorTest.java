@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.swagger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +24,7 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
     @Autowired
     private WebApplicationContext webAppContext;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.mvc = webAppContextSetup(webAppContext).build();
     }
@@ -54,7 +54,7 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
     }
 
     private void generateSpecsFor(String groupName) throws Exception {
-        ResultActions perform = mvc.perform(get("/v2/api-docs?group=" + groupName));
+        ResultActions perform = mvc.perform(get("/v3/api-docs?group=" + groupName));
         byte[] specs = perform
             .andExpect(status().isOk())
             .andReturn()
