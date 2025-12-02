@@ -86,7 +86,7 @@ class ReferenceDataRepositoryTest {
 
     @DisplayName("getBuildingLocations()")
     @Nested
-    class GetBuildingLocations {
+    public class GetBuildingLocations {
 
         @Test
         @DisplayName("Should load ReferenceData using SystemUser headers")
@@ -138,7 +138,7 @@ class ReferenceDataRepositoryTest {
 
     @DisplayName("getServices()")
     @Nested
-    class GetServices {
+    public class GetServices {
 
         @Test
         @DisplayName("Should load ReferenceData using SystemUser headers")
@@ -191,7 +191,7 @@ class ReferenceDataRepositoryTest {
 
     @DisplayName("updateCache()")
     @Nested
-    class UpdateCache {
+    public class UpdateCache {
 
         @Mock
         private Cache cache;

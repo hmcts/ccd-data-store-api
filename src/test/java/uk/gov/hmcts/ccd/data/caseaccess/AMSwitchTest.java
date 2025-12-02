@@ -36,7 +36,7 @@ class AMSwitchTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(ccdOnlyWriteCaseTypes).when(applicationParams).getWriteToCCDCaseTypesOnly();
         doReturn(amOnlyWriteCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
         doReturn(bothWriteCaseTypes).when(applicationParams).getWriteToBothCaseTypes();

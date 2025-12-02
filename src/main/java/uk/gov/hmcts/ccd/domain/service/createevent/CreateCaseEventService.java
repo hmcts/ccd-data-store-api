@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -31,12 +32,14 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -49,6 +52,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -57,13 +61,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -105,6 +110,8 @@ public class CreateCaseEventService {
     private final PersistenceStrategyResolver resolver;
     private final SynchronisedCaseProcessor synchronisedCaseProcessor;
     private final CasePointerRepository pointerRepository;
+    private final ConditionalFieldRestorer conditionalFieldRestorer;
+    private final CaseAccessService caseAccessService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -124,6 +131,7 @@ public class CreateCaseEventService {
                                   final CallbackInvoker callbackInvoker,
                                   final UIDService uidService,
                                   final SecurityClassificationServiceImpl securityClassificationService,
+                                  @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
@@ -142,7 +150,9 @@ public class CreateCaseEventService {
                                   final DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                   final PersistenceStrategyResolver resolver,
                                   final CasePointerRepository pointerRepository,
-                                  final SynchronisedCaseProcessor synchronisedCaseProcessor) {
+                                  final SynchronisedCaseProcessor synchronisedCaseProcessor,
+                                  final ConditionalFieldRestorer conditionalFieldRestorer,
+                                  final CaseAccessService caseAccessService) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -177,6 +187,8 @@ public class CreateCaseEventService {
         this.resolver = resolver;
         this.pointerRepository = pointerRepository;
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
+        this.conditionalFieldRestorer = conditionalFieldRestorer;
+        this.caseAccessService = caseAccessService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -213,8 +225,8 @@ public class CreateCaseEventService {
             content.getData(),
             caseDetails,
             caseEventDefinition,
-            caseTypeDefinition
-        );
+            caseTypeDefinition,
+            caseReference);
 
         timeToLiveService.validateTTLChangeAgainstTTLGuard(content.getData(), caseDetailsInDatabase.getData());
 
@@ -253,7 +265,6 @@ public class CreateCaseEventService {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
                 caseTypeDefinition);
         }
-
 
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
@@ -309,7 +320,6 @@ public class CreateCaseEventService {
             );
 
         }
-
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
@@ -490,7 +500,8 @@ public class CreateCaseEventService {
     CaseDetails mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
                                                 final CaseDetails caseDetails,
                                                 final CaseEventDefinition caseEventDefinition,
-                                                final CaseTypeDefinition caseTypeDefinition) {
+                                                final CaseTypeDefinition caseTypeDefinition,
+                                                final String caseReference) {
 
         return Optional.ofNullable(data)
             .map(nonNullData -> {
@@ -499,7 +510,13 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, nonNullData);
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
-                caseData.putAll(sanitisedData);
+
+                Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
+                final Map<String, JsonNode> filteredData =
+                    conditionalFieldRestorer.restoreConditionalFields(caseTypeDefinition, sanitisedData, caseData,
+                        accessProfiles);
+
+                caseData.putAll(filteredData);
                 clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
                     caseData));
 

@@ -47,7 +47,7 @@ class UIDraftsControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(caseView.getCaseId()).thenReturn(CASE_REFERENCE);
         when(upsertDraftOperation.executeSave(CASE_TYPE_ID, CASE_DATA_CONTENT)).thenReturn(DRAFT_RESPONSE);
         when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT)).thenReturn(DRAFT_RESPONSE);

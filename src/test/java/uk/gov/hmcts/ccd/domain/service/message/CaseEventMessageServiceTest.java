@@ -79,7 +79,7 @@ class CaseEventMessageServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(getUser()).when(userRepository).getUser();
         doReturn(getAuditEvent()).when(caseAuditEventRepository).findByCase(any());
         fixedClock = Clock.fixed(Instant.now(), ZoneId.systemDefault());

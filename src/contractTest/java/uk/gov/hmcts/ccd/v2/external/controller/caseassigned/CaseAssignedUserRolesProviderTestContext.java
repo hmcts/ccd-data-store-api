@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.v2.external.controller.caseassigned;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
@@ -16,13 +17,13 @@ import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
 @Profile("CASE_ASSIGNED")
 public class CaseAssignedUserRolesProviderTestContext {
 
-    @MockBean
+    @MockitoBean
     ApplicationParams applicationParams;
 
-    @MockBean
+    @MockitoBean
     SecurityUtils securityUtils;
 
-    @MockBean
+    @MockitoBean
     CaseAccessOperation caseAccessOperation;
 
     @Primary

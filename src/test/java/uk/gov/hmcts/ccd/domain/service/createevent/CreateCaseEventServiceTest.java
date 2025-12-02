@@ -35,12 +35,14 @@ import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -72,6 +74,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -108,6 +111,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String CATEGORY_ID = "categoryId";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
+    private static final String EXISTING_CASE_REFERENCE = "1234123412341234";
     protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
 
     @Mock
@@ -172,6 +176,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CasePointerRepository pointerRepository;
     @Mock
     private SynchronisedCaseProcessor synchronisedCaseProcessor;
+    @Mock
+    private ConditionalFieldRestorer conditionalFieldRestorer;
+    @Mock
+    private CaseAccessService caseAccessService;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
@@ -196,7 +204,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();
@@ -261,6 +269,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
         when(resolver.isDecentralised(any(CaseDetails.class))).thenReturn(false);
         when(resolver.isDecentralised(anyLong())).thenReturn(false);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(emptySet());
     }
 
     @Test
@@ -293,8 +302,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
             emptyMap(),
             caseDetails,
             caseEventDefinition,
-            caseTypeDefinition
-        );
+            caseTypeDefinition,
+            EXISTING_CASE_REFERENCE);
 
         // THEN
         assertThat(updatedCaseDetails)
@@ -617,7 +626,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         Map<String, JsonNode> data = Maps.newHashMap();
         ObjectNode objectNode = createBasicDoc();
         final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
-        objectNode.put(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
+        objectNode.set(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
         caseDetailsFromDB = caseDetails.shallowClone();
@@ -659,9 +668,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     private ObjectNode createBasicDoc() {
         ObjectNode node = MAPPER.createObjectNode();
-        node.put(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
-        node.put(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
-        node.put("document_filename", new TextNode("test-a5.pdf"));
+        node.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
+        node.set(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
+        node.set("document_filename", new TextNode("test-a5.pdf"));
 
         return node;
     }
