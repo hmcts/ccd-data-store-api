@@ -3,7 +3,6 @@
 
   "CaseLinkField": {
     "CaseReference":  "${[scenarioContext][parentContext][childContexts][testData][actualResponse][body][id]}"
-
   },
   "caseLinks": [
     {

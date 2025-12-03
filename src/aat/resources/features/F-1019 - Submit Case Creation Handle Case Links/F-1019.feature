@@ -344,13 +344,15 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldOneWay]
 
 
-  @S-1019.25 @Ignore
+  @S-1019.25
   Scenario: Simulate concurrent updates to linked cases
-  //Create a case - F-1019_CreateCasePreRequisiteCaseworkerBase
-  // Create a case -[F-1019_CreateAnotherCasePreRequisiteCaseworkerBase
-  //and link to F-1019_CreateCasePreRequisiteCaseworkerBase
-    //update F-1019_CreateCasePreRequisiteCaseworkerBase case to link to [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase
-    //
+  //Need to do the following:
+  //1.	Create a case using F-1019_CreateCasePreRequisiteCaseworkerBase
+  //2.	Create a case using F-1019_CreateAnotherCasePreRequisiteCaseworkerBase
+  //3.	Get update token to edit the case created using F-1019_CreateAnotherCasePreRequisiteCaseworkerBase (S-1019_Get_Update_Token_ CreateAnotherCasePreRequisiteCaseworkerBase)
+  //4.	Update the case links for the case that an update token was created ( to link case created by F-1019_CreateCasePreRequisiteCaseworkerBase). Use F-1019-LinkToF-1019_CreateCasePreRequisiteCaseworkerBase  to link case
+  //5.	Get update token to edit the case created using F-1019_CreateCasePreRequisiteCaseworkerBase S-1019_Get_Update_Token_ CreateCasePreRequisiteCaseworkerBase)
+  //6.	Update the case links for the case that an update token was created ( to link case created by F-1019_CreateAnotherCasePreRequisiteCaseworkerBase). Use F-1019-LinkToF-1019_CreateAnotherCasePreRequisiteCaseworkerBase  to link case
   //Then a deadlock may occur
     Given a user with [an active profile in CCD]
     # Create cases needed for linking
@@ -359,19 +361,16 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     # Create cases needed for linking
     And   a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
 
-    #get event token to update F-1019_CreateAnotherCasePreRequisiteCaseworkerBase case
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_TokenForAnother],
 
-    # Create case link to F-1019_CreateCasePreRequisiteCaseworkerBase
-    And     a successful call [to update case to link a case] as in [F-1019_Update_Case_Link_To_Case_Link_Two_Way_Another]
-
-    # Create case linking F-1019_CreateCasePreRequisiteCaseworkerBase
-    And     a successful call [create case to case link] as in [F-1019_Create_Case_Link]
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase_DeadLock],
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
 
-   # get event token to update
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token],
+    #return null for cid need to investigate, need this to work to determine if deadlock occurs
+    And a successful call [to update a case to create case to case link] as in [F-1019_Update_Case_Link_TO_LINK_TO_CreateCasePreRequisiteCaseworkerBase_DeadLock],
+
+
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase],
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
 
@@ -379,4 +378,4 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     When    a request is prepared with appropriate values
     Then    a positive response is received
     And     the response has all other details as expected
-    And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkFieldOneWay]
+    And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyCaseLinksForCasePreRequisiteCaseworkerBase]

@@ -1,15 +1,17 @@
 {
   "_guid_": "F-1019-LinkToF-1019_CreateCasePreRequisiteCaseworkerBase",
 
+  "TextField" : "This is the case being updated",
   "CaseLinkField": {
-    "CaseReference":  "${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    "CaseReference":  "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
 
   },
+  "SearchCriteria" : { },
   "caseLinks": [
     {
-      "id": "d7e67a81-0000-F-1019_CreateCasePreRequisiteCaseworkerBase",
+      "id": "d7e67a81-0000-CreateCasePreRequisiteCaseworkerBase",
       "value": {
-        "CaseReference": "${}${[scenarioContext][parentContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
       }
     }
   ]
