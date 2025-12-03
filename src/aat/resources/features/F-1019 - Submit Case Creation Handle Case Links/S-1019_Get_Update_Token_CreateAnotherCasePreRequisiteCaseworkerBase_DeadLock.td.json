@@ -27,7 +27,7 @@
 			"jid": "BEFTA_MASTER",
 			"ctid": "FT_MasterCaseType",
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"cid": "${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+			"cid": "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
 			"etid": "updateCase"
 		}
 	},
