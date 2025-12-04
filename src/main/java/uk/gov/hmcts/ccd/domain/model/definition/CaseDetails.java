@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,11 +82,13 @@ public class CaseDetails implements Cloneable {
     private SecurityClassification securityClassification;
 
     @JsonProperty("case_data")
-    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(
+        description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure."
+    )
     private Map<String, JsonNode> data;
 
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+    @Schema(description = "Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
 
@@ -300,12 +304,12 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
                                                          draftResponse) {
-        if (SC_OK == draftResponse.getStatusCodeValue()) {
+        if (SC_OK == draftResponse.getStatusCode().value()) {
             setDeleteDraftResponseEntity();
         } else {
             LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
                      draftId,
-                     draftResponse.getStatusCodeValue());
+                     draftResponse.getStatusCode().value());
             setIncompleteDeleteDraftResponse();
         }
     }
@@ -319,13 +323,13 @@ public class CaseDetails implements Cloneable {
     @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
-        if (SC_OK == callBackResponse.getStatusCodeValue()) {
+        if (SC_OK == callBackResponse.getStatusCode().value()) {
             setAfterSubmitCallbackResponseEntity(callBackResponse.getBody());
         } else {
             LOG.warn("Incomplete call back response for case {} (db id={}); status code {}, body {}",
                      reference,
                      id,
-                     callBackResponse.getStatusCodeValue(),
+                     callBackResponse.getStatusCode().value(),
                      callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }

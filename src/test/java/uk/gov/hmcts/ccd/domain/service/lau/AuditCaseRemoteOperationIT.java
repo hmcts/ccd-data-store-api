@@ -3,10 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.lau;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -14,7 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -30,14 +30,13 @@ import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -83,7 +82,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Mock
     private AuditRepository auditRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     @Inject
@@ -120,18 +119,19 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final ZonedDateTime LOG_TIMESTAMP =
         ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);
         doReturn(user).when(userRepository).getUser();
+
         auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository,
             auditCaseRemoteConfiguration, auditCaseRemoteOperation);
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         WireMock.reset();
     }
@@ -163,7 +163,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
                 .build();
 
         auditService.audit(auditContext);
-        waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT);
+        waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT, 1);
 
         Mockito.verify(auditCaseRemoteOperation).postCaseSearch(captor.capture(), ArgumentMatchers.any());
         assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.SEARCH_CASE.getLabel())));
@@ -172,7 +172,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
         verifyWireMock(1, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
-
     }
 
     @Test
@@ -204,7 +203,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
 
         auditService.audit(auditContext);
-        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT, 1);
 
         Mockito.verify(auditCaseRemoteOperation).postCaseAction(captor.capture(), ArgumentMatchers.any());
         assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.CASE_ACCESSED.getLabel())));
@@ -215,8 +214,8 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
-    @Test(expected = Test.None.class)
-    public void shouldNotThrowExceptionInAuditServiceIfLauIsDownAndRetry()
+    @Test
+    public void shouldNotThrowExceptionInAuditServiceIfLauIsDown()
         throws JsonProcessingException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
@@ -242,12 +241,13 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .willReturn(aResponse().withStatus(AUDIT_UNAUTHORISED_HTTP_STATUS)));
 
         auditService.audit(auditContext);
-        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT, 3);
 
         verifyWireMock(3, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
+    @Test
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
 
@@ -272,7 +272,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
             .build();
 
         auditService.audit(auditContext);
-        waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT);
+        waitForPossibleAuditResponse(SEARCH_AUDIT_ENDPOINT, 3);
 
         verifyWireMock(3, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
             .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
@@ -375,21 +375,23 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     private void waitForPossibleAuditResponse(String pathPrefix) throws InterruptedException {
-        List<ServeEvent> allServeEvents;
-        boolean found = false;
-        long finishTime = ZonedDateTime.now().toInstant().toEpochMilli() + ASYNC_DELAY_TIMEOUT_MILLISECONDS;
+        waitForPossibleAuditResponse(pathPrefix, 1);
+    }
 
-        while (ZonedDateTime.now().toInstant().toEpochMilli() < finishTime && !found) {
-            allServeEvents = getAllServeEvents();
-            for (ServeEvent serveEvent : allServeEvents) {
-                if (serveEvent.getRequest().getUrl().startsWith(pathPrefix)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                TimeUnit.MILLISECONDS.sleep(ASYNC_DELAY_INTERVAL_MILLISECONDS);
-            }
+    private void waitForPossibleAuditResponse(String pathPrefix, int expectedCount) throws InterruptedException {
+        long finishTime = System.currentTimeMillis() + ASYNC_DELAY_TIMEOUT_MILLISECONDS;
+        long currentCount = countServeEvents(pathPrefix);
+
+        while (System.currentTimeMillis() < finishTime && currentCount < expectedCount) {
+            TimeUnit.MILLISECONDS.sleep(ASYNC_DELAY_INTERVAL_MILLISECONDS);
+            currentCount = countServeEvents(pathPrefix);
         }
+    }
+
+    private long countServeEvents(String pathPrefix) {
+        return getAllServeEvents().stream()
+            .filter(serveEvent -> serveEvent.getRequest().getUrl().startsWith(pathPrefix))
+            .count();
     }
 
 }

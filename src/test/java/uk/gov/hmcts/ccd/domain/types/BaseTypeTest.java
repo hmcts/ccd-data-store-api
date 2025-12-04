@@ -25,7 +25,7 @@ public class BaseTypeTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         final FieldTypeDefinition documentFieldTypeDefinition = mock(FieldTypeDefinition.class);
         when(documentFieldTypeDefinition.getType()).thenReturn(TEXT_TYPE);

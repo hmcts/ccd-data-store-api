@@ -37,7 +37,7 @@ class ChallengedGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         challengedGrantTypeQueryBuilder = new ChallengedGrantTypeQueryBuilder(accessControlService,
             caseDataAccessControl, applicationParams);
 

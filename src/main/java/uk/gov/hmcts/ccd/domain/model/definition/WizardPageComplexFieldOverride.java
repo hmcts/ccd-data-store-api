@@ -2,12 +2,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.Optional;
 
-@ApiModel(description = "")
+@Schema
 public class WizardPageComplexFieldOverride implements Serializable, Copyable<WizardPageComplexFieldOverride> {
     private String complexFieldElementId;
     private String displayContext;

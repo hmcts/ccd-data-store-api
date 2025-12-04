@@ -594,6 +594,9 @@
           "order": 1,
           "wizard_page_fields": [
             {
+                "__ordering__": "UNORDERED"
+            },
+            {
               "case_field_id": "Address1",
               "order": 1,
               "page_column_no": null,
