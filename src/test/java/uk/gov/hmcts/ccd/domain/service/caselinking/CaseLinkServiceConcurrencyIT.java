@@ -133,18 +133,18 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
         CaseDetails caseA = persistCase(5555000011118888L);
         CaseDetails caseB = persistCase(5555000011119999L);
 
-        Callable<Void> aToBInsertTask = () -> {
+        Callable<Void> taToBInsertTask = () -> {
             caseLinkRepository.insertUsingCaseReferences(caseA.getReference(), caseB.getReference(), true);
             return null;
         };
-        Callable<Void> bToAInsertTask = () -> {
+        Callable<Void> tbToAInsertTask = () -> {
             caseLinkRepository.insertUsingCaseReferences(caseB.getReference(), caseA.getReference(), true);
             return null;
         };
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<Void> f1 = executor.submit(aToBInsertTask);
-        Future<Void> f2 = executor.submit(bToAInsertTask);
+        Future<Void> f1 = executor.submit(taToBInsertTask);
+        Future<Void> f2 = executor.submit(tbToAInsertTask);
 
         f1.get(5, TimeUnit.SECONDS);
         f2.get(5, TimeUnit.SECONDS);
