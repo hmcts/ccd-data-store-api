@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "")
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema
 public class FixedListItemDefinition implements Serializable, Copyable<FixedListItemDefinition> {
 
     private static final long serialVersionUID = 6196146295016140921L;
@@ -15,7 +15,7 @@ public class FixedListItemDefinition implements Serializable, Copyable<FixedList
     private String label = null;
     private String order = null;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("code")
     public String getCode() {
         return code;
@@ -34,7 +34,7 @@ public class FixedListItemDefinition implements Serializable, Copyable<FixedList
         this.label = label;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("order")
     public String getOrder() {
         return order;

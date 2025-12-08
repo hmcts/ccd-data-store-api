@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.enablingcondition.PrioritiseEnablingCondition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;

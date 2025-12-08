@@ -41,6 +41,8 @@
     "body" : {
       "case_version" : 1,
       "categories" : [ {
+        "__ordering__": "UNORDERED"
+      }, {
         "category_id" : "CategoryID4",
         "category_name" : "Residence Proof",
         "category_order" : 100,

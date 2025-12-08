@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -243,6 +244,14 @@ public class ApplicationParams {
 
     @Value("#{'${case.data.exclude.verifyaccess.casetype.validate}'.split(',')}")
     private List<String> excludeVerifyAccessCaseTypesForValidate;
+
+    @Getter
+    @Value("${validation.dynamic-list.code-max-length}")
+    private Integer validationDynamicListCodeMaxLength;
+
+    @Getter
+    @Value("${validation.dynamic-list.value-max-length}")
+    private Integer validationDynamicListValueMaxLength;
 
     public static String encode(final String stringToEncode) {
         try {

@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "")
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema
 public class UserRole implements Serializable {
 
     private static final long serialVersionUID = -6867026961393510122L;
@@ -32,7 +32,7 @@ public class UserRole implements Serializable {
     @NotNull
     private String securityClassification;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("id")
     public Integer getId() {
         return id;
@@ -42,7 +42,7 @@ public class UserRole implements Serializable {
         this.id = id;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("created_at")
     public String getCreatedAt() {
         return createdAt;
@@ -60,7 +60,7 @@ public class UserRole implements Serializable {
         this.liveTo = liveTo;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("role")
     public String getRole() {
         return role;
@@ -70,7 +70,7 @@ public class UserRole implements Serializable {
         this.role = role;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("security_classification")
     public String getSecurityClassification() {
         return securityClassification;
@@ -80,13 +80,13 @@ public class UserRole implements Serializable {
         this.securityClassification = securityClassification;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("live_from")
     public String getLiveFrom() {
         return liveFrom;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("live_to")
     public String getLiveTo() {
         return liveTo;

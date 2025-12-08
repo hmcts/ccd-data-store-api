@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
