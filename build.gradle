@@ -207,7 +207,7 @@ dependencies {
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.2'                // spring-cloud-starter-contract-stub-runner
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockito        // spring-boot-starter-test
     
