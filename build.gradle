@@ -11,8 +11,8 @@ plugins {
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
     id 'info.solidsoft.pitest' version '1.15.0'
-    id 'uk.gov.hmcts.java' version '0.12.63'
-    id 'au.com.dius.pact' version '4.6.16'
+    id 'uk.gov.hmcts.java' version '0.12.67'
+    id 'au.com.dius.pact' version '4.6.18'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '11.1.1'
 }
@@ -248,7 +248,7 @@ dependencies {
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.6'
 
@@ -295,7 +295,7 @@ dependencies {
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
