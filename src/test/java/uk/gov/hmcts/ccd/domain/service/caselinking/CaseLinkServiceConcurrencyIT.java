@@ -76,21 +76,18 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
         CaseDetails linkedCaseOne = persistCase(9999000011112222L);
         CaseDetails linkedCaseTwo = persistCase(8888000011112222L);
 
-        long linkedCaseOneId = Long.parseLong(linkedCaseOne.getId());
-        long linkedCaseTwoId = Long.parseLong(linkedCaseTwo.getId());
-
         AtomicInteger invocation = new AtomicInteger();
         doAnswer(invocationOnMock -> {
-                boolean firstCall = invocation.getAndIncrement() == 0;
-                Long targetReference = firstCall ? linkedCaseOne.getReference() : linkedCaseTwo.getReference();
-                return List.of(
-                    CaseLink.builder()
-                        .caseReference(sourceCase.getReference())
-                        .linkedCaseReference(targetReference)
-                        .standardLink(firstCall)
-                        .build()
-                );
-            }).when(caseLinkExtractor).getCaseLinksFromData(same(sourceCase), anyList());
+            boolean firstCall = invocation.getAndIncrement() == 0;
+            Long targetReference = firstCall ? linkedCaseOne.getReference() : linkedCaseTwo.getReference();
+            return List.of(
+                CaseLink.builder()
+                    .caseReference(sourceCase.getReference())
+                    .linkedCaseReference(targetReference)
+                    .standardLink(firstCall)
+                    .build()
+            );
+        }).when(caseLinkExtractor).getCaseLinksFromData(same(sourceCase), anyList());
 
         Callable<Void> updateTask = () -> {
             caseLinkService.updateCaseLinks(sourceCase, Collections.<CaseFieldDefinition>emptyList());
@@ -118,6 +115,8 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
         List<CaseLinkEntity> links = caseLinkRepository.findAllByCaseReference(sourceCase.getReference());
         assertFalse(links.isEmpty(), "Expected at least one case link to be written");
         assertTrue(links.size() <= 2, "Concurrent updates should not leave more than two rows");
+        long linkedCaseOneId = Long.parseLong(linkedCaseOne.getId());
+        long linkedCaseTwoId = Long.parseLong(linkedCaseTwo.getId());
         assertTrue(
             links.stream()
                 .allMatch(link -> {
@@ -126,6 +125,36 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
                 }),
             "All linked cases should be one of the two concurrent updates"
         );
+    }
+
+    @Test
+    @DisplayName("insertUsingCaseReferences on inverse links completes without deadlock")
+    void shouldInsertInverseLinksWithoutDeadlock() throws Exception {
+        CaseDetails caseA = persistCase(5555000011118888L);
+        CaseDetails caseB = persistCase(5555000011119999L);
+
+        Callable<Void> aToBInsertTask = () -> {
+            caseLinkRepository.insertUsingCaseReferences(caseA.getReference(), caseB.getReference(), true);
+            return null;
+        };
+        Callable<Void> bToAInsertTask = () -> {
+            caseLinkRepository.insertUsingCaseReferences(caseB.getReference(), caseA.getReference(), true);
+            return null;
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<Void> f1 = executor.submit(aToBInsertTask);
+        Future<Void> f2 = executor.submit(bToAInsertTask);
+
+        f1.get(5, TimeUnit.SECONDS);
+        f2.get(5, TimeUnit.SECONDS);
+        executor.shutdownNow();
+
+        List<CaseLinkEntity> links = caseLinkRepository.findAllByCaseReference(caseA.getReference());
+        assertFalse(links.isEmpty(), "Expected link from A");
+
+        List<CaseLinkEntity> reverseLinks = caseLinkRepository.findAllByCaseReference(caseB.getReference());
+        assertFalse(reverseLinks.isEmpty(), "Expected link from B");
     }
 
     @Test
@@ -139,20 +168,24 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
 
         Callable<Void> t1 = () -> {
             return new TransactionTemplate(transactionManager).execute(status -> {
-                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_A", caseOne.getReference());
+                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_A",
+                    caseOne.getReference());
                 firstLocksAcquired.countDown();
                 await(proceedToSecondLock);
-                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_B", caseTwo.getReference());
+                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_B",
+                    caseTwo.getReference());
                 return null;
             });
         };
 
         Callable<Void> t2 = () -> {
             return new TransactionTemplate(transactionManager).execute(status -> {
-                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_C", caseTwo.getReference());
+                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_C",
+                    caseTwo.getReference());
                 firstLocksAcquired.countDown();
                 await(proceedToSecondLock);
-                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_D", caseOne.getReference());
+                jdbcTemplate.update("update case_data set state = ? where reference = ?", "LOCK_D",
+                    caseOne.getReference());
                 return null;
             });
         };
@@ -247,11 +280,13 @@ class CaseLinkServiceConcurrencyIT extends AbstractBaseIntegrationTest {
         template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         return template.execute(status -> {
             // Lock firstRef row first
-            jdbcTemplate.queryForObject("select id from case_data where reference=? for update", Long.class, firstRef);
+            jdbcTemplate.queryForObject("select id from case_data where reference=? for update",
+                Long.class, firstRef);
             firstLocks.countDown();
             await(proceed);
             // Now attempt to lock the second row in opposite order; this should deadlock with the peer transaction
-            jdbcTemplate.queryForObject("select id from case_data where reference=? for update", Long.class, secondRef);
+            jdbcTemplate.queryForObject("select id from case_data where reference=? for update",
+                Long.class, secondRef);
             return null;
         });
     }
