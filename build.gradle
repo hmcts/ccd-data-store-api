@@ -205,7 +205,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'            // java-property-to-json
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.4.Final'       // spring-boot-starter-data-jpa
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'             // ccd-test-definitions
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
