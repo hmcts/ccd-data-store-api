@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.GetCaseCallbackResponse;
@@ -197,7 +196,9 @@ public class CallbackInvoker {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
 
             callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
-            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse);
+            if (callbackResponse.getData() != null) {
+                validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+            }
         }
 
         return caseDetails;
@@ -213,7 +214,9 @@ public class CallbackInvoker {
                                                         CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
-        validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse);
+        if (callbackResponse.getData() != null) {
+            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+        }
     }
 
     private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseTypeDefinition
@@ -233,7 +236,7 @@ public class CallbackInvoker {
             caseDetails.setState(callbackResponse.getState());
         }
         if (callbackResponse.getData() != null) {
-            validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse);
+            validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
 
             if (hasSecurityClassification(callbackResponse)) {
                 securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
@@ -267,42 +270,36 @@ public class CallbackInvoker {
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
-                                    final CallbackResponse callbackResponse,
+                                    final Map<String, JsonNode> responseData,
                                     final boolean populateGlobalSearch) {
-        if (callbackResponse.getData() != null) {
-            final Map<String, JsonNode> responseData = callbackResponse.getData();
-            timeToLiveService.verifyTTLContentNotChangedByCallback(caseDetails.getData(), responseData);
-            caseTypeService.validateData(responseData, caseTypeDefinition);
+        if (responseData != null) {
 
-            Map<String, JsonNode> responseDataToSanitise = responseData;
-
-            if (populateGlobalSearch) {
-                responseDataToSanitise =
-                    globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData);
-            }
-
-            caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseDataToSanitise));
-            deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
         }
-        setSupplementaryData(caseDetails, callbackResponse.getSupplementaryData());
-    }
+        timeToLiveService.verifyTTLContentNotChangedByCallback(caseDetails.getData(), responseData);
+        caseTypeService.validateData(responseData, caseTypeDefinition);
 
-    private void setSupplementaryData(CaseDetails caseDetails, Map<String, JsonNode> supplementaryData) {
-        if (supplementaryData != null) {
-            caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData));
+        Map<String, JsonNode> responseDataToSanitise = responseData;
+
+        if (populateGlobalSearch) {
+            responseDataToSanitise =
+                globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData);
         }
+
+        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseDataToSanitise));
+        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
-                                    final CallbackResponse callbackResponse) {
-        validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse, false);
+                                    final Map<String, JsonNode> responseData) {
+        validateAndSetData(caseTypeDefinition, caseDetails, responseData, false);
     }
 
     private void validateAndSetDataForGlobalSearch(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
-                                    final CallbackResponse callbackResponse) {
-        validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse, true);
+                                    final Map<String, JsonNode> responseData) {
+
+        validateAndSetData(caseTypeDefinition, caseDetails, responseData, true);
     }
 
     private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
