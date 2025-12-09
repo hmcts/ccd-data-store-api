@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
 import uk.gov.hmcts.ccd.data.caselinking.CaseLinkRepository;
@@ -46,6 +47,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
     @Mock
     private CaseLinkMapper caseLinkMapper;
+
+    @Mock
+    private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
     private CaseLinkService caseLinkService;
