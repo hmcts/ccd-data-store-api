@@ -3,8 +3,12 @@ package uk.gov.hmcts.ccd.domain.service.caselinking;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
@@ -106,11 +110,14 @@ public class CaseLinkService {
         }
 
         referencesToLock = referencesToLock.stream().sorted().toList();
-        String placeholders = referencesToLock.stream().map(ref -> "?")
-            .collect(Collectors.joining(", "));
-        jdbcTemplate.queryForList(
-            "select id from case_data where reference in (" + placeholders + ") order by reference for update",
-            referencesToLock.toArray());
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("references", referencesToLock);
+        namedTemplate.queryForList(
+            "select id from case_data "
+                + "where reference in (:references) "
+                + "order by reference for update",
+            params);
     }
 
 }

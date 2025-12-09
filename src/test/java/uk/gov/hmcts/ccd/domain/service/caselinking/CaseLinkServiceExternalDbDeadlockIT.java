@@ -80,7 +80,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
     @Test
     @DisplayName("deadlock reproduced against external Postgres when inserting case_link rows with inverse locks")
     void shouldSurfaceDeadlockAgainstExternalDb() throws Exception {
-        Assumptions.assumeTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
+        assertTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
 
         long refA = 7000000000000000L + System.currentTimeMillis() % 1000000;
         long refB = refA + 1;
@@ -116,7 +116,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
     @Test
     @DisplayName("CaseLinkService updateCaseLinks avoids deadlock against external DB")
     void shouldAvoidDeadlockWhenUpdatingCaseLinksAgainstExternalDb() throws Exception {
-        Assumptions.assumeTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
+        assertTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
 
         long refBase = 8000000000000000L + System.currentTimeMillis() % 1000000;
         CaseDetails sourceCase = persistCase(refBase);
