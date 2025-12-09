@@ -367,9 +367,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And     the request [contains the standard CaseLinks field with Case Reference values]
 
     #return null for cid need to investigate, need this to work to determine if deadlock occurs
-    When a successful call [to update a case to create case to case link] as in [F-1019_Update_Case_Link_TO_LINK_TO_CreateCasePreRequisiteCaseworkerBase_DeadLock],
-    When    a request is prepared with appropriate values
-      #And a call [to update a case to create case to case link] will get the expected response as in [F-1019_Update_Case_Link_TO_LINK_TO_CreateCasePreRequisiteCaseworkerBase_DeadLock],
+    #When a successful call [to update a case to create case to case link] as in [F-1019_Update_Case_Link_TO_LINK_TO_CreateCasePreRequisiteCaseworkerBase_DeadLock],
+    #When    a request is prepared with appropriate values
 
     # get event token to update First
     And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase],
