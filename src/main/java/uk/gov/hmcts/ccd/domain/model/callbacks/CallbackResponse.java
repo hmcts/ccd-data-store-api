@@ -34,6 +34,9 @@ public class CallbackResponse {
     private SignificantItem significantItem;
     private String state;
 
+    @JsonProperty("supplementary_data")
+    private Map<String, JsonNode> supplementaryData;
+
     private List<String> errors;
     private List<String> warnings;
 
@@ -118,5 +121,13 @@ public class CallbackResponse {
                 this.setState(dataCaseState.get());
             }
         }
+    }
+
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
@@ -842,6 +844,73 @@ class CallbackInvokerTest {
                 );
             }
 
+            @DisplayName("should set supplementary data when present in callback response")
+            @Test
+            void shouldSetSupplementaryDataWhenPresent() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+
+                // Create supplementary_data map
+                final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
+                supplementaryDataMap.put("key1", TextNode.valueOf("value1"));
+                supplementaryDataMap.put("key2", IntNode.valueOf(42));
+
+                callbackResponse.setData(data);
+                callbackResponse.setSupplementaryData(supplementaryDataMap);
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                    data,
+                    caseDetails.getDataClassification())).thenReturn(
+                    currentDataClassification);
+                when(callbackService.send(caseEventDefinition.getCallBackURLAboutToStartEvent(),
+                    ABOUT_TO_START, caseEventDefinition,
+                    null,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(data))).thenReturn(data);
+
+                callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, TRUE);
+
+                assertAll(
+                    () -> assertNotNull(caseDetails.getSupplementaryData()),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("key1").asText(), is("value1")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("key2").asInt(), is(42)),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChangedByCallback(
+                        any(), eq(callbackResponse.getData())),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
+                        caseDetails.getData(),
+                        caseDetails.getDataClassification())
+                );
+            }
+
+            @DisplayName("should not set supplementary data when not present in callback response")
+            @Test
+            void shouldNotSetSupplementaryDataWhenNotPresent() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+                callbackResponse.setData(data);
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                    data,
+                    caseDetails.getDataClassification())).thenReturn(
+                    currentDataClassification);
+                when(callbackService.send(caseEventDefinition.getCallBackURLAboutToStartEvent(),
+                    ABOUT_TO_START, caseEventDefinition,
+                    null,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(data))).thenReturn(data);
+
+                callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, TRUE);
+
+                assertNull(caseDetails.getSupplementaryData());
+            }
+
             @DisplayName("validate call back response and there are errors in call back validation when setting data")
             @Test
             void validateAndSetDataMetError() throws ApiException {
@@ -1093,6 +1162,54 @@ class CallbackInvokerTest {
                             any())
                 );
             }
+
+            @DisplayName("should set supplementary data when present in about to submit callback response")
+            @Test
+            void shouldSetSupplementaryDataWhenPresentInAboutToSubmit() {
+                // Create supplementary_data map with nested structure
+                final ObjectNode orgsNode = JSON_NODE_FACTORY.objectNode();
+                orgsNode.set("organisationA", IntNode.valueOf(54));
+                orgsNode.set("organisationB", IntNode.valueOf(32));
+                final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
+                supplementaryDataMap.put("orgs_assigned_users", orgsNode);
+                
+                callbackResponse.setData(data);
+                callbackResponse.setSupplementaryData(supplementaryDataMap);
+                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    data)).thenReturn(callbackResponse.getData());
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(callbackResponse.getData()))).thenReturn(data);
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
+                    caseTypeDefinition, TRUE);
+
+                assertAll(
+                    () -> assertNotNull(caseDetails.getSupplementaryData()),
+                    () -> assertNotNull(caseDetails.getSupplementaryData().get("orgs_assigned_users")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("orgs_assigned_users")
+                        .get("organisationA").asInt(), is(54)),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("orgs_assigned_users")
+                        .get("organisationB").asInt(), is(32)),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService).populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData())
+                );
+            }
+
+            @DisplayName("should not set supplementary data when not present in about to submit callback response")
+            @Test
+            void shouldNotSetSupplementaryDataWhenNotPresentInAboutToSubmit() {
+                // data already set up in @BeforeEach without supplementary_data
+                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    data)).thenReturn(callbackResponse.getData());
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(callbackResponse.getData()))).thenReturn(data);
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
+                    caseTypeDefinition, TRUE);
+
+                assertNull(caseDetails.getSupplementaryData());
+            }
         }
 
         @Nested
@@ -1202,6 +1319,77 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(securityValidationService, never()).setDataClassificationFromCallbackIfValid(
                         any(), any(), any())
                 );
+            }
+
+            @DisplayName("should set supplementary data when present in mid event callback response")
+            @Test
+            void shouldSetSupplementaryDataWhenPresentInMidEvent() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+
+                final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
+                supplementaryDataMap.put("key1", TextNode.valueOf("value1"));
+                supplementaryDataMap.put("key2", IntNode.valueOf(100));
+                
+                callbackResponse.setData(data);
+                callbackResponse.setSupplementaryData(supplementaryDataMap);
+
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, data,
+                    caseDetails.getDataClassification())).thenReturn(currentDataClassification);
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    MID_EVENT, caseEventDefinition,
+                    caseDetailsBefore,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(data))).thenReturn(data);
+
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseTypeDefinition,
+                    caseEventDefinition,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
+
+                assertAll(
+                    () -> assertNotNull(caseDetails.getSupplementaryData()),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("key1").asText(), is("value1")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("key2").asInt(), is(100)),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(timeToLiveService).verifyTTLContentNotChangedByCallback(
+                        any(), eq(callbackResponse.getData())),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData())
+                );
+            }
+
+            @DisplayName("should not set supplementary data when not present in mid event callback response")
+            @Test
+            void shouldNotSetSupplementaryDataWhenNotPresentInMidEvent() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+                callbackResponse.setData(data);
+                // Do NOT set supplementary data for this test
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, data,
+                    caseDetails.getDataClassification())).thenReturn(currentDataClassification);
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    MID_EVENT, caseEventDefinition,
+                    caseDetailsBefore,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                when(caseSanitiser.sanitise(eq(caseTypeDefinition), eq(data))).thenReturn(data);
+
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseTypeDefinition,
+                    caseEventDefinition,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
+
+                assertNull(caseDetails.getSupplementaryData());
             }
         }
 

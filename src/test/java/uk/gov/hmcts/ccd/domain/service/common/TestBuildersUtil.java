@@ -101,6 +101,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CallbackResponseBuilder withSupplementaryData(Map<String, JsonNode> data) {
+            callbackResponse.setSupplementaryData(data);
+            return this;
+        }
+
         public CallbackResponse build() {
             return callbackResponse;
         }
