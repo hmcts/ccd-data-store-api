@@ -281,7 +281,7 @@ dependencies {
     mockitoAgent(libs.mockito) {
         transitive = false;
     }
-    testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.0'
+    testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
