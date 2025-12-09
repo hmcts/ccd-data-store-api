@@ -132,9 +132,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             ObjectNode orgsNode = JsonNodeFactory.instance.objectNode();
             orgsNode.set("organisationA", IntNode.valueOf(54));
             orgsNode.set("organisationB", IntNode.valueOf(32));
-            ObjectNode supplementaryDataNode = JsonNodeFactory.instance.objectNode();
-            supplementaryDataNode.set("orgs_assigned_users", orgsNode);
-            callbackData.put("supplementary_data", supplementaryDataNode);
+            callbackData.put("orgs_assigned_users", orgsNode);
 
             CallbackResponse responseWithSupplementaryData = aCallbackResponse()
                 .withSupplementaryData(callbackData)
@@ -160,11 +158,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             String testUrl = hostUrl + "/test-about-to-start";
             caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
 
-            // Create callback response without supplementary_data (empty data map to avoid field validation)
-            Map<String, JsonNode> callbackData = new HashMap<>();
-
             CallbackResponse responseWithoutSupplementaryData = aCallbackResponse()
-                .withSupplementaryData(callbackData)
                 .build();
 
             stubFor(post(urlMatching("/test-about-to-start.*"))
@@ -190,12 +184,11 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             ObjectNode orgsNode = JsonNodeFactory.instance.objectNode();
             orgsNode.set("organisationA", IntNode.valueOf(54));
             orgsNode.set("organisationB", IntNode.valueOf(32));
-            ObjectNode supplementaryDataNode = JsonNodeFactory.instance.objectNode();
-            supplementaryDataNode.set("orgs_assigned_users", orgsNode);
-            callbackData.put("supplementary_data", supplementaryDataNode);
+            callbackData.put("orgs_assigned_users", orgsNode);
 
             CallbackResponse responseWithSupplementaryData = aCallbackResponse()
                 .withSupplementaryData(callbackData)
+                .withData(new HashMap<>())
                 .build();
 
             stubFor(post(urlMatching("/test-about-to-submit.*"))
@@ -221,12 +214,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
             CaseDetails caseDetailsBefore = newCaseDetails().build();
 
-            // Create callback response without supplementary_data (empty data map to avoid field validation)
-            Map<String, JsonNode> callbackData = new HashMap<>();
-
-            CallbackResponse responseWithoutSupplementaryData = aCallbackResponse()
-                .withSupplementaryData(callbackData)
-                .build();
+            CallbackResponse responseWithoutSupplementaryData = aCallbackResponse().build();
 
             stubFor(post(urlMatching("/test-about-to-submit.*"))
                 .willReturn(okJson(mapper.writeValueAsString(responseWithoutSupplementaryData)).withStatus(200)));
@@ -253,9 +241,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
             ObjectNode orgsNode = JsonNodeFactory.instance.objectNode();
             orgsNode.set("organisationA", IntNode.valueOf(54));
             orgsNode.set("organisationB", IntNode.valueOf(32));
-            ObjectNode supplementaryDataNode = JsonNodeFactory.instance.objectNode();
-            supplementaryDataNode.set("orgs_assigned_users", orgsNode);
-            callbackData.put("supplementary_data", supplementaryDataNode);
+            callbackData.put("orgs_assigned_users", orgsNode);
 
             CallbackResponse responseWithSupplementaryData = aCallbackResponse()
                 .withSupplementaryData(callbackData)
@@ -285,12 +271,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
             CaseDetails caseDetailsBefore = newCaseDetails().build();
 
-            // Create callback response without supplementary_data (empty data map to avoid field validation)
-            Map<String, JsonNode> callbackData = new HashMap<>();
-
-            CallbackResponse responseWithoutSupplementaryData = aCallbackResponse()
-                .withSupplementaryData(callbackData)
-                .build();
+            CallbackResponse responseWithoutSupplementaryData = aCallbackResponse().build();
 
             stubFor(post(urlMatching("/test-mid-event.*"))
                 .willReturn(okJson(mapper.writeValueAsString(responseWithoutSupplementaryData)).withStatus(200)));
