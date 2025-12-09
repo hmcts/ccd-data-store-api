@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
