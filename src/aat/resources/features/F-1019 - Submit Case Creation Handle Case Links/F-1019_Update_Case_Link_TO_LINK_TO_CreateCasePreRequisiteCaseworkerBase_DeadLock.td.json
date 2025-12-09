@@ -10,6 +10,7 @@
   "specs": [
     "to update a case to create case to case link",
     "contains the standard CaseLinks field with Case Reference values",
+    "submit event for an existing case (V2)",
     "As a prerequisite"
   ],
 
@@ -30,7 +31,7 @@
 			"experimental": true
 		},
      "pathVariables": {
-       "cid": "${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+       "cid": "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
         "data": {

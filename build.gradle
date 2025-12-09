@@ -652,7 +652,7 @@ test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = true
-    systemProperty 'java.locale.providers', 'COMPAT'
+    systemProperty 'java.locale.providers', 'CLDR'
 
     useJUnitPlatform()
 
