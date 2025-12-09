@@ -34,7 +34,7 @@ ext {
     junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.6.16'
-    lombokVersion = '1.18.36'
+    lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.15.2'
     elasticVersion = '8.16.2'
