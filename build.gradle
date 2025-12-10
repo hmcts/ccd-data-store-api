@@ -33,8 +33,8 @@ ext {
     junit = '5.11.4'
     junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
-    pactProviderVersion = '4.6.16'
-    lombokVersion = '1.18.36'
+    pactProviderVersion = '4.6.18'
+    lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.15.2'
     elasticVersion = '8.16.2'
@@ -190,8 +190,8 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.9.0'                // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.1'                // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.2.1'                             // spring-boot-starter-data-jpa
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.16'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'              // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.21'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.21'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.10.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'          // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'                       // spring-cloud-starter-openfeign
@@ -203,7 +203,7 @@ dependencies {
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.5.1'                       // spring-security-oauth2-client
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'            // java-property-to-json
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.4.Final'       // spring-boot-starter-data-jpa
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.38.Final'       // spring-boot-starter-data-jpa
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
@@ -242,7 +242,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.1'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.14'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
@@ -260,7 +260,7 @@ dependencies {
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
     implementation group: 'io.searchbox', name: 'jest', version: '6.3.1'
-    implementation group: 'io.vavr', name: 'vavr', version: '0.10.5'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.7'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.4.0'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.1'
