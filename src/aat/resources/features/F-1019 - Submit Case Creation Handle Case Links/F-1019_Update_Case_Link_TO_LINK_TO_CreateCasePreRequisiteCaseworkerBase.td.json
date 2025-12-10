@@ -30,7 +30,7 @@
 			"experimental": true
 		},
      "pathVariables": {
-       "cid": "${}${[scenarioContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1019_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
         "data": {

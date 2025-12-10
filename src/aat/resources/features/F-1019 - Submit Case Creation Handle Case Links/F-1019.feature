@@ -288,10 +288,6 @@ Feature: F-1019: Submit Case Creation Handle Case Links
 
   @S-1019.23
   Scenario: Simulate concurrent updates to linked cases
-  //And case A is linked to case B
-  //And case B is linked to case A
-  //When both cases are updated at the same time
-  //Then a deadlock may occur
     Given a user with [an active profile in CCD]
     # Create cases needed for linking
     And   a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
@@ -316,10 +312,6 @@ Feature: F-1019: Submit Case Creation Handle Case Links
 
   @S-1019.24
   Scenario: Simulate concurrent updates to linked cases
-  //And case A is linked to case B
-  //And case B is linked to case A
-  //When both cases are updated at the same time
-  //Then a deadlock may occur
     Given a user with [an active profile in CCD]
     # Create cases needed for linking
     And   a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
@@ -346,14 +338,6 @@ Feature: F-1019: Submit Case Creation Handle Case Links
 
   @S-1019.25
   Scenario: Simulate concurrent updates to linked cases
-  //Need to do the following:
-  //1.	Create a case using F-1019_CreateCasePreRequisiteCaseworkerBase
-  //2.	Create a case using F-1019_CreateAnotherCasePreRequisiteCaseworkerBase
-  //3.	Get update token to edit the case created using F-1019_CreateAnotherCasePreRequisiteCaseworkerBase (S-1019_Get_Update_Token_ CreateAnotherCasePreRequisiteCaseworkerBase)
-  //4.	Update the case links for the case that an update token was created ( to link case created by F-1019_CreateCasePreRequisiteCaseworkerBase). Use F-1019-LinkToF-1019_CreateCasePreRequisiteCaseworkerBase  to link case
-  //5.	Get update token to edit the case created using F-1019_CreateCasePreRequisiteCaseworkerBase S-1019_Get_Update_Token_ CreateCasePreRequisiteCaseworkerBase)
-  //6.	Update the case links for the case that an update token was created ( to link case created by F-1019_CreateAnotherCasePreRequisiteCaseworkerBase). Use F-1019-LinkToF-1019_CreateAnotherCasePreRequisiteCaseworkerBase  to link case
-  //Then a deadlock may occur
     Given a user with [an active profile in CCD]
     # Create cases needed for linking
     And   a successful call [to create a case] as in [F-1019_CreateCasePreRequisiteCaseworkerBase]
@@ -362,15 +346,6 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And   a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
 
     # get event token to update Another
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase_DeadLock],
-    When    a request is prepared with appropriate values
-    And     the request [contains the standard CaseLinks field with Case Reference values]
-
-    #return null for cid need to investigate, need this to work to determine if deadlock occurs
-    #When a successful call [to update a case to create case to case link] as in [F-1019_Update_Case_Link_TO_LINK_TO_CreateCasePreRequisiteCaseworkerBase_DeadLock],
-    #When    a request is prepared with appropriate values
-
-    # get event token to update First
     And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase],
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
