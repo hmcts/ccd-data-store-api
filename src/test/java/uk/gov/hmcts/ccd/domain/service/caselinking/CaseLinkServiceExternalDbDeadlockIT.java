@@ -17,6 +17,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -36,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -56,6 +59,8 @@ import static org.mockito.Mockito.doAnswer;
     "spring.security.oauth2.client.provider.oidc.issuer-uri=${IDAM_OIDC_URL:http://localhost:5000/o}"
 })
 class CaseLinkServiceExternalDbDeadlockIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseLinkServiceExternalDbDeadlockIT.class);
 
     @Autowired
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -79,7 +84,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
     @Test
     @DisplayName("deadlock reproduced against external Postgres when inserting case_link rows with inverse locks")
     void shouldSurfaceDeadlockAgainstExternalDb() throws Exception {
-        assertTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
+        assumeTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
 
         long refA = 7000000000000000L + System.currentTimeMillis() % 1000000;
         long refB = refA + 1;
@@ -115,7 +120,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
     @Test
     @DisplayName("CaseLinkService updateCaseLinks avoids deadlock against external DB")
     void shouldAvoidDeadlockWhenUpdatingCaseLinksAgainstExternalDb() throws Exception {
-        assertTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
+        assumeTrue(externalDbAvailable(), "External Postgres not available for deadlock test");
 
         long refBase = 8000000000000000L + System.currentTimeMillis() % 1000000;
         CaseDetails sourceCase = persistCase(refBase);
@@ -228,6 +233,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
             jdbcTemplate.execute("select 1");
             return true;
         } catch (Exception ex) {
+            LOG.info("Skipping external DB deadlock tests: external Postgres unreachable: {}", ex.getMessage());
             return false;
         }
     }
