@@ -190,8 +190,8 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.9.0'                // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.1'                // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.2.1'                             // spring-boot-starter-data-jpa
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.21'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.21'              // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.22'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.22'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.10.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'          // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'                       // spring-cloud-starter-openfeign
