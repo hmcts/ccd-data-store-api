@@ -103,11 +103,7 @@ public class CaseLinkService {
                 .distinct()
                 .toList());
         }
-        if (referencesToLock.isEmpty()) {
-            return;
-        }
 
-        referencesToLock = referencesToLock.stream().sorted().toList();
         NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("references", referencesToLock);
