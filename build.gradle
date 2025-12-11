@@ -39,7 +39,7 @@ ext {
     mockito = '5.15.2'
     elasticVersion = '8.16.2'
     testContainersVersion = '1.20.4'
-    cucumber = '6.6.1'
+    cucumber = '6.11.0'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
     limits = [
