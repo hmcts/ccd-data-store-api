@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
@@ -20,6 +21,12 @@ import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 @Service
 @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
 public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseViewOperation implements
@@ -29,6 +36,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
     private static final String EVENT_NOT_FOUND = "Event history not found";
 
     private final GetEventsOperation getEventsOperation;
+    private final FieldProcessorService fieldProcessorService;
 
     @Autowired
     public DefaultGetCaseHistoryViewOperation(
@@ -49,6 +57,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
             fieldProcessorService);
 
         this.getEventsOperation = getEventsOperation;
+        this.fieldProcessorService = fieldProcessorService;
     }
 
     @Override
@@ -74,6 +83,24 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         caseHistoryView.setEvent(CaseViewEvent.createFrom(event));
 
         return caseHistoryView;
+    }
+
+    /**
+     * Override removes filterCaseTabFieldsBasedOnSecureData filter to allow data
+     * fields missing from current case data to be returned in case history view.
+     */
+    @Override
+    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data) {
+        CaseTypeTabsDefinition caseTypeTabsDefinition = getCaseTabCollection(caseDetails.getCaseTypeId());
+        return caseTypeTabsDefinition.getTabs().stream().map(tab -> {
+            CommonField[] caseViewFields = tab.getTabFields().stream()
+                .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
+                .map(fieldProcessorService::processCaseViewField)
+                .toArray(CaseViewField[]::new);
+            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
+                                   tab.getShowCondition(), tab.getRole());
+
+        }).toArray(CaseViewTab[]::new);
     }
 
 }
