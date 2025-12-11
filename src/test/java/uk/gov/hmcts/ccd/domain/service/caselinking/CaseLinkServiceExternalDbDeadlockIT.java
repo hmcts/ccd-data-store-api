@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -44,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -242,8 +244,8 @@ class CaseLinkServiceExternalDbDeadlockIT {
     static class ExternalDbDeadlockConfig {
         @Bean
         @Primary
-        org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder() {
-            return org.mockito.Mockito.mock(org.springframework.security.oauth2.jwt.JwtDecoder.class);
+        JwtDecoder jwtDecoder() {
+            return mock(JwtDecoder.class);
         }
     }
 }
