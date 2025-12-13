@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.endpoint.std;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
@@ -22,6 +24,8 @@ import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.AuthorisedValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -33,6 +37,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +107,6 @@ public class CaseDetailsEndpoint {
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    private final MidEventCallback midEventCallback;
 
     @Autowired
     public CaseDetailsEndpoint(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -92,10 +115,10 @@ public class CaseDetailsEndpoint {
                                @Qualifier("authorised") final StartEventOperation startEventOperation,
                                @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
+                               @Qualifier(AuthorisedValidateCaseFieldsOperation.QUALIFIER)
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
-                               final MidEventCallback midEventCallback,
                                final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
@@ -106,7 +129,6 @@ public class CaseDetailsEndpoint {
         this.documentsOperation = documentsOperation;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
-        this.midEventCallback = midEventCallback;
         this.appInsights = appinsights;
     }
 
@@ -188,7 +210,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start event creation as Citizen", 
+        summary = "Start event creation as Citizen",
         description = "Start the event creation process for an existing case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -215,7 +237,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Case worker", 
+        summary = "Start case creation as Case worker",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -239,7 +261,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Citizen", 
+        summary = "Start case creation as Citizen",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -340,12 +362,8 @@ public class CaseDetailsEndpoint {
         @RequestParam(required = false) final String pageId,
         @RequestBody final CaseDataContent content) {
 
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-                                                        content);
-
-        return midEventCallback.invoke(caseTypeId,
-                                       content,
-                                       pageId);
+        validateCaseFieldsOperation.validateCaseDetails(new OperationContext(caseTypeId, content, pageId));
+        return JacksonUtils.convertValueJsonNode(content.getData());
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
@@ -435,7 +453,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @Parameter(name = "Query Parameters", 
+        @Parameter(name = "Query Parameters",
             description = "Query Parameters, valid options: created_date, last_modified_date, "
             + "state, case_reference", required = false)
         @RequestParam(required = false) Map<String, String> queryParameters) {

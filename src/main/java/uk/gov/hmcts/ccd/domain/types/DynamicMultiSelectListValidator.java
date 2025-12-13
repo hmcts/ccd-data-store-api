@@ -1,14 +1,22 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import uk.gov.hmcts.ccd.ApplicationParams;
+
+import java.util.List;
 
 @Named
 @Singleton
 public class DynamicMultiSelectListValidator extends DynamicListValidator {
     protected static final String TYPE_ID = "DynamicMultiSelectList";
+
+    @Inject
+    public DynamicMultiSelectListValidator(ApplicationParams applicationParams) {
+        super(applicationParams);
+    }
 
     @Override
     public BaseType getType() {
