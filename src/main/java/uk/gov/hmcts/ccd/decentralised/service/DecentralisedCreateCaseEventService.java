@@ -68,7 +68,8 @@ public class DecentralisedCreateCaseEventService {
             result.getCaseDetails().setResolvedTTL(caseDetails.getResolvedTTL());
             return result;
         } catch (FeignException.Conflict conflict) {
-            log.warn("Decentralised service reported concurrency conflict for case {} event {}",
+            log.warn("Decentralised service reported concurrency conflict for caseType {} case {} event {}",
+                caseDetails.getCaseTypeId(),
                 caseDetails.getReference(),
                 event.getEventId());
             throw new CaseConcurrencyException("""
