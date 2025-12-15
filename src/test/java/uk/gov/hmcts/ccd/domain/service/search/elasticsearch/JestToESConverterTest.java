@@ -25,7 +25,7 @@ class JestToESConverterTest {
         assertEquals(1, request.searches().size());
 
         RequestItem item = request.searches().get(0);
-        assertEquals("cases", item.header().index());
+        assertEquals("cases", item.header().index().getFirst());
         assertNotNull(item.body());
         assertEquals(10, item.body().size());
         assertNotNull(item.body().query());
