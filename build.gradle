@@ -35,7 +35,7 @@ ext {
     lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.15.2'
-    testContainersVersion = '1.20.4'
+    testContainersVersion = '2.0.2'
     cucumber = '6.11.0'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
@@ -288,15 +288,13 @@ dependencies {
         transitive = false;
     }
 
-    testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.1.4'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
