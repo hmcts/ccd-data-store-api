@@ -70,7 +70,6 @@ class RestTemplateConfiguration {
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
         LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
-        restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
     }
 
@@ -79,8 +78,9 @@ class RestTemplateConfiguration {
 
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
-            new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
-        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
+            new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        requestFactory.setReadTimeout(readTimeout);
+        LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
 
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
@@ -120,18 +120,22 @@ class RestTemplateConfiguration {
         }
     }
 
-    private HttpClient getHttpClient(final int timeout) {
-        return getHttpClient(timeout, timeout);
+    private HttpClient getHttpClient() {
+        return getHttpClient(connectionTimeout);
     }
 
-    private HttpClient getHttpClient(final int connectTimeout, final int socketTimeout) {
+    private HttpClient getHttpClient(final int connectTimeout) {
+        return getHttpClient(connectTimeout, connectTimeout);
+    }
+
+    private HttpClient getHttpClient(final int timeout, final int socketTimeout) {
         cm = new PoolingHttpClientConnectionManager();
 
         LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
         LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
         LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
         LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
-        LOG.info("connectTimeout: {}, socketTimeout: {}", connectTimeout, socketTimeout);
+        LOG.info("connectionTimeout: {}, socketTimeout {} ", timeout, socketTimeout);
 
         cm.setMaxTotal(maxTotalHttpClient);
         cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
@@ -140,8 +144,8 @@ class RestTemplateConfiguration {
         final RequestConfig
             config =
             RequestConfig.custom()
-                         .setConnectTimeout(connectTimeout)
-                         .setConnectionRequestTimeout(connectTimeout)
+                         .setConnectTimeout(timeout)
+                         .setConnectionRequestTimeout(timeout)
                          .setSocketTimeout(socketTimeout)
                          .build();
 
