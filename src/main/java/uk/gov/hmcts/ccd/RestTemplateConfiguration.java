@@ -70,6 +70,7 @@ class RestTemplateConfiguration {
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
         LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
+        restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
     }
 
