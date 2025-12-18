@@ -157,6 +157,9 @@ configurations {
     contractTestAnnotationProcessor.extendsFrom(annotationProcessor)
     cucumberRuntime.extendsFrom(functionalRuntime)
     cucumberImplementation.extendsFrom(functionalImplementation)
+    integrationTestImplementation.extendsFrom(testImplementation)
+    integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
 
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
