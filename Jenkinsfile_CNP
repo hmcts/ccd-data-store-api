@@ -150,6 +150,8 @@ withPipeline(type, product, component) {
     afterAlways('test') {
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
 
+    builder.gradle('integration')
+
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
