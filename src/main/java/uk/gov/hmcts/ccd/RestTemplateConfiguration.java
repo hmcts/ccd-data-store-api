@@ -169,7 +169,7 @@ class RestTemplateConfiguration {
         final RequestConfig config =
             RequestConfig.custom()
                          .setConnectTimeout(timeout)
-                         .setConnectionRequestTimeout(timeout)
+                         .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
                          .setSocketTimeout(socketTimeout)
                          .build();
 
