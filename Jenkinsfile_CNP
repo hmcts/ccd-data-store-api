@@ -241,3 +241,10 @@ withPipeline(type, product, component) {
         ]
     }
 }
+
+/**
+ * Forces a recursive copy by always returning 0 regardless of errors
+ */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
+}
