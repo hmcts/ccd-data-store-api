@@ -11,15 +11,14 @@ properties(
     ]
 )
 
-//@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
-//reverting back to main branch as branch DO-NOT-MERGE-FT-TIMEOUT-EXTENSION
-//does not contain builder.gradle
-@Library("Infrastructure")
+@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
+
+GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
     'ccd-${env}': [
