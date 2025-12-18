@@ -13,6 +13,8 @@ properties(
 
 @Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
