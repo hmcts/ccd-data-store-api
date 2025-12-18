@@ -153,14 +153,18 @@ withPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
+     copyIgnore('./build/reports/tests/integration', './Integration Tests/')
+     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+     
+      copyIgnore('./build/reports/tests/test', './Unit Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+     
 
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
           keepAll              : true,
-          reportDir            : 'build/reports/jacoco/html',
+          reportDir            : "Unit Tests",
           reportFiles          : "index.html",
           reportName           : "Unit Test Report"
         ]
@@ -169,7 +173,7 @@ withPipeline(type, product, component) {
       allowMissing         : true,
       alwaysLinkToLastBuild: true,
       keepAll              : true,
-      reportDir            : 'build/reports/tests/integration',
+      reportDir            : "Integration Tests",
       reportFiles          : "index.html",
       reportName           : "Integration Test Report"
       ]
@@ -234,4 +238,9 @@ withPipeline(type, product, component) {
             reportName           : "Contract Tests Report"
         ]
     }
+/**
+ * Forces a recursive copy by always returning 0 regardless of errors
+ */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }
