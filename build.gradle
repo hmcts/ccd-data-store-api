@@ -111,7 +111,6 @@ sourceSets {
         compileClasspath += main.output
         runtimeClasspath += main.output
         srcDir file('src/test/java/uk/gov/hmcts/ccd/integrations')
-        src/test/java/uk/gov/hmcts/ccd/integrations
         }
         resources.srcDir file('src/test/resources')
     }
@@ -179,6 +178,14 @@ tasks.withType(Test) {
     testLogging {
         exceptionFormat = 'full'
     }
+}
+
+task integration(type: Test) {
+    description = "Runs integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    failFast = true
 }
 
 ext.libraries = [
@@ -802,14 +809,6 @@ task functional(type: JavaExec) {
     }
 
     outputs.upToDateWhen { false }
-}
-
-task integration(type: Test) {
-  description = "Runs integration tests"
-  group = "Verification"
-  testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
 }
 
 project.ext {
