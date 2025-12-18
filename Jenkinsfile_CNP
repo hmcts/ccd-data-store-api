@@ -11,7 +11,10 @@ properties(
     ]
 )
 
-@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
+//@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
+//reverting back to main branch as branch DO-NOT-MERGE-FT-TIMEOUT-EXTENSION
+//does not contain builder.gradle
+@Library("Infrastructure")
 
 def type = "java"
 def product = "ccd"
@@ -155,13 +158,12 @@ withPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
-     copyIgnore('./build/reports/tests/integration', './Integration Tests/')
-     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+      copyIgnore('./build/reports/tests/integration', './Integration Tests/')
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
      
       copyIgnore('./build/reports/tests/test', './Unit Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
-     
-
+       
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
@@ -172,24 +174,24 @@ withPipeline(type, product, component) {
         ]
 
       publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : "Integration Tests",
-      reportFiles          : "index.html",
-      reportName           : "Integration Test Report"
-      ]
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "Integration Tests",
+          reportFiles          : "index.html",
+          reportName           : "Integration Test Report"
+        ]
     }
 
     afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'BEFTA Report for Smoke Tests',
-      reportFiles          : "overview-features.html",
-      reportName           : "Smoke Test Report"
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Smoke Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Smoke Test Report"
       ]
     }
 
