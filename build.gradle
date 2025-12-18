@@ -108,8 +108,8 @@ sourceSets {
     }
     integrationTest {
         java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += main.output + sourceSets.test.output
+            runtimeClasspath += main.output + sourceSets.test.output
             srcDir file('src/test/java/uk/gov/hmcts/ccd/integrations')
         }
         resources.srcDir file('src/test/resources')
