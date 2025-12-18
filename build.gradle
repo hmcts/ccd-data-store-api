@@ -106,6 +106,15 @@ sourceSets {
             srcDir('src/contractTest/resources')
         }
     }
+    integrationTest {
+        java {
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+        srcDir file('src/test/java/uk/gov/hmcts/ccd/integrations')
+        src/test/java/uk/gov/hmcts/ccd/integrations
+        }
+        resources.srcDir file('src/test/resources')
+    }
 }
 
 // tag::repositories[]
@@ -579,6 +588,7 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    executionData(test, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
     }
@@ -789,6 +799,14 @@ task functional(type: JavaExec) {
     }
 
     outputs.upToDateWhen { false }
+}
+
+task integration(type: Test) {
+  description = "Runs integration tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  failFast = true
 }
 
 project.ext {
