@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -41,10 +39,7 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = {"Elastic Based Search API"})
-@SwaggerDefinition(tags = {
-    @Tag(name = "Elastic Based Search API", description = "ElasticSearch based search API")
-})
+@Tag(name = "Elastic Based Search API", description = "ElasticSearch based search API")
 @Slf4j
 public class CaseSearchEndpoint {
 
@@ -62,19 +57,17 @@ public class CaseSearchEndpoint {
     }
 
     @PostMapping(value = "/searchCases")
-    @ApiOperation("Search cases according to the provided ElasticSearch query. Supports searching across multiple case"
-        + " types.")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of case data for the given search request")
-    })
+    @Operation(description = "Search cases according to the provided ElasticSearch query. "
+        + "Supports searching across multiple case types.")
+    @ApiResponse(responseCode = "200", description = "List of case data for the given search request")
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
         caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildCaseIds(#result)")
     public CaseSearchResult searchCases(
-        @ApiParam(value = "Comma separated list of case type ID(s) or '*' if the search should be applied on any "
-            + "existing case type. Note that using '*' is an expensive operation and might have low response times so "
-            + "always prefer explicitly listing the case types when known in advance", required = true)
+        @Parameter(description = "Comma separated list of case type ID(s) or '*' if the search should be applied on "
+            + "any existing case type. Note that using '*' is an expensive operation and might have low response times"
+            + " so always prefer explicitly listing the case types when known in advance", required = true)
         @RequestParam("ctid") List<String> caseTypeIds,
-        @ApiParam(value = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
+        @Parameter(description = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
             + "documentation. For cross case type search, "
             + "the search results will contain only metadata by default (no case field data). To get case data in the "
             + "search results, please state the alias fields to be returned in the _source property for e.g."

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +39,9 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
     protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
@@ -44,8 +49,9 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        basicGrantTypeESQueryBuilder = new BasicGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl);
+        MockitoAnnotations.openMocks(this);
+        basicGrantTypeESQueryBuilder = new BasicGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl,
+            applicationParams);
     }
 
     @Test
@@ -69,7 +75,7 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     void shouldIncludeShouldQueryWhenCaseTypeContainsCaseAccessCategory() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE", "", "",
-            "", "", null, "", ROLE_NAME_1);
+            "", "", null, "", ROLE_NAME_1, null);
 
         Set<String> caseStates = Sets.newHashSet("STATE-1");
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
@@ -93,5 +99,64 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         assertNotNull(query);
         assertTrue(query.hasClauses());
         assertEquals(1, (query.should().size()));
+    }
+
+    @Test
+    void shouldIncludeShouldQueryWhenCaseTypeContainsCaseAccessGroup() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
+            "CASE", "", "",
+            "", "", null, "", ROLE_NAME_1, "caseAccesGroupId1");
+
+        when(applicationParams.getCaseGroupAccessFilteringEnabled()).thenReturn(true);
+        CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
+        when(caseStateDefinition.getId()).thenReturn("STATE-1");
+        List<CaseStateDefinition> caseStateDefinitions = Lists.newArrayList(caseStateDefinition);
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any())).thenReturn(caseStateDefinitions);
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
+            ROLE_NAME_1,
+            CASE_TYPE_ID_1,
+            1,
+            false,
+            null,
+            "Civil/Standard,Crime/Standard");
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
+
+        BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
+            caseTypeDefinition);
+
+        assertNotNull(query);
+        assertTrue(query.hasClauses());
+        assertTrue(query.toString().contains("CaseAccessGroups"));
+    }
+
+    @Test
+    void shouldNotIncludeCaseAccessGroupForFilteringDisabled() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
+            "CASE", "", "",
+            "", "", null, "", ROLE_NAME_1, "caseAccesGroupId1");
+
+        CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
+        when(caseStateDefinition.getId()).thenReturn("STATE-1");
+        List<CaseStateDefinition> caseStateDefinitions = Lists.newArrayList(caseStateDefinition);
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any())).thenReturn(caseStateDefinitions);
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
+            ROLE_NAME_1,
+            CASE_TYPE_ID_1,
+            1,
+            false,
+            null,
+            "Civil/Standard,Crime/Standard");
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
+
+        BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
+            caseTypeDefinition);
+
+        assertNotNull(query);
+        assertTrue(query.hasClauses());
+        assertFalse(query.toString().contains("CaseAccessGroups"));
     }
 }

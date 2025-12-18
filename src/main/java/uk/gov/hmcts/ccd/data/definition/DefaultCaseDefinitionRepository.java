@@ -63,7 +63,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
                         + jurisdictionId + " because of " + e.getMessage());
             } else {
@@ -95,7 +95,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
                         + caseTypeId + " because of " + e.getMessage());
             } else {
@@ -103,6 +103,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage(), e);
             }
         }
+    }
+
+    @Override
+    public CaseTypeDefinition getScopedCachedCaseType(String caseTypeId) {
+        return this.getCaseType(caseTypeId);
     }
 
     @Override
@@ -114,7 +119,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
                     "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
@@ -134,7 +139,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 UserRole.class, queryParams).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
@@ -181,7 +186,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(
                         "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
@@ -193,16 +198,20 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable(value = "jurisdictionCache")
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
-        return getJurisdictionFromDefinitionStore(jurisdictionId);
+        return retrieveJurisdictions(Optional.of(Collections.singletonList(jurisdictionId)))
+            .stream()
+            .findFirst()
+            .orElse(null);
     }
 
-    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(Collections.singletonList(jurisdictionId)));
-        if (jurisdictionDefinitions.isEmpty()) {
-            return null;
-        }
-        return jurisdictionDefinitions.get(0);
+    @Cacheable(value = "allJurisdictionsCache")
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return retrieveJurisdictions(Optional.of(Collections.emptyList()));
+    }
+
+    public List<JurisdictionDefinition> retrieveJurisdictions(Optional<List<String>> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
     }
 
     @Override
@@ -230,12 +239,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "allJurisdictionsCache")
-    @Override
-    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
-        return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
-    }
-
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
@@ -254,7 +257,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
                     jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();

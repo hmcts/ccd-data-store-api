@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import java.util.List;
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;

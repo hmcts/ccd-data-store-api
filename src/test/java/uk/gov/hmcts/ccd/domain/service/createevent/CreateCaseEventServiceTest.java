@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,13 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -26,17 +31,22 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -47,23 +57,30 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -73,11 +90,16 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_BINARY_URL;
+import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
+import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
 class CreateCaseEventServiceTest extends TestFixtures {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String USER_ID = "123";
     private static final String TOKEN = "eygeyvcey12w2";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
@@ -88,67 +110,80 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
+    private static final String EXISTING_CASE_REFERENCE = "1234123412341234";
     protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
 
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private CaseDetailsRepository caseDetailsRepository;
-    @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private CallbackInvoker callbackInvoker;
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
-    private EventTriggerService eventTriggerService;
-    @Mock
-    private EventTokenService eventTokenService;
+    private CaseDataIssueLogger caseDataIssueLogger;
     @Mock
     private CaseDataService caseDataService;
     @Mock
-    private CaseTypeService caseTypeService;
+    private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
-    private CaseSanitiser caseSanitiser;
+    private CaseDetailsRepository caseDetailsRepository;
     @Mock
-    private CallbackInvoker callbackInvoker;
+    private CaseDetailsJsonParser caseDetailsJsonParser;
     @Mock
-    private UIDService uidService;
-    @Mock
-    private SecurityClassificationServiceImpl securityClassificationService;
-    @Mock
-    private ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    @Mock
-    private CaseService caseService;
-    @Mock
-    private UserAuthorisation userAuthorisation;
-
-    @Mock
-    private FieldProcessorService fieldProcessorService;
-    @Mock
-    private Clock clock;
-    @Mock
-    private CasePostStateService casePostStateService;
+    private CaseDocumentService caseDocumentService;
     @Mock
     private CaseEventMessageService caseEventMessageService;
     @Mock
-    private CaseDataIssueLogger caseDataIssueLogger;
-
+    private CaseLinkService caseLinkService;
     @Mock
-    private HttpServletRequest request;
-
+    private CasePostStateService casePostStateService;
     @Mock
-    private CaseDocumentService caseDocumentService;
-
+    private CaseSanitiser caseSanitiser;
+    @Mock
+    private CaseService caseService;
+    @Mock
+    private CaseTypeService caseTypeService;
+    @Mock
+    private Clock clock;
+    @Mock
+    private EventTokenService eventTokenService;
+    @Mock
+    private EventTriggerService eventTriggerService;
+    @Mock
+    private FieldProcessorService fieldProcessorService;
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
-
+    @Mock
+    private SecurityClassificationServiceImpl securityClassificationService;
     @Mock
     private TimeToLiveService timeToLiveService;
-
     @Mock
-    private CaseLinkService caseLinkService;
-
+    private UserAuthorisation userAuthorisation;
     @Mock
-    private CaseDetailsJsonParser caseDetailsJsonParser;
+    private ApplicationParams applicationParams;
+    @Mock
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UIDService uidService;
+    @Mock
+    private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private CasePointerRepository pointerRepository;
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
+    @Mock
+    private ConditionalFieldRestorer conditionalFieldRestorer;
+    @Mock
+    private CaseAccessService caseAccessService;
+
+    @Spy
+    private CaseDocumentTimestampService caseDocumentTimestampService =
+        new CaseDocumentTimestampService(Clock.systemDefaultZone(), new ApplicationParams());
 
     @InjectMocks
     private CreateCaseEventService underTest;
@@ -167,17 +202,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseDetails caseDetailsBefore;
     private CaseDataContent caseDataContent;
 
-    private static Event buildEvent() {
-        final Event event = anEvent().build();
-        event.setEventId(EVENT_ID);
-        event.setSummary("Update case summary");
-        event.setDescription("Update case description");
-        return event;
-    }
-
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();
@@ -214,7 +241,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(fixedClock.getZone()).when(clock).getZone();
 
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
@@ -239,6 +265,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         doReturn(emptyMap()).when(caseSanitiser).sanitise(any(CaseTypeDefinition.class), anyMap());
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+
+        when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
+        when(resolver.isDecentralised(any(CaseDetails.class))).thenReturn(false);
+        when(resolver.isDecentralised(anyLong())).thenReturn(false);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(emptySet());
     }
 
     @Test
@@ -271,8 +302,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
             emptyMap(),
             caseDetails,
             caseEventDefinition,
-            caseTypeDefinition
-        );
+            caseTypeDefinition,
+            EXISTING_CASE_REFERENCE);
 
         // THEN
         assertThat(updatedCaseDetails)
@@ -561,12 +592,87 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     }
 
+    @Test
+    @DisplayName("should add upload timestamp to a document")
+    void shouldAddUploadTimestampToDocument() throws Exception  {
+        caseDetailsFromDB = caseDetails.shallowClone();
+        Map<String, JsonNode> data = Maps.newHashMap();
+        ObjectNode objectNode = createBasicDoc();
+        data.put("dataKey1", objectNode);
+        caseDetails.setData(data);
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
+
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(true);
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        Collection<JsonNode> nodes = caseDocumentTimestampService.findNodes(
+            caseEventResult.getSavedCaseDetails().getData().values());
+
+        AtomicInteger countChanges = new AtomicInteger();
+        nodes.forEach(node -> {
+            countChanges.getAndIncrement();
+            System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
+            assertTrue(node.has(UPLOAD_TIMESTAMP));
+        });
+        assertEquals(1, countChanges.get());
+    }
+
+    @Test
+    @DisplayName("should not replace upload timestamp in a document")
+    void shouldNotReplaceUploadTimestampInDocument() throws Exception {
+        Map<String, JsonNode> data = Maps.newHashMap();
+        ObjectNode objectNode = createBasicDoc();
+        final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
+        objectNode.set(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
+        data.put("dataKey1", objectNode);
+        caseDetails.setData(data);
+        caseDetailsFromDB = caseDetails.shallowClone();
+        CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
+
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        Collection<JsonNode> nodes = caseDocumentTimestampService.findNodes(
+            caseEventResult.getSavedCaseDetails().getData().values());
+
+        AtomicInteger countChanges = new AtomicInteger();
+        nodes.forEach(node -> {
+            countChanges.getAndIncrement();
+            System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
+            assertTrue(node.has(UPLOAD_TIMESTAMP));
+            assertEquals(uploadTimestamp, node.get(UPLOAD_TIMESTAMP).asText());
+        });
+        assertEquals(1, countChanges.get());
+    }
+
+    private static Event buildEvent() {
+        final Event event = anEvent().build();
+        event.setEventId(EVENT_ID);
+        event.setSummary("Update case summary");
+        event.setDescription("Update case description");
+        return event;
+    }
+
     private void createCaseEvent() {
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {
         return new HashMap<>();
+    }
+
+    private ObjectNode createBasicDoc() {
+        ObjectNode node = MAPPER.createObjectNode();
+        node.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
+        node.set(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
+        node.set("document_filename", new TextNode("test-a5.pdf"));
+
+        return node;
     }
 
 }

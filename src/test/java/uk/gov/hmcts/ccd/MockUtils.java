@@ -35,6 +35,7 @@ public class MockUtils {
     public static final String ROLE_CASEWORKER_SSCS = "caseworker-sscs";
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";
     public static final String ROLE_CITIZEN = "citizen";
+    public static final String ROLE_EXTERNAL_USER = "caseworker-divorce-solicitor";
     public static final String ROLE_DCP_CASEWORKER = "caseworker-dcptest1";
     public static final String CASE_ROLE_CAN_CREATE = "[01-CAN_CREATE]";
     public static final String CASE_ROLE_CAN_READ = "[01-CAN_READ]";
@@ -45,7 +46,9 @@ public class MockUtils {
         return Jwts.builder()
             .setSubject(serviceName)
             .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            ))
             .compact();
     }
 

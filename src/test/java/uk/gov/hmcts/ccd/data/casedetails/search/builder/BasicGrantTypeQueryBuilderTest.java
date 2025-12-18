@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -40,14 +42,18 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
     protected static final String ROLE_NAME_1 = "ROLE1";
     protected static final String ROLE_NAME_2 = "ROLE2";
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        basicGrantTypeQueryBuilder = new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl);
+        MockitoAnnotations.openMocks(this);
+        basicGrantTypeQueryBuilder = new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl,
+            applicationParams);
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
         when(caseStateDefinition.getId()).thenReturn("CaseCreated");
         when(accessControlService
@@ -66,6 +72,33 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String expectedValue =  "( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) )";
         assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldReturnQueryWhenRoleAssignmentHasCaseAccessGroupId() {
+        when(applicationParams.getCaseGroupAccessFilteringEnabled()).thenReturn(true);
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "ROLE1",
+            "PRIVATE", "", "", null, null, "", "caseAccessGroupId");
+        String query = basicGrantTypeQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), caseTypeDefinition);
+
+        assertNotNull(query);
+        String expectedValue =  "( data->'CaseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": "
+            + "\"caseAccessGroupId\"}}]' AND state in (:states_1_basic) "
+            + "AND security_classification in (:classifications_1_basic) )";
+        assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldNotReturnCaseAccessGroupQueryWhenNotEnabled() {
+        when(applicationParams.getCaseGroupAccessFilteringEnabled()).thenReturn(false);
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "ROLE1",
+            "PRIVATE", "", "", null, null, "", "caseAccessGroupId");
+        String query = basicGrantTypeQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), caseTypeDefinition);
+
+        assertNotNull(query);
+        assertFalse(query.contains("caseAccessGroups"));
     }
 
     @Test

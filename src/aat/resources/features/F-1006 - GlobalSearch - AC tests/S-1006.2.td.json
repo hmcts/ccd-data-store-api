@@ -1,7 +1,7 @@
 {
   "title": "Returning all results from Global Search matching the users jurisdictions/case types and excluding restricted cases",
   "_guid_": "S-1006.2",
-  "_extends_": "F-1006_SearchCaseBase",
+  "_extends_": "F-1006_SearchCaseBaseRestricted",
   "specs": [
     "no field level RESTRICTED of security classification",
     "does not contain any restricted classification results"

@@ -1,0 +1,50 @@
+{
+  "_guid_": "F-1006_SearchCaseBaseRestricted",
+  "productName": "CCD Data Store",
+  "operationName": "Global Search",
+  "method": "POST",
+  "uri": "/globalSearch",
+  "specs": [
+    "to search a full case",
+    "contains relevant jurisdictions and case types"
+  ],
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "SC_Restricted"
+        ],
+        "CCDJurisdictionIds": [
+          "BEFTA_MASTER",
+          "AUTOTEST1"
+        ]
+      },
+      "sortCriteria": [
+        {
+          "sortBy": "caseName",
+          "sortDirection": "descending"
+        },
+        {
+          "sortBy": "caseManagementCategoryName",
+          "sortDirection": "ascending"
+        },
+        {
+          "sortBy": "createdDate",
+          "sortDirection": "ascending"
+        }
+      ],
+      "maxReturnRecordCount": 500,
+      "startRecordNumber": 1
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

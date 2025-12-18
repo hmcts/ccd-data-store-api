@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -29,13 +30,16 @@ class ChallengedGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     private AccessControlService accessControlService;
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private CaseDataAccessControl caseDataAccessControl;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         challengedGrantTypeQueryBuilder = new ChallengedGrantTypeQueryBuilder(accessControlService,
-            caseDataAccessControl);
+            caseDataAccessControl, applicationParams);
 
         CaseStateDefinition caseStateDefinition = mock(CaseStateDefinition.class);
         when(caseStateDefinition.getId()).thenReturn("CaseCreated");

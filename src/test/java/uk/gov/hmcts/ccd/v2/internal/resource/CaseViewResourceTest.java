@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,7 @@ class CaseViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         mockArrays();
 
@@ -73,7 +74,7 @@ class CaseViewResourceTest {
         final CaseViewResource resource = new CaseViewResource(caseView);
 
         Optional<Link> self = resource.getLink("self");
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
     private void mockArrays() {

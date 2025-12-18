@@ -1,12 +1,9 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.type.StringType;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,11 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinksResource;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.v2.V2;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/testing-support")
 @ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "true")
+@Slf4j
 public class TestingSupportController {
 
     private final CaseLinkService caseLinkService;
@@ -53,21 +55,24 @@ public class TestingSupportController {
     }
 
     @DeleteMapping(value = "/cleanup-case-type/{changeId}")
-    @ApiOperation(value = "Delete a list of Case Type Schemas", notes = "Blank body response.\n")
-    @ApiResponses(value = {
-        @ApiResponse(code = 204, message = "Success"),
-        @ApiResponse(code = 404, message = "Unable to find case type"),
-        @ApiResponse(code = 500, message = "Unexpected error")
-    })
+    @Operation(summary = "Delete a list of Case Type Schemas", description = "Blank body response.\n")
+    @ApiResponse(responseCode = "204", description = "Success")
+    @ApiResponse(responseCode = "404", description = "Unable to find case type")
+    @ApiResponse(responseCode = "500", description = "Unexpected error")
     public void dataCaseTypeIdDelete(
-        @ApiParam(value = "Change ID", required = true) @PathVariable("changeId") BigInteger changeId,
-        @ApiParam(value = "Case Type ID", required = true) @RequestParam("caseTypeIds") String caseTypeIds) {
+        @Parameter(name = "Change ID", required = true) @PathVariable("changeId") BigInteger changeId,
+        @Parameter(name = "Case Type ID", required = true) @RequestParam("caseTypeIds") String caseTypeIds) {
+        log.info("Invoked for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
 
         var caseIdList = Arrays.stream(caseTypeIds.split(",")).toList();
         var caseTypesWithChangeIds = caseIdList.stream().map(caseTypeId -> caseTypeId + "-" + changeId).toList();
 
         Session session = sessionFactory.openSession();
 
+        executeSql(
+            session,
+            "DELETE FROM case_link WHERE case_type_id IN (:caseTypeReferences)",
+            caseTypesWithChangeIds);
         executeSql(
             session,
             "DELETE FROM case_event WHERE case_type_id IN (:caseTypeReferences)",
@@ -78,12 +83,13 @@ public class TestingSupportController {
             caseTypesWithChangeIds);
 
         session.close();
+        log.info("Deleted records for changeId {} and caseTypeIds {} ", changeId, caseTypeIds);
     }
 
     private void executeSql(Session session, String sql, List<String> ids) {
         session.beginTransaction();
         session.createNativeQuery(sql)
-            .setParameterList("caseTypeReferences", ids, StringType.INSTANCE)
+            .setParameterList("caseTypeReferences", ids, StandardBasicTypes.STRING)
             .executeUpdate();
         session.getTransaction().commit();
     }

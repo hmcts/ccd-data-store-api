@@ -1,0 +1,16 @@
+{
+  "_guid_": "S-1023_GetUpdateTokenCaseworker",
+  "_extends_": "S-1023_GetEventTokenBase",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1023_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}

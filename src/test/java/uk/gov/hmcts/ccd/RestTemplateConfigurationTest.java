@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,7 +19,6 @@ import java.util.concurrent.Future;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
@@ -26,10 +26,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
-import static wiremock.com.google.common.collect.Lists.newArrayList;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,29 +59,29 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
         final RequestEntity<String>
             request =
-            new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
+            new RequestEntity<>(PUT, URI.create(hostUrl + URL));
 
         final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
         assertResponse(response);
     }
 
-    @Test(expected = ResourceAccessException.class)
+    @Test
     public void shouldTimeOut() {
         assertNotNull(restTemplate);
         stubFor(get(urlEqualTo(URL)).willReturn(aResponse().withStatus(SC_OK).withFixedDelay(2000)));
 
         final RequestEntity<String>
             request =
-            new RequestEntity<>(GET, URI.create("http://localhost:" + wiremockPort + URL));
+            new RequestEntity<>(GET, URI.create(hostUrl + URL));
 
-        restTemplate.exchange(request, String.class);
+        assertThrows(ResourceAccessException.class, () -> restTemplate.exchange(request, String.class));
     }
 
-    @Ignore("for local dev only")
+    @Disabled("for local dev only")
     @Test
     public void shouldBeAbleToUseMultipleTimes() throws Exception {
         stubResponse();
-        final List<Future<Integer>> futures = newArrayList();
+        final List<Future<Integer>> futures = new ArrayList<>();
         final ExecutorService executorService = Executors.newFixedThreadPool(25);
         final int totalNumberOfCalls = 200;
 
@@ -89,7 +89,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             futures.add(executorService.submit(() -> {
                 final RequestEntity<String>
                     request =
-                    new RequestEntity<>(PUT, URI.create("http://localhost:" + wiremockPort + URL));
+                    new RequestEntity<>(PUT, URI.create(hostUrl + URL));
                 final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
                 assertResponse(response);
                 return response.getStatusCode().value();

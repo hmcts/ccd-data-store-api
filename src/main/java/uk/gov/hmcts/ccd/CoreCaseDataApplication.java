@@ -1,19 +1,28 @@
 package uk.gov.hmcts.ccd;
 
+import java.time.Clock;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.time.Clock;
-
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ "uk.gov.hmcts.ccd" })
+@ComponentScan({ 
+    "uk.gov.hmcts.ccd",
+    "uk.gov.hmcts.reform.ccd.document.am"
+})
+@EnableFeignClients(basePackages = {
+    "uk.gov.hmcts.reform.idam",
+    "uk.gov.hmcts.reform.ccd.document.am",
+    "uk.gov.hmcts.ccd.auditlog"
+})
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
 

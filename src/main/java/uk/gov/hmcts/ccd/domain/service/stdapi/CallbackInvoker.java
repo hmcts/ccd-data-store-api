@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -46,6 +47,7 @@ public class CallbackInvoker {
     private final SecurityValidationService securityValidationService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private final TimeToLiveService timeToLiveService;
+    private final PersistenceStrategyResolver persistenceStrategyResolver;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -54,7 +56,8 @@ public class CallbackInvoker {
                            final CaseSanitiser caseSanitiser,
                            final SecurityValidationService securityValidationService,
                            final GlobalSearchProcessorService globalSearchProcessorService,
-                           final TimeToLiveService timeToLiveService) {
+                           final TimeToLiveService timeToLiveService,
+                           final PersistenceStrategyResolver persistenceStrategyResolver) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
@@ -62,6 +65,7 @@ public class CallbackInvoker {
         this.securityValidationService = securityValidationService;
         this.globalSearchProcessorService = globalSearchProcessorService;
         this.timeToLiveService = timeToLiveService;
+        this.persistenceStrategyResolver = persistenceStrategyResolver;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -89,6 +93,12 @@ public class CallbackInvoker {
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
+
+        // Decentralised case types manage their own event submission
+        if (persistenceStrategyResolver.isDecentralised(caseDetails)) {
+            return new AboutToSubmitCallbackResponse();
+        }
+
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -99,20 +109,22 @@ public class CallbackInvoker {
                 caseEventDefinition, caseDetailsBefore, caseDetails, ignoreWarning);
         }
 
-        if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
+        return callbackResponse.map(response -> validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
-                callbackResponse.get());
-        }
+                response)).orElseGet(AboutToSubmitCallbackResponse::new);
 
-        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEventDefinition
                                                                                    caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
+        // Decentralised case types manage their own event submission
+        if (persistenceStrategyResolver.isDecentralised(caseDetails)) {
+            return ResponseEntity.ok(caseDetails.getAfterSubmitCallbackResponse());
+        }
+
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =
@@ -225,8 +237,13 @@ public class CallbackInvoker {
         }
         if (callbackResponse.getData() != null) {
             validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
-            if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
-                securityValidationService.setClassificationFromCallbackIfValid(
+
+            if (hasSecurityClassification(callbackResponse)) {
+                securityValidationService.updateSecurityClassificationIfValid(callbackResponse, caseDetails);
+            }
+
+            if (hasDataClassification(callbackResponse)) {
+                securityValidationService.setDataClassificationFromCallbackIfValid(
                     callbackResponse,
                     caseDetails,
                     deduceDefaultClassificationForExistingFields(caseTypeDefinition, caseDetails)
@@ -236,19 +253,19 @@ public class CallbackInvoker {
         return aboutToSubmitCallbackResponse;
     }
 
+    private boolean hasSecurityClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getSecurityClassification() != null;
+    }
 
-    private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null
-            && callbackResponse.getDataClassification() != null) ? true : false;
+    private boolean hasDataClassification(CallbackResponse callbackResponse) {
+        return callbackResponse.getDataClassification() != null;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseTypeDefinition caseTypeDefinition,
                                                                                CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            caseDetails.getData(),
-            EMPTY_DATA_CLASSIFICATION);
-        return defaultSecurityClassifications;
+        return caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
+                                                                caseDetails.getData(),
+                                                                EMPTY_DATA_CLASSIFICATION);
     }
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,

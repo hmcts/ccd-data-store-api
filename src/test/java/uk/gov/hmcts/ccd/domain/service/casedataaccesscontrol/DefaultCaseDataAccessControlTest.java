@@ -283,7 +283,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, GrantType.EXCLUDED.name());
@@ -298,7 +298,7 @@ class DefaultCaseDataAccessControlTest {
 
         assertNotNull(accessProfiles);
         assertEquals(0, accessProfiles.size());
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -321,7 +321,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -338,7 +338,7 @@ class DefaultCaseDataAccessControlTest {
             .allMatch(s -> accessProfiles.stream()
                 .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -361,7 +361,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -376,7 +376,7 @@ class DefaultCaseDataAccessControlTest {
         assertEquals(1, accessProfiles.size());
         assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -400,7 +400,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -417,7 +417,7 @@ class DefaultCaseDataAccessControlTest {
             .allMatch(s -> accessProfiles.stream()
                 .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -441,7 +441,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -458,7 +458,7 @@ class DefaultCaseDataAccessControlTest {
                 .allMatch(s -> accessProfiles.stream()
                     .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -482,7 +482,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -497,7 +497,7 @@ class DefaultCaseDataAccessControlTest {
         assertEquals(1, accessProfiles.size());
         assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -521,7 +521,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -536,7 +536,7 @@ class DefaultCaseDataAccessControlTest {
         assertEquals(1, accessProfiles.size());
         assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -560,7 +560,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -575,7 +575,7 @@ class DefaultCaseDataAccessControlTest {
         assertEquals(1, accessProfiles.size());
         assertTrue(accessProfiles.stream().allMatch(a -> a.getAccessProfile().equals("ap_1")));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -599,7 +599,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         doReturn(Collections.emptyList()).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
@@ -616,7 +616,7 @@ class DefaultCaseDataAccessControlTest {
             .allMatch(s -> accessProfiles.stream()
                 .anyMatch(ap -> s.equals(ap.getAccessProfile()))));
 
-        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignments(anyString());
         verify(roleAssignmentsFilteringService)
@@ -1050,7 +1050,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getScopedCachedCaseType(CASE_TYPE_1);
 
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, STANDARD.name());
@@ -1158,7 +1158,7 @@ class DefaultCaseDataAccessControlTest {
 
 
     @Nested
-    class GenerateAccessMetadata {
+    public class GenerateAccessMetadata {
 
         private CaseDetails caseDetails;
 

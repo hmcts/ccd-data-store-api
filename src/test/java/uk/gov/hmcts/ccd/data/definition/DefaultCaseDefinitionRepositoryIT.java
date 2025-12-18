@@ -2,8 +2,7 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -11,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,7 +157,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             .willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
-        Assert.assertThat(exception.getMessage(),
+        assertThat(exception.getMessage(),
             startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
     }
 }

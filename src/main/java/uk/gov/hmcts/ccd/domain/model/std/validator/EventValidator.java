@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.model.std.validator;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 @Named
 @Singleton

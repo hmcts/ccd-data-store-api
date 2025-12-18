@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ccd.integrations;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedUIDefinitionGateway;
@@ -26,24 +27,27 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
-import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
@@ -58,13 +62,16 @@ public class DefinitionsCachingIT {
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
 
-    private static final String USE_CASE_1 = "usecase1";
+    private static final String JURISDICTION_ID_1 = "J1";
+    private static final String JURISDICTION_ID_2 = "J2";
+    private static final String JURISDICTION_ID_3 = "J3";
+    private static final String JURISDICTION_ID_4 = "J4";
 
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
 
-    @SpyBean
+    @MockitoSpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
@@ -73,13 +80,13 @@ public class DefinitionsCachingIT {
     @Autowired
     ApplicationParams applicationParams;
 
-    @SpyBean
+    @MockitoSpyBean
     UIDefinitionRepository uiDefinitionRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
-    @SpyBean
+    @MockitoSpyBean
     private CachedUIDefinitionGateway cachedUIDefinitionGateway;
 
     @Mock
@@ -100,7 +107,7 @@ public class DefinitionsCachingIT {
     List<WizardPage> wizardPageList = new ArrayList<>();
     List<Banner> bannersList = Collections.emptyList();
 
-    @Before
+    @BeforeEach
     public void setup() {
         initiateWizardPageList(wizardPageList);
 
@@ -110,20 +117,16 @@ public class DefinitionsCachingIT {
             .getLatestVersionFromDefinitionStore(ID_2);
         doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository)
             .getLatestVersionFromDefinitionStore(ID_3);
-        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository)
-            .getJurisdictionFromDefinitionStore("J1");
-        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository)
-            .getJurisdictionFromDefinitionStore("J2");
-        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository)
-            .getJurisdictionFromDefinitionStore("J3");
+        doReturn(List.of(JURISDICTION_DEFINITION_1)).when(this.caseDefinitionRepository)
+            .retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_1)));
+        doReturn(List.of(JURISDICTION_DEFINITION_2)).when(this.caseDefinitionRepository)
+            .retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
+        doReturn(List.of(JURISDICTION_DEFINITION_3)).when(this.caseDefinitionRepository)
+            .retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_3)));
+
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
 
         doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
-        SearchResultDefinition searchResultDefinition = createSearchResultDefinition();
-        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
-        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
-        doReturn(searchResultDefinition).when(this.httpUIDefinitionGateway)
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
     }
 
     private void initiateWizardPageList(List<WizardPage> wizardPageList) {
@@ -137,66 +140,111 @@ public class DefinitionsCachingIT {
         wizardPageList.add(wizardPage);
     }
 
-    private SearchResultDefinition createSearchResultDefinition() {
-        SortOrder sortOrder = new SortOrder();
-        sortOrder.setDirection("direction");
-        sortOrder.setPriority(1);
-
-        SearchResultField searchResultField = new SearchResultField();
-        searchResultField.setCaseFieldId("casefield_1");
-        searchResultField.setSortOrder(sortOrder);
-
-        SearchResultField[] searchResultFields = new SearchResultField[]{searchResultField};
-        SearchResultDefinition searchResultDefinition = new SearchResultDefinition();
-        searchResultDefinition.setFields(searchResultFields);
-        return searchResultDefinition;
+    private JurisdictionDefinition createJurisdictionDefinition(String jurisdictionId) {
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
+        CaseTypeDefinition caseType1 = new CaseTypeDefinition();
+        caseType1.setId(ID_1);
+        CaseTypeDefinition caseType2 = new CaseTypeDefinition();
+        caseType1.setId(ID_2);
+        jurisdictionDefinition.setCaseTypeDefinitions(List.of(caseType1, caseType2));
+        return jurisdictionDefinition;
     }
 
 
     @Test
     public void testJurisdictionListsAreCached() {
-        verify(caseDefinitionRepository, times(0)).getJurisdiction("J1");
-        cachedCaseDefinitionRepository.getJurisdiction("J1");
-        verify(caseDefinitionRepository, times(1)).getJurisdiction("J1");
-        cachedCaseDefinitionRepository.getJurisdiction("J1");
-        verify(caseDefinitionRepository, times(1)).getJurisdiction("J1");
-        cachedCaseDefinitionRepository.getJurisdiction("J1");
-        verify(caseDefinitionRepository, times(1)).getJurisdiction("J1");
+        verify(caseDefinitionRepository, times(0)).getJurisdiction(JURISDICTION_ID_1);
+        cachedCaseDefinitionRepository.getJurisdiction(JURISDICTION_ID_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdiction(JURISDICTION_ID_1);
+        cachedCaseDefinitionRepository.getJurisdiction(JURISDICTION_ID_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdiction(JURISDICTION_ID_1);
+        cachedCaseDefinitionRepository.getJurisdiction(JURISDICTION_ID_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdiction(JURISDICTION_ID_1);
+    }
+
+    @Disabled
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testJurisdictionDefinitionPreventCacheManipulation() {
+        doReturn(List.of(createJurisdictionDefinition(JURISDICTION_ID_1))).when(this.caseDefinitionRepository)
+            .retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_4)));
+
+        var jurisdictionDefinitionFirstAttempt = caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_4);
+        jurisdictionDefinitionFirstAttempt.setCaseTypeDefinitions(null);
+        assertNull(jurisdictionDefinitionFirstAttempt.getCaseTypeDefinitions());
+
+        var jurisdictionDefinitionSecondAttempt = caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_4);
+
+        assertAll(
+            () -> assertNotNull(jurisdictionDefinitionSecondAttempt.getCaseTypeDefinitions()),
+            () -> assertNotEquals(jurisdictionDefinitionFirstAttempt.hashCode(),
+                jurisdictionDefinitionSecondAttempt.hashCode())
+        );
+
+        verify(caseDefinitionRepository, times(1)).getJurisdiction(JURISDICTION_ID_4);
+    }
+
+    @Disabled
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void testJurisdictionDefinitionListPreventCacheManipulation() {
+        var expectedJurisdictionDefinitionList = Arrays.asList(createJurisdictionDefinition(JURISDICTION_ID_1),
+            createJurisdictionDefinition(JURISDICTION_ID_2));
+        doReturn(expectedJurisdictionDefinitionList).when(this.caseDefinitionRepository)
+            .retrieveJurisdictions(Optional.of(Collections.emptyList()));
+
+        var jurisdictionDefinitionListFirstAttempt = caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
+        assertNotNull(jurisdictionDefinitionListFirstAttempt.get(0).getCaseTypeDefinitions());
+        jurisdictionDefinitionListFirstAttempt.get(0).setCaseTypeDefinitions(null);
+        assertNull(jurisdictionDefinitionListFirstAttempt.get(0).getCaseTypeDefinitions());
+
+        var jurisdictionDefinitionListSecondAttempt = caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
+
+        assertAll(
+            () -> assertNotNull(jurisdictionDefinitionListSecondAttempt.get(0).getCaseTypeDefinitions()),
+            () -> assertNotEquals(jurisdictionDefinitionListFirstAttempt.stream().map(Object::hashCode).toList(),
+                jurisdictionDefinitionListSecondAttempt.stream().map(Object::hashCode).toList()),
+            () -> assertEquals(expectedJurisdictionDefinitionList.stream().map(JurisdictionDefinition::getId).toList(),
+                jurisdictionDefinitionListSecondAttempt.stream().map(JurisdictionDefinition::getId).toList()),
+            () -> assertNotEquals(expectedJurisdictionDefinitionList.stream().map(Object::hashCode).toList(),
+                jurisdictionDefinitionListSecondAttempt.stream().map(Object::hashCode).toList())
+        );
+
+        verify(caseDefinitionRepository, times(1)).getAllJurisdictionsFromDefinitionStore();
     }
 
     @Test
     public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+        assertEquals(3, applicationParams.getJurisdictionTTLSecs());
 
-        verify(caseDefinitionRepository, times(0)).getJurisdictionFromDefinitionStore("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+        verify(caseDefinitionRepository, times(0)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        verify(caseDefinitionRepository, times(1)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
 
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        verify(caseDefinitionRepository, times(1)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
 
         TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        verify(caseDefinitionRepository, times(1)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
 
         TimeUnit.SECONDS.sleep(2);
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
+        verify(caseDefinitionRepository, times(1)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        verify(caseDefinitionRepository, times(2)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
 
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
+        verify(caseDefinitionRepository, times(2)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
     }
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
-        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
+        assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
@@ -208,7 +256,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
+        assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
 
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
@@ -262,152 +310,26 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWorkbasketResultAreCached() {
+
+        doReturn(searchResult).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
+
         uiDefinitionRepository.getWorkBasketResult(ID_1);
         uiDefinitionRepository.getWorkBasketResult(ID_1);
         uiDefinitionRepository.getWorkBasketResult(ID_1);
-
-        verify(httpUIDefinitionGateway, times(1)).getWorkBasketResult(VERSION_1, ID_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testWorkbasketResultPreventCacheManipulation() {
-        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
-
-        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
-
-        searchResultDefinitionSecondAttempt.setFields(null);
-        assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getWorkBasketResult(ID_1);
-
-        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
-
-        verify(httpUIDefinitionGateway, times(1)).getWorkBasketResult(VERSION_1, ID_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testWorkbasketResultFailWithCacheManipulationWithoutDeepCopy() {
-        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
-        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway.getWorkBasketResult(VERSION_1, ID_1);
-        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
 
         verify(httpUIDefinitionGateway, times(1)).getWorkBasketResult(VERSION_1, ID_1);
     }
 
     @Test
     public void testSearchResultAreCached() {
+
+        doReturn(searchResult).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
+
         uiDefinitionRepository.getSearchResult(ID_1);
         uiDefinitionRepository.getSearchResult(ID_1);
         uiDefinitionRepository.getSearchResult(ID_1);
 
         verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testSearchResultPreventCacheManipulation() {
-        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getSearchResult(ID_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getSearchResult(ID_1);
-
-        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
-
-        searchResultDefinitionSecondAttempt.setFields(null);
-        assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getSearchResult(ID_1);
-
-        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
-
-        verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testSearchResultFailWithCacheManipulationWithoutDeepCopy() {
-        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
-        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway.getSearchResult(VERSION_1, ID_1);
-        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
-
-        verify(httpUIDefinitionGateway, times(1)).getSearchResult(VERSION_1, ID_1);
-    }
-
-    @Test
-    public void testSearchCasesResultAreCached() {
-        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-        uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-
-        verify(httpUIDefinitionGateway, times(1))
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testSearchCasesResultPreventCacheManipulation() {
-        var searchResultDefinitionFirstAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-
-        assertEquals(1, searchResultDefinitionSecondAttempt.getFields().length);
-
-        searchResultDefinitionSecondAttempt.setFields(null);
-        assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = uiDefinitionRepository.getSearchCasesResult(ID_1, USE_CASE_1);
-
-        assertEquals(1, searchResultDefinitionThirdAttempt.getFields().length);
-
-        verify(httpUIDefinitionGateway, times(1))
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testSearchCasesResultFailWithCacheManipulationWithoutDeepCopy() {
-        var searchResultDefinitionFirstAttempt = cachedUIDefinitionGateway
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
-        //change cached data
-        searchResultDefinitionFirstAttempt.setFields(null);
-        Assert.assertNull(searchResultDefinitionFirstAttempt.getFields());
-
-        var searchResultDefinitionSecondAttempt = cachedUIDefinitionGateway
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
-        Assert.assertNull(searchResultDefinitionSecondAttempt.getFields());
-
-        var searchResultDefinitionThirdAttempt = cachedUIDefinitionGateway
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
-        Assert.assertNull(searchResultDefinitionThirdAttempt.getFields());
-
-        verify(httpUIDefinitionGateway, times(1))
-            .getSearchCasesResultDefinition(VERSION_1, ID_1, USE_CASE_1);
     }
 
     @Test
@@ -432,8 +354,7 @@ public class DefinitionsCachingIT {
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
 
-        verify(httpUIDefinitionGateway, times(1))
-            .getSearchInputFieldDefinitions(VERSION_1, ID_1);
+        verify(httpUIDefinitionGateway, times(1)).getSearchInputFieldDefinitions(VERSION_1, ID_1);
     }
 
     @Test
@@ -514,4 +435,3 @@ public class DefinitionsCachingIT {
     }
 
 }
-

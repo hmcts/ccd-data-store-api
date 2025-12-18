@@ -36,12 +36,13 @@ class RoleAssignmentsMapperTest {
     public static final String CASE_ID2 = "caseId2";
     public static final String ASSIGNMENT_1 = "assignment1";
     public static final String ASSIGNMENT_2 = "assignment2";
+    public static final String CASE_GROUP_ID1 = "caseGroupId1";
 
     private final RoleAssignmentsMapper instance = RoleAssignmentsMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Nested
@@ -119,8 +120,9 @@ class RoleAssignmentsMapperTest {
         void shouldMapToRoleAssignments() {
             RoleAssignmentResource roleAssignment1 = createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID1);
             RoleAssignmentResource roleAssignment2 = createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID2);
+            RoleAssignmentResource roleAssignment3 = createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID2, CASE_GROUP_ID1);
             RoleAssignmentResponse response = createRoleAssignmentResponse(asList(
-                roleAssignment1, roleAssignment2
+                roleAssignment1, roleAssignment2, roleAssignment3
             ));
 
             RoleAssignments mapped = instance.toRoleAssignments(response);
@@ -128,10 +130,11 @@ class RoleAssignmentsMapperTest {
             List<RoleAssignment> roleAssignments = mapped.getRoleAssignments();
 
             assertAll(
-                () -> assertThat(roleAssignments.size(), is(2)),
+                () -> assertThat(roleAssignments.size(), is(3)),
 
                 () -> assertThat(roleAssignments.get(0), matchesRoleAssignmentResource(roleAssignment1)),
-                () -> assertThat(roleAssignments.get(1), matchesRoleAssignmentResource(roleAssignment2))
+                () -> assertThat(roleAssignments.get(1), matchesRoleAssignmentResource(roleAssignment2)),
+                () -> assertThat(roleAssignments.get(2), matchesRoleAssignmentResource(roleAssignment3))
             );
         }
 

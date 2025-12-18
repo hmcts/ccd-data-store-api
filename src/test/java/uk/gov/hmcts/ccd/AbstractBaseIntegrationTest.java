@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,13 +15,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -56,7 +56,8 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -68,18 +69,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
-// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
-@SuppressWarnings("checkstyle:OperatorWrap")
 public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
@@ -118,7 +117,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Inject
     private CaseDataIssueLogger caseDataIssueLogger;
     @Inject
-    private CallbackService callbackService;
+    protected CallbackService callbackService;
     @Inject
     private EventTokenService eventTokenService;
     @Inject
@@ -137,11 +136,16 @@ public abstract class AbstractBaseIntegrationTest {
     protected Authentication authentication;
     @Mock
     protected SecurityContext securityContext;
+    @Mock
+    protected HttpServletRequest request;
 
-    @Before
     @BeforeEach
     public void initMock() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -168,7 +172,6 @@ public abstract class AbstractBaseIntegrationTest {
         when(uidService.checkSum(anyString(), anyBoolean())).thenCallRealMethod();
     }
 
-    @BeforeClass
     @BeforeAll
     public static void init() {
         mapper.registerModule(new JavaTimeModule());
@@ -178,7 +181,6 @@ public abstract class AbstractBaseIntegrationTest {
         ReflectionTestUtils.setField(BaseType.class, "initialised", false);
     }
 
-    @After
     @AfterEach
     public void clearDownData() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
@@ -186,11 +188,11 @@ public abstract class AbstractBaseIntegrationTest {
         List<String> sequences = determineSequences(jdbcTemplate);
 
         String truncateTablesQuery =
-            "START TRANSACTION;\n" +
-                tables.stream()
+            "START TRANSACTION;\n"
+                + tables.stream()
                     .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
-                    .collect(Collectors.joining("\n")) +
-                "\nCOMMIT;";
+                    .collect(Collectors.joining("\n"))
+                + "\nCOMMIT;";
         jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
@@ -24,34 +25,54 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import feign.FeignException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
-import static org.mockito.Matchers.notNull;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -82,7 +103,6 @@ class SubmitCaseTransactionTest {
     private static final String ON_BEHALF_OF_FNAME = "Pierre OnBehalf";
     private static final String ON_BEHALF_OF_LNAME = "Martin OnBehalf";
 
-
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
@@ -100,6 +120,8 @@ class SubmitCaseTransactionTest {
     @Mock
     private CaseDetails savedCaseDetails;
 
+    private DecentralisedCaseDetails savedDecentralisedCaseDetails;
+
     @Mock
     private UIDService uidService;
 
@@ -110,7 +132,13 @@ class SubmitCaseTransactionTest {
     private CaseDocumentService caseDocumentService;
 
     @Mock
+    private CaseDocumentTimestampService caseDocumentTimestampService;
+
+    @Mock
     private MessageService messageService;
+
+    @Mock
+    private CaseDataService caseDataService;
 
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
@@ -119,10 +147,27 @@ class SubmitCaseTransactionTest {
     private IdamUser idamUser;
     private CaseEventDefinition caseEventDefinition;
     private CaseStateDefinition state;
+    @Mock
+    private ApplicationParams applicationParams;
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    private ObjectMapper objectMapper;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+    @Mock
+    private CasePointerRepository casePointerRepository;
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
+
+        event = buildEvent();
+        caseTypeDefinition = buildCaseType();
+        objectMapper = new ObjectMapper();
+        caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
             caseAuditEventRepository,
@@ -132,11 +177,16 @@ class SubmitCaseTransactionTest {
             securityClassificationService,
             caseDataAccessControl,
             messageService,
-            caseDocumentService
+            caseDocumentService,
+            applicationParams,
+            caseAccessGroupUtils,
+            caseDocumentTimestampService,
+            decentralisedSubmitCaseTransaction,
+            resolver,
+            casePointerRepository,
+            synchronisedCaseProcessor
         );
 
-        event = buildEvent();
-        caseTypeDefinition = buildCaseType();
         idamUser = buildIdamUser();
         caseEventDefinition = buildEventTrigger();
         state = buildState();
@@ -152,6 +202,30 @@ class SubmitCaseTransactionTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
+        doReturn("12345").when(savedCaseDetails).getReferenceAsString();
+        doReturn("TestType").when(savedCaseDetails).getCaseTypeId();
+        doReturn("TestJurisdiction").when(savedCaseDetails).getJurisdiction();
+        doReturn(1234567890L).when(savedCaseDetails).getReference();
+        doReturn(LocalDate.of(2030, 1, 1)).when(savedCaseDetails).getResolvedTTL();
+
+        doReturn("12345").when(caseDetails).getReferenceAsString();
+        doReturn("TestType").when(caseDetails).getCaseTypeId();
+        doReturn("TestJurisdiction").when(caseDetails).getJurisdiction();
+        doReturn(LocalDate.of(2030, 1, 1)).when(caseDetails).getResolvedTTL();
+
+        // Setup DecentralisedCaseDetails mock
+        savedDecentralisedCaseDetails = new DecentralisedCaseDetails();
+        savedDecentralisedCaseDetails.setCaseDetails(savedCaseDetails);
+        savedDecentralisedCaseDetails.setRevision(1L);
+
+        doAnswer(invocation -> {
+            DecentralisedCaseDetails responseDetails = invocation.getArgument(0);
+            Consumer<CaseDetails> consumer = invocation.getArgument(1);
+            consumer.accept(responseDetails.getCaseDetails());
+            return null;
+        }).when(synchronisedCaseProcessor).applyConditionallyWithLock(any(), any());
+
+        doNothing().when(casePointerRepository).persistCasePointerAndInitId(caseDetails);
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
@@ -192,8 +266,8 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
-            () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
+            () -> order.verify(caseDetails).setCreatedDate(notNull()),
+            () -> order.verify(caseDetails).setLastStateModifiedDate(notNull()),
             () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
             () -> order.verify(caseDetailsRepository).set(caseDetails)
         );
@@ -273,7 +347,6 @@ class SubmitCaseTransactionTest {
         );
     }
 
-
     @Test
     @DisplayName("should invoke callback")
     void shouldInvokeCallback() {
@@ -308,6 +381,96 @@ class SubmitCaseTransactionTest {
             () -> assertAuditEventProxyByUser(auditEventCaptor.getValue()),
             () -> verify(messageService).handleMessage(messageCandidateCaptor.capture())
         );
+    }
+
+    @Test
+    @DisplayName("should use decentralised service when resolver indicates decentralised case")
+    void shouldUseDecentralisedServiceWhenDecentralised() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        assertAll(
+            () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> verify(casePointerRepository).persistCasePointerAndInitId(caseDetails),
+            () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
+                event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty()),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(
+                eq(savedDecentralisedCaseDetails),
+                any()
+            ),
+            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
+            () -> verify(caseDetailsRepository, never()).set(caseDetails),
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
+            () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
+            () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
+        );
+    }
+
+    @Test
+    @DisplayName("should use decentralised service when resolver indicates decentralised case with onBehalfOfUser")
+    void shouldUseDecentralisedServiceWhenDecentralisedWithOnBehalfOfUser() {
+        IdamUser onBehalfOfUser = buildOnBehalfOfUser();
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.of(onBehalfOfUser));
+
+        final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            onBehalfOfUser);
+
+        assertAll(
+            () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> verify(casePointerRepository).persistCasePointerAndInitId(caseDetails),
+            () -> verify(decentralisedSubmitCaseTransaction).submitDecentralisedEvent(
+                event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.of(onBehalfOfUser)),
+            () -> verify(synchronisedCaseProcessor).applyConditionallyWithLock(
+                eq(savedDecentralisedCaseDetails),
+                any()
+            ),
+            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
+            () -> verify(caseDetailsRepository, never()).set(caseDetails),
+            () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
+            () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
+            () -> verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList())
+        );
+    }
+
+    @Test
+    @DisplayName("should still grant access and attach documents for decentralised cases")
+    void shouldGrantAccessAndAttachDocumentsForDecentralisedCases() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(savedDecentralisedCaseDetails).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID);
+        verify(caseDocumentService).attachCaseDocuments(
+            eq("12345"), eq("TestType"), eq("TestJurisdiction"), anyList());
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {
@@ -396,7 +559,6 @@ class SubmitCaseTransactionTest {
         return event;
     }
 
-
     private IdamUser buildIdamUser() {
         final IdamUser idamUser = new IdamUser();
         idamUser.setId(IDAM_ID);
@@ -423,6 +585,161 @@ class SubmitCaseTransactionTest {
             });
 
         return result;
+    }
+
+    @Test
+    @DisplayName("should rollback case pointer when ApiException has populated errors array")
+    void shouldRollbackCasePointerWhenApiExceptionHasErrors() {
+        // Setup for decentralised case
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        // Setup ApiException with errors
+        ApiException apiException = new ApiException("Validation failed")
+            .withErrors(Arrays.asList("Field is required", "Invalid value"));
+
+        // Mock the decentralised service to throw ApiException
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        // Execute and verify exception is thrown
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        // Verify case pointer was persisted then deleted
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("should rollback case pointer when ApiException has warnings and ignoreWarning is false")
+    void shouldRollbackCasePointerWhenApiExceptionHasWarningsAndIgnoreWarningFalse() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Warnings present")
+            .withWarnings(Collections.singletonList("Upstream validation warning"));
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, Boolean.FALSE, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("should rollback case pointer when FeignException has 4xx status code")
+    void shouldRollbackCasePointerWhenFeignExceptionIs4xx() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        FeignException feignException = FeignException.errorStatus("submitEvent",
+            feign.Response.builder()
+                .status(400)
+                .reason("Bad Request")
+                .headers(Collections.emptyMap())
+                .request(feign.Request.create(feign.Request.HttpMethod.POST, "/test",
+                    Collections.emptyMap(), null, null, null))
+                .build());
+
+        doThrow(feignException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(FeignException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when FeignException has 5xx status code")
+    void shouldNotRollbackCasePointerWhenFeignExceptionIs5xx() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        // Setup FeignException with 500 status code
+        FeignException feignException = FeignException.errorStatus("submitEvent",
+            feign.Response.builder()
+                .status(500)
+                .reason("Internal Server Error")
+                .headers(Collections.emptyMap())
+                .request(feign.Request.create(feign.Request.HttpMethod.POST, "/test",
+                    Collections.emptyMap(), null, null, null))
+                .build());
+
+        doThrow(feignException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(FeignException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when ApiException has no errors")
+    void shouldNotRollbackCasePointerWhenApiExceptionHasNoErrors() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Some other error");
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("should not rollback case pointer when ApiException has empty errors list")
+    void shouldNotRollbackCasePointerWhenApiExceptionHasEmptyErrors() {
+        doReturn(true).when(resolver).isDecentralised(caseDetails);
+        doReturn(1234567890L).when(caseDetails).getReference();
+
+        ApiException apiException = new ApiException("Some other error")
+            .withErrors(Collections.emptyList());
+
+        doThrow(apiException).when(decentralisedSubmitCaseTransaction)
+            .submitDecentralisedEvent(event, caseEventDefinition, caseTypeDefinition, caseDetails,
+                Optional.empty(), Optional.empty());
+
+        assertThrows(ApiException.class, () ->
+            submitCaseTransaction.submitCase(event, caseTypeDefinition, idamUser,
+                caseEventDefinition, caseDetails, IGNORE_WARNING, null));
+
+        verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
+        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
     }
 
 }

@@ -1,20 +1,26 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartEventResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -23,16 +29,87 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class StartEventControllerIT extends WireMockBaseTest {
 
+    private static final String responseJsonString1 = """
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000001",
+                    "task_name": "Task 1 name"
+                },
+                "complete_task": "false"
+            }
+        }
+        """;
+    private static final String responseJsonString2 = """
+        {
+            "user_task": {
+                "task_data": {
+                    "task_id": "000002",
+                    "task_name": "Task 2 name"
+                },
+                "complete_task": "false"
+            }
+        }
+        """;
+    private static final String jsonObjectString = """
+        {
+            "json": "anyData"
+        }
+        """;
+    private static JSONObject jsonObject;
+    private static JSONObject responseJsonObject1;
+    private static JSONObject responseJsonObject2;
+
     @Inject
     private WebApplicationContext wac;
+    @Inject
+    private CustomHeadersFilter customHeadersFilter;
+
     private MockMvc mockMvc;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp() throws JSONException {
+        jsonObject = new JSONObject(jsonObjectString);
+        responseJsonObject1 = new JSONObject(responseJsonString1);
+        responseJsonObject2 = new JSONObject(responseJsonString2);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    @Test
+    public void shouldReturnCustomHeader() throws Exception {
+        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+        headers.add(customContext, jsonObject.toString());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                    "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
+                .headers(headers)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+             .andExpect(MockMvcResultMatchers.header().string(customContext, jsonObject.toString()));
+    }
+
+    @Test
+    public void shouldReturnCustomHeaderFromAttribute() throws Exception {
+        final String customContext = applicationParams.getCallbackPassthruHeaderContexts().get(0);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+        headers.add(customContext, responseJsonObject1.toString());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+            "/case-types/TestAddressBookCreatorCase/event-triggers/NO_PRE_STATES_EVENT")
+                .requestAttr(customContext, responseJsonObject2)
+                .headers(headers)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(customContext, responseJsonObject2.toString()));
     }
 
     @Test

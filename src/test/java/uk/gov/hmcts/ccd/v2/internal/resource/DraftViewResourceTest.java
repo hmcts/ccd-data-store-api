@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ class DraftViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -44,7 +45,7 @@ class DraftViewResourceTest {
 
         Optional<Link> self = resource.getLink("self");
 
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ class UserProfileViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         channels = new String[]{channel1, channel2};
         jurisdictionDisplayProperties =
@@ -80,7 +81,7 @@ class UserProfileViewResourceTest {
 
         Optional<Link> self = resource.getLink("self");
 
-        assertThat(self.get().getHref(), equalTo(LINK_SELF));
+        assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
 }

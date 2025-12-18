@@ -1,22 +1,24 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Version;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -79,6 +81,7 @@ public class CaseDetailsEntity {
     public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
+    public static final String CASE_ACCESS_GROUP_ID_FIELD_COL = "data.CaseAccessGroups.value.caseAccessGroupId";
     public static final String JURISDICTION_FIELD_KEYWORD_COL = "jurisdiction.keyword";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
     public static final String REFERENCE_FIELD_COL = "reference";
@@ -98,7 +101,10 @@ public class CaseDetailsEntity {
 
     @Id
     @Column(name = ID_FIELD_COL)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+        generator = "case_data_id_seq_generator")
+    @SequenceGenerator(name = "case_data_id_seq_generator", 
+        sequenceName = "case_data_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
     private Long reference;

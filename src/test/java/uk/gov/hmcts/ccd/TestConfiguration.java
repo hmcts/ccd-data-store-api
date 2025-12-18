@@ -125,7 +125,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
-        when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.retrieveJurisdictions(any())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 
@@ -134,4 +134,5 @@ class TestConfiguration extends ContextCleanupListener {
     UIDService uidService() {
         return Mockito.mock(UIDService.class);
     }
+
 }

@@ -2,14 +2,14 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +27,17 @@ import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequestEvent;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -57,9 +61,13 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.TestFixtures.loadCaseTypeDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -87,13 +95,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private RequestContextListener listener;
     private ServletContext context;
 
-    @MockBean
+    @MockitoBean
     private UserAuthorisation userAuthorisation;
 
-    @MockBean
+    @MockitoBean
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
-    @MockBean
+    @MockitoBean
     private AccessControlService accessControlService;
 
 
@@ -104,7 +112,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         template = new JdbcTemplate(db);
 
@@ -120,9 +128,44 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         wireMockServer.resetToDefaultMappings();
     }
 
-    @After
+    @AfterEach
     public void clearDown() {
         listener.requestDestroyed(new ServletRequestEvent(context, request));
+    }
+
+    @Test
+    public void setShouldThrowCaseConcurrencyException() throws NoSuchFieldException, IllegalAccessException {
+        EntityManager emMock = mock(EntityManager.class);
+        CaseDetailsMapper caseDetailsMapper = mock(CaseDetailsMapper.class);
+
+        DefaultCaseDetailsRepository defaultCaseDetailsRepository =
+            new DefaultCaseDetailsRepository(caseDetailsMapper, null, null,
+                applicationParams);
+
+        Field emField = DefaultCaseDetailsRepository.class.getDeclaredField("em");
+        emField.setAccessible(true);
+        emField.set(defaultCaseDetailsRepository, emMock);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setReference(1L);
+
+        CaseDetailsEntity caseDetailsEntity = new CaseDetailsEntity();
+        caseDetailsEntity.setReference(1L);
+        caseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        caseDetailsEntity.setVersion(1);
+
+        when(caseDetailsMapper.modelToEntity(caseDetails)).thenReturn(caseDetailsEntity);
+        when(emMock.merge(caseDetailsEntity)).thenReturn(caseDetailsEntity);
+        doThrow(new OptimisticLockException()).when(emMock).flush();
+
+        CaseConcurrencyException exception = assertThrows(CaseConcurrencyException.class,
+            () -> defaultCaseDetailsRepository.set(caseDetails));
+
+        assertThat(exception.getMessage(), is("Unfortunately we were unable to save your work to the case as "
+            + "another action happened at the same time.\nPlease review the case and try again."));
+
+        verify(emMock).merge(caseDetailsEntity);
+        verify(emMock).flush();
     }
 
     @Test
@@ -267,7 +310,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(byMetaData.size(), is(0));
     }
 
-    @Test (expected = BadRequestException.class)
+    @Test
     public void sanitiseInputMainQuerySortOrderForCaseFieldID() {
         final String caseFieldId = "insert into case users values(1,2,3)";
 
@@ -286,10 +329,12 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .direction("DESC")
             .build());
 
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(BadRequestException.class, () -> 
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap())
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateInputMainQueryMetaDataFieldId() {
         final String notSoEvil = "[UNKNOWN_FIELD]";
 
@@ -310,7 +355,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
         // injection vulnerability
-        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        assertThrows(IllegalArgumentException.class, () -> 
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap()));
     }
 
     @Test

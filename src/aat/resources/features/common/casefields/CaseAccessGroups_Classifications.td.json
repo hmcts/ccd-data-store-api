@@ -1,0 +1,20 @@
+{
+  "_guid_": "CaseAccessGroups_Classifications",
+
+  "CaseAccessGroups": {
+    "classification": "PUBLIC",
+    "value": [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+        "value": {
+          "caseAccessGroupId": "PUBLIC",
+          "caseAccessGroupType": "PUBLIC"
+        },
+        "id": "[[ANYTHING_PRESENT]]"
+      }
+    ]
+  }
+}
