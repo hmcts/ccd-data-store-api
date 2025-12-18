@@ -168,7 +168,6 @@ class RestTemplateConfiguration {
         cm.setSocketConfigResolver(socketConfigResolver);
         final RequestConfig config =
             RequestConfig.custom()
-                         .setConnectTimeout(timeout)
                          .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
                          .setSocketTimeout(socketTimeout)
                          .build();
