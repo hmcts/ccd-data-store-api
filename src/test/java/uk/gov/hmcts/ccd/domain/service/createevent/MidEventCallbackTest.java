@@ -449,8 +449,8 @@ class MidEventCallbackTest {
 
         Map<String, JsonNode> payload = baseData();
         for (int i = 0; i < 3; i++) {
-            Map<String, JsonNode> payloadBeforeCall = deepCopyData(payload);
             content.setEventData(deepCopyData(payload));
+            Map<String, JsonNode> payloadBeforeCall = deepCopyData(payload);
             payload = midEventCallback.invoke(CASE_TYPE_ID, content, wizardPageWithCallback.getId());
             seenOutputs.add(deepCopyData(payload));
 
@@ -490,7 +490,8 @@ class MidEventCallbackTest {
             () -> assertEquals("Yes", yesOrNoValue(seenOutputs.get(0))),
             () -> assertEquals(List.of("Callback_2", "Callback_1", "B", "A"), lettersFrom(seenOutputs.get(1))),
             () -> assertEquals("No", yesOrNoValue(seenOutputs.get(1))),
-            () -> assertEquals(List.of("Callback_3", "Callback_2", "Callback_1", "B", "A"), lettersFrom(seenOutputs.get(2))),
+            () -> assertEquals(List.of("Callback_3", "Callback_2", "Callback_1", "B", "A"),
+                lettersFrom(seenOutputs.get(2))),
             () -> assertEquals("Yes", yesOrNoValue(seenOutputs.get(2))),
             () -> assertEquals(List.of("Callback_3", "Callback_2", "Callback_1", "B", "A"), lettersFrom(finalPayload),
                 "Final payload should retain collection returned by last mid-event"),
