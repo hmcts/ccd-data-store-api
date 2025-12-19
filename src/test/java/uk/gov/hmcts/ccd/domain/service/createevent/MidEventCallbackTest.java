@@ -2,12 +2,18 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +41,11 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -379,6 +389,116 @@ class MidEventCallbackTest {
             IGNORE_WARNINGS);
     }
 
+    @Test
+    @DisplayName("should retain mid-event mutations across sequential callback invocations")
+    void shouldRetainMidEventMutationsAcrossSequentialInvocations() {
+        AtomicInteger callbackCount = new AtomicInteger(0);
+        List<Map<String, JsonNode>> seenInputs = new ArrayList<>();
+        List<Map<String, JsonNode>> seenOutputs = new ArrayList<>();
+
+        when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE))
+            .thenAnswer(invocation -> cloneCaseDetails(baseCaseDetails()));
+        when(caseService.clone(any(CaseDetails.class)))
+            .thenAnswer(invocation -> cloneCaseDetails(invocation.getArgument(0)));
+        when(caseService.populateCurrentCaseDetailsWithEventFields(any(CaseDataContent.class), any(CaseDetails.class)))
+            .thenAnswer(invocation -> {
+                CaseDataContent content = invocation.getArgument(0);
+                CaseDetails details = cloneCaseDetails(invocation.getArgument(1));
+                Map<String, JsonNode> payload = Optional.ofNullable(content.getEventData())
+                    .orElse(content.getData());
+                payload.forEach(details.getData()::put);
+                return details;
+            });
+
+        when(callbackInvoker.invokeMidEventCallback(eq(wizardPageWithCallback),
+            eq(caseTypeDefinition),
+            eq(caseEventDefinition),
+            any(CaseDetails.class),
+            any(CaseDetails.class),
+            eq(IGNORE_WARNINGS)))
+            .thenAnswer(invocation -> {
+                CaseDetails supplied = invocation.getArgument(4);
+                Map<String, JsonNode> suppliedData = deepCopyData(supplied.getData());
+                seenInputs.add(deepCopyData(suppliedData));
+
+                int index = callbackCount.getAndIncrement();
+
+                String currentYesNo = yesOrNoValue(suppliedData);
+                String nextYesNo = currentYesNo == null ? "Yes"
+                    : ("Yes".equalsIgnoreCase(currentYesNo) ? "No" : "Yes");
+
+                ArrayNode letters = suppliedData.containsKey("letters")
+                    ? ((ArrayNode) suppliedData.get("letters")).deepCopy()
+                    : JsonNodeFactory.instance.arrayNode();
+                letters.insert(0, JsonNodeFactory.instance.textNode("Callback_" + (index + 1)));
+                suppliedData.put("letters", letters);
+                suppliedData.put("y_or_n",
+                    nextYesNo == null ? JsonNodeFactory.instance.nullNode()
+                        : JsonNodeFactory.instance.textNode(nextYesNo));
+
+                CaseDetails response = new CaseDetails();
+                response.setData(suppliedData);
+                return response;
+            });
+
+        CaseDataContent content = newCaseDataContent()
+            .withEvent(event)
+            .withCaseReference(CASE_REFERENCE)
+            .withIgnoreWarning(IGNORE_WARNINGS)
+            .build();
+
+        Map<String, JsonNode> payload = baseData();
+        for (int i = 0; i < 3; i++) {
+            Map<String, JsonNode> payloadBeforeCall = deepCopyData(payload);
+            content.setEventData(deepCopyData(payload));
+            payload = midEventCallback.invoke(CASE_TYPE_ID, content, wizardPageWithCallback.getId());
+            seenOutputs.add(deepCopyData(payload));
+
+            int callIndex = i;
+            String messagePrefix = "Mid-event call " + (i + 1) + " ";
+            String beforeYesNo = yesOrNoValue(payloadBeforeCall);
+            String inputYesNo = yesOrNoValue(seenInputs.get(i));
+            String outputYesNo = yesOrNoValue(payload);
+            String inputLetters = lettersFrom(seenInputs.get(i)).toString();
+            String outputLetters = lettersFrom(payload).toString();
+            String expectedOutputYesNo = switch (callIndex) {
+                case 0 -> "Yes";
+                case 1 -> "No";
+                default -> "Yes";
+            };
+
+            assertAll(
+                () -> assertEquals(beforeYesNo, inputYesNo,
+                    messagePrefix + "input Yes/No should match client-submitted payload; input=" + inputYesNo),
+                () -> assertEquals(expectedOutputYesNo, outputYesNo,
+                    messagePrefix + "output should toggle Yes/No; expected=" + expectedOutputYesNo
+                        + ", before=" + beforeYesNo
+                        + ", input=" + inputYesNo + ", output=" + outputYesNo),
+                () -> org.junit.jupiter.api.Assertions.assertTrue(
+                    outputLetters.startsWith("[Callback_") || callIndex == 0,
+                    messagePrefix + "output letters should prepend callback marker; input=" + inputLetters
+                        + ", output=" + outputLetters)
+            );
+        }
+
+        Map<String, JsonNode> finalPayload = payload;
+
+        assertAll(
+            () -> assertEquals(List.of("B", "A"), lettersFrom(seenInputs.get(0))),
+            () -> assertNull(yesOrNoValue(seenInputs.get(0))),
+            () -> assertEquals(List.of("Callback_1", "B", "A"), lettersFrom(seenOutputs.get(0))),
+            () -> assertEquals("Yes", yesOrNoValue(seenOutputs.get(0))),
+            () -> assertEquals(List.of("Callback_2", "Callback_1", "B", "A"), lettersFrom(seenOutputs.get(1))),
+            () -> assertEquals("No", yesOrNoValue(seenOutputs.get(1))),
+            () -> assertEquals(List.of("Callback_3", "Callback_2", "Callback_1", "B", "A"), lettersFrom(seenOutputs.get(2))),
+            () -> assertEquals("Yes", yesOrNoValue(seenOutputs.get(2))),
+            () -> assertEquals(List.of("Callback_3", "Callback_2", "Callback_1", "B", "A"), lettersFrom(finalPayload),
+                "Final payload should retain collection returned by last mid-event"),
+            () -> assertEquals("Yes", yesOrNoValue(finalPayload),
+                "Final payload should end with Yes after third mid-event (before submission toggle)")
+        );
+    }
+
     private Map<String, JsonNode> createData() {
         Map<String, JsonNode> data = new HashMap<>();
         data.put("createCase2_field1", new TextNode("test1"));
@@ -396,6 +516,51 @@ class MidEventCallbackTest {
         WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
         wizardPageComplexFieldOverride.setComplexFieldElementId(elementId);
         return wizardPageComplexFieldOverride;
+    }
+
+    private Map<String, JsonNode> baseData() {
+        Map<String, JsonNode> startingData = new HashMap<>();
+        ArrayNode letters = JsonNodeFactory.instance.arrayNode();
+        letters.add("B");
+        letters.add("A");
+        startingData.put("letters", letters);
+        return startingData;
+    }
+
+    private Map<String, JsonNode> buildCallbackData(List<String> letters, String yesOrNo) {
+        Map<String, JsonNode> data = new HashMap<>();
+        ArrayNode lettersNode = JsonNodeFactory.instance.arrayNode();
+        letters.forEach(lettersNode::add);
+        data.put("letters", lettersNode);
+        data.put("y_or_n", yesOrNo == null ? JsonNodeFactory.instance.nullNode()
+            : JsonNodeFactory.instance.textNode(yesOrNo));
+        return data;
+    }
+
+    private CaseDetails baseCaseDetails() {
+        return caseDetails(baseData());
+    }
+
+    private Map<String, JsonNode> deepCopyData(Map<String, JsonNode> source) {
+        return JacksonUtils.convertValue(JacksonUtils.convertValueJsonNode(source));
+    }
+
+    private CaseDetails cloneCaseDetails(CaseDetails source) {
+        return caseDetails(deepCopyData(source.getData()));
+    }
+
+    private List<String> lettersFrom(Map<String, JsonNode> data) {
+        JsonNode lettersNode = data.get("letters");
+        List<String> letters = new ArrayList<>();
+        if (lettersNode != null && lettersNode.isArray()) {
+            lettersNode.forEach(node -> letters.add(node.asText()));
+        }
+        return letters;
+    }
+
+    private String yesOrNoValue(Map<String, JsonNode> data) {
+        JsonNode yesOrNo = data.get("y_or_n");
+        return yesOrNo == null || yesOrNo.isNull() ? null : yesOrNo.asText();
     }
 
     private CaseDetails caseDetails(Map<String, JsonNode> data) {
