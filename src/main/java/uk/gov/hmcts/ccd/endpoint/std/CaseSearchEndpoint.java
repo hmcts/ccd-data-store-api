@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
@@ -45,6 +46,7 @@ public class CaseSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -54,6 +56,14 @@ public class CaseSearchEndpoint {
                               ApplicationParams applicationParams) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
+        this.applicationParams = applicationParams;
+    }
+
+    @Deprecated
+    public CaseSearchResult searchCases(List<String> caseTypeIds,
+                                        String jsonSearchRequest,
+                                        boolean dataClassification) {
+        return searchCases(caseTypeIds, jsonSearchRequest, dataClassification, false);
     }
 
     @PostMapping(value = "/searchCases")
@@ -74,9 +84,10 @@ public class CaseSearchEndpoint {
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
         @RequestBody String jsonSearchRequest,
-        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification) {
+        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification,
+        @RequestParam(value = "global", required = false, defaultValue = "false") boolean global) {
 
-        Instant start = Instant.now();
+        final Instant start = Instant.now();
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =
@@ -86,16 +97,32 @@ public class CaseSearchEndpoint {
             elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
         }
 
-        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(getCaseTypeIds(caseTypeIds))
-            .withSearchRequest(elasticsearchRequest)
-            .build();
+        CrossCaseTypeSearchRequest request = buildCrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, global);
 
         CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
         return result;
+    }
+
+    private CrossCaseTypeSearchRequest buildCrossCaseTypeSearchRequest(List<String> caseTypeIds,
+                            ElasticsearchRequest elasticsearchRequest, boolean global) {
+
+        CrossCaseTypeSearchRequest.Builder builder = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(getCaseTypeIds(caseTypeIds))
+            .withSearchRequest(elasticsearchRequest);
+
+        if (global) {
+            SearchIndex searchIndex = new SearchIndex(
+                applicationParams.getGlobalSearchIndexName(),
+                applicationParams.getGlobalSearchIndexType()
+            );
+            builder.withSearchIndex(searchIndex);
+            log.info("pointing to global search index...");
+        }
+
+        return builder.build();
     }
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
