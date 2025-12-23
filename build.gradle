@@ -17,8 +17,6 @@ plugins {
     id 'org.owasp.dependencycheck' version '11.1.1'
 }
 
-apply from: './gradle/suppress.gradle'
-
 def versions = [
         pact_version    : '4.3.4',
 ]
@@ -69,7 +67,6 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
-apply from: './gradle/suppress.gradle'
 dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
 }
