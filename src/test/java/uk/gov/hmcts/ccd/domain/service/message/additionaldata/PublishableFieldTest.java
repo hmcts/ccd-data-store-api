@@ -36,7 +36,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class ConstructorTest {
+    public class ConstructorTest {
 
         private CaseTypeDefinition caseTypeDefinition;
         private CaseEventFieldDefinition caseEventFieldDefinition;
@@ -239,7 +239,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class IsNestedTest {
+    public class IsNestedTest {
 
         @Test
         void shouldReturnTrueForNestedField() {
@@ -261,7 +261,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class GetFieldIdTest {
+    public class GetFieldIdTest {
 
         @Test
         void shouldGetFieldIdForFieldWithNestedPath() {
@@ -284,7 +284,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class SplitPathTest {
+    public class SplitPathTest {
 
         @Test
         void shouldSplitPathForFieldWithNestedPath() {
@@ -314,7 +314,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class IsSubfieldOfTest {
+    public class IsSubfieldOfTest {
 
         private PublishableField comparisonField;
 
@@ -375,7 +375,7 @@ class PublishableFieldTest {
     }
 
     @Nested
-    class FilterDirectChildrenFromTest {
+    public class FilterDirectChildrenFromTest {
 
         @Test
         void shouldOnlyReturnDirectChildren() {

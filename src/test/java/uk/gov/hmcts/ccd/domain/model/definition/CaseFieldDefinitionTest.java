@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.util.List;
 import java.util.Optional;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,12 +12,13 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -52,32 +52,34 @@ public class CaseFieldDefinitionTest {
     private static final String ROLE2 = "role2";
     private static final String ROLE3 = "role3";
 
-    private CaseFieldDefinition addressLine1 = newCaseField()
+    private final CaseFieldDefinition addressLine1 = newCaseField()
         .withId(ADDRES_LINE_1)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition addressLine2 = newCaseField()
+    private final CaseFieldDefinition addressLine2 = newCaseField()
         .withId(ADDRES_LINE_2)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition addressLine3 = newCaseField()
+    private final CaseFieldDefinition addressLine3 = newCaseField()
         .withId(ADDRES_LINE_3)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition postcode = newCaseField().withId(POSTCODE).withFieldType(aFieldType().withId(TEXT_TYPE)
+    private final CaseFieldDefinition postcode = newCaseField().withId(POSTCODE).withFieldType(aFieldType()
+        .withId(TEXT_TYPE)
         .withType(TEXT_TYPE).build()).build();
-    private CaseFieldDefinition country = newCaseField().withId(COUNTRY).withFieldType(aFieldType().withId(TEXT_TYPE)
+    private final CaseFieldDefinition country = newCaseField().withId(COUNTRY).withFieldType(aFieldType()
+        .withId(TEXT_TYPE)
         .withType(TEXT_TYPE).build()).build();
-    private FieldTypeDefinition addressFieldTypeDefinition = aFieldType()
+    private final FieldTypeDefinition addressFieldTypeDefinition = aFieldType()
         .withId(ADDRESS)
         .withType(COMPLEX)
         .withComplexField(addressLine1)
@@ -86,74 +88,78 @@ public class CaseFieldDefinitionTest {
         .withComplexField(postcode)
         .withComplexField(country)
         .build();
-    private CaseFieldDefinition address =
+    private final CaseFieldDefinition address =
         newCaseField().withId(ADDRESS).withFieldType(addressFieldTypeDefinition).build();
 
-    private CaseFieldDefinition name =
+    private final CaseFieldDefinition name =
         newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE)
+    private final CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType()
+        .withId(TEXT_TYPE)
         .withType(TEXT_TYPE).build()).build();
-    private FieldTypeDefinition personFieldTypeDefinition = aFieldType()
+    private final FieldTypeDefinition personFieldTypeDefinition = aFieldType()
         .withId(PERSON)
         .withType(COMPLEX)
         .withComplexField(name)
         .withComplexField(surname)
         .withComplexField(address)
         .build();
-    private CaseFieldDefinition person = newCaseField().withId(PERSON).withFieldType(personFieldTypeDefinition).build();
+    private final CaseFieldDefinition person = newCaseField().withId(PERSON)
+        .withFieldType(personFieldTypeDefinition).build();
 
-    private FieldTypeDefinition debtorFieldTypeDefinition =
+    private final FieldTypeDefinition debtorFieldTypeDefinition =
         aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
-    private CaseFieldDefinition debtorDetails =
+    private final CaseFieldDefinition debtorDetails =
         newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldTypeDefinition).build();
 
-    private FieldTypeDefinition membersFieldTypeDefinition = aFieldType()
+    private final FieldTypeDefinition membersFieldTypeDefinition = aFieldType()
         .withId(MEMBERS + "-some-uid-value")
         .withType(COLLECTION)
         .withCollectionField(person)
         .build();
-    private CaseFieldDefinition members =
+    private final CaseFieldDefinition members =
         newCaseField().withId(MEMBERS).withFieldType(membersFieldTypeDefinition).build();
 
-    private CaseFieldDefinition familyName = newCaseField()
+    private final CaseFieldDefinition familyName = newCaseField()
         .withId(FAMILY_NAME)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private FieldTypeDefinition familyNamesFieldTypeDefinition =
+    private final FieldTypeDefinition familyNamesFieldTypeDefinition =
         aFieldType().withId(FAMILY_NAMES).withType(COLLECTION).withCollectionField(familyName).build();
-    private CaseFieldDefinition familyNames =
+    private final CaseFieldDefinition familyNames =
         newCaseField().withId(FAMILY_NAMES).withFieldType(familyNamesFieldTypeDefinition).build();
 
 
-    private CaseFieldDefinition addressLine21 = newCaseField()
+    private final CaseFieldDefinition addressLine21 = newCaseField()
         .withId(ADDRES_LINE_1)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition addressLine22 = newCaseField()
+    private final CaseFieldDefinition addressLine22 = newCaseField()
         .withId(ADDRES_LINE_2)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition addressLine23 = newCaseField()
+    private final CaseFieldDefinition addressLine23 = newCaseField()
         .withId(ADDRES_LINE_3)
         .withFieldType(aFieldType()
             .withId(TEXT_TYPE)
             .withType(TEXT_TYPE)
             .build())
         .build();
-    private CaseFieldDefinition postcode2 = newCaseField().withId(POSTCODE).withFieldType(aFieldType().withId(TEXT_TYPE)
+    private final CaseFieldDefinition postcode2 = newCaseField().withId(POSTCODE)
+        .withFieldType(aFieldType().withId(TEXT_TYPE)
         .withType(TEXT_TYPE).build()).build();
-    private CaseFieldDefinition country2 = newCaseField().withId(COUNTRY).withFieldType(aFieldType().withId(TEXT_TYPE)
+    private final CaseFieldDefinition country2 = newCaseField().withId(COUNTRY)
+        .withFieldType(aFieldType().withId(TEXT_TYPE)
         .withType(TEXT_TYPE).build()).build();
-    private FieldTypeDefinition addressFieldTypeDefinition2 = aFieldType()
+    private final FieldTypeDefinition addressFieldTypeDefinition2 = aFieldType()
         .withId(ADDRESS)
         .withType(COMPLEX)
         .withComplexField(addressLine21)
@@ -162,16 +168,17 @@ public class CaseFieldDefinitionTest {
         .withComplexField(postcode2)
         .withComplexField(country2)
         .build();
-    private CaseFieldDefinition familyAddress =
+    private final CaseFieldDefinition familyAddress =
         newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition2).build();
-    private FieldTypeDefinition familyInfoType = aFieldType().withId(FAMILY_INFO)
+    private final FieldTypeDefinition familyInfoType = aFieldType().withId(FAMILY_INFO)
         .withType(COMPLEX)
         .withComplexField(familyNames)
         .withComplexField(familyAddress)
         .build();
-    private CaseFieldDefinition familyInfo = newCaseField().withId(FAMILY_INFO).withFieldType(familyInfoType).build();
+    private final CaseFieldDefinition familyInfo = newCaseField().withId(FAMILY_INFO)
+        .withFieldType(familyInfoType).build();
 
-    private FieldTypeDefinition familyFieldTypeDefinition =
+    private final FieldTypeDefinition familyFieldTypeDefinition =
         aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyInfo).withComplexField(members).build();
     private AccessControlList acl1 = AccessControlList.builder()
         .accessProfile(ROLE1)
@@ -347,6 +354,47 @@ public class CaseFieldDefinitionTest {
             assertEquals("CaseViewField " + DEBTOR_DETAILS + " has no nested elements with code Field2.Field3.",
                 exception.getMessage());
         }
+
+        @Test
+        void getSubfieldDefinition_shouldReturnSubfieldDefinition() {
+            Optional<CaseFieldDefinition> result = debtorDetails.getSubfieldDefinition(PERSON);
+
+            assertAll(
+                () -> assertThat(result.isPresent(), is(true)),
+                () -> assertThat(result.get().getId(), is(PERSON)),
+                () -> assertThat(result.get(), is(person))
+            );
+        }
+
+        @Test
+        void getSubfieldDefinition_shouldReturnSubfieldDefinitionForCollection() {
+            Optional<CaseFieldDefinition> result = members.getSubfieldDefinition(PERSON);
+
+            assertAll(
+                () -> assertThat(result.isPresent(), is(true)),
+                () -> assertThat(result.get().getId(), is(PERSON)),
+                () -> assertThat(result.get(), is(person))
+            );
+        }
+
+        @Test
+        void getSubfieldDefinition_shouldReturnEmptyOptionalWhenCollectionFieldIsNotPresent() {
+            Optional<CaseFieldDefinition> result = members.getSubfieldDefinition("NonExistingCollectionField");
+            assertFalse(result.isPresent());
+        }
+
+        @Test
+        void getSubfieldDefinition_shouldReturnEmptyOptionalForNonExistingField() {
+            Optional<CaseFieldDefinition> result = debtorDetails.getSubfieldDefinition("NonExistingField");
+            assertFalse(result.isPresent());
+        }
+
+        @Test
+        void getSubfieldDefinition_shouldReturnEmptyOptionalWhenFieldTypeIsNull() {
+            CaseFieldDefinition caseField = new CaseFieldDefinition();
+            Optional<CaseFieldDefinition> result = caseField.getSubfieldDefinition("anyField");
+            assertFalse(result.isPresent());
+        }
     }
 
     @Nested
@@ -359,7 +407,7 @@ public class CaseFieldDefinitionTest {
 
             DisplayContext result = name.displayContextType();
 
-            MatcherAssert.assertThat(result, is(DisplayContext.READONLY));
+            assertThat(result, is(DisplayContext.READONLY));
         }
 
         @Test
@@ -368,7 +416,7 @@ public class CaseFieldDefinitionTest {
 
             DisplayContext result = name.displayContextType();
 
-            MatcherAssert.assertThat(result, is(DisplayContext.MANDATORY));
+            assertThat(result, is(DisplayContext.MANDATORY));
         }
 
         @Test
@@ -377,7 +425,7 @@ public class CaseFieldDefinitionTest {
 
             DisplayContext result = name.displayContextType();
 
-            MatcherAssert.assertThat(result, is(DisplayContext.OPTIONAL));
+            assertThat(result, is(DisplayContext.OPTIONAL));
         }
 
         @Test
@@ -402,8 +450,8 @@ public class CaseFieldDefinitionTest {
 
             assertAll(
                 () -> assertThat(result.size(), is(1)),
-                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
-                () -> assertThat(result.get(0).getValue(), is("ddMMyy"))
+                () -> assertThat(result.getFirst().getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
+                () -> assertThat(result.getFirst().getValue(), is("ddMMyy"))
             );
         }
 
@@ -415,8 +463,8 @@ public class CaseFieldDefinitionTest {
 
             assertAll(
                 () -> assertThat(result.size(), is(2)),
-                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
-                () -> assertThat(result.get(0).getValue(), is("ddMMyy")),
+                () -> assertThat(result.getFirst().getType(), is(DisplayContextParameterType.DATETIMEENTRY)),
+                () -> assertThat(result.getFirst().getValue(), is("ddMMyy")),
                 () -> assertThat(result.get(1).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
                 () -> assertThat(result.get(1).getValue(), is("yyyy"))
             );
@@ -430,8 +478,8 @@ public class CaseFieldDefinitionTest {
 
             assertAll(
                 () -> assertThat(result.size(), is(1)),
-                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
-                () -> assertThat(result.get(0).getValue(), is("yyyy"))
+                () -> assertThat(result.getFirst().getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.getFirst().getValue(), is("yyyy"))
             );
         }
 
@@ -443,8 +491,8 @@ public class CaseFieldDefinitionTest {
 
             assertAll(
                 () -> assertThat(result.size(), is(1)),
-                () -> assertThat(result.get(0).getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
-                () -> assertThat(result.get(0).getValue(), is("yyyy"))
+                () -> assertThat(result.getFirst().getType(), is(DisplayContextParameterType.DATETIMEDISPLAY)),
+                () -> assertThat(result.getFirst().getValue(), is("yyyy"))
             );
         }
 

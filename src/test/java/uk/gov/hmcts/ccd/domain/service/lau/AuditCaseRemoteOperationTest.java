@@ -1,23 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAndAuditFeignClient;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
+import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,17 +18,29 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.lau.AuditCaseRemoteOperation.CASE_ACTION_MAP;
 
 @DisplayName("audit log specific calls")
 class AuditCaseRemoteOperationTest {
@@ -56,19 +61,17 @@ class AuditCaseRemoteOperationTest {
     private SecurityUtils securityUtils;
 
     @Mock
-    private HttpClient httpClient;
+    private LogAndAuditFeignClient feignClient;
 
     @Mock
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
-
-    @Mock
-    private ObjectMapper objectMapper;
 
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.01Z"), ZoneOffset.UTC);
 
+    @InjectMocks
     private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     private AuditContext baseAuditContext = AuditContext.auditContextWith()
@@ -87,12 +90,11 @@ class AuditCaseRemoteOperationTest {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
-        doReturn("{}").when(objectMapper).writeValueAsString(any());
-        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, httpClient, objectMapper,
+        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
             auditCaseRemoteConfiguration);
     }
 
@@ -106,20 +108,27 @@ class AuditCaseRemoteOperationTest {
         // Setup as viewing a case
         entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
 
-        when(httpClient.sendAsync(any(HttpRequest.class),
-            any(HttpResponse.BodyHandler.class))).thenReturn(new CompletableFuture<Void>());
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
-        verify(httpClient).sendAsync(captor.capture(),any());
+        // Verify asyncRequestService interaction
+        ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture())
+        );
+        // Verify headers and endpoint
+        verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
+        assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
 
-        assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseAction")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
-        assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
-        assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
-        assertThat(captor.getValue().headers().map().get("Accept").get(0), is(equalTo("application/json")));
+        // Assert the captured request
+        CaseActionPostRequest capturedRequest = requestCaptor.getValue();
+        assertThat(capturedRequest.getActionLog().getUserId(), is(equalTo(IDAM_ID)));
+        assertThat(capturedRequest.getActionLog().getCaseAction(), is(equalTo(CASE_ACTION_MAP
+            .get(AuditOperationType.CASE_ACCESSED.getLabel()))));
+        assertThat(capturedRequest.getActionLog().getCaseJurisdictionId(), is(equalTo(JURISDICTION)));
+        assertThat(capturedRequest.getActionLog().getCaseRef(), is(equalTo(CASE_ID)));
+        assertThat(capturedRequest.getActionLog().getCaseTypeId(), is(equalTo(CASE_TYPE)));
+        assertThat(capturedRequest.getActionLog().getTimestamp(), is(equalTo(fixedDateTime.toString())));
 
-        HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
     }
 
     @Test
@@ -133,20 +142,21 @@ class AuditCaseRemoteOperationTest {
         entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
         entry.setCaseId(MULTIPLE_CASE_IDS);
 
-        when(httpClient.sendAsync(any(HttpRequest.class),
-            any(HttpResponse.BodyHandler.class))).thenReturn(new CompletableFuture<Void>());
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
-        verify(httpClient).sendAsync(captor.capture(),any());
+        // Verify FeignClient interaction
+        ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture())
+        );
+        verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
+        assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
 
-        assertThat(captor.getValue().uri().getPath(), is(equalTo("/caseSearch")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
-        assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 1234")));
-        assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
-        assertThat(captor.getValue().headers().map().get("Accept").get(0), is(equalTo("application/json")));
-
-        HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
+        // Assert the captured request
+        CaseSearchPostRequest capturedRequest = requestCaptor.getValue();
+        assertThat(capturedRequest.getSearchLog().getUserId(), is(equalTo(IDAM_ID)));
+        assertThat(capturedRequest.getSearchLog().getCaseRefs(), is(equalTo(List.of(MULTIPLE_CASE_IDS.split(", ")))));
+        assertThat(capturedRequest.getSearchLog().getTimestamp(), is(equalTo(fixedDateTime.toString())));
     }
 
     @Test
@@ -161,7 +171,51 @@ class AuditCaseRemoteOperationTest {
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
-        verifyNoInteractions(httpClient);
+        verifyNoInteractions(feignClient);
+    }
+
+    @Test
+    @DisplayName("should handle exception during postCaseAction")
+    void shouldHandleExceptionDuringPostCaseAction() {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as viewing a case
+        entry.setOperationType(AuditOperationType.CASE_ACCESSED.getLabel());
+
+        // Simulate exception in FeignClient
+        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
+            .postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+
+        auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
+
+        // Verify exception is logged and no further interaction occurs
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class))
+        );
+    }
+
+    @Test
+    @DisplayName("should handle exception during postSearchAction")
+    void shouldHandleExceptionDuringPostSearchAction() {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as viewing a case
+        entry.setOperationType(AuditOperationType.SEARCH_CASE.getLabel());
+
+        // Simulate exception in FeignClient
+        doThrow(new RuntimeException("FeignClient error")).when(feignClient)
+            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        // Verify exception is logged and no further interaction occurs
+        await().atMost(200, MILLISECONDS).untilAsserted(() ->
+            verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class))
+        );
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {

@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.List;
 
-@ApiModel(description = "")
+@Schema
 public class BannersResult implements Serializable {
 
     private List<Banner> banners;
@@ -19,7 +20,7 @@ public class BannersResult implements Serializable {
         this.banners = banners;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("banners")
     public List<Banner> getBanners() {
         return banners;

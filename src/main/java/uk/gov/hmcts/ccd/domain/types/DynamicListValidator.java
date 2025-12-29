@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 @Named
@@ -17,6 +19,15 @@ public class DynamicListValidator implements BaseTypeValidator {
     public static final String CODE = "code";
     public static final String VALUE = "value";
     public static final String LABEL = "label";
+
+    private final int codeMaxLength;
+    private final int valueMaxLength;
+
+    @Inject
+    public DynamicListValidator(ApplicationParams applicationParams) {
+        this.codeMaxLength = applicationParams.getValidationDynamicListCodeMaxLength();
+        this.valueMaxLength = applicationParams.getValidationDynamicListValueMaxLength();
+    }
 
     @Override
     public BaseType getType() {
@@ -70,12 +81,12 @@ public class DynamicListValidator implements BaseTypeValidator {
 
         //To correct Fortify dereferencing a null-pointer,
         // thereby causing a null-pointer exception warning
-        if (code != null && StringUtils.isNotEmpty(code) && code.length() > 150) {
+        if (code != null && StringUtils.isNotEmpty(code) && code.length() > codeMaxLength) {
             results.add(new ValidationResult("Code length exceeds MAX limit", dataFieldId));
         }
         //To correct Fortify dereferencing a null-pointer,
         // thereby causing a null-pointer exception warning
-        if (value != null && StringUtils.isNotEmpty(value) && value.length() > 250) {
+        if (value != null && StringUtils.isNotEmpty(value) && value.length() > valueMaxLength) {
             results.add(new ValidationResult("Value length exceeds MAX limit", dataFieldId));
         }
 
