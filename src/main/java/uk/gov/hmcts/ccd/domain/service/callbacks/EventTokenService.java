@@ -14,6 +14,8 @@ import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.crypto.SecretKey;
+
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,6 +23,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.impl.TextCodec;
+import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,14 +77,18 @@ public class EventTokenService {
             .claim(EventTokenProperties.CASE_STATE, caseDetails.getState())
             .claim(EventTokenProperties.CASE_VERSION, caseService.hashData(caseDetails))
             .claim(EventTokenProperties.ENTITY_VERSION, caseDetails.getVersion())
+            .claim(EventTokenProperties.CASE_REVISION, caseDetails.getRevision())
             .compact();
     }
 
     public EventTokenProperties parseToken(final String token) {
         try {
+            SecretKey key = Keys.hmacShaKeyFor(tokenSecret.getBytes());
             final Claims claims = Jwts.parser()
-                .setSigningKey(TextCodec.BASE64.encode(tokenSecret))
-                .parseClaimsJws(token).getBody();
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
             return new EventTokenProperties(
                 claims.getSubject(),
@@ -90,7 +98,8 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.CASE_TYPE_ID)),
                 toString(claims.get(EventTokenProperties.CASE_VERSION)),
                 toString(claims.get(EventTokenProperties.CASE_STATE)),
-                toString(claims.get(EventTokenProperties.ENTITY_VERSION)));
+                toString(claims.get(EventTokenProperties.ENTITY_VERSION)),
+                toString(claims.get(EventTokenProperties.CASE_REVISION)));
 
         } catch (ExpiredJwtException | SignatureException e) {
             throw new EventTokenException("Token is not valid: " + e.getMessage());
@@ -111,6 +120,16 @@ public class EventTokenService {
                               final CaseEventDefinition event,
                               final JurisdictionDefinition jurisdictionDefinition,
                               final CaseTypeDefinition caseTypeDefinition) {
+        validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition, false);
+    }
+
+    public void validateToken(final String token,
+                              final String uid,
+                              final CaseDetails caseDetails,
+                              final CaseEventDefinition event,
+                              final JurisdictionDefinition jurisdictionDefinition,
+                              final CaseTypeDefinition caseTypeDefinition,
+                              final boolean revisionRequired) {
         if (token == null || token.isEmpty()) {
             throw new BadRequestException("Missing start trigger token");
         }
@@ -126,6 +145,7 @@ public class EventTokenService {
         if (eventTokenProperties.getEntityVersion() != null) {
             caseDetails.setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
         }
+        applyRevision(eventTokenProperties.getCaseRevision(), caseDetails, revisionRequired);
     }
 
     private boolean isTokenPropertiesMatching(EventTokenProperties eventTokenProperties,
@@ -159,5 +179,17 @@ public class EventTokenService {
         }
 
         return object.toString();
+    }
+
+    private void applyRevision(String revisionClaim,
+                               CaseDetails caseDetails,
+                               boolean revisionRequired) {
+        if (revisionClaim != null) {
+            caseDetails.setRevision(Long.parseLong(revisionClaim));
+        } else if (revisionRequired) {
+            // Old start-event tokens (minted before we added the revision claim) cannot safely
+            // participate in decentralised optimistic locking, so ask the caller to restart.
+            throw new BadRequestException("Start trigger token has expired. Please restart the event.");
+        }
     }
 }

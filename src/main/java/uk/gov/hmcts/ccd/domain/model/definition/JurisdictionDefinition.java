@@ -2,8 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 import lombok.ToString;
 
-@ApiModel(description = "")
+@Schema
 @ToString
 public class JurisdictionDefinition implements Serializable, Copyable<JurisdictionDefinition> {
 
@@ -24,7 +25,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
 
     private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -34,7 +35,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         this.id = id;
     }
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -44,7 +45,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         this.name = name;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -54,7 +55,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         this.description = description;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
@@ -64,7 +65,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         this.liveFrom = liveFrom;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;
@@ -74,7 +75,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         this.liveUntil = liveUntil;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("case_types")
     public List<CaseTypeDefinition> getCaseTypeDefinitions() {
         return caseTypeDefinitions;

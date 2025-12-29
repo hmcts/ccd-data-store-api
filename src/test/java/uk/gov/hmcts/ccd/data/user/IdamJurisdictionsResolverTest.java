@@ -18,7 +18,7 @@ public class IdamJurisdictionsResolverTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

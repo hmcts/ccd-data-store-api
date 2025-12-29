@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +14,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,7 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,8 @@ class CallbackServiceTest {
     private SecurityContext securityContext;
     @Mock
     private Jwt principal;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Captor
     private ArgumentCaptor<HttpEntity> argument;
@@ -131,7 +134,7 @@ class CallbackServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseEventDefinition.setId("TEST-EVENT");
 
@@ -141,7 +144,8 @@ class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         initSecurityContext();
-        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights, request);
+        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights, request,
+            objectMapper);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate

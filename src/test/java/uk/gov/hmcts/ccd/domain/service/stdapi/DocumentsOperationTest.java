@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -14,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,11 +24,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+@DirtiesContext
 public class DocumentsOperationTest extends WireMockBaseTest {
     private CaseDetails caseDetails = new CaseDetails();
     private Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
@@ -42,7 +45,7 @@ public class DocumentsOperationTest extends WireMockBaseTest {
     public static final String TEST_CASE_REFERENCE = "1504259907353537";
     public static final String TEST_URL = "/test-document-callback";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
@@ -56,7 +59,7 @@ public class DocumentsOperationTest extends WireMockBaseTest {
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
+        caseTypeDefinition.setPrintableDocumentsUrl(hostUrl + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
         Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION))
                 .thenReturn(caseTypeDefinition);
@@ -70,11 +73,12 @@ public class DocumentsOperationTest extends WireMockBaseTest {
         when(uidService.checkSum(anyString(), anyBoolean())).thenCallRealMethod();
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void shouldThrowBadRequestExceptionIfCaseReferenceInvalid() {
         final String testCaseReference = "Invalid";
-
-        documentsOperation.getPrintableDocumentsForCase(testCaseReference);
+        assertThrows(BadRequestException.class, () -> 
+            documentsOperation.getPrintableDocumentsForCase(testCaseReference)
+        );
     }
 
     @Test

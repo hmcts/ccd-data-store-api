@@ -80,7 +80,7 @@ class FieldProcessorServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDataFieldProcessors.add(caseDataFieldProcessor1);
         caseDataFieldProcessors.add(caseDataFieldProcessor2);

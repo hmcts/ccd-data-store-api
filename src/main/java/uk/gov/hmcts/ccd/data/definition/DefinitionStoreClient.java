@@ -50,7 +50,7 @@ public class DefinitionStoreClient {
     @Retryable(value = {HttpServerErrorException.class, SocketTimeoutException.class},
         maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
-    <T> ResponseEntity<T> invokeGetRequest(final URI url, final Class<T> responseType) {
+    public <T> ResponseEntity<T> invokeGetRequest(final URI url, final Class<T> responseType) {
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType);
     }
 }

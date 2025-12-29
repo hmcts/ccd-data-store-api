@@ -26,21 +26,24 @@ import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,16 +60,17 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CaseDataService caseDataService;
     private final SubmitCaseTransaction submitCaseTransaction;
     private final CaseSanitiser caseSanitiser;
-    private final CaseTypeService caseTypeService;
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final DraftGateway draftGateway;
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final CaseLinkService caseLinkService;
+    private final TimeToLiveService timeToLiveService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
+    private final IdempotencyKeyHolder idempotencyKeyHolder;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -77,8 +81,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseDataService caseDataService,
                                       final SubmitCaseTransaction submitCaseTransaction,
                                       final CaseSanitiser caseSanitiser,
-                                      final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
+                                      @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                       final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
@@ -87,14 +91,15 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       @Qualifier("default")
                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                       SupplementaryDataUpdateRequestValidator supplementaryDataValidator,
-                                      final CaseLinkService caseLinkService) {
+                                      final CaseLinkService caseLinkService,
+                                      final TimeToLiveService timeToLiveService,
+                                      final IdempotencyKeyHolder idempotencyKeyHolder) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
         this.eventTokenService = eventTokenService;
         this.submitCaseTransaction = submitCaseTransaction;
         this.caseSanitiser = caseSanitiser;
-        this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
@@ -105,6 +110,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.supplementaryDataValidator = supplementaryDataValidator;
         this.caseLinkService = caseLinkService;
+        this.timeToLiveService = timeToLiveService;
+        this.idempotencyKeyHolder = idempotencyKeyHolder;
     }
 
     @Transactional
@@ -139,8 +146,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseEventDefinition,
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition);
+        idempotencyKeyHolder.computeAndSetKeyToRequestContext(token);
 
-        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
+        validateCaseFieldsOperation.validateCaseDetails(new OperationContext(caseTypeId, caseDataContent));
 
         final CaseDetails newCaseDetails = new CaseDetails();
 
@@ -157,6 +165,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             newCaseDetails.getData(),
             EMPTY_DATA_CLASSIFICATION));
         updateCaseState(caseEventDefinition, newCaseDetails);
+
+        updateCaseDetailsWithTtlIncrement(newCaseDetails, caseTypeDefinition, caseEventDefinition);
+
+        newCaseDetails.setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(newCaseDetails.getData()));
 
         final IdamUser idamUser = userRepository.getUser();
         caseDataIssueLogger.logAnyDataIssuesIn(null, newCaseDetails);
@@ -226,6 +238,26 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                 caseDetails.getReferenceAsString(), request
             );
             caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData.getResponse()));
+        }
+    }
+
+    private void updateCaseDetailsWithTtlIncrement(CaseDetails caseDetails,
+                                                   CaseTypeDefinition caseTypeDefinition,
+                                                   CaseEventDefinition caseEventDefinition) {
+
+        if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
+
+            // update TTL in data
+            var caseDataWithTtl = timeToLiveService.updateCaseDetailsWithTTL(
+                caseDetails.getData(), caseEventDefinition, caseTypeDefinition
+            );
+            caseDetails.setData(caseDataWithTtl);
+            // update TTL in data classification
+            var caseDataClassificationWithTtl = timeToLiveService.updateCaseDataClassificationWithTTL(
+                caseDetails.getData(), caseDetails.getDataClassification(), caseEventDefinition, caseTypeDefinition
+            );
+            caseDetails.setDataClassification(caseDataClassificationWithTtl);
+
         }
     }
 }

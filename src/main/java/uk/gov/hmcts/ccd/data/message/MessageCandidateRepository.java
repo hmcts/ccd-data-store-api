@@ -2,11 +2,11 @@ package uk.gov.hmcts.ccd.data.message;
 
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Named
 @Singleton

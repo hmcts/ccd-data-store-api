@@ -112,6 +112,7 @@
         {
           "fields": {
             "FixedListField": "VALUE1",
+            "EmailField" : "fuctional@test.com",
             "[JURISDICTION]": "AUTOTEST1",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
@@ -124,6 +125,7 @@
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
+            "EmailField" : "fuctional@test.com",
             "[JURISDICTION]": "AUTOTEST1",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
