@@ -250,7 +250,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
