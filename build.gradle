@@ -27,7 +27,7 @@ ext {
     set('log4j2.version', '2.24.3')
     set('jacksonVersion', '2.19.2')
     set('snakeyaml.version', '2.2')
-    elasticsearchVersion = '9.1.2'
+    elasticsearchVersion = '9.2.1'
     junit = '5.11.4'
     junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
@@ -188,9 +188,11 @@ dependencies {
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
     implementation group: 'net.minidev', name: 'json-smart', version: '2.5.1'                       // spring-security-oauth2-client
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'            // java-property-to-json
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.4.Final'       // spring-boot-starter-data-jpa
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.3.Final'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
@@ -274,7 +276,7 @@ dependencies {
     testImplementation libraries.junit5
     testImplementation libs.mockito
     mockitoAgent(libs.mockito) {
-        transitive = false;
+        transitive = false
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.0'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
@@ -609,7 +611,7 @@ jacocoTestReport {
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
 
@@ -895,7 +897,7 @@ void loadEnvSecrets(String env) {
                 }
                 standardOutput = os
             }
-            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
         }
     }
 }
