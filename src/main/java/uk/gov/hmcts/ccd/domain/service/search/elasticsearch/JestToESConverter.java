@@ -16,7 +16,6 @@ import jakarta.json.JsonReader;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class JestToESConverter {
 
@@ -26,7 +25,7 @@ public class JestToESConverter {
     public static MsearchRequest fromJest(List<Search> jestSearches) {
         List<RequestItem> items = jestSearches.stream()
             .map(JestToESConverter::toRequestItem)
-            .collect(Collectors.toList());
+            .toList();
 
         return new MsearchRequest.Builder()
             .searches(items)
@@ -56,18 +55,19 @@ public class JestToESConverter {
         String queryJson = normalizeRequest(json);
         SourceConfig sourceConfig = parseSourceJson(extractSource(json));
         try {
-            JsonReader reader = Json.createReader(new StringReader(queryJson));
-            JsonObject jsonObject = reader.readObject();
-            SearchRequestBody requestBody = SearchRequestBody._DESERIALIZER.deserialize(
-                mapper.jsonProvider().createParser(new StringReader(jsonObject.toString())),
-                mapper
-            );
-            return SearchRequestBody.of(b -> b
-                .query(requestBody.query())
-                .sort(requestBody.sort())
-                .from(requestBody.from())
-                .size(requestBody.size())
-                .source(sourceConfig));
+            try (JsonReader reader = Json.createReader(new StringReader(queryJson))) {
+                JsonObject jsonObject = reader.readObject();
+                SearchRequestBody requestBody = SearchRequestBody._DESERIALIZER.deserialize(
+                    mapper.jsonProvider().createParser(new StringReader(jsonObject.toString())),
+                    mapper
+                );
+                return SearchRequestBody.of(b -> b
+                    .query(requestBody.query())
+                    .sort(requestBody.sort())
+                    .from(requestBody.from())
+                    .size(requestBody.size())
+                    .source(sourceConfig));
+            }
         } catch (Exception e) {
             Query query = Query.of(b -> b
                 .withJson(new StringReader(queryJson))

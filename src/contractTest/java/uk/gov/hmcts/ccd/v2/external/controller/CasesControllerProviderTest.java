@@ -232,7 +232,7 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
-        when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
+        when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 
     @State("adoption-web makes request to get cases")

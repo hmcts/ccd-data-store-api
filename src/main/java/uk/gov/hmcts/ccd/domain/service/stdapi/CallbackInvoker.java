@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -46,6 +47,7 @@ public class CallbackInvoker {
     private final SecurityValidationService securityValidationService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
     private final TimeToLiveService timeToLiveService;
+    private final PersistenceStrategyResolver persistenceStrategyResolver;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -54,7 +56,8 @@ public class CallbackInvoker {
                            final CaseSanitiser caseSanitiser,
                            final SecurityValidationService securityValidationService,
                            final GlobalSearchProcessorService globalSearchProcessorService,
-                           final TimeToLiveService timeToLiveService) {
+                           final TimeToLiveService timeToLiveService,
+                           final PersistenceStrategyResolver persistenceStrategyResolver) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
@@ -62,6 +65,7 @@ public class CallbackInvoker {
         this.securityValidationService = securityValidationService;
         this.globalSearchProcessorService = globalSearchProcessorService;
         this.timeToLiveService = timeToLiveService;
+        this.persistenceStrategyResolver = persistenceStrategyResolver;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -89,6 +93,12 @@ public class CallbackInvoker {
                                                                      final CaseDetails caseDetails,
                                                                      final CaseTypeDefinition caseTypeDefinition,
                                                                      final Boolean ignoreWarning) {
+
+        // Decentralised case types manage their own event submission
+        if (persistenceStrategyResolver.isDecentralised(caseDetails)) {
+            return new AboutToSubmitCallbackResponse();
+        }
+
         final Optional<CallbackResponse> callbackResponse;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLAboutToSubmitEvent())) {
             callbackResponse = callbackService.sendSingleRequest(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -110,6 +120,11 @@ public class CallbackInvoker {
                                                                                    caseEventDefinition,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
+        // Decentralised case types manage their own event submission
+        if (persistenceStrategyResolver.isDecentralised(caseDetails)) {
+            return ResponseEntity.ok(caseDetails.getAfterSubmitCallbackResponse());
+        }
+
         ResponseEntity<AfterSubmitCallbackResponse> afterSubmitCallbackResponseEntity;
         if (isRetriesDisabled(caseEventDefinition.getRetriesTimeoutURLSubmittedEvent())) {
             afterSubmitCallbackResponseEntity =

@@ -70,6 +70,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
         MsearchRequest msearchRequest = secureAndTransformSearchRequest(request);
+        log.info("MsearchRequest: {}", msearchRequest);
         try {
             MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
                 ElasticSearchCaseDetailsDTO.class);
