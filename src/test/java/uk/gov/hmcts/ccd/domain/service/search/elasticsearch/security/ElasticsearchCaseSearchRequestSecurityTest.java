@@ -70,7 +70,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
         elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
         underTest =

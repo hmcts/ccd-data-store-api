@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
@@ -269,7 +270,6 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws Exception {
-
         List<ElasticSearchCaseDetailsDTO> caseDetailsList = parseSources(caseDetailElastic);
 
         List<Hit<ElasticSearchCaseDetailsDTO>> hits = new ArrayList<>();

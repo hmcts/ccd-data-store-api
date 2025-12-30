@@ -1,5 +1,7 @@
 elastic:
   enabled: false
+ccd:
+  enabled: false
 
 java:
   image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest'
@@ -35,6 +37,8 @@ java:
           alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
         - name: idam-data-store-system-user-password
           alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
+        - name: data-store-api-TOKEN-SECRET
+          alias: DATA_STORE_TOKEN_SECRET
 
   environment:
     DATA_STORE_DB_PORT: 5432

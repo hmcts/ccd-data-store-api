@@ -62,6 +62,7 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+        secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_S2S_SECRET'),
 
         secret('idam-data-store-system-user-username','ROLE_ASSIGNMENT_USER_EMAIL'),
         secret('idam-data-store-system-user-password','ROLE_ASSIGNMENT_USER_PASSWORD')
@@ -71,7 +72,9 @@ def secrets = [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
         secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
-        secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
+        secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
+        secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
+        secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY')
     ]
 ]
 
@@ -122,10 +125,6 @@ withPipeline(type, product, component) {
 //            AppPipelineDsl.PactRoles.PROVIDER
 //        ])
     }
-    if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
-        enableSlackNotifications('#ccd-develop-builds')
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-    }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
@@ -137,11 +136,10 @@ withPipeline(type, product, component) {
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
@@ -156,27 +154,89 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
 
     afterAlways('test') {
-        // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+      // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+
+      publishHTML target: [
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : 'build/reports/jacoco/html',
+          reportFiles          : "index.html",
+          reportName           : "Unit Test Report"
+        ]
+
+      publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'build/reports/tests/integration',
+      reportFiles          : "index.html",
+      reportName           : "Integration Test Report"
+      ]
     }
 
     afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+        publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'BEFTA Report for Smoke Tests',
+      reportFiles          : "overview-features.html",
+      reportName           : "Smoke Test Report"
+      ]
     }
 
     afterAlways('smoketest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Smoke Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Smoke Test Report"
+      ]
     }
 
     afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Functional Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Functional Test Report"
+      ]
     }
 
     afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Functional Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Functional Test Report"
+      ]
     }
 
     afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+         publishHTML target: [
+             allowMissing         : true,
+             alwaysLinkToLastBuild: true,
+             keepAll              : true,
+            reportDir            : "build/reports/tests/runProviderPactVerification",
+            reportFiles          : "index.html",
+            reportName           : "Contract Tests Report"
+        ]
     }
 }
