@@ -12,7 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -21,12 +20,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
+import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 class EventTokenServiceTest {
 
-    @InjectMocks
+    public static final String TEST_TOKEN_SECRET = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private EventTokenService eventTokenService;
 
     @Mock
@@ -44,6 +45,12 @@ class EventTokenServiceTest {
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
+    @Mock
+    private RandomKeyGenerator randomKeyGenerator;
+
+    @Mock
+    private CaseService caseService;
+
     private String token;
     private String uid;
     private EventTokenProperties eventTokenProperties;
@@ -54,10 +61,16 @@ class EventTokenServiceTest {
     @BeforeEach
     public void setUp() {
         openMocks = MockitoAnnotations.openMocks(this);
+
+        when(applicationParams.getTokenSecret())
+            .thenReturn(TEST_TOKEN_SECRET);
+        when(applicationParams.isValidateTokenClaims()).thenReturn(true);
+
+        // Now construct the service with mocked dependencies
+        eventTokenService = new EventTokenService(randomKeyGenerator, applicationParams, caseService);
+
         token = "token";
         uid = "userId";
-
-        when(applicationParams.getTokenSecret()).thenReturn("secretKey");
 
         eventTokenProperties = new EventTokenProperties(
             uid,
@@ -67,6 +80,7 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
+            "1",
             "1"
         );
     }
@@ -116,6 +130,7 @@ class EventTokenServiceTest {
             null,
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -143,6 +158,7 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -170,6 +186,7 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -197,6 +214,7 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -224,6 +242,7 @@ class EventTokenServiceTest {
             null,
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -251,6 +270,7 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
+            "1",
             "1"
         );
 
@@ -331,9 +351,7 @@ class EventTokenServiceTest {
 
     @Test
     public void testValidateToken_InvalidTokenConditionsUidNotMet() {
-        when(applicationParams.isValidateTokenClaims()).thenReturn(true);
-        EventTokenService spyEventTokenService = spy(new EventTokenService(null,
-            applicationParams, null));
+        EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
         when(caseDetails.getId()).thenReturn("caseId");
@@ -349,6 +367,8 @@ class EventTokenServiceTest {
 
     @Test
     public void testValidateToken_DoNothingWhenValidateClaimIsFalseForInvalidTokenConditionsUidNotMet() {
+        when(applicationParams.isValidateTokenClaims()).thenReturn(false);
+
         EventTokenService spyEventTokenService = spy(new EventTokenService(null,
             applicationParams, null));
 
@@ -384,7 +404,8 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
-            "2"
+            "2",
+            "1"
         );
 
         doReturn(propertiesWithVersion).when(spyEventTokenService).parseToken(token);
@@ -411,7 +432,8 @@ class EventTokenServiceTest {
             "caseTypeId",
             "version",
             "caseState",
-            null
+            null,
+            "1"
         );
 
         doReturn(propertiesWithVersion).when(spyEventTokenService).parseToken(token);

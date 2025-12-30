@@ -406,6 +406,14 @@ public class ApplicationParams {
         return callbackRetries;
     }
 
+    public String getCaseDocumentAmUrl() {
+        return caseDocumentAmUrl;
+    }
+
+    public boolean isDocumentSanitiserCaseDocAMEnable() {
+        return documentSanitiserCaseDocumentAMEnabled;
+    }
+
     public String getDocumentURLPattern() {
         return documentURLPattern;
     }

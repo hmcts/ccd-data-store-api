@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import io.jsonwebtoken.JwtException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -18,12 +19,9 @@ import javax.crypto.SecretKey;
 
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.TextCodec;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Decoders;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class EventTokenService {
     }
 
     private final RandomKeyGenerator randomKeyGenerator;
-    private final String tokenSecret;
+    private final SecretKey secretKey;
     private final CaseService caseService;
     private final boolean isValidateTokenClaims;
 
@@ -47,7 +45,8 @@ public class EventTokenService {
                              final ApplicationParams applicationParams,
                              final CaseService caseService) {
         this.randomKeyGenerator = randomKeyGenerator;
-        this.tokenSecret = applicationParams.getTokenSecret();
+        byte[] keyBytes = Decoders.BASE64.decode(applicationParams.getTokenSecret());
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.isValidateTokenClaims = applicationParams.isValidateTokenClaims();
         this.caseService = caseService;
     }
@@ -66,10 +65,10 @@ public class EventTokenService {
                                 final JurisdictionDefinition jurisdictionDefinition,
                                 final CaseTypeDefinition caseTypeDefinition) {
         return Jwts.builder()
-            .setId(randomKeyGenerator.generate())
-            .setSubject(uid)
-            .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
+            .id(randomKeyGenerator.generate())
+            .subject(uid)
+            .issuedAt(new Date())
+            .signWith(secretKey)
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
             .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
@@ -83,9 +82,8 @@ public class EventTokenService {
 
     public EventTokenProperties parseToken(final String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(tokenSecret.getBytes());
             final Claims claims = Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -101,7 +99,7 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.ENTITY_VERSION)),
                 toString(claims.get(EventTokenProperties.CASE_REVISION)));
 
-        } catch (ExpiredJwtException | SignatureException e) {
+        } catch (JwtException e) {
             throw new EventTokenException("Token is not valid: " + e.getMessage());
         }
     }
