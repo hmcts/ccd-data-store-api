@@ -112,6 +112,7 @@ public class ElasticsearchTestHelper {
     public static final String CASEWORKER_CAA = "caseworker-caa";
 
     private static final String CASE_TYPE_ID_PARAM = "ctid";
+    private static final String GLOBAL_PARAM = "global";
     private static final String USE_CASE_PARAM = "use_case";
 
     private ElasticsearchTestHelper() {
@@ -134,16 +135,35 @@ public class ElasticsearchTestHelper {
                                                                           searchRequest,
                                                                   String caseTypeParam,
                                                                   String useCase) throws Exception {
+
+        return createPostRequest(url, searchRequest, caseTypeParam, useCase, false);
+    }
+
+    public static MockHttpServletRequestBuilder createPostRequest(String url,
+                                                                  ElasticsearchBaseTest.ElasticsearchTestRequest
+                                                                      searchRequest,
+                                                                  String caseTypeParam,
+                                                                  String useCase,
+                                                                  boolean global) throws Exception {
         MockHttpServletRequestBuilder postRequest = post(url)
             .contentType(MediaType.APPLICATION_JSON)
             .content(searchRequest.toJsonString())
             .param(CASE_TYPE_ID_PARAM, caseTypeParam);
-        LOG.info("Executing request: {} with param: {}={} and body: {}", url, CASE_TYPE_ID_PARAM, caseTypeParam,
-            searchRequest.toJsonString());
 
+        StringBuilder msgInfo = new StringBuilder("Executing request: ").append(url).append(" with params: ")
+            .append(CASE_TYPE_ID_PARAM).append("=").append(caseTypeParam);
         if (!Strings.isNullOrEmpty(useCase)) {
             postRequest.param(USE_CASE_PARAM, useCase);
+            msgInfo.append(", ").append(USE_CASE_PARAM).append("=").append(useCase);
         }
+
+        if (global) {
+            postRequest.param(GLOBAL_PARAM, String.valueOf(global));
+            msgInfo.append(", ").append(GLOBAL_PARAM).append("=").append(global);
+        }
+
+        msgInfo.append("and body: ").append(searchRequest.toJsonString());
+        LOG.info(msgInfo.toString());
 
         return postRequest;
     }
