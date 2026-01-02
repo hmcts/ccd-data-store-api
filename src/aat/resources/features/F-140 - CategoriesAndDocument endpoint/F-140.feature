@@ -118,7 +118,7 @@ Feature: F-140: CategoriesAndDocument endpoint
 
   @S-140.9 #AC9
   Scenario:  No Categories defined in Categories tab, no categories assigned to Document - Return the hierarchy with ALL documents in the "unCategorisedDocuments" element.
-    Given a case that has just been created as in [F-140_CreateCase_NoCategories],
+    Given a case that has just been created as in [S-140.9_CreateCase_NoCategories],
     And a user with [an active profile in CCD and has read access permissions for all the Document fields],
     And [a case definition with Document fields in CaseField tab and ComplexTab exist *without* the category Id for case type CT1] in the context,
     And [a case definition with Collection of Document fields in CaseField tab and ComplexTab exist with the category Id for case type CT1] in the context,

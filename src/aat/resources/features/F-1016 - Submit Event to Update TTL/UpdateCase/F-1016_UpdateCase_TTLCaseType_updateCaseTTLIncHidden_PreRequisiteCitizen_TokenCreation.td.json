@@ -11,7 +11,7 @@
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][siblingContexts][CreateCase_TTLCaseType_PreRequisiteCitizen][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLInc"
+      "etid": "updateCaseTTLIncHidden"
     }
   },
 
