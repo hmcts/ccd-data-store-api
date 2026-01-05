@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DelegatingCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -37,9 +39,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -61,7 +63,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -79,6 +80,7 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDetailsRepository delegatingCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -117,6 +119,8 @@ public class CreateCaseEventService {
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
+                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                  CaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository delegatingCasedetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -156,6 +160,7 @@ public class CreateCaseEventService {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.eventTriggerService = eventTriggerService;
@@ -194,7 +199,7 @@ public class CreateCaseEventService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference, false);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
             caseTypeDefinition,
@@ -245,8 +250,8 @@ public class CreateCaseEventService {
         // add upload timestamp
         caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        // Fetch updated case details after call
+        final CaseDetails caseDetailsAfterCallback = getCaseDetails(caseReference, true);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
@@ -451,11 +456,12 @@ public class CreateCaseEventService {
         }
     }
 
-    private CaseDetails getCaseDetails(final String caseReference) {
+    private CaseDetails getCaseDetails(final String caseReference, boolean useDefault) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        return caseDetailsRepository.findByReference(caseReference)
+        CaseDetailsRepository repository = useDefault ? defaultCaseDetailsRepository : caseDetailsRepository;
+        return repository.findByReference(caseReference)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
