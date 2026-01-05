@@ -99,10 +99,21 @@ class Globals {
     static String WHITE_SPACE_FOR_INDENT = "\n" + "\u0020".repeat(8) // white space for indentation
 }
 
-task suppressCves() {
-    doLast {
-        // Optional argument can be added to specify the name of the report file.
-        // If no argument is specified, the default report file is 'dependency-check-report.xml'
-        suppressCves()
+def existingSuppressTask = tasks.findByName("suppressCves")
+if (existingSuppressTask != null) {
+    existingSuppressTask.configure {
+        doLast {
+            // Optional argument can be added to specify the name of the report file.
+            // If no argument is specified, the default report file is 'dependency-check-report.xml'
+            suppressCves()
+        }
+    }
+} else {
+    tasks.register("suppressCves") {
+        doLast {
+            // Optional argument can be added to specify the name of the report file.
+            // If no argument is specified, the default report file is 'dependency-check-report.xml'
+            suppressCves()
+        }
     }
 }
