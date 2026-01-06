@@ -250,8 +250,8 @@ public class CreateCaseEventService {
         // add upload timestamp
         caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
-        // Fetch updated case details after call
-        final CaseDetails caseDetailsAfterCallback = getCaseDetails(caseReference, true);
+        // Fetch updated case details after call and update SupplementaryData
+        final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference, updatedCaseDetailsWithoutHashes);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
@@ -331,6 +331,13 @@ public class CreateCaseEventService {
             .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
+    }
+
+    private CaseDetails mergeSupplementaryData(String caseReference, CaseDetails updatedCaseDetailsWithoutHashes) {
+        final CaseDetails updatedCaseDetailsInDatabase = getCaseDetails(caseReference, true);
+        updatedCaseDetailsWithoutHashes.setSupplementaryData(updatedCaseDetailsInDatabase.getSupplementaryData());
+
+        return updatedCaseDetailsWithoutHashes;
     }
 
     public CreateCaseEventResult createCaseSystemEvent(final String caseReference,
