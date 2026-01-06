@@ -251,7 +251,8 @@ public class CreateCaseEventService {
         caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
         // Fetch updated case details after call and update SupplementaryData
-        final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference, updatedCaseDetailsWithoutHashes);
+        final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference,
+            updatedCaseDetailsWithoutHashes);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
