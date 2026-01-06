@@ -404,8 +404,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertAll(
             () -> verify(caseDetailsRepository, times(2)).findByReference(anyString()),
             () -> assertNotNull(caseEventResult.getSavedCaseDetails().getSupplementaryData()),
-            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText()).isEqualTo("value1"),
-            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key2").asInt()).isEqualTo(42)
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
+                .isEqualTo("value1"),
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key2").asInt())
+                .isEqualTo(42)
         );
     }
 

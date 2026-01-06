@@ -68,7 +68,8 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
     @BeforeEach
     void setUp() {
         // Stub case type definition to add callback URL and pre_states to TEST_EVENT
-        final String caseTypeDefinitionJson = TestFixtures.fromFileAsString("__files/test-addressbook-case_supplementary.json")
+        final String caseTypeDefinitionJson = TestFixtures
+            .fromFileAsString("__files/test-addressbook-case_supplementary.json")
             .replace("${CALLBACK_URL}", hostUrl + "/callback-about-to-submit");
 
         stubFor(get(urlMatching("/api/data/case-type/TestAddressBookCase"))
