@@ -63,9 +63,9 @@ class DateTimeValueFormatterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
-        when(definitionRepository.getBaseTypes()).thenReturn(Collections.EMPTY_LIST);
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
     }

@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.validator;
 
 import uk.gov.hmcts.ccd.validator.annotation.ValidCaseTypeId;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.PatternSyntaxException;
 
 import org.slf4j.Logger;

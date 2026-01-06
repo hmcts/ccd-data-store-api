@@ -78,10 +78,10 @@ class CaseResourceTest {
                 () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
                 () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
                 () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
             );
         }
@@ -121,10 +121,10 @@ class CaseResourceTest {
                 () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
                 () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
                 () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
             );
         }
@@ -166,10 +166,10 @@ class CaseResourceTest {
                 () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
                 () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
                 () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE
-                    .getStatusCodeValue())),
+                    .getStatusCode().value())),
                 () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
             );
         }

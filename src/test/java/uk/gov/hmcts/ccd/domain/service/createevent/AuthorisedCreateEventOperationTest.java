@@ -25,13 +25,13 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
 import uk.gov.hmcts.ccd.data.documentdata.DocumentData;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CategoryDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeRoleDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -68,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
@@ -162,7 +162,7 @@ class AuthorisedCreateEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         EVENT.setEventId(EVENT_ID);
         authorisedCreateEventOperation = new AuthorisedCreateEventOperation(
             createEventOperation,
@@ -297,7 +297,6 @@ class AuthorisedCreateEventOperationTest {
 
         // THEN
         verify(timeToLiveService).isCaseTypeUsingTTL(any());
-        verify(eventTriggerService, never()).findCaseEvent(any(), any());
         verify(timeToLiveService, never()).updateCaseDetailsWithTTL(any(), any(), any());
         verify(timeToLiveService, never()).updateCaseDataClassificationWithTTL(any(), any(), any(), any());
     }

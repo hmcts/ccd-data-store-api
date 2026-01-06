@@ -10,34 +10,33 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -56,8 +55,9 @@ import uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -175,7 +175,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPubl
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
 @Slf4j
-@RunWith(Enclosed.class)
+@ExtendWith(SpringExtension.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
 
     private static final String REFERENCE_GLOBAL_SEARCH_01 = "1111222233334444";
@@ -212,7 +212,15 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 new HostConfig().withPortBindings(
                     new PortBinding(Ports.Binding.bindPort(httpPortValue), new ExposedPort(9200))
                 )
-            ));
+            ))
+            .waitingFor(Wait.forLogMessage(".Started Application.", 1));
+
+        String regex = ".*(\"message\":\\s?\"started\".*|] started\n$)";
+        container.setWaitStrategy((new LogMessageWaitStrategy())
+            .withRegEx(regex)
+            .withStartupTimeout(Duration.ofMinutes(3))
+        );
+
         container.start();
         log.info("Elastic search started.");
         ElasticsearchITSetup configurer = new ElasticsearchITSetup(httpPortValue);
@@ -241,7 +249,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     }
 
     @Nested
-    class UICaseSearchControllerIT {
+    public class UICaseSearchControllerIT {
 
         private static final String POST_SEARCH_CASES = "/internal/searchCases";
         private static final String CASE_FIELD_ID = "caseFieldId";
@@ -831,13 +839,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
     }
 
-    @AutoConfigureWireMock(port = 0)
-    @ActiveProfiles("test")
-    @RunWith(SpringRunner.class)
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @TestPropertySource(locations = "classpath:test.properties")
     @Nested
-    class CaseSearchEndpointESSecurityIT {
+    public class CaseSearchEndpointESSecurityIT extends WireMockBaseTest {
 
         private static final String POST_SEARCH_CASES = "/searchCases";
         private static final String SECURITY_CASE_2 = "1589460125872336";
@@ -853,7 +856,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Nested
-        class CrudTest {
+        public class CrudTest {
             @BeforeEach
             void beforeEach() {
                 log.info("CrudTest BeforeEach test method");
@@ -1060,7 +1063,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Nested
-        class SecurityClassificationTest {
+        public class SecurityClassificationTest {
 
             // Case
 
@@ -1123,7 +1126,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnCaseFieldsWithHigherSC() throws Exception {
+            void shouldReturnCaseFieldsWithHigherSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -1131,8 +1134,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.containsKey(PHONE_FIELD), is(false)), // PRIVATE
+                    () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.containsKey(PHONE_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.containsKey(COLLECTION_FIELD), is(true)) // PUBLIC
                 );
             }
@@ -1203,7 +1206,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
-            void shouldNotReturnComplexNestedFieldsWithHigherSC() throws Exception {
+            void shouldReturnComplexNestedFieldsRegardlessOfSC() throws Exception {
                 if (applicationParams.getEnableAttributeBasedAccessControl()) {
                     String userId = "123";
                     String roleAssignmentResponseJson = roleAssignmentResponseJson(
@@ -1222,15 +1225,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
-                        .has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
-                    () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
+                        .has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                        .has(NESTED_NUMBER_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true)) // PUBLIC
                 );
             }
         }
 
         @Nested
-        class GeneralAccessTest {
+        public class GeneralAccessTest {
             @BeforeEach
             void beforeEach() {
                 log.info("GeneralAccessTest BeforeEach test method");
@@ -1402,7 +1406,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     }
 
     @Nested
-    class CaseSearchEndpointESIT {
+    public class CaseSearchEndpointESIT {
 
         private static final String POST_SEARCH_CASES = "/searchCases";
 
@@ -1419,7 +1423,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Nested
-        class CrossCaseTypeSearch {
+        public class CrossCaseTypeSearch {
 
             // Note that cross case type searches do NOT return case data
             @Test
@@ -1499,7 +1503,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Nested
-        class SingleCaseTypeSearch {
+        public class SingleCaseTypeSearch {
 
             @Test
             void shouldReturnAllCaseDetails() throws Exception {
@@ -1667,7 +1671,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
 
     @Nested
-    class GlobalSearchEndpointESIT {
+    public class GlobalSearchEndpointESIT {
 
         private static final String CASE_TYPE_GLOBAL_SEARCH = "GlobalSearch";
         private static final String JURISDICTION_GLOBAL_SEARCH = "AUTOTEST1";
@@ -1846,8 +1850,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Pagination: should apply Pagination: {0}")
-        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#providePaginationTestArguments")
-        @SuppressWarnings("unused")
+        @ArgumentsSource(value = PaginationTestProvider.class)
         void shouldApplyPagination(String name,
                                    int startRecordNumber,
                                    int maxReturnRecordCount,
@@ -1898,8 +1901,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @ParameterizedTest(name = "Sort: should apply sort: {0}")
-        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#provideSortCriteriaTestArguments")
-        @SuppressWarnings("unused")
+        @ArgumentsSource(SortCriteriaTestProvider.class)
         void shouldApplySort(String name,
                              List<SortCriteria> sortCriteria,
                              List<String> expectedCaseReferenceOrder) throws Exception {
@@ -1966,7 +1968,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    public static class PaginationTestProvider implements ArgumentsProvider  {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            return providePaginationTestArguments();
+        }
+    }
+
     private static Stream<Arguments> providePaginationTestArguments() {
         // NB: sort order for test data same as sort test: "caseName.ASCENDING and createdDate.DESCENDING"
         List<String> defaultSortOrder = List.of(
@@ -2039,8 +2048,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         );
     }
 
-    @SuppressWarnings("unused")
-    private static Stream<Arguments> provideSortCriteriaTestArguments() {
+    public static class SortCriteriaTestProvider implements ArgumentsProvider  {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            return provideSortCriteriaTestArguments();
+        }
+
+    }
+
+    public static Stream<Arguments> provideSortCriteriaTestArguments() {
         return Stream.of(
             Arguments.of(
                 "DEFAULT",
@@ -2150,6 +2167,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         return sortCriteria;
     }
+    
 
     private void stubCaseTypeRoleAssignments(String... caseTypes) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {

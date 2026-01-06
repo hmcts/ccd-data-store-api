@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-065a.2",
+  "_extends_": "F-065a_Test_Data_Access_Metadata_Base",
+  "title": "must return null when case reference does NOT exist",
+
+  "specs": [
+    "an active profile in CCD",
+    "uses case-reference which does not exist in CCD",
+    "has an HTTP-200 OK",
+    "contains the case access metadata with null"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "1234123412341238"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case found",
+      "path": "/internal/cases/1234123412341238",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

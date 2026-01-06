@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

@@ -1,39 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.HttpMethod.POST;
-import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.http.HttpEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -43,20 +19,45 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.util.ClientContextUtil;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpMethod.POST;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
 
 @TestPropertySource(properties =
     {
@@ -68,7 +69,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
-    public static final JSONObject requestJson1 = new JSONObject("""
+    public static final String requestJson1 = """
         {
             "user_task": {
                 "task_data": {
@@ -77,8 +78,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
                 }
             }
         }
-        """);
-    public static final JSONObject responseJson1 = new JSONObject("""
+        """;
+    public static final String responseJson1 = """
         {
             "user_task": {
                 "task_data": {
@@ -88,8 +89,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             },
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject responseJson1Merged = new JSONObject("""
+        """;
+    public static final String responseJson1Merged = """
         {
             "user_task": {
                 "task_data": {
@@ -99,8 +100,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             },
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject requestJson2 = new JSONObject("""
+        """;
+    public static final String requestJson2 = """
         {
             "user_task": {
                 "task_data": {
@@ -110,8 +111,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             },
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject responseJson2 = new JSONObject("""
+        """;
+    public static final String responseJson2 = """
         {
             "user_task": {
                 "task_data": {
@@ -122,8 +123,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "new_field": "check1",
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject responseJson2Merged = new JSONObject("""
+        """;
+    public static final String responseJson2Merged = """
         {
             "user_task": {
                 "task_data": {
@@ -134,8 +135,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "new_field": "check1",
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject requestJson3 = new JSONObject("""
+        """;
+    public static final String requestJson3 = """
         {
             "user_task": {
                 "task_data": {
@@ -147,8 +148,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "new_field2": "check2",
             "complete_task": "false"
         }
-        """);
-    public static final JSONObject responseJson3 = new JSONObject("""
+        """;
+    public static final String responseJson3 = """
         {
             "user_task": {
                 "task_data": {
@@ -159,8 +160,8 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "new_field2": "check2ed",
             "complete_task": "true"
         }
-        """);
-    public static final JSONObject responseJson3Merged = new JSONObject("""
+        """;
+    public static final String responseJson3Merged = """
         {
             "user_task": {
                 "task_data": {
@@ -172,11 +173,11 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             "new_field2": "check2ed",
             "complete_task": "true"
         }
-        """);
+        """;
 
     @Test
     public void happyPathWithNoErrorsOrWarnings() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final String testUrl = hostUrl + "/test-callback";
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
@@ -204,9 +205,9 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        final String testUrl1 = "http://localhost:" + wiremockPort + "/test-callback101";
-        final String testUrl2 = "http://localhost:" + wiremockPort + "/test-callback102";
-        final String testUrl3 = "http://localhost:" + wiremockPort + "/test-callback103";
+        final String testUrl1 = hostUrl + "/test-callback101";
+        final String testUrl2 = hostUrl + "/test-callback102";
+        final String testUrl3 = hostUrl + "/test-callback103";
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
@@ -218,43 +219,49 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
 
-        String clientContextValue1 = ClientContextUtil.encodeToBase64(requestJson1.toString());
+        String clientContextValue1 = ClientContextUtil.encodeToBase64(new JSONObject(requestJson1).toString());
         stubFor(post(urlMatching("/test-callback101.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(responseJson1.toString()))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(
+                        new JSONObject(responseJson1).toString()
+                    ))));
 
-        String clientContextValue2 = ClientContextUtil.encodeToBase64(requestJson2.toString());
+        String clientContextValue2 = ClientContextUtil.encodeToBase64(new JSONObject(requestJson2).toString());
         stubFor(post(urlMatching("/test-callback102.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(responseJson2.toString()))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64(
+                        new JSONObject(responseJson2).toString()
+                    ))));
 
         stubFor(post(urlMatching("/test-callback103.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse))
                 .withStatus(200)
-                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64((responseJson3.toString())))));
+                .withHeader(CLIENT_CONTEXT, ClientContextUtil.encodeToBase64((
+                        new JSONObject(responseJson3).toString())
+                    ))));
 
         final Optional<CallbackResponse> result1 = callbackService.send(testUrl1, TEST_CALLBACK_ABOUT_TO_START,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response1 = result1.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson1Merged, CLIENT_CONTEXT);
+        assertOnRequestAttribute(new JSONObject(responseJson1Merged), CLIENT_CONTEXT);
 
         final Optional<CallbackResponse> result2 = callbackService.send(testUrl2, TEST_CALLBACK_ABOUT_TO_SUBMIT,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response2 = result2.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson2Merged, CLIENT_CONTEXT);
+        assertOnRequestAttribute(new JSONObject(responseJson2Merged), CLIENT_CONTEXT);
 
         final Optional<CallbackResponse> result3 = callbackService.send(testUrl3, TEST_CALLBACK_SUBMITTED,
             caseEventDefinition, null, caseDetails, false);
         final CallbackResponse response3 = result3.orElseThrow(() -> new AssertionError("Missing result"));
-        assertOnRequestAttribute(responseJson3Merged, CLIENT_CONTEXT);
+        assertOnRequestAttribute(new JSONObject(responseJson3Merged), CLIENT_CONTEXT);
     }
 
-    @org.junit.Ignore // TODO investigating socket issues in Azure
+    @Disabled // TODO investigating socket issues in Azure
     @Test
     public void shouldRetryIfCallbackRespondsLate() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final String testUrl = hostUrl + "/test-callback";
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
@@ -280,7 +287,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void failurePathWithErrors() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final String testUrl = hostUrl + "/test-callback";
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
@@ -302,20 +309,21 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         assertThat(response.getErrors(), Matchers.contains("Test message"));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void notFoundFailurePath() {
         final String testUrl = "http://localhost";
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
-
-        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
-            caseDetails, false);
+        assertThrows(CallbackException.class, () ->
+            callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
+                caseDetails, false)
+        );
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void serverError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final String testUrl = hostUrl + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -324,13 +332,15 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
 
-        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
-            caseDetails, false);
+        assertThrows(CallbackException.class, () ->
+            callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
+                caseDetails, false)
+        );
     }
 
     @Test
     public void retryOnServerError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
+        final String testUrl = hostUrl + "/test-callbackGrrrr";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -351,9 +361,9 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void authorisationError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final String testUrl = hostUrl + "/test-callback";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -362,8 +372,10 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(401)));
 
-        callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
-            caseDetails, false);
+        assertThrows(CallbackException.class, () ->
+            callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
+                caseDetails, false)
+        );
     }
 
     @Test
@@ -372,7 +384,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
-    @Test(expected = ApiException.class)
+    @Test
     public void validateCallbackErrorsAndWarningsWithWarnings() {
         final String testWarning1 = "WARNING 1";
         final String testWarning2 = "WARNING 2";
@@ -383,15 +395,20 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         warnings.add(testWarning2);
 
         callbackResponse.setWarnings(warnings);
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+        assertThrows(ApiException.class, () ->
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+        
     }
 
-    @Test(expected = ApiException.class)
+    @Test
     public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("an error"));
         callbackResponse.setWarnings(Collections.singletonList("a warning"));
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        assertThrows(ApiException.class, () ->
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true)
+        );
     }
 
     @Test
@@ -406,7 +423,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void shouldGetBodyInGeneric() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-submitted";
+        final String testUrl = hostUrl + "/test-callback-submitted";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -419,7 +436,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             caseEventDefinition, null, caseDetails, String.class);
 
         assertAll(
-            () -> assertThat(result.getStatusCodeValue(), is(201)),
+            () -> assertThat(result.getStatusCode().value(), is(201)),
             () -> JSONAssert.assertEquals(
                 "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\""
                     + "security_classification\"" + ":null}",
@@ -430,7 +447,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
     @Test
     public void shouldRetryOnError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-invaliddd";
+        final String testUrl = hostUrl + "/test-callback-invaliddd";
         final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -451,7 +468,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callback-invaliddd.*")));
     }
 
-    @Test(expected = CallbackException.class)
+    @Test
     public void shouldThrowCallbackException_whenSendInvalidUrlGetGenericBody() {
         final String testUrl = "http://localhost/invalid-test-callback";
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
@@ -468,14 +485,11 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
 
-        try {
-            underTest.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null, caseDetails,
-                String.class);
-        } catch (CallbackException ex) {
-            assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event "
-                + caseEventDefinition.getName()));
-            throw ex;
-        }
+        CallbackException ex = assertThrows(CallbackException.class, () -> 
+            underTest.send(testUrl, TEST_CALLBACK_ABOUT_TO_START,
+                caseEventDefinition, null, caseDetails, String.class));
+        assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event "
+            + caseEventDefinition.getName()));
     }
 
     private void assertOnRequestAttribute(JSONObject jsonObject, String customContext) {
