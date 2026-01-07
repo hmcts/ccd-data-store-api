@@ -33,7 +33,7 @@ ext {
     junit = '5.11.4'
     junitPlatform = '1.11.4'
     appInsightsVersion = '2.6.4'
-    pactProviderVersion = '4.6.18'
+    pactProviderVersion = '4.6.19'
     lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.15.2'
@@ -190,8 +190,8 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'                // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.6'                // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.2.1'                             // spring-boot-starter-data-jpa
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.22'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.22'              // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.24'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.24'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.10.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'          // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'                       // spring-cloud-starter-openfeign
