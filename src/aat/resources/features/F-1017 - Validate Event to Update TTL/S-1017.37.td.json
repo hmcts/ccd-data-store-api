@@ -19,7 +19,7 @@
 
     "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
     "contains the TTL.OverrideTTL from the previous data",
-    "contains the TTL.Suspended value echoed back (even when null) to reveal mismatches between request and callback"
+    "does not contain the TTL.Suspended as removed by callback (null -> missing)"
   ],
 
   "users": {
