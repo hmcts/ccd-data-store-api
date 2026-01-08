@@ -19,8 +19,8 @@ import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -50,7 +50,7 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
     private static final String EVENT_ID = "TEST_EVENT";
 
     @Autowired
-    @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+    @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
