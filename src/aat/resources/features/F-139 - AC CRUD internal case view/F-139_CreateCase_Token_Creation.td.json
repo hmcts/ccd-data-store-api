@@ -1,16 +1,14 @@
 {
-  "_guid_" : "F-131_Token_Creation_Base",
-
+  "_guid_": "F-139_CreateCase_Token_Creation",
 
   "productName": "CCD Data Store",
   "operationName": "Start event creation as Case worker",
 
   "method": "GET",
-  "uri": "/cases/{caseId}/event-triggers/{etid}",
+  "uri": "/case-types/FT_CRUD/event-triggers/{etid}",
 
   "specs": [
-    "to create a token for case creation",
-    "to create a token for event creation"
+    "to create a token for case creation"
   ],
 
   "users": {
@@ -25,8 +23,7 @@
       "Experimental" : "true"
     },
     "pathVariables": {
-      "etid": "createCase",
-      "caseId": ""
+      "etid": "createCase"
     }
   },
 
@@ -44,17 +41,17 @@
         }
       },
       "case_details" : {
-        "id" : "[[ANYTHING_PRESENT]]",
+        "id" : null,
         "jurisdiction" : "BEFTA_MASTER",
-        "state" : "[[ANYTHING_PRESENT]]",
-        "version" : "[[ANYTHING_PRESENT]]",
-        "case_type_id" : "[[ANYTHING_PRESENT]]",
-        "created_date" : "[[ANYTHING_PRESENT]]",
-        "last_modified" : "[[ANYTHING_PRESENT]]",
-        "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-        "security_classification" : "[[ANYTHING_PRESENT]]",
-        "case_data" : "[[ANYTHING_PRESENT]]",
-        "data_classification": "[[ANYTHING_PRESENT]]",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "FT_CRUD",
+        "created_date" : null,
+        "last_modified" : null,
+        "last_state_modified_date" : null,
+        "security_classification" : null,
+        "case_data" : { },
+        "data_classification": {},
         "supplementary_data": null,
         "after_submit_callback_response" : null,
         "callback_response_status_code" : null,
@@ -62,7 +59,7 @@
         "delete_draft_response_status_code" : null,
         "delete_draft_response_status" : null
       },
-      "event_id" : "[[ANYTHING_PRESENT]]"
+      "event_id" : "createCase"
     }
   }
 }
