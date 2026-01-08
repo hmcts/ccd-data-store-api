@@ -474,5 +474,5 @@ Feature: F-1017: Validate Event to Update TTL
        Then a positive response is received
         And the response has all other details as expected
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
-        And the response [contains the TTL.OverrideTTL from the previouse data]
+        And the response [contains the TTL.OverrideTTL from the previous data]
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
