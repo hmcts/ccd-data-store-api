@@ -34,6 +34,8 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> findByReference(String reference);
 
+    Optional<CaseDetails> findByReference(String reference, boolean refresh);
+
     /**
      * Find by reference.
      *
