@@ -83,6 +83,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -249,7 +250,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, true);
 
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
@@ -402,7 +404,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         // THEN
         assertAll(
-            () -> verify(caseDetailsRepository, times(2)).findByReference(anyString()),
+            () -> verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean()),
             () -> assertNotNull(caseEventResult.getSavedCaseDetails().getSupplementaryData()),
             () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
                 .isEqualTo("value1"),
@@ -420,7 +422,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         // THEN
-        verify(caseDetailsRepository, times(2)).findByReference(anyString());
+        verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean());
         assertNull(caseEventResult.getSavedCaseDetails().getSupplementaryData());
     }
 
@@ -562,6 +564,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         caseDetails.setState(POST_STATE);
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
             ATTRIBUTE_PATH,
@@ -627,7 +630,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @DisplayName("should throw Resource Not Found Exception when no case reference found")
     void shouldThrowResourceNotFoundExceptionWhenNoCaseReferenceFound() throws Exception {
         CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
-        doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
+        doReturn(Optional.empty()).when(defaultCaseDetailsRepository)
+            .findByReference(NON_EXISTENT_CASE_REFERENCE, false);
         assertThrows(ResourceNotFoundException.class, () -> {
             underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
                 ATTRIBUTE_PATH,
@@ -653,8 +657,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setData(data);
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(true);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
@@ -683,8 +688,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetailsFromDB = caseDetails.shallowClone();
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 

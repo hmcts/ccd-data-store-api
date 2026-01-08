@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DelegatingCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -80,7 +79,6 @@ public class CreateCaseEventService {
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
-    private final CaseDetailsRepository defaultCaseDetailsRepository;
     private final CaseDetailsRepository delegatingCaseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -119,8 +117,6 @@ public class CreateCaseEventService {
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
-                                  @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                  CaseDetailsRepository defaultCaseDetailsRepository,
                                   @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository delegatingCasedetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -160,7 +156,6 @@ public class CreateCaseEventService {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
-        this.defaultCaseDetailsRepository = defaultCaseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.eventTriggerService = eventTriggerService;
@@ -464,12 +459,11 @@ public class CreateCaseEventService {
         }
     }
 
-    private CaseDetails getCaseDetails(final String caseReference, boolean useDefault) {
+    private CaseDetails getCaseDetails(final String caseReference, boolean refresh) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        CaseDetailsRepository repository = useDefault ? defaultCaseDetailsRepository : caseDetailsRepository;
-        return repository.findByReference(caseReference)
+        return caseDetailsRepository.findByReference(caseReference, refresh)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
