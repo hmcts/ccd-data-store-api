@@ -103,6 +103,26 @@ class EmailValidatorTest {
     }
 
     @Test
+    void invalidEmailWithConsecutiveDotsInLocalPart() {
+        final List<ValidationResult> result = validator.validate(
+            FIELD_ID,
+            NODE_FACTORY.textNode("judge..name@judiciary.uk"),
+            caseFieldDefinition
+        );
+        assertEquals(1, result.size(), result.toString());
+    }
+
+    @Test
+    void invalidEmailEndingWithDotBeforeAt() {
+        final List<ValidationResult> result = validator.validate(
+            FIELD_ID,
+            NODE_FACTORY.textNode("judge.name.@judiciary.uk"),
+            caseFieldDefinition
+        );
+        assertEquals(1, result.size(), result.toString());
+    }
+
+    @Test
     void fieldTypeRegEx() {
         final CaseFieldDefinition regexCaseFieldDefinition = caseField().withRegExp("^[a-z]\\w*@hmcts.net$").build();
         final JsonNode validValue = NODE_FACTORY.textNode("k9@hmcts.net");
