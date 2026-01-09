@@ -25,14 +25,13 @@ import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
-    private PoolingHttpClientConnectionManager cm;
+    private final List<PoolingHttpClientConnectionManager> connectionManagers = new ArrayList<>();
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -74,8 +73,8 @@ class RestTemplateConfiguration {
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
-            new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        LOG.info("readTimeout: {}", readTimeout);
+            new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
+        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
         restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
     }
@@ -86,7 +85,7 @@ class RestTemplateConfiguration {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        LOG.info("readTimeout: {}", readTimeout);
+        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
         restTemplate.setRequestFactory(requestFactory);
 
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
@@ -120,25 +119,46 @@ class RestTemplateConfiguration {
     @PreDestroy
     void close() {
         LOG.info("PreDestroy called");
-        if (null != cm) {
+        connectionManagers.forEach(cm -> {
             LOG.info("closing connection manager");
             cm.close();
-        }
+        });
     }
 
     private HttpClient getHttpClient() {
-        return getHttpClient(connectionTimeout);
+        return getHttpClient(connectionTimeout, readTimeout);
     }
 
-    private HttpClient getHttpClient(final int timeout) {
-        cm = new PoolingHttpClientConnectionManager();
+    private HttpClient getHttpClient(final int connectTimeout) {
+        return getHttpClient(connectTimeout, readTimeout);
+    }
 
+    private HttpClient getHttpClient(final int timeout, final int socketTimeout) {
+        PoolingHttpClientConnectionManager cm = buildConnectionManager(timeout, socketTimeout);
+        connectionManagers.add(cm);
+
+        final RequestConfig config =
+            RequestConfig.custom()
+                         .setConnectionRequestTimeout(Timeout.ofMilliseconds(timeout))
+                         .setResponseTimeout(Timeout.ofMilliseconds(socketTimeout))
+                         .setConnectTimeout(Timeout.ofMilliseconds(timeout))
+                         .build();
+
+        return HttpClientBuilder.create()
+                                .useSystemProperties()
+                                .setDefaultRequestConfig(config)
+                                .setConnectionManager(cm)
+                                .build();
+    }
+
+    private PoolingHttpClientConnectionManager buildConnectionManager(final int timeout, final int socketTimeout) {
         LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
         LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
         LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
         LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
-        LOG.info("connectionTimeout: {}", timeout);
+        LOG.info("connectionTimeout: {}, socketTimeout {} ", timeout, socketTimeout);
 
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(maxTotalHttpClient);
         cm.closeIdle(TimeValue.ofSeconds(maxSecondsIdleConnection));
         cm.setDefaultMaxPerRoute(maxClientPerRoute);
@@ -147,7 +167,7 @@ class RestTemplateConfiguration {
             public ConnectionConfig resolve(HttpRoute route) {
                 return ConnectionConfig.custom()
                         .setConnectTimeout(Timeout.ofMilliseconds(timeout))
-                        .setSocketTimeout(Timeout.ofMilliseconds(timeout))
+                        .setSocketTimeout(Timeout.ofMilliseconds(socketTimeout))
                         .setValidateAfterInactivity(TimeValue.ofMilliseconds(validateAfterInactivity))
                         .build();
             }
@@ -157,21 +177,12 @@ class RestTemplateConfiguration {
             @Override
             public SocketConfig resolve(HttpRoute route) {
                 return SocketConfig.custom()
-                        .setSoTimeout(Timeout.ofMilliseconds(timeout))
+                        .setSoTimeout(Timeout.ofMilliseconds(socketTimeout))
                         .build();
             }
         };
         cm.setSocketConfigResolver(socketConfigResolver);
-        final RequestConfig config =
-            RequestConfig.custom()
-                         .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
-                         .build();
 
-
-        return HttpClientBuilder.create()
-                                .useSystemProperties()
-                                .setDefaultRequestConfig(config)
-                                .setConnectionManager(cm)
-                                .build();
+        return cm;
     }
 }
