@@ -275,7 +275,8 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
             );
         }
 
-        @DisplayName("lockCaseDataRows issues the DB lock query and passes only the primary case reference plus distinct, non-null linked references")
+        @DisplayName("lockCaseDataRows issues the DB lock query and passes only the primary case reference plus "
+            + "distinct, non-null linked references")
         @Test
         void lockCaseDataRowsQueriesForPrimaryAndLinkedReferences() {
 
