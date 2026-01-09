@@ -192,7 +192,7 @@ dependencies {
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.24'                 // applicationinsights-logging-logback
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.24'              // applicationinsights-logging-logback
-    implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.10.0'         // commons-validator
+    implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'          // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'                       // spring-cloud-starter-openfeign
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'          // spring-cloud-starter-openfeign
