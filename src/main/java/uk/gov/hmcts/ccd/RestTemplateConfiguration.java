@@ -85,7 +85,7 @@ class RestTemplateConfiguration {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        LOG.info("readTimeout: {}", readTimeout);
+        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
         restTemplate.setRequestFactory(requestFactory);
 
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
