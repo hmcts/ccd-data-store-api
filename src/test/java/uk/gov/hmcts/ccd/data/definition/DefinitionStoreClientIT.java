@@ -20,12 +20,15 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import java.net.URI;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -149,6 +152,25 @@ public class DefinitionStoreClientIT extends WireMockBaseTest {
             HttpMethod.GET,
             HttpEntity.EMPTY,
             Class.class
+        );
+    }
+
+    @Test
+    public void testShouldRetryOnSocketReadTimeoutException() throws SocketTimeoutException {
+        doAnswer(invocation -> { throw new SocketTimeoutException("read timed out"); })
+            .when(restTemplate)
+            .exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap());
+
+        Exception thrown = assertThrows(Exception.class, () -> definitionStoreClient.invokeGetRequest(
+            "http://localhost", Class.class, Collections.emptyMap()));
+        assertTrue(thrown.getCause() instanceof SocketTimeoutException);
+
+        verify(restTemplate, times(5)).exchange(
+            "http://localhost",
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            Class.class,
+            Collections.emptyMap()
         );
     }
 }
