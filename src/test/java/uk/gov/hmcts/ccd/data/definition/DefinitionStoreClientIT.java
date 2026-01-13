@@ -157,7 +157,9 @@ public class DefinitionStoreClientIT extends WireMockBaseTest {
 
     @Test
     public void testShouldRetryOnSocketReadTimeoutException() throws SocketTimeoutException {
-        doAnswer(invocation -> { throw new SocketTimeoutException("read timed out"); })
+        doAnswer(invocation -> {
+            throw new SocketTimeoutException("read timed out");
+        })
             .when(restTemplate)
             .exchange(anyString(), any(), any(), ArgumentMatchers.<Class<Object>>any(), anyMap());
 
