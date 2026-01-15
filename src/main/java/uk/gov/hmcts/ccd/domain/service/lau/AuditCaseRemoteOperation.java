@@ -155,7 +155,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private void logCorrelationId(
         String requestId, String activity, String jurisdiction, String idamId, String auditLogId) {
-        log.info("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}, logId:{}",
+        log.debug("LAU Correlation-ID:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},jurisdiction:{},idamId:{}, logId:{}",
             activity,
             requestId,
             jurisdiction,
@@ -165,7 +165,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private void logAuditResponse(
         String requestId, String activity, int httpStatus, URI uri, String auditLogId) {
-        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}, logId:{}",
+        log.debug("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}, logId:{}",
             activity,
             requestId,
             httpStatus,
