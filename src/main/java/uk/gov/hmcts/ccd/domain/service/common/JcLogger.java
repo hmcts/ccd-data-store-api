@@ -24,9 +24,9 @@ public class JcLogger {
     public void jclog(final String method, final String message) {
         if (logEnabled) {
             LOG.info(" | JCDEBUG: Info:  {}: {}: {}", method, className, message);
-            LOG.warn(" | JCDEBUG: Warn:  {}: {}: {}", method, className, message);
-            LOG.error("| JCDEBUG: Error: {}: {}: {}", method, className, message);
-            LOG.debug("| JCDEBUG: Debug: {}: {}: {}", method, className, message);
+            //LOG.warn(" | JCDEBUG: Warn:  {}: {}: {}", method, className, message);
+            //LOG.error("| JCDEBUG: Error: {}: {}: {}", method, className, message);
+            //LOG.debug("| JCDEBUG: Debug: {}: {}: {}", method, className, message);
         }
     }
 
@@ -50,7 +50,7 @@ public class JcLogger {
         try {
             return MAPPER.writeValueAsString(object);
         } catch (Exception e) {
-            return "ERROR_WRITING_OBJECT";
+            return "ERROR_WRITING_OBJECT: "  + e.getMessage();
         }
     }
 
