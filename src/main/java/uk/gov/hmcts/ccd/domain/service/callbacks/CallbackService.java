@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -45,6 +46,8 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+    private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
+        = "Unable to proceed because there are one or more callback Errors or Warnings";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -159,14 +162,14 @@ public class CallbackService {
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
             responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
-            httpStatus = responseEntity.getStatusCodeValue();
+            httpStatus = responseEntity.getStatusCode().value();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
                 url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
-                httpStatus = ((HttpStatusCodeException) e).getRawStatusCode();
+                httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
             }
             return Optional.empty();
         } finally {
@@ -187,9 +190,15 @@ public class CallbackService {
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
                                                   final Boolean ignoreWarning) {
-        if (!isEmpty(callbackResponse.getErrors())
+
+        if (!ObjectUtils.isEmpty(callbackResponse.getErrorMessageOverride())
+            || !isEmpty(callbackResponse.getErrors())
             || (!isEmpty(callbackResponse.getWarnings()) && (ignoreWarning == null || !ignoreWarning))) {
-            throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
+
+            String errorMessage = Optional.ofNullable(callbackResponse.getErrorMessageOverride())
+                .orElse(DEFAULT_CALLBACK_ERROR_MESSAGE);
+
+            throw new ApiException(errorMessage)
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }

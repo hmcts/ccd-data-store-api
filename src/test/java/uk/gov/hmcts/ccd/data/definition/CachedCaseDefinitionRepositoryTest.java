@@ -56,7 +56,6 @@ class CachedCaseDefinitionRepositoryTest {
     @BeforeEach
     void setUp() {
         openMocks = MockitoAnnotations.openMocks(this);
-
         doReturn(List.of("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();
         cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
     }

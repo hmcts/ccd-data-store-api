@@ -50,7 +50,7 @@ class CachedDraftGatewayTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(draftId).doReturn(draftId2).when(defaultDraftGateway).create(createCaseDraftRequest);
         doReturn(draftResponse).when(defaultDraftGateway).get(draftIdS);

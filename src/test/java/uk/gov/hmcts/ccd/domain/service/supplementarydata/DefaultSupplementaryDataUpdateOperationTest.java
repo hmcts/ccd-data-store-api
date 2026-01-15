@@ -36,7 +36,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         this.defaultSupplementaryDataOperation =
             new DefaultSupplementaryDataUpdateOperation(supplementaryDataRepository);

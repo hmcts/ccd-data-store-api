@@ -82,7 +82,7 @@ class DefaultGetCaseHistoryViewOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -129,7 +129,7 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         assertAll(
             () -> verify(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
+            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(2)),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id",
                     equalTo("dataTestField2")))),
             () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),

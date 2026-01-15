@@ -43,7 +43,7 @@ class ClassifiedCreateEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         doReturn(caseDetails).when(createEventOperation).createCaseEvent(CASE_REFERENCE,

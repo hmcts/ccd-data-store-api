@@ -44,9 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -109,7 +109,7 @@ class DefaultDraftGatewayTest {
 
     @BeforeEach
     public void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
         when(applicationParams.draftBaseURL()).thenReturn(draftBaseURL);

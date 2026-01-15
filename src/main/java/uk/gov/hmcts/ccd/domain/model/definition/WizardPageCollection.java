@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@ApiModel(description = "")
+@Schema
 public class WizardPageCollection {
 
     private String caseTypeId = null;
@@ -25,7 +25,7 @@ public class WizardPageCollection {
     /**
      * Unique identifier for a Case Type.
      **/
-    @ApiModelProperty(required = true, value = "Unique identifier for a Case Type.")
+    @Schema(required = true, description = "Unique identifier for a Case Type.")
     @JsonProperty("case_type_id")
     public String getCaseTypeId() {
         return caseTypeId;
@@ -38,7 +38,7 @@ public class WizardPageCollection {
     /**
      * Identifier for the Event that is related to CaseTypeId.
      **/
-    @ApiModelProperty(required = true, value = "Event Trigger Id")
+    @Schema(required = true, description = "Event Trigger Id")
     @JsonProperty("event_id")
     public String getEventId() {
         return eventId;
@@ -48,7 +48,7 @@ public class WizardPageCollection {
         this.eventId = eventId;
     }
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("wizard_pages")
     public List<WizardPage> getWizardPages() {
         return wizardPages;

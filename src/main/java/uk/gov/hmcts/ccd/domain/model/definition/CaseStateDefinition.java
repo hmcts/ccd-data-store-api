@@ -2,13 +2,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.List;
 
-@ApiModel(description = "")
+@Schema
 public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefinition> {
 
     @JsonIgnore
@@ -21,7 +21,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
     private String titleDisplay;
     private List<AccessControlList> accessControlLists;
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -34,7 +34,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
     /**
      * Short name to display.
      **/
-    @ApiModelProperty(value = "Short name to display.")
+    @Schema(description = "Short name to display.")
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -44,7 +44,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         this.name = name;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -63,7 +63,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty(value = "Title label to be displayed for state")
+    @Schema(description = "Title label to be displayed for state")
     @JsonProperty("title_display")
     public String getTitleDisplay() {
         return titleDisplay;
@@ -73,7 +73,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         this.titleDisplay = titleDisplay;
     }
 
-    @ApiModelProperty(value = "State Access Control Lists")
+    @Schema(description = "State Access Control Lists")
     @JsonProperty("acls")
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;

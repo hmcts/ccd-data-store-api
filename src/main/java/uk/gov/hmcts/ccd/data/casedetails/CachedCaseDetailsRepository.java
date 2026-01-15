@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
     @Inject
-    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+    public CachedCaseDetailsRepository(final @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
                                                CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
