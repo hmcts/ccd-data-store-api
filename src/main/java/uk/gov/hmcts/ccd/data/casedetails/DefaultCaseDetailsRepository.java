@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
@@ -43,6 +44,8 @@ import java.util.Optional;
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
+
+    private final JcLogger jclogger = new JcLogger("DefaultCaseDetailsRepository", true);
 
     public static final String QUALIFIER = "default";
     private static final String UNIQUE_REFERENCE_KEY_CONSTRAINT = "case_data_reference_key";
@@ -82,7 +85,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 another action happened at the same time.
                 Please review the case and try again.""");
         } catch (PersistenceException e) {
-            if ((e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) 
+            if ((e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException)
                     && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
@@ -157,15 +160,33 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return findByReference(jurisdiction, reference).orElse(null);
     }
 
+    /*
+     * QUESTION: How are metadata and dataSearchParams constructed in the scenario ?
+     */
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
                                                         final Map<String, String> dataSearchParams) {
-        return getQuery(metadata, dataSearchParams, false)
-            .map(query -> {
-                paginate(query, metadata.getPage());
-                return caseDetailsMapper.entityToModel((List<CaseDetailsEntity>) query.getResultList());
-            })
-            .orElse(Collections.emptyList());
+        jclogger.jclog("findByMetaDataAndFieldData()",
+            "CALL STACK: " + jclogger.getCallStackAsString());
+        jclogger.jclog("findByMetaDataAndFieldData()",
+            "MetaData: " + jclogger.printObjectToString(metadata));
+        jclogger.jclog("findByMetaDataAndFieldData()",
+            "SearchParams: " + dataSearchParams.size());
+        jclogger.jclog("findByMetaDataAndFieldData()",
+            "SearchParams: " + jclogger.printObjectToString(dataSearchParams));
+
+        Optional<Query> optionalQuery = getQuery(metadata, dataSearchParams, false);
+        if (optionalQuery.isPresent()) {
+            Query query = optionalQuery.get();
+            paginate(query, metadata.getPage());
+            List<CaseDetailsEntity> resultsList = (List<CaseDetailsEntity>) query.getResultList();
+
+            jclogger.jclog("findByMetaDataAndFieldData()", "ResultList.size: " + resultsList.size());
+
+            return caseDetailsMapper.entityToModel(resultsList);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
