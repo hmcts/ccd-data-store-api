@@ -202,7 +202,7 @@ dependencies {
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'            // java-property-to-json
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.40.Final'       // spring-boot-starter-data-jpa
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
