@@ -463,8 +463,12 @@ public class CaseDetailsEndpoint {
 
         final MetaData metadata = createMetadata(jurisdictionId, caseTypeId, queryParameters);
 
-        jclogger.jclog("searchCases()", "sanitized: " + queryParameters.size());
-        jclogger.jclog("searchCases()", "sanitized: " + jclogger.printObjectToString(queryParameters));
+        jclogger.jclog("searchCases()", "jurisdictionId: " + jurisdictionId);
+        jclogger.jclog("searchCases()", "caseTypeId: " + caseTypeId);
+        jclogger.jclog("searchCases()",
+            "queryParameters: " + queryParameters.size());
+        jclogger.jclog("searchCases()",
+            "queryParameters: " + jclogger.printObjectToString(queryParameters));
         final Map<String, String> sanitizedParams = fieldMapSanitizeOperation.execute(queryParameters);
 
         jclogger.jclog("searchCases()", "sanitized: " + sanitizedParams.size());

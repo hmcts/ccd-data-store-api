@@ -184,8 +184,10 @@ public class QueryEndpoint {
         metadata.setPage(param(params, PAGE_PARAM));
         metadata.setSortDirection(param(params, SORT_PARAM));
 
-        jclogger.jclog("searchNew()", "sanitized: " + params.size());
-        jclogger.jclog("searchNew()", "sanitized: " + jclogger.printObjectToString(params));
+        jclogger.jclog("searchNew()", "jurisdictionId: " + jurisdictionId);
+        jclogger.jclog("searchNew()", "caseTypeId: " + caseTypeId);
+        jclogger.jclog("searchNew()", "params: " + params.size());
+        jclogger.jclog("searchNew()", "params: " + jclogger.printObjectToString(params));
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
         jclogger.jclog("searchNew()", "sanitized: " + sanitized.size());
