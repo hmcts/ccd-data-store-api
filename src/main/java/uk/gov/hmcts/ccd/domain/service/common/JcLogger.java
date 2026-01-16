@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public class JcLogger {
 
@@ -16,6 +17,7 @@ public class JcLogger {
     public JcLogger(final String className, final boolean logEnabled) {
         this.className = className;
         this.logEnabled = logEnabled;
+        MAPPER.registerModule(new Jdk8Module());
     }
 
     /**
