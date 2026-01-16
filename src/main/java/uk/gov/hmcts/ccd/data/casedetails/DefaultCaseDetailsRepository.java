@@ -85,7 +85,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 another action happened at the same time.
                 Please review the case and try again.""");
         } catch (PersistenceException e) {
-            if ((e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) 
+            if ((e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException)
                     && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
@@ -166,8 +166,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
                                                         final Map<String, String> dataSearchParams) {
+        final String callstack = jclogger.getCallStackAsString();
         jclogger.jclog("findByMetaDataAndFieldData()",
-            "CALL STACK: " + jclogger.getCallStackAsString());
+            "CALL STACK: " + callstack.hashCode());
+        jclogger.jclog("findByMetaDataAndFieldData()",
+            "CALL STACK: " + callstack);
         jclogger.jclog("findByMetaDataAndFieldData()",
             "MetaData: " + jclogger.printObjectToString(metadata));
         jclogger.jclog("findByMetaDataAndFieldData()",

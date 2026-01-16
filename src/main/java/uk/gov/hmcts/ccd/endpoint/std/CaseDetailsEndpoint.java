@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -74,6 +75,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Standard case API")
 public class CaseDetailsEndpoint {
+
+    private final JcLogger jclogger = new JcLogger("CaseDetailsEndpoint", true);
 
     private final GetCaseOperation getCaseOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -188,7 +191,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start event creation as Citizen", 
+        summary = "Start event creation as Citizen",
         description = "Start the event creation process for an existing case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -215,7 +218,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Case worker", 
+        summary = "Start case creation as Case worker",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -239,7 +242,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Citizen", 
+        summary = "Start case creation as Citizen",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -431,7 +434,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @Parameter(name = "Query Parameters", 
+        @Parameter(name = "Query Parameters",
             description = "Query Parameters, valid options: created_date, last_modified_date, "
             + "state, case_reference", required = false)
         @RequestParam(required = false) Map<String, String> queryParameters) {
@@ -451,14 +454,21 @@ public class CaseDetailsEndpoint {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
+    /*
+     * QUESTION: How is 'sanitizedParams' constructed in method searchCases() ?
+     */
     private List<CaseDetails> searchCases(final String jurisdictionId,
                                           final String caseTypeId,
                                           final Map<String, String> queryParameters) {
 
         final MetaData metadata = createMetadata(jurisdictionId, caseTypeId, queryParameters);
 
+        jclogger.jclog("searchCases()", "sanitized: " + queryParameters.size());
+        jclogger.jclog("searchCases()", "sanitized: " + jclogger.printObjectToString(queryParameters));
         final Map<String, String> sanitizedParams = fieldMapSanitizeOperation.execute(queryParameters);
 
+        jclogger.jclog("searchCases()", "sanitized: " + sanitizedParams.size());
+        jclogger.jclog("searchCases()", "sanitized: " + jclogger.printObjectToString(sanitizedParams));
         return searchOperation.execute(metadata, sanitizedParams);
     }
 
