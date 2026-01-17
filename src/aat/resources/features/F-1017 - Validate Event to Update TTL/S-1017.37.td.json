@@ -1,0 +1,68 @@
+{
+  "_guid_": "S-1017.37",
+  "_extends_": "MidEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "Mid-event callback normalisation of TTL.Suspended must not drop user intent across null/No/Yes variants",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1017_UpdateCase_TTLCaseType_updateWithMidEventTTLToUpper_PreRequisiteCaseworker_TokenCreation"
+  } ],
+
+  "specs": [
+    "a caseworker with an active profile in CCD",
+    "access to manage TTL properties",
+
+    "contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has a TTLIncrement of 20 days configured",
+    "has the mid event callback change the TTL.Suspended value changed",
+
+    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
+    "contains the TTL.OverrideTTL from the previous data",
+    "does not contain the TTL.Suspended as removed by callback (null -> missing)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "manageTTL": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_TTL_v2"
+    },
+    "queryParams": {
+      "pageId": "updateWithMidEventTTLToUpperSingleFormPage"
+    },
+    "body": {
+      "data": {
+        "TextField": "Updated mid-event - expect Suspended retained",
+        "TTL": {
+          "SystemTTL": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][TTL][SystemTTL]}",
+          "OverrideTTL": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][TTL][OverrideTTL]}",
+          "Suspended": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][case_details][case_data][TTL][Suspended]}"
+        }
+      },
+      "event": {
+        "id": "updateWithMidEventTTLToUpper"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "TTL" : {
+          "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
+          "OverrideTTL" : "${[scenarioContext][customValues][dateGreaterThanTTLGuardDate]}"
+        },
+        "TextField" : "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}
