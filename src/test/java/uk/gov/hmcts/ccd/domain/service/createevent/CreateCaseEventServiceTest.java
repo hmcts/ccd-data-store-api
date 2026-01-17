@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -78,13 +79,17 @@ import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -201,6 +206,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseDetails caseDetailsFromDB;
     private CaseDetails caseDetailsBefore;
     private CaseDataContent caseDataContent;
+    private AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -220,7 +226,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
         significantItem.setType(SignificantItemType.DOCUMENT.name());
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
@@ -244,7 +250,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, true);
 
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
@@ -371,6 +378,52 @@ class CreateCaseEventServiceTest extends TestFixtures {
             caseTypeDefinition,
             IGNORE_WARNING);
         verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
+    }
+
+    @Test
+    @DisplayName("should set supplementary data when present in about to submit callback response")
+    void shouldSetSupplementaryDataWhenPresentInAboutToSubmitCallback() {
+        // GIVEN - Create supplementary_data map
+        final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
+        supplementaryDataMap.put("key1", TextNode.valueOf("value1"));
+        supplementaryDataMap.put("key2", IntNode.valueOf(42));
+
+        // Mock callbackInvoker to set supplementary_data on the CaseDetails
+        doAnswer(invocation -> {
+            CaseDetails caseDetailsArg = invocation.getArgument(2);
+            caseDetailsArg.setSupplementaryData(supplementaryDataMap);
+            return aboutToSubmitCallbackResponse;
+        }).when(callbackInvoker).invokeAboutToSubmitCallback(any(),
+            any(),
+            any(),
+            any(),
+            any());
+
+        // WHEN
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        assertAll(
+            () -> verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean()),
+            () -> assertNotNull(caseEventResult.getSavedCaseDetails().getSupplementaryData()),
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
+                .isEqualTo("value1"),
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key2").asInt())
+                .isEqualTo(42)
+        );
+    }
+
+    @Test
+    @DisplayName("should not set supplementary data when not present in about to submit callback response")
+    void shouldNotSetSupplementaryDataWhenNotPresentInAboutToSubmitCallback() {
+        // GIVEN - callbackInvoker doesn't set supplementary_data (default behavior)
+
+        // WHEN
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean());
+        assertNull(caseEventResult.getSavedCaseDetails().getSupplementaryData());
     }
 
     @Test
@@ -511,6 +564,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         caseDetails.setState(POST_STATE);
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
             ATTRIBUTE_PATH,
@@ -576,7 +630,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @DisplayName("should throw Resource Not Found Exception when no case reference found")
     void shouldThrowResourceNotFoundExceptionWhenNoCaseReferenceFound() throws Exception {
         CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
-        doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
+        doReturn(Optional.empty()).when(defaultCaseDetailsRepository)
+            .findByReference(NON_EXISTENT_CASE_REFERENCE, false);
         assertThrows(ResourceNotFoundException.class, () -> {
             underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
                 ATTRIBUTE_PATH,
@@ -602,8 +657,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setData(data);
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(true);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
@@ -632,8 +688,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetailsFromDB = caseDetails.shallowClone();
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
