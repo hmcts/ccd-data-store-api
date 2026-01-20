@@ -202,10 +202,10 @@ dependencies {
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'            // java-property-to-json
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.40.Final'       // spring-boot-starter-data-jpa
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'             // ccd-test-definitions
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
@@ -262,7 +262,7 @@ dependencies {
     implementation group: 'io.searchbox', name: 'jest', version: '6.3.1'
     implementation group: 'io.vavr', name: 'vavr', version: '0.11.0'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
-    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.4.0'
+    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.1'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2'
