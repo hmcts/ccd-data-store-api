@@ -264,7 +264,7 @@ dependencies {
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.1'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.2'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
@@ -273,7 +273,7 @@ dependencies {
     
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.6'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.9'
 
     // TEST DEPENDENCIES
     testImplementation libraries.junit5
