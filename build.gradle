@@ -273,7 +273,7 @@ dependencies {
     
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.5.6'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.9'
 
     // TEST DEPENDENCIES
     testImplementation libraries.junit5
