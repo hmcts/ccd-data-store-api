@@ -104,6 +104,11 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
         return findByReference(null, Long.parseLong(caseReference));
     }
 
+    @Override
+    public Optional<CaseDetails> findByReference(String reference, boolean refresh) {
+        return findByReference(reference);
+    }
+
     /**
      * Legacy overload that only receives a case reference.
      *
