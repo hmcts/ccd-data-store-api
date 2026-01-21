@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,9 +40,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
@@ -63,7 +64,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -196,7 +196,7 @@ public class CreateCaseEventService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference, false);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
             caseTypeDefinition,
@@ -247,8 +247,9 @@ public class CreateCaseEventService {
         // add upload timestamp
         caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        // Fetch updated case details after call and update SupplementaryData
+        final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference,
+            updatedCaseDetailsWithoutHashes);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
@@ -333,6 +334,13 @@ public class CreateCaseEventService {
             .savedCaseDetails(finalCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
+    }
+
+    private CaseDetails mergeSupplementaryData(String caseReference, CaseDetails updatedCaseDetailsWithoutHashes) {
+        final CaseDetails updatedCaseDetailsInDatabase = getCaseDetails(caseReference, true);
+        updatedCaseDetailsWithoutHashes.setSupplementaryData(updatedCaseDetailsInDatabase.getSupplementaryData());
+
+        return updatedCaseDetailsWithoutHashes;
     }
 
     public CreateCaseEventResult createCaseSystemEvent(final String caseReference,
@@ -458,11 +466,11 @@ public class CreateCaseEventService {
         }
     }
 
-    private CaseDetails getCaseDetails(final String caseReference) {
+    private CaseDetails getCaseDetails(final String caseReference, boolean refresh) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        return caseDetailsRepository.findByReference(caseReference)
+        return caseDetailsRepository.findByReference(caseReference, refresh)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }

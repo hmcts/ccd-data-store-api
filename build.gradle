@@ -31,8 +31,8 @@ ext {
     set('log4j2.version', '2.24.3')
     set('jackson.version', '2.16.0')
     set('snakeyaml.version', '2.2')
-    junit = '5.11.4'
-    junitPlatform = '1.11.4'
+    junit = '5.14.2'
+    junitPlatform = '1.14.2'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.6.19'
     lombokVersion = '1.18.42'
