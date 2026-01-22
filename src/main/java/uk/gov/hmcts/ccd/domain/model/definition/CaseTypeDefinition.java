@@ -292,21 +292,21 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setJurisdictionDefinition(this.getJurisdictionDefinition() != null
             ? this.getJurisdictionDefinition().createCopy() : null);
         copy.setSecurityClassification(this.getSecurityClassification());
-        copy.setEvents(createCopyList(this.getEvents()));
-        copy.setStates(createCopyList(this.getStates()));
-        copy.setCaseFieldDefinitions(createCopyList(this.getCaseFieldDefinitions()));
+        copy.setEvents(createDeepCopyList(this.getEvents()));
+        copy.setStates(createDeepCopyList(this.getStates()));
+        copy.setCaseFieldDefinitions(createDeepCopyList(this.getCaseFieldDefinitions()));
         copy.setPrintableDocumentsUrl(this.getPrintableDocumentsUrl());
-        copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setAccessControlLists(createShallowCopyList(this.getAccessControlLists()));
         copy.setCallbackGetCaseUrl(this.getCallbackGetCaseUrl());
         copy.setRetriesGetCaseUrl(this.getRetriesGetCaseUrl() != null
             ? new ArrayList<>(this.getRetriesGetCaseUrl()) : null);
-        copy.setSearchAliasFields(createCopyList(this.getSearchAliasFields()));
-        copy.setSearchParties(createCopyList(this.getSearchParties()));
-        copy.setSearchCriterias(createCopyList(this.getSearchCriterias()));
-        copy.setCategories(createCopyList(this.getCategories()));
-        copy.setRoleToAccessProfiles(createCopyList(this.getRoleToAccessProfiles()));
-        copy.setAccessTypeRoleDefinitions(createCopyList(this.getAccessTypeRoleDefinitions()));
-        copy.setAccessTypeDefinitions(createCopyList(this.getAccessTypeDefinitions()));
+        copy.setSearchAliasFields(createDeepCopyList(this.getSearchAliasFields()));
+        copy.setSearchParties(createDeepCopyList(this.getSearchParties()));
+        copy.setSearchCriterias(createDeepCopyList(this.getSearchCriterias()));
+        copy.setCategories(createDeepCopyList(this.getCategories()));
+        copy.setRoleToAccessProfiles(createDeepCopyList(this.getRoleToAccessProfiles()));
+        copy.setAccessTypeRoleDefinitions(createDeepCopyList(this.getAccessTypeRoleDefinitions()));
+        copy.setAccessTypeDefinitions(createDeepCopyList(this.getAccessTypeDefinitions()));
 
         return copy;
     }
