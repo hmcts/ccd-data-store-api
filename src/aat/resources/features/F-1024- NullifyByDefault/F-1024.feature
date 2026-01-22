@@ -40,6 +40,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 200 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.4
   Scenario: About to start callback changes the value of TTL during case creation for v1_external#/case-details-endpoint/startCaseForCaseworkerUsingGET
@@ -74,6 +76,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_6_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.7
   Scenario: Value of TTL is not null before case creation for v1_external#/case-details-endpoint/startCaseForCaseworkerUsingGET
@@ -111,6 +115,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_6_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.10
   Scenario: During validation, adjust any validation on TTL for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -137,6 +143,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 200 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_11_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.12
   Scenario: During validation, adjust any validation on TTL for v2_external#/case-data-validator-controller/validateUsingPOST
@@ -150,6 +158,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 200 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_11_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.13
   Scenario: During validation, Mid-event callback updates TTL value for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -175,6 +185,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_14_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.15
   Scenario:  During validation, Mid-event callback updates TTL value for v2_external#/case-data-validator-controller/validateUsingPOST
@@ -187,6 +199,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_14_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.16
   Scenario: Value of TTL is not null before validation for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -213,6 +227,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_11_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.18
   Scenario: Value of TTL is not null before validation for v2_external#/case-data-validator-controller/validateUsingPOST
@@ -226,6 +242,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_11_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.19
   Scenario: During Submit case creation adjust any validation on TTL for  v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
@@ -254,6 +272,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 200 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_20_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.21
   Scenario:  During Submit case creation adjust any validation on TTL for v2_external#/case-controller/createCaseUsingPOST
@@ -268,6 +288,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     And   the response [has the 200 OK code]
     And   the response has all other details as expected
     And   the response [contains the TTL set to null]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_20_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.22
   Scenario: During Submit case creation About to submit callback updates TTL value for v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
@@ -294,6 +316,8 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_23_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1024.24
   Scenario: During Submit case creation About to submit callback updates TTL value for v2_external#/case-controller/createCaseUsingPOST
@@ -307,4 +331,6 @@ Feature: F-1024: Update Case - Start Case Event - NullifyByDefault
     Then  a negative response is received
     And   the response [has the 400 OK code]
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1024_23_Remove_Case_Assigned_User_role_for_Case].
 
