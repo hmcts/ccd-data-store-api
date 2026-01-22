@@ -40,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.domain.service.common.JcLogger;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
@@ -85,6 +86,7 @@ public class QueryEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
     public static final String CASE_TYPE_ID_PATTERN = "^[a-zA-Z0-9_.]+$";
 
+    private final JcLogger jclogger = new JcLogger("QueryEndpoint", true);
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -153,6 +155,9 @@ public class QueryEndpoint {
         }
     }
 
+    /*
+     * QUESTION: How is 'sanitized' constructed in method searchNew() ?
+     */
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
         method = RequestMethod.GET)
     @Operation(summary = "Get case data with UI layout")
@@ -179,8 +184,14 @@ public class QueryEndpoint {
         metadata.setPage(param(params, PAGE_PARAM));
         metadata.setSortDirection(param(params, SORT_PARAM));
 
+        jclogger.jclog("searchNew()", "jurisdictionId: " + jurisdictionId);
+        jclogger.jclog("searchNew()", "caseTypeId: " + caseTypeId);
+        jclogger.jclog("searchNew()", "params: " + params.size());
+        jclogger.jclog("searchNew()", "params: " + jclogger.printObjectToString(params));
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
+        jclogger.jclog("searchNew()", "sanitized: " + sanitized.size());
+        jclogger.jclog("searchNew()", "sanitized: " + jclogger.printObjectToString(sanitized));
         return searchQueryOperation.execute(view, metadata, sanitized);
     }
 
@@ -207,11 +218,11 @@ public class QueryEndpoint {
         method = RequestMethod.GET)
     @Operation(summary = "Get Workbasket Input details")
     @ApiResponse(
-        responseCode = "200", 
+        responseCode = "200",
         description = "Workbasket Input data found for the given case type and jurisdiction"
     )
     @ApiResponse(
-        responseCode = "404", 
+        responseCode = "404",
         description = "No Workbasket Input found for the given case type and jurisdiction"
     )
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
