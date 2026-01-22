@@ -112,6 +112,11 @@ env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
+//enable BEFTA logging
+env.LOGGING_LEVEL_UK_GOV_HMCTS_CCD = "DEBUG"
+env.BEFTA_HTTP_LOGGING_ENABLED = "true"
+
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
@@ -133,7 +138,9 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        //env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        def definitionStoreDevelopPr = "PR-1529"  
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
