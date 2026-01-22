@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-122.5",
-  "_extends_": "F-122-UpdateEventBase",
+  "_extends_": "F-122-UpdateEvent2Base",
   "title": "Ordering should take precedence when both conditions resolve (End state: CaseUpdated2)",
 
   "productName": "CCD data store",

@@ -240,7 +240,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + urlPortionForCaseType + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+        final String token = generateEventToken(template, UID, JURISDICTION, "TestAddressBookCaseTTL", caseReference,
             TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{"
@@ -447,7 +447,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
 
-        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -582,200 +582,201 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
         assertEquals(messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Definition"),
-            mapper.readTree("{\n"
-                + "    \"OtherAlias\": {\n"
-                + "        \"type\": \"SimpleNumber\",\n"
-                + "        \"subtype\": \"Number\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"ComplexNestedField.NestedNumberField\"\n"
-                + "    },\n"
-                + "    \"NumberField\": {\n"
-                + "        \"type\": \"SimpleNumber\",\n"
-                + "        \"subtype\": \"Number\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"NumberField\"\n"
-                + "    },\n"
-                + "    \"ComplexField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"ComplexType\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"ComplexTextField\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexTextField\"\n"
-                + "            },\n"
-                + "            \"ComplexNestedField\": {\n"
-                + "                \"type\": \"Complex\",\n"
-                + "                \"subtype\": \"NestedComplexType\",\n"
-                + "                \"typeDef\": {\n"
-                + "                    \"NestedNumberField\": {\n"
-                + "                        \"type\": \"SimpleNumber\",\n"
-                + "                        \"subtype\": \"Number\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedNumberField\"\n"
-                + "                    }\n"
-                + "                },\n"
-                + "                \"originalId\": \"ComplexNestedField\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"ComplexField\"\n"
-                + "    },\n"
-                + "    \"YesOrNoField\": {\n"
-                + "        \"type\": \"SimpleBoolean\",\n"
-                + "        \"subtype\": \"YesOrNo\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"YesOrNoField\"\n"
-                + "    },\n"
-                + "    \"DateTimeField\": {\n"
-                + "        \"type\": \"SimpleDateTime\",\n"
-                + "        \"subtype\": \"DateTime\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"DateTimeField\"\n"
-                + "    },\n"
-                + "    \"DocumentField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"Document\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"document_url\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_url\"\n"
-                + "            },\n"
-                + "            \"document_filename\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_filename\"\n"
-                + "            },\n"
-                + "            \"document_binary_url\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"document_binary_url\"\n"
-                + "            },\n"
-                + "            \"category_id\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"category_id\"\n"
-                + "            },\n"
-                + "           \"upload_timestamp\": {\n"
-                + "                \"type\": \"SimpleDateTime\",\n"
-                + "                \"subtype\": \"DateTime\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"upload_timestamp\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"DocumentField\"\n"
-                + "    },\n"
-                + "    \"AddressUKField\": {\n"
-                + "        \"type\": \"Complex\",\n"
-                + "        \"subtype\": \"AddressUK\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"County\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"County\"\n"
-                + "            },\n"
-                + "            \"Country\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"Country\"\n"
-                + "            },\n"
-                + "            \"PostCode\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"PostCode\"\n"
-                + "            },\n"
-                + "            \"PostTown\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"PostTown\"\n"
-                + "            },\n"
-                + "            \"AddressLine1\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine1\"\n"
-                + "            },\n"
-                + "            \"AddressLine2\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine2\"\n"
-                + "            },\n"
-                + "            \"AddressLine3\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"AddressLine3\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"AddressUKField\"\n"
-                + "    },\n"
-                + "    \"CollectionField\": {\n"
-                + "        \"type\": \"Collection\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"CollectionField\"\n"
-                + "    },\n"
-                + "    \"TopLevelPublish\": {\n"
-                + "        \"type\": \"SimpleText\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"ComplexTextField\"\n"
-                + "    },\n"
-                + "    \"AliasForTextField\": {\n"
-                + "        \"type\": \"SimpleText\",\n"
-                + "        \"subtype\": \"Text\",\n"
-                + "        \"typeDef\": null,\n"
-                + "        \"originalId\": \"TextField\"\n"
-                + "    },\n"
-                + "    \"ComplexCollectionField\": {\n"
-                + "        \"type\": \"Collection\",\n"
-                + "        \"subtype\": \"ComplexType\",\n"
-                + "        \"typeDef\": {\n"
-                + "            \"ComplexTextField\": {\n"
-                + "                \"type\": \"SimpleText\",\n"
-                + "                \"subtype\": \"Text\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexTextField\"\n"
-                + "            },\n"
-                + "            \"ComplexNestedField\": {\n"
-                + "                \"type\": \"Complex\",\n"
-                + "                \"subtype\": \"NestedComplexType\",\n"
-                + "                \"typeDef\": {\n"
-                + "                    \"NestedNumberField\": {\n"
-                + "                        \"type\": \"SimpleNumber\",\n"
-                + "                        \"subtype\": \"Number\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedNumberField\"\n"
-                + "                    },\n"
-                + "                    \"NestedCollectionTextField\": {\n"
-                + "                        \"type\": \"Collection\",\n"
-                + "                        \"subtype\": \"Text\",\n"
-                + "                        \"typeDef\": null,\n"
-                + "                        \"originalId\": \"NestedCollectionTextField\"\n"
-                + "                    }\n"
-                + "                },\n"
-                + "                \"originalId\": \"ComplexNestedField\"\n"
-                + "            },\n"
-                + "            \"ComplexFixedListField\": {\n"
-                + "                \"type\": \"FixedList\",\n"
-                + "                \"subtype\": \"FixedList\",\n"
-                + "                \"typeDef\": null,\n"
-                + "                \"originalId\": \"ComplexFixedListField\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        \"originalId\": \"ComplexCollectionField\"\n"
-                + "    }\n"
-                + "}"));
+            mapper.readTree("""
+                {
+                    "OtherAlias": {
+                        "type": "SimpleNumber",
+                        "subtype": "Number",
+                        "typeDef": null,
+                        "originalId": "ComplexNestedField.NestedNumberField"
+                    },
+                    "NumberField": {
+                        "type": "SimpleNumber",
+                        "subtype": "Number",
+                        "typeDef": null,
+                        "originalId": "NumberField"
+                    },
+                    "ComplexField": {
+                        "type": "Complex",
+                        "subtype": "ComplexType",
+                        "typeDef": {
+                            "ComplexTextField": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "ComplexTextField"
+                            },
+                            "ComplexNestedField": {
+                                "type": "Complex",
+                                "subtype": "NestedComplexType",
+                                "typeDef": {
+                                    "NestedNumberField": {
+                                        "type": "SimpleNumber",
+                                        "subtype": "Number",
+                                        "typeDef": null,
+                                        "originalId": "NestedNumberField"
+                                    }
+                                },
+                                "originalId": "ComplexNestedField"
+                            }
+                        },
+                        "originalId": "ComplexField"
+                    },
+                    "YesOrNoField": {
+                        "type": "SimpleBoolean",
+                        "subtype": "YesOrNo",
+                        "typeDef": null,
+                        "originalId": "YesOrNoField"
+                    },
+                    "DateTimeField": {
+                        "type": "SimpleDateTime",
+                        "subtype": "DateTime",
+                        "typeDef": null,
+                        "originalId": "DateTimeField"
+                    },
+                    "DocumentField": {
+                        "type": "Complex",
+                        "subtype": "Document",
+                        "typeDef": {
+                            "document_url": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_url"
+                            },
+                            "document_filename": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_filename"
+                            },
+                            "document_binary_url": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "document_binary_url"
+                            },
+                            "category_id": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "category_id"
+                            },
+                           "upload_timestamp": {
+                                "type": "SimpleDateTime",
+                                "subtype": "DateTime",
+                                "typeDef": null,
+                                "originalId": "upload_timestamp"
+                            }
+                        },
+                        "originalId": "DocumentField"
+                    },
+                    "AddressUKField": {
+                        "type": "Complex",
+                        "subtype": "AddressUK",
+                        "typeDef": {
+                            "County": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "County"
+                            },
+                            "Country": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "Country"
+                            },
+                            "PostCode": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "PostCode"
+                            },
+                            "PostTown": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "PostTown"
+                            },
+                            "AddressLine1": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine1"
+                            },
+                            "AddressLine2": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine2"
+                            },
+                            "AddressLine3": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "AddressLine3"
+                            }
+                        },
+                        "originalId": "AddressUKField"
+                    },
+                    "CollectionField": {
+                        "type": "Collection",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "CollectionField"
+                    },
+                    "TopLevelPublish": {
+                        "type": "SimpleText",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "ComplexTextField"
+                    },
+                    "AliasForTextField": {
+                        "type": "SimpleText",
+                        "subtype": "Text",
+                        "typeDef": null,
+                        "originalId": "TextField"
+                    },
+                    "ComplexCollectionField": {
+                        "type": "Collection",
+                        "subtype": "ComplexType",
+                        "typeDef": {
+                            "ComplexTextField": {
+                                "type": "SimpleText",
+                                "subtype": "Text",
+                                "typeDef": null,
+                                "originalId": "ComplexTextField"
+                            },
+                            "ComplexNestedField": {
+                                "type": "Complex",
+                                "subtype": "NestedComplexType",
+                                "typeDef": {
+                                    "NestedNumberField": {
+                                        "type": "SimpleNumber",
+                                        "subtype": "Number",
+                                        "typeDef": null,
+                                        "originalId": "NestedNumberField"
+                                    },
+                                    "NestedCollectionTextField": {
+                                        "type": "Collection",
+                                        "subtype": "Text",
+                                        "typeDef": null,
+                                        "originalId": "NestedCollectionTextField"
+                                    }
+                                },
+                                "originalId": "ComplexNestedField"
+                            },
+                            "ComplexFixedListField": {
+                                "type": "FixedList",
+                                "subtype": "FixedList",
+                                "typeDef": null,
+                                "originalId": "ComplexFixedListField"
+                            }
+                        },
+                        "originalId": "ComplexCollectionField"
+                    }
+                }"""));
     }
 
     @Test
@@ -784,58 +785,59 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
-        final JsonNode DATA = mapper.readTree("{\n"
-            + "  \"MoneyGBPField\": \"1000\",\n"
-            + "  \"FixedListField\": \"VALUE3\",\n"
-            + "  \"AddressUKField\": {\n"
-            + "    \"AddressLine1\": \"123 street name\",\n"
-            + "    \"AddressLine2\": \"\",\n"
-            + "    \"AddressLine3\": \"\",\n"
-            + "    \"PostTown\": \"town\",\n"
-            + "    \"County\": \"county\",\n"
-            + "    \"PostCode\": \"postcode\",\n"
-            + "    \"Country\": \"\"\n"
-            + "  },\n"
-            + "  \"ComplexField\": {\n"
-            + "    \"ComplexTextField\": \"text in complex\",\n"
-            + "    \"ComplexFixedListField\": \"VALUE3\",\n"
-            + "    \"ComplexNestedField\": {\n"
-            + "      \"NestedNumberField\": \"1\",\n"
-            + "      \"NestedCollectionTextField\": [\n"
-            + "        {\n"
-            + "          \"value\": \"collection of text in nested complex 1\",\n"
-            + "          \"id\": \"62c18dd8-d6d2-4378-b940-8614ee1ab25a\"\n"
-            + "        },\n"
-            + "        {\n"
-            + "          \"value\": \"collection of text  in nested complex 2\",\n"
-            + "          \"id\": \"4acd46b4-f292-4e5d-a436-16dcca6b2cfe\"\n"
-            + "        }\n"
-            + "      ]\n"
-            + "    }\n"
-            + "  },\n"
-            + "  \"DateTimeField\": \"2000-12-12T11:11:11.000\",\n"
-            + "  \"PhoneUKField\": \"07986542987\",\n"
-            + "  \"NumberField\": \"2\",\n"
-            + "  \"MultiSelectListField\": [\n"
-            + "    \"OPTION4\",\n"
-            + "    \"OPTION3\"\n"
-            + "  ],\n"
-            + "  \"YesOrNoField\": \"Yes\",\n"
-            + "  \"EmailField\": \"test@test.com\",\n"
-            + "  \"TextField\": \"text field\",\n"
-            + "  \"DateField\": \"2000-12-12\",\n"
-            + "  \"TextAreaField\": \"text area\",\n"
-            + "  \"CollectionField\": [\n"
-            + "    {\n"
-            + "      \"value\": \"collection field\",\n"
-            + "      \"id\": \"9af355b6-19ef-4a19-b5db-ad873772b478\"\n"
-            + "    },\n"
-            + "    {\n"
-            + "      \"value\": \"collection field 2\",\n"
-            + "      \"id\": \"7bce938e-7400-424f-86c9-c896ecbabc1f\"\n"
-            + "    }\n"
-            + "  ]\n"
-            + "}");
+        final JsonNode DATA = mapper.readTree("""
+            {
+              "MoneyGBPField": "1000",
+              "FixedListField": "VALUE3",
+              "AddressUKField": {
+                "AddressLine1": "123 street name",
+                "AddressLine2": "",
+                "AddressLine3": "",
+                "PostTown": "town",
+                "County": "county",
+                "PostCode": "postcode",
+                "Country": ""
+              },
+              "ComplexField": {
+                "ComplexTextField": "text in complex",
+                "ComplexFixedListField": "VALUE3",
+                "ComplexNestedField": {
+                  "NestedNumberField": "1",
+                  "NestedCollectionTextField": [
+                    {
+                      "value": "collection of text in nested complex 1",
+                      "id": "62c18dd8-d6d2-4378-b940-8614ee1ab25a"
+                    },
+                    {
+                      "value": "collection of text  in nested complex 2",
+                      "id": "4acd46b4-f292-4e5d-a436-16dcca6b2cfe"
+                    }
+                  ]
+                }
+              },
+              "DateTimeField": "2000-12-12T11:11:11.000",
+              "PhoneUKField": "07986542987",
+              "NumberField": "2",
+              "MultiSelectListField": [
+                "OPTION4",
+                "OPTION3"
+              ],
+              "YesOrNoField": "Yes",
+              "EmailField": "test@test.com",
+              "TextField": "text field",
+              "DateField": "2000-12-12",
+              "TextAreaField": "text area",
+              "CollectionField": [
+                {
+                  "value": "collection field",
+                  "id": "9af355b6-19ef-4a19-b5db-ad873772b478"
+                },
+                {
+                  "value": "collection field 2",
+                  "id": "7bce938e-7400-424f-86c9-c896ecbabc1f"
+                }
+              ]
+            }""");
 
 
         Map data = JacksonUtils.convertValue(DATA);
@@ -949,7 +951,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -1013,7 +1015,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
 
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            "MultipleSearchCriteriaAndSearchParties", TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1231,7 +1234,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            "MultipleSearchCriteriaAndSearchParties", TEST_EVENT_ID));
         caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1243,6 +1247,63 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
 
         GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(null);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Missing start trigger token'",
+            content.contains("Missing start trigger token"));
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenTokenIsEmpty() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken("");
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Missing start trigger token'",
+            content.contains("Missing start trigger token"));
+    }
+
+    @Test
+    public void shouldReturnForbiddenWhenTokenIsInvalid() throws Exception {
+        final String invalidToken = "eyJhbGciOiJIUzI1NiJ9.e0.KUFDva2DpGi-zmDrHrcMOPMC1DlaKodGHKHIsib3gTA";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(invalidToken);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isForbidden())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue("The response should contain 'Token is not valid'", content.contains("Token is not valid"));
     }
 
     @Test
@@ -2082,7 +2143,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "MultipleSearchCriteriaAndSearchParties", caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -2194,7 +2255,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "MultipleSearchCriteriaAndSearchParties", caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -3622,10 +3683,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
         Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
-        assertAll(() -> 
+        assertAll(() ->
             assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
                 .containsAll(actualData.entrySet())),
-            () -> assertThat("Response contains filtered out data", 
+            () -> assertThat("Response contains filtered out data",
                 caseData.has("PersonFirstName"), is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
@@ -3657,18 +3718,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(CREATE_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-                "  \"PersonFirstName\": \"First Name\",\n" +
-                "  \"PersonLastName\": \"Last Name\",\n" +
-                "  \"PersonAddress\": {\n" +
-                "    \"AddressLine1\": \"Address Line 1\",\n" +
-                "    \"AddressLine2\": \"Address Line 2\"\n" +
-                "  }\n" +
-                "}\n"
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name",
+                  "PersonAddress": {
+                    "AddressLine1": "Address Line 1",
+                    "AddressLine2": "Address Line 2"
+                  }
+                }
+                """
         );
-        Map data = JacksonUtils.convertValue(DATA);
+        Map<String, JsonNode> data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseNoReadCaseTypeAccess", CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
 
@@ -3689,7 +3753,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION,
+            "TestAddressBookCaseNoReadCaseTypeAccess", caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -3722,7 +3787,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION,
+            "TestAddressBookCaseNoReadFieldAccess", caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -3844,26 +3910,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        String expected = "{  \n" +
-            "   \"case_details\":{  \n" +
-            "      \"id\":1504259907353610,\n" +
-            "      \"jurisdiction\":\"PROBATE\",\n" +
-            "      \"state\":\"CaseCreated\",\n" +
-            "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +
-            "      \"last_modified\":null,\n" +
-            "      \"security_classification\":\"PUBLIC\",\n" +
-            "      \"case_data\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"data_classification\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"after_submit_callback_response\":null,\n" +
-            "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null\n" +
-            "   },\n" +
-            "   \"event_id\":\"TEST_EVENT\"\n" +
-            "}";
+        String expected = """
+            { \s
+               "case_details":{ \s
+                  "id":1504259907353610,
+                  "jurisdiction":"PROBATE",
+                  "state":"CaseCreated",
+                  "case_type_id":"TestAddressBookCaseNoReadCaseTypeAccess",
+                  "last_modified":null,
+                  "security_classification":"PUBLIC",
+                  "case_data":{ \s
+
+                  },
+                  "data_classification":{ \s
+
+                  },
+                  "after_submit_callback_response":null,
+                  "callback_response_status_code":null,
+                  "callback_response_status":null
+               },
+               "event_id":"TEST_EVENT"
+            }""";
         String actual = mvcResult.getResponse().getContentAsString();
         assertAll(
             () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
@@ -3915,7 +3982,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "TestAddressBookCaseCaseLinks", reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -3986,7 +4053,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "TestAddressBookCaseCaseLinks", reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
@@ -5597,7 +5664,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
 
         caseDetailsToSave.setToken(token);
 
@@ -5654,7 +5722,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -5701,7 +5770,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(

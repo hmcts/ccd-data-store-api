@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import io.jsonwebtoken.JwtException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -9,21 +10,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.TextCodec;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Decoders;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,15 +35,19 @@ public class EventTokenService {
     }
 
     private final RandomKeyGenerator randomKeyGenerator;
-    private final String tokenSecret;
+    private final SecretKey secretKey;
     private final CaseService caseService;
+    private final boolean isValidateTokenClaims;
+
 
     @Autowired
     public EventTokenService(final RandomKeyGenerator randomKeyGenerator,
                              final ApplicationParams applicationParams,
                              final CaseService caseService) {
         this.randomKeyGenerator = randomKeyGenerator;
-        this.tokenSecret = applicationParams.getTokenSecret();
+        byte[] keyBytes = Decoders.BASE64.decode(applicationParams.getTokenSecret());
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+        this.isValidateTokenClaims = applicationParams.isValidateTokenClaims();
         this.caseService = caseService;
     }
 
@@ -63,10 +65,10 @@ public class EventTokenService {
                                 final JurisdictionDefinition jurisdictionDefinition,
                                 final CaseTypeDefinition caseTypeDefinition) {
         return Jwts.builder()
-            .setId(randomKeyGenerator.generate())
-            .setSubject(uid)
-            .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
+            .id(randomKeyGenerator.generate())
+            .subject(uid)
+            .issuedAt(new Date())
+            .signWith(secretKey)
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
             .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
@@ -80,9 +82,8 @@ public class EventTokenService {
 
     public EventTokenProperties parseToken(final String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(tokenSecret.getBytes());
             final Claims claims = Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -98,8 +99,8 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.ENTITY_VERSION)),
                 toString(claims.get(EventTokenProperties.CASE_REVISION)));
 
-        } catch (ExpiredJwtException | SignatureException e) {
-            throw new EventTokenException(e.getMessage());
+        } catch (JwtException e) {
+            throw new EventTokenException("Token is not valid: " + e.getMessage());
         }
     }
 
@@ -131,29 +132,37 @@ public class EventTokenService {
             throw new BadRequestException("Missing start trigger token");
         }
 
-        try {
-            final EventTokenProperties eventTokenProperties = parseToken(token);
+        final EventTokenProperties eventTokenProperties = parseToken(token);
 
-            if (!(eventTokenProperties.getEventId() == null
-                || eventTokenProperties.getEventId().equalsIgnoreCase(event.getId())
-                && eventTokenProperties.getCaseId() == null
-                || eventTokenProperties.getCaseId().equalsIgnoreCase(caseDetails.getId().toString())
-                && eventTokenProperties.getJurisdictionId() == null
-                || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdictionDefinition.getId())
-                && eventTokenProperties.getCaseTypeId() == null
-                || eventTokenProperties.getCaseTypeId().equalsIgnoreCase(caseTypeDefinition.getId())
-                && eventTokenProperties.getUid() == null
-                || eventTokenProperties.getUid().equalsIgnoreCase(uid))) {
-                throw new ResourceNotFoundException("Cannot find matching start trigger");
-            }
-
-            if (eventTokenProperties.getEntityVersion() != null) {
-                caseDetails.setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
-            }
-            applyRevision(eventTokenProperties.getCaseRevision(), caseDetails, revisionRequired);
-        } catch (EventTokenException e) {
-            throw new SecurityException("Token is not valid");
+        if (isValidateTokenClaims && !isTokenPropertiesMatching(eventTokenProperties, uid, caseDetails, event,
+            jurisdictionDefinition,
+            caseTypeDefinition)) {
+            throw new EventTokenException("Token properties do not match the expected values");
         }
+
+        if (eventTokenProperties.getEntityVersion() != null) {
+            caseDetails.setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        }
+        applyRevision(eventTokenProperties.getCaseRevision(), caseDetails, revisionRequired);
+    }
+
+    private boolean isTokenPropertiesMatching(EventTokenProperties eventTokenProperties,
+                                              String uid,
+                                              CaseDetails caseDetails,
+                                              CaseEventDefinition event,
+                                              JurisdictionDefinition jurisdictionDefinition,
+                                              CaseTypeDefinition caseTypeDefinition) {
+        return isMatching(eventTokenProperties.getEventId(), event.getId())
+            && isMatching(eventTokenProperties.getCaseId(), caseDetails.getId())
+            && isMatching(eventTokenProperties.getJurisdictionId(), jurisdictionDefinition.getId())
+            && isMatching(eventTokenProperties.getCaseTypeId(), caseTypeDefinition.getId())
+            && isMatching(eventTokenProperties.getUid(), uid);
+    }
+
+    private boolean isMatching(String tokenValue, String actualValue) {
+        return Optional.ofNullable(tokenValue)
+            .map(value -> value.equalsIgnoreCase(actualValue))
+            .orElse(true);
     }
 
     /**
