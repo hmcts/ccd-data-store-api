@@ -178,7 +178,7 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
+  image: "hmctspublic.azurecr.io/imported/elastic/logstash"
   imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
