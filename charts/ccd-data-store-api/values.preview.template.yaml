@@ -197,7 +197,7 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
-      http.host: 0.0.0.0
+      api.http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
       queue.type: persisted
