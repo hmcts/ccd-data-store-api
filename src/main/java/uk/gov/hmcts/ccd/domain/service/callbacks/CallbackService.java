@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
@@ -45,6 +46,8 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+    private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
+        = "Unable to proceed because there are one or more callback Errors or Warnings";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -187,9 +190,15 @@ public class CallbackService {
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
                                                   final Boolean ignoreWarning) {
-        if (!isEmpty(callbackResponse.getErrors())
+
+        if (!ObjectUtils.isEmpty(callbackResponse.getErrorMessageOverride())
+            || !isEmpty(callbackResponse.getErrors())
             || (!isEmpty(callbackResponse.getWarnings()) && (ignoreWarning == null || !ignoreWarning))) {
-            throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
+
+            String errorMessage = Optional.ofNullable(callbackResponse.getErrorMessageOverride())
+                .orElse(DEFAULT_CALLBACK_ERROR_MESSAGE);
+
+            throw new ApiException(errorMessage)
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }
