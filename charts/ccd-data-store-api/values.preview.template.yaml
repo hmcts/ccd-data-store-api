@@ -179,13 +179,13 @@ elasticsearch:
     #       - path: /
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctspublic.azurecr.io/curl:7.70.0
-      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
