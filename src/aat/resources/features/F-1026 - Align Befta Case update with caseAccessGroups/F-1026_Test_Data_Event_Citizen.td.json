@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-1026_Test_Data_Event_Citizen",
+  "_extends_": "Event_Creation_Citizen_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CaseAccessGroups_Align_Befta",
+      "cid": "${[scenarioContext][childContexts][F-1026_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    }
+  }
+}
