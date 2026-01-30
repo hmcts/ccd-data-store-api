@@ -29,15 +29,19 @@ public class PersistenceStrategyResolver {
     private final CasePointerRepository pointerRepository;
     private final Cache<Long, String> caseTypeCache;
 
+    private static final String TEMPLATE_PLACEHOLDER = "%s";
+
     /**
      * A map where the key is a lowercase(case-type-id-prefix) and the value is the base URL
-     * of the owning service responsible for its persistence.
+     * or template URL of the owning service responsible for its persistence.
      * e.g., 'mycasetype': 'http://my-service-host:port' would match 'MyCaseType-1234'.
+     * Template values can contain a single '%s' placeholder which will be replaced with
+     * the case type suffix (the part after the prefix).
      *
      * <p>This can be set via application properties and environment variables.
      */
     @NotNull
-    private Map<String, URI> caseTypeServiceUrls = Map.of();
+    private Map<String, String> caseTypeServiceUrls = Map.of();
 
 
     @Autowired
@@ -56,7 +60,7 @@ public class PersistenceStrategyResolver {
      * Sets the case type service URLs when the application starts.
      * The keys in the map are converted to lowercase to ensure case-insensitivity.
      */
-    public void setCaseTypeServiceUrls(Map<String, URI> caseTypeServiceUrls) {
+    public void setCaseTypeServiceUrls(Map<String, String> caseTypeServiceUrls) {
         this.caseTypeServiceUrls = new HashMap<>();
         caseTypeServiceUrls.forEach((key, value) ->
             this.caseTypeServiceUrls.put(key.toLowerCase(), value)
@@ -137,7 +141,8 @@ public class PersistenceStrategyResolver {
 
         if (matchingPrefixOptional.isPresent()) {
             String prefix = matchingPrefixOptional.get();
-            URI url = caseTypeServiceUrls.get(prefix);
+            String template = caseTypeServiceUrls.get(prefix);
+            URI url = resolveTemplate(caseTypeId, prefix, template);
             log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
                 caseTypeId,
                 prefix,
@@ -146,6 +151,49 @@ public class PersistenceStrategyResolver {
         } else {
             log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
             return Optional.empty();
+        }
+    }
+
+    private URI resolveTemplate(String caseTypeId, String prefix, String template) {
+        if (template == null || template.isBlank()) {
+            throw new IllegalStateException(String.format(
+                "Empty decentralised persistence URL configured for prefix '%s'",
+                prefix
+            ));
+        }
+
+        int firstPlaceholder = template.indexOf(TEMPLATE_PLACEHOLDER);
+        if (firstPlaceholder != -1
+            && template.indexOf(TEMPLATE_PLACEHOLDER, firstPlaceholder + TEMPLATE_PLACEHOLDER.length()) != -1) {
+            throw new IllegalStateException(String.format(
+                "Decentralised persistence URL template for prefix '%s' contains multiple '%s' placeholders",
+                prefix,
+                TEMPLATE_PLACEHOLDER
+            ));
+        }
+
+        String resolved = template;
+        if (firstPlaceholder != -1) {
+            String suffix = caseTypeId.substring(prefix.length());
+            if (suffix.isBlank()) {
+                throw new IllegalStateException(String.format(
+                    "Case type '%s' matches prefix '%s' but has no suffix for template substitution",
+                    caseTypeId,
+                    prefix
+                ));
+            }
+            resolved = template.replace(TEMPLATE_PLACEHOLDER, suffix);
+        }
+
+        try {
+            return URI.create(resolved);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalStateException(String.format(
+                "Invalid decentralised persistence URL '%s' for prefix '%s' and case type '%s'",
+                resolved,
+                prefix,
+                caseTypeId
+            ), ex);
         }
     }
 
