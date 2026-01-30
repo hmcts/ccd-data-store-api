@@ -155,13 +155,6 @@ public class PersistenceStrategyResolver {
     }
 
     private URI resolveTemplate(String caseTypeId, String prefix, String template) {
-        if (template == null || template.isBlank()) {
-            throw new IllegalStateException(String.format(
-                "Empty decentralised persistence URL configured for prefix '%s'",
-                prefix
-            ));
-        }
-
         int firstPlaceholder = template.indexOf(TEMPLATE_PLACEHOLDER);
         if (firstPlaceholder != -1
             && template.indexOf(TEMPLATE_PLACEHOLDER, firstPlaceholder + TEMPLATE_PLACEHOLDER.length()) != -1) {
