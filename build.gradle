@@ -35,7 +35,7 @@ ext {
     pactProviderVersion = '4.6.19'
     lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
-    mockito = '5.15.2'
+    mockito = '5.21.0'
     elasticVersion = '8.16.2'
     testContainersVersion = '1.20.4'
     cucumber = '6.11.0'
