@@ -118,6 +118,7 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTY_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COUNTY_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE_VALUE_GLOBAL;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_TIME_VALUE;
@@ -181,6 +182,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_02 = "2222333344441111";
     private static final String REFERENCE_GLOBAL_SEARCH_03 = "3333444411112222";
     private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
+    private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
+    private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
 
     @Inject
     private WebApplicationContext wac;
@@ -201,7 +204,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @BeforeAll
     public static void initElastic(@Value("${search.elastic.version}") final String elasticVersion,
                                    @Value("${search.elastic.port}") final int httpPortValue)
-        throws IOException, InterruptedException {
+        throws IOException {
 
         log.info("Starting Elastic search...");
         container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
@@ -292,7 +295,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
-        void shouldReturnAllCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
+        void shouldReturnFirstPageCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
+            final int PAGE_SIZE = 10;
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(boolQuery()
                     .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
@@ -303,6 +307,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
                     .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
                     .must(matchQuery(STATE, STATE_VALUE))) // Metadata
+                .size(PAGE_SIZE)
+                .sort("reference.keyword")
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
@@ -310,10 +316,72 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
-                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
-                () -> assertExampleCaseData(caseDetails.getFields(), false),
-                () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
+                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(10)),
+                () -> assertNewGlobalCaseData(caseDetails.getFields(), false),
+                () -> assertNewGlobalCaseMetadata(caseDetails.getFields(), false)
+            );
+        }
+
+        @Test
+        void shouldReturnNextPage20CaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
+            final int PAGE_FROM = 10;
+            final int PAGE_SIZE = 20;
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(boolQuery()
+                    .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
+                    .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
+                    .must(matchQuery(caseData(TEXT_FIELD), TEXT_VALUE)) // ES Text
+                    .must(matchQuery(caseData(DATE_FIELD), DATE_VALUE)) // ES Date
+                    .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE)) // ES Phone
+                    .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
+                    .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
+                    .must(matchQuery(STATE, STATE_VALUE)))
+                .from(PAGE_FROM)
+                .size(PAGE_SIZE)
+                .sort("reference.keyword")
+                .build();
+
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null, true);
+
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
+            assertAll(
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
+                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
+                () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
+                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
+            );
+        }
+
+        @Test
+        void shouldReturnNextPage100CaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
+            final int PAGE_FROM = 10;
+            final int PAGE_SIZE = 100;
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(boolQuery()
+                    .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
+                    .must(matchQuery(caseData(YES_OR_NO_FIELD), YES_OR_NO_VALUE)) // ES Keyword
+                    .must(matchQuery(caseData(TEXT_FIELD), TEXT_VALUE)) // ES Text
+                    .must(matchQuery(caseData(DATE_FIELD), DATE_VALUE)) // ES Date
+                    .must(matchQuery(caseData(PHONE_FIELD), PHONE_VALUE)) // ES Phone
+                    .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
+                    .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
+                    .must(matchQuery(STATE, STATE_VALUE)))
+                .from(PAGE_FROM)
+                .size(PAGE_SIZE)
+                .sort("reference.keyword")
+                .build();
+
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null, true);
+
+            SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
+            assertAll(
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
+                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
+                () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
+                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
             );
         }
 
@@ -329,6 +397,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .must(matchQuery(caseData(COUNTRY_FIELD), ElasticsearchTestHelper.COUNTRY_VALUE)) // Complex
                     .must(matchQuery(caseData(COLLECTION_FIELD) + VALUE_SUFFIX, COLLECTION_VALUE)) // Collection
                     .must(matchQuery(STATE, STATE_VALUE))) // Metadata
+                .sort("reference.keyword")
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
@@ -824,6 +893,88 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(LAST_STATE_MODIFIED_DATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
                     is(DEFAULT_CASE_REFERENCE)),
+                () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
+                    is(SecurityClassification.PUBLIC.name()))
+            );
+        }
+
+        private void assertNewGlobalCaseData(Map<String, Object> data, boolean formatted) {
+            assertAll(
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
+                    is("CollectionTextValue1")),
+                () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
+                () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
+                () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
+                () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_COLLECTION_TEXT_FIELD)).getFirst().get(VALUE), is("NestedCollectionTextValue1")),
+                () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
+                () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD),
+                    is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
+                () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
+                () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
+                () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
+                () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE))
+            );
+        }
+
+        private void assertNewGlobalCaseMetadata(Map<String, Object> data, boolean formatted) {
+            assertAll(
+                () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
+                () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
+                () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()),
+                    is(formatted ? "07 05 2026" : CREATED_DATE_VALUE_GLOBAL)),
+                () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
+                    is(LAST_MODIFIED_DATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
+                    is(LAST_STATE_MODIFIED_DATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
+                    is(REFERENCE_GLOBAL_SEARCH_05)),
+                () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
+                    is(SecurityClassification.PUBLIC.name()))
+            );
+        }
+
+        private void assertNextPageGlobalCaseData(Map<String, Object> data, boolean formatted) {
+            assertAll(
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
+                () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
+                    is("CollectionTextValue1")),
+                () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
+                () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
+                () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
+                () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_COLLECTION_TEXT_FIELD)).getFirst().get(VALUE), is("NestedCollectionTextValue1")),
+                () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                    .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
+                () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD),
+                    is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
+                () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
+                () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
+                () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
+                () -> assertThat(data.get(TEXT_FIELD), is(TEXT_VALUE))
+            );
+        }
+
+        private void assertNextPageGlobalCaseMetadata(Map<String, Object> data, boolean formatted) {
+            assertAll(
+                () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
+                () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
+                () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()),
+                    is(formatted ? "07 05 2026" : CREATED_DATE_VALUE_GLOBAL)),
+                () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
+                    is(LAST_MODIFIED_DATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
+                    is(LAST_STATE_MODIFIED_DATE_VALUE)),
+                () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
+                    is(REFERENCE_GLOBAL_SEARCH_06)),
                 () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
                     is(SecurityClassification.PUBLIC.name()))
@@ -2007,7 +2158,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     public static class PaginationTestProvider implements ArgumentsProvider  {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return providePaginationTestArguments();
         }
     }
@@ -2087,7 +2238,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     public static class SortCriteriaTestProvider implements ArgumentsProvider  {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return provideSortCriteriaTestArguments();
         }
 
@@ -2159,33 +2310,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         String name = category.getCategoryName() + "." + direction.name();
         SortCriteria sortCriteria = createSortCriteria(category, direction);
 
-        List<String> expectedCaseReferenceOrder = null;
-
-        switch (category) {
-            case CASE_NAME:
-                expectedCaseReferenceOrder = List.of(
-                    REFERENCE_GLOBAL_SEARCH_01,
-                    REFERENCE_GLOBAL_SEARCH_02,
-                    REFERENCE_GLOBAL_SEARCH_03
-                );
-                break;
-
-            case CASE_MANAGEMENT_CATEGORY_NAME:
-                expectedCaseReferenceOrder = List.of(
-                    REFERENCE_GLOBAL_SEARCH_03,
-                    REFERENCE_GLOBAL_SEARCH_01,
-                    REFERENCE_GLOBAL_SEARCH_02
-                );
-                break;
-
-            case CREATED_DATE:
-                expectedCaseReferenceOrder = List.of(
-                    REFERENCE_GLOBAL_SEARCH_02,
-                    REFERENCE_GLOBAL_SEARCH_03,
-                    REFERENCE_GLOBAL_SEARCH_01
-                );
-                break;
-        }
+        List<String> expectedCaseReferenceOrder = switch (category) {
+            case CASE_NAME -> List.of(
+                REFERENCE_GLOBAL_SEARCH_01,
+                REFERENCE_GLOBAL_SEARCH_02,
+                REFERENCE_GLOBAL_SEARCH_03
+            );
+            case CASE_MANAGEMENT_CATEGORY_NAME -> List.of(
+                REFERENCE_GLOBAL_SEARCH_03,
+                REFERENCE_GLOBAL_SEARCH_01,
+                REFERENCE_GLOBAL_SEARCH_02
+            );
+            case CREATED_DATE -> List.of(
+                REFERENCE_GLOBAL_SEARCH_02,
+                REFERENCE_GLOBAL_SEARCH_03,
+                REFERENCE_GLOBAL_SEARCH_01
+            );
+        };
 
         if (direction == GlobalSearchSortDirection.DESCENDING) {
             expectedCaseReferenceOrder = Lists.reverse(expectedCaseReferenceOrder);

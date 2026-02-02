@@ -64,6 +64,9 @@ class CaseSearchEndpointTest {
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(null, null, true)
         );
+        assertThrows(BadRequestException.class, () ->
+            endpoint.searchCases(null, null, true, true)
+        );
     }
 
     @Test
@@ -71,6 +74,9 @@ class CaseSearchEndpointTest {
         List<String> emptyList = List.of();
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(emptyList, null, true)
+        );
+        assertThrows(BadRequestException.class, () ->
+            endpoint.searchCases(emptyList, null, true, true)
         );
     }
 
@@ -94,7 +100,35 @@ class CaseSearchEndpointTest {
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
-            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
+            assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
+            return true;
+        }), anyBoolean());
+        assertThat(caseSearchResult, is(result));
+    }
+
+    @Test
+    void searchCaseDetailsGlobalInvokesOperation() throws JsonProcessingException {
+
+        // ARRANGE
+        CaseSearchResult result = mock(CaseSearchResult.class);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
+        String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
+        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
+
+        // ACT
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true, true);
+
+        // ASSERT
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
+        verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
+            assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
@@ -116,7 +150,8 @@ class CaseSearchEndpointTest {
         when(elasticsearchQueryHelper.getCaseTypesAvailableToUser()).thenReturn(List.of(CASE_TYPE_ID, CASE_TYPE_ID_2));
 
         // ACT
-        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true,
+            false);
 
         // ASSERT
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);

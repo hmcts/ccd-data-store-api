@@ -99,6 +99,7 @@ public class ElasticsearchTestHelper {
     public static final String TOWN_VALUE = "TownValue";
     public static final String IN_PROGRESS_STATE = "IN_PROGRESS";
     public static final String CREATED_DATE_VALUE = "2020-05-07T15:53:40.974";
+    public static final String CREATED_DATE_VALUE_GLOBAL = "2026-05-07T15:53:40.974";
     public static final String LAST_STATE_MODIFIED_DATE_VALUE = "2020-05-07T17:42:00.527";
     public static final String LAST_MODIFIED_DATE_VALUE = "2020-06-09T13:17:06.542";
     public static final String NESTED_NUMBER_FIELD_VALUE = "567";
@@ -162,7 +163,7 @@ public class ElasticsearchTestHelper {
             msgInfo.append(", ").append(GLOBAL_PARAM).append("=").append(global);
         }
 
-        msgInfo.append("and body: ").append(searchRequest.toJsonString());
+        msgInfo.append(" and body: ").append(searchRequest.toJsonString());
         LOG.info(msgInfo.toString());
 
         return postRequest;
