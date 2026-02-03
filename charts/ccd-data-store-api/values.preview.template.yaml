@@ -29,10 +29,10 @@ java:
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-1611-java/
-    USER_PROFILE_HOST: http://ccd-user-profile-api-pr-399-java/
+    DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-    ELASTIC_SEARCH_ENABLED: true # enable whenever ES required on a particular PR
+    ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
@@ -92,7 +92,8 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      #image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1611
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -178,14 +179,14 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  image: "hmctspublic.azurecr.io/imported/elastic/logstash"
+  imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctspublic.azurecr.io/curl:7.70.0
-      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
@@ -197,7 +198,7 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
-      http.host: 0.0.0.0
+      api.http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
       queue.type: persisted
