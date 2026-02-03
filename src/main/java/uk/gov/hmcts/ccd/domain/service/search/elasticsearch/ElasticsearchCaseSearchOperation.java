@@ -70,11 +70,11 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
         MsearchRequest msearchRequest = secureAndTransformSearchRequest(request);
-        log.info("MsearchRequest: {}", msearchRequest);
+        log.debug("MsearchRequest: {}", msearchRequest);
         try {
             MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
                 ElasticSearchCaseDetailsDTO.class);
-            log.info("MsearchResponse: {}", response);
+            log.debug("MsearchResponse: {}", response);
             return response;
         } catch (Exception e) {
             throw new ServiceException("Exception executing Elasticsearch search: " + e.getMessage(), e);
@@ -139,7 +139,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             total += result.hits().total().value();
             List<Hit<ElasticSearchCaseDetailsDTO>> hits = result.hits().hits();
             if (!hits.isEmpty()) {
-                String indexName = hits.get(0).index();
+                String indexName = hits.getFirst().index();
                 String caseTypeId = request.getSearchIndex().isEmpty()
                     ? getCaseTypeIDFromIndex(indexName, request.getCaseTypeIds())
                     : null;
@@ -184,12 +184,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             throw new ServiceException("Cannot determine case type id from ES index name - cannot extract"
                 + " case type id");
         }
-    }
-
-    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
-        List<String> casesAsString = searchResult.getSourceAsStringList();
-        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

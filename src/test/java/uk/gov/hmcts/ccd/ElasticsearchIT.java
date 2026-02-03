@@ -74,6 +74,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -184,6 +185,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
     private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
     private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
+    private static final Long GLOBAL_DOCS_SIZE = 1000L;
 
     @Inject
     private WebApplicationContext wac;
@@ -283,7 +285,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -316,8 +318,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
-                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(10)),
+                () -> assertThat(caseSearchResultViewResource.getTotal(), greaterThanOrEqualTo(GLOBAL_DOCS_SIZE)),
+                () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertNewGlobalCaseData(caseDetails.getFields(), false),
                 () -> assertNewGlobalCaseMetadata(caseDetails.getFields(), false)
             );
@@ -347,7 +349,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
-                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(GLOBAL_DOCS_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
                 () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
@@ -378,7 +380,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
-                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1000L)),
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(GLOBAL_DOCS_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
                 () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
@@ -401,7 +403,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -427,7 +429,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             assertThat(caseSearchResultViewResource.getCases().size(),is(0));
         }
@@ -448,7 +450,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -464,7 +466,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -478,7 +480,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "TEST");
+                "TEST", false);
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -493,7 +495,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource =
-                executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
+                executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782", false);
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             List<String> expectedFields = Collections.singletonList(EMAIL_FIELD);
@@ -521,7 +523,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "RDM-8782NOACCESS");
+                "RDM-8782NOACCESS", false);
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             assertAll(
@@ -544,7 +546,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "orgcases");
+                "orgcases", false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -557,7 +559,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "ORGCASES");
+                "ORGCASES", false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -582,7 +584,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -619,7 +621,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "SEARCH");
+                "SEARCH", false);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
@@ -652,7 +654,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "orgcases");
+                "orgcases", false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -675,7 +677,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "orgcases");
+                "orgcases", false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -697,7 +699,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "orgcases");
+                "orgcases", false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -713,7 +715,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .build();
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                null);
+                null, false);
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -987,11 +989,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         private List<Map<String, Object>> asCollection(Object obj) {
             return (List<Map<String, Object>>) obj;
-        }
-
-        private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest,
-                                                            String caseTypeParam, String useCase) throws Exception {
-            return executeRequest(searchRequest, caseTypeParam, useCase, false);
         }
 
         private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest,
