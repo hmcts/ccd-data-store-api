@@ -9,6 +9,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.config.Configurable;
+import org.apache.hc.core5.util.Timeout;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import java.net.URI;
 import java.util.List;
 import java.util.ArrayList;
@@ -101,6 +106,54 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         for (Future<Integer> future: futures) {
             assertThat(future.get(), is(SC_OK));
         }
+    }
+
+    @Test
+    public void shouldApplyDistinctConnectAndReadTimeoutsWhenConfiguredSeparately() {
+        final int connectTimeout = 500;
+        final int readTimeout = 5000;
+        RestTemplateConfiguration configuration = new RestTemplateConfiguration();
+        // Provide minimal defaults to satisfy the configuration wiring
+        ReflectionTestUtils.setField(configuration, "maxTotalHttpClient", 10);
+        ReflectionTestUtils.setField(configuration, "maxSecondsIdleConnection", 1);
+        ReflectionTestUtils.setField(configuration, "maxClientPerRoute", 2);
+        ReflectionTestUtils.setField(configuration, "validateAfterInactivity", 1);
+        ReflectionTestUtils.setField(configuration, "connectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "readTimeout", readTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsCreateConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "definitionStoreConnectionTimeout", connectTimeout);
+
+        ReflectionTestUtils.invokeMethod(configuration, "getHttpClient", connectTimeout, readTimeout);
+        Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient", connectTimeout, readTimeout);
+        RequestConfig config = ((Configurable) client).getConfig();
+
+        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
+        assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
+        assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
+    }
+
+    @Test
+    public void defaultClientFactoryShouldUseReadTimeoutForSocket() {
+        final int connectTimeout = 800;
+        final int readTimeout = 3200;
+        RestTemplateConfiguration configuration = new RestTemplateConfiguration();
+        ReflectionTestUtils.setField(configuration, "maxTotalHttpClient", 10);
+        ReflectionTestUtils.setField(configuration, "maxSecondsIdleConnection", 1);
+        ReflectionTestUtils.setField(configuration, "maxClientPerRoute", 2);
+        ReflectionTestUtils.setField(configuration, "validateAfterInactivity", 1);
+        ReflectionTestUtils.setField(configuration, "connectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "readTimeout", readTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsCreateConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "definitionStoreConnectionTimeout", connectTimeout);
+
+        Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient");
+        RequestConfig config = ((Configurable) client).getConfig();
+
+        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
+        assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
+        assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
     }
 
     private void stubResponse() {
