@@ -92,7 +92,8 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      #image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1611
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
