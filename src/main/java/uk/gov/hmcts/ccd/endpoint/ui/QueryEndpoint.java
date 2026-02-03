@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.google.common.collect.Maps;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,10 +18,11 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
@@ -44,14 +45,13 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 
-import jakarta.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +153,23 @@ public class QueryEndpoint {
         }
     }
 
+    @GetMapping(value = "/caseworkers/{uid}/jurisdictions-lite")
+    @Operation(summary = "Get jurisdictions available to the user")
+    @ApiResponse(responseCode = "200", description = "List of jurisdictions for the given access criteria")
+    @ApiResponse(responseCode = "404", description = "No jurisdictions found for given access criteria")
+    public List<JurisdictionLiteDisplayProperties> getJurisdictionsLite(@RequestParam(value = "access") String access) {
+        if (accessMap.get(access) == null) {
+            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+        }
+        List<JurisdictionLiteDisplayProperties> jurisdictions = Arrays.asList(
+            getUserProfileOperation.execute(accessMap.get(access)).getLiteJurisdictions());
+        if (jurisdictions.isEmpty()) {
+            throw new ResourceNotFoundException("No jurisdictions found");
+        } else {
+            return jurisdictions;
+        }
+    }
+
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
         method = RequestMethod.GET)
     @Operation(summary = "Get case data with UI layout")
@@ -207,11 +224,11 @@ public class QueryEndpoint {
         method = RequestMethod.GET)
     @Operation(summary = "Get Workbasket Input details")
     @ApiResponse(
-        responseCode = "200", 
+        responseCode = "200",
         description = "Workbasket Input data found for the given case type and jurisdiction"
     )
     @ApiResponse(
-        responseCode = "404", 
+        responseCode = "404",
         description = "No Workbasket Input found for the given case type and jurisdiction"
     )
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,

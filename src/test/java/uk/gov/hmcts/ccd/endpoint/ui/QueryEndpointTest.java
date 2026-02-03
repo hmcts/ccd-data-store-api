@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -22,19 +23,24 @@ import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.JURIS
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -49,6 +55,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class QueryEndpointTest {
 
     @Mock
@@ -73,7 +81,6 @@ class QueryEndpointTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         queryEndpoint = new QueryEndpoint(getCaseViewOperation,
                                           getCaseHistoryViewOperation,
                                           getEventTriggerOperation,
@@ -150,6 +157,91 @@ class QueryEndpointTest {
     }
 
     @Test
+    @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions")
+    void shouldCallGetUserProfileOperationForLiteJurisdictions() {
+        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        j1.setId("J1");
+        JurisdictionLiteDisplayProperties j2 = new JurisdictionLiteDisplayProperties();
+        j2.setId("J2");
+        JurisdictionLiteDisplayProperties[] jurisdictions = {j1, j2};
+        UserProfile userProfile = new UserProfile();
+        userProfile.setLiteJurisdictions(jurisdictions);
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
+
+        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("create");
+
+        assertEquals(jurisdictions.length, response.size());
+        assertThat(response.get(0), is(j1));
+        assertThat(response.get(1), is(j2));
+        verify(getUserProfileOperation, times(1)).execute(CAN_CREATE);
+    }
+
+    @Test
+    @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions with read access")
+    void shouldCallGetUserProfileOperationForLiteJurisdictionsWithReadAccess() {
+        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        j1.setId("J1");
+        JurisdictionLiteDisplayProperties[] jurisdictions = {j1};
+        UserProfile userProfile = new UserProfile();
+        userProfile.setLiteJurisdictions(jurisdictions);
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
+
+        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("read");
+
+        assertEquals(jurisdictions.length, response.size());
+        assertThat(response.get(0), is(j1));
+        verify(getUserProfileOperation, times(1)).execute(CAN_READ);
+    }
+
+    @Test
+    @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions with update access")
+    void shouldCallGetUserProfileOperationForLiteJurisdictionsWithUpdateAccess() {
+        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        j1.setId("J1");
+        JurisdictionLiteDisplayProperties[] jurisdictions = {j1};
+        UserProfile userProfile = new UserProfile();
+        userProfile.setLiteJurisdictions(jurisdictions);
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_UPDATE);
+
+        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("update");
+
+        assertEquals(jurisdictions.length, response.size());
+        assertThat(response.get(0), is(j1));
+        verify(getUserProfileOperation, times(1)).execute(CAN_UPDATE);
+    }
+
+    @Test
+    @DisplayName("Should throw bad request Exception when access is not correct for Lite Jurisdictions")
+    void shouldThrowBadRequestForLiteJurisdictions() {
+        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictionsLite("creat"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictionsLite("invalid"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictionsLite(""));
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when Lite Jurisdictions are empty")
+    void shouldThrowResourceNotFoundExceptionWhenLiteJurisdictionsAreEmpty() {
+        UserProfile userProfile = new UserProfile();
+        userProfile.setLiteJurisdictions(new JurisdictionLiteDisplayProperties[0]);
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
+
+        assertThrows(ResourceNotFoundException.class, () -> queryEndpoint.getJurisdictionsLite("read"));
+    }
+
+    @Test
+    @DisplayName("Should return list with null element when Lite Jurisdictions array is null")
+    void shouldReturnListWithNullWhenLiteJurisdictionsAreNull() {
+        UserProfile userProfile = new UserProfile();
+        userProfile.setLiteJurisdictions(null);
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
+
+        // Arrays.asList(null) creates a list with one null element, which is not empty
+        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("read");
+        assertEquals(1, response.size());
+        assertThat(response.get(0), is(nullValue()));
+    }
+
+    @Test
     @DisplayName("Should throw bad request Exception for invalid case type id")
     void shouldThrowBadRequestForInvalidCaseType() {
         assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
@@ -188,7 +280,6 @@ class QueryEndpointTest {
         void shouldThrowBadRequestException() {
             String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-28T::.000";
             Map<String, String> params = new HashMap<>();
-            Map<String, String> sanitised = new HashMap<>();
             params.put("created_date", "2021-06-28T::.000");
             params.put("last_modified_date", "2021-06-29T::.000");
 
@@ -202,7 +293,6 @@ class QueryEndpointTest {
         @DisplayName("Should should throw bad request exception for 3rd date")
         void shouldThrowBadRequestExceptionForLastDate() {
             Map<String, String> params = new HashMap<>();
-            Map<String, String> sanitised = new HashMap<>();
             params.put("created_date", "2021-06-28");
             params.put("last_state_modified_date", "2021-06-29");
             params.put("last_modified_date", "2021-06-30T::.000");
@@ -218,7 +308,6 @@ class QueryEndpointTest {
         @DisplayName("Should should throw bad request exception for 2nd and 3rd date")
         void shouldThrowBadRequestExceptionForTwoDates() {
             Map<String, String> params = new HashMap<>();
-            Map<String, String> sanitised = new HashMap<>();
             params.put("created_date", "2021-06-28");
             params.put("last_state_modified_date", "2021-06-29T::.000");
             params.put("last_modified_date", "2021-06-30T::.000");

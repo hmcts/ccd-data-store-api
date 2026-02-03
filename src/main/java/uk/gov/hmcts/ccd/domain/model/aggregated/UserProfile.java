@@ -9,6 +9,7 @@ public class UserProfile {
     private User user = new User();
     private String[] channels;
     private JurisdictionDisplayProperties[] jurisdictions;
+    private JurisdictionLiteDisplayProperties[] liteJurisdictions;
     @JsonProperty("default")
     private DefaultSettings defaultSettings = new DefaultSettings();
 
@@ -26,6 +27,14 @@ public class UserProfile {
 
     public void setJurisdictions(JurisdictionDisplayProperties[] jurisdictions) {
         this.jurisdictions = jurisdictions;
+    }
+
+    public JurisdictionLiteDisplayProperties[] getLiteJurisdictions() {
+        return liteJurisdictions;
+    }
+
+    public void setLiteJurisdictions(JurisdictionLiteDisplayProperties[] liteJurisdictions) {
+        this.liteJurisdictions = liteJurisdictions;
     }
 
     public User getUser() {

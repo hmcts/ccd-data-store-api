@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewJurisdiction;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -52,6 +53,7 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -106,6 +108,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
         + "case-types?access=read";
     private static final String GET_JURISDICTIONS_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions?access=read";
+    private static final String GET_JURISDICTIONS_LITE_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=read";
+    private static final String GET_JURISDICTIONS_LITE_CREATE_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=create";
+    private static final String GET_JURISDICTIONS_LITE_UPDATE_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=update";
+    private static final String GET_JURISDICTIONS_LITE_INVALID_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=invalid";
 
 
     private static final String GET_CASE_TYPES_NO_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
@@ -1580,6 +1586,83 @@ public class QueryEndpointIT extends WireMockBaseTest {
             () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getStates().size(), is(equalTo(2))),
             () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getEvents().size(), is(equalTo(3)))
         );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldGetJurisdictionsLiteForReadAccess() throws Exception {
+        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_LITE_READ_ACCESS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+
+        // match against wiremock:`/src/test/resources/mappings/jurisdictions.json`
+        assertThat(jurisdictions.length, is(equalTo(4)));
+
+        // find and verify 1
+        JurisdictionLiteDisplayProperties jurisdiction = Arrays.stream(jurisdictions)
+            .filter(item -> item.getId().equalsIgnoreCase("PROBATE"))
+            .findFirst().orElse(null);
+        assertNotNull(jurisdiction);
+
+        assertAll(
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().size(), is(equalTo(2))),
+
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0),
+                hasProperty("id", equalTo("GrantOfRepresentation"))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getEvents().size(), is(equalTo(2))),
+
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1),
+                hasProperty("id", equalTo("TestAddressBookCaseCaseLinks"))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getEvents().size(), is(equalTo(3)))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldGetJurisdictionsLiteForCreateAccess() throws Exception {
+        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_LITE_CREATE_ACCESS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+
+        assertNotNull("Jurisdictions should not be null", jurisdictions);
+        assertThat("Jurisdictions should not be empty", jurisdictions.length, is(greaterThan(0)));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldGetJurisdictionsLiteForUpdateAccess() throws Exception {
+        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_LITE_UPDATE_ACCESS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+
+        assertNotNull("Jurisdictions should not be null", jurisdictions);
+        assertThat("Jurisdictions should not be empty", jurisdictions.length, is(greaterThan(0)));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturnBadRequestForInvalidAccessInJurisdictionsLite() throws Exception {
+        mockMvc.perform(get(GET_JURISDICTIONS_LITE_INVALID_ACCESS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400));
     }
 
     @Test
