@@ -108,11 +108,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
         + "case-types?access=read";
     private static final String GET_JURISDICTIONS_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions?access=read";
-    private static final String GET_JURISDICTIONS_LITE_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=read";
-    private static final String GET_JURISDICTIONS_LITE_CREATE_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=create";
-    private static final String GET_JURISDICTIONS_LITE_UPDATE_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=update";
-    private static final String GET_JURISDICTIONS_LITE_INVALID_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=invalid";
-
+    public static final String JURISDICTIONS_LITE_ACCESS = "/aggregated/caseworkers/0/jurisdictions-lite?access=";
+    private static final String GET_JURISDICTIONS_LITE_READ_ACCESS = JURISDICTIONS_LITE_ACCESS + "read";
+    private static final String GET_JURISDICTIONS_LITE_CREATE_ACCESS = JURISDICTIONS_LITE_ACCESS + "create";
+    private static final String GET_JURISDICTIONS_LITE_UPDATE_ACCESS = JURISDICTIONS_LITE_ACCESS + "update";
+    private static final String GET_JURISDICTIONS_LITE_INVALID_ACCESS = JURISDICTIONS_LITE_ACCESS + "invalid";
 
     private static final String GET_CASE_TYPES_NO_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
         + "case-types";

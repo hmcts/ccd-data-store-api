@@ -161,8 +161,11 @@ public class QueryEndpoint {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
-        List<JurisdictionLiteDisplayProperties> jurisdictions = Arrays.asList(
-            getUserProfileOperation.execute(accessMap.get(access)).getLiteJurisdictions());
+        JurisdictionLiteDisplayProperties[] liteJurisdictions = getUserProfileOperation
+            .execute(accessMap.get(access)).getLiteJurisdictions();
+        List<JurisdictionLiteDisplayProperties> jurisdictions = liteJurisdictions == null
+            ? new ArrayList<>()
+            : Arrays.asList(liteJurisdictions);
         if (jurisdictions.isEmpty()) {
             throw new ResourceNotFoundException("No jurisdictions found");
         } else {

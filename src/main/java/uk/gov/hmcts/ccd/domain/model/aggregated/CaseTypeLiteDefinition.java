@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
@@ -39,5 +40,23 @@ public class CaseTypeLiteDefinition implements Serializable {
         this.securityClassification = caseTypeDefinition.getSecurityClassification();
         this.events = caseTypeDefinition.getEvents();
         this.states = caseTypeDefinition.getStates();
+    }
+
+    @JsonCreator
+    public CaseTypeLiteDefinition(
+            @JsonProperty("id") String id,
+            @JsonProperty("description") String description,
+            @JsonProperty("version") Version version,
+            @JsonProperty("name") String name,
+            @JsonProperty("security_classification") SecurityClassification securityClassification,
+            @JsonProperty("events") List<CaseEventDefinition> events,
+            @JsonProperty("states") List<CaseStateDefinition> states) {
+        this.id = id;
+        this.description = description;
+        this.version = version;
+        this.name = name;
+        this.securityClassification = securityClassification;
+        this.events = events;
+        this.states = states;
     }
 }
