@@ -70,7 +70,7 @@ class PersistenceStrategyResolverTest {
     }
 
     @Test
-    void shouldThrowWhenMultiplePrefixesMatch() {
+    void shouldPreferLongestMatchingPrefix() {
         resolver.setCaseTypeServiceUrls(Map.of(
             "pre", "http://one.test",
             "prefix", "http://two.test"
@@ -78,7 +78,9 @@ class PersistenceStrategyResolverTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("Prefix-Case");
 
-        assertThrows(IllegalStateException.class, () -> resolver.isDecentralised(caseDetails));
+        URI result = resolver.resolveUriOrThrow(caseDetails);
+
+        assertEquals(URI.create("http://two.test"), result);
     }
 
     @Test

@@ -126,10 +126,24 @@ public class PersistenceStrategyResolver {
             .filter(lowerCaseTypeId::startsWith)
             .toList();
 
-        if (matchingPrefixes.size() > 1) {
-            String conflictingPrefixes = String.join(", ", matchingPrefixes);
+        if (matchingPrefixes.isEmpty()) {
+            log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
+            return Optional.empty();
+        }
+
+        int maxPrefixLength = matchingPrefixes.stream()
+            .mapToInt(String::length)
+            .max()
+            .orElse(0);
+
+        List<String> longestMatches = matchingPrefixes.stream()
+            .filter(prefix -> prefix.length() == maxPrefixLength)
+            .toList();
+
+        if (longestMatches.size() > 1) {
+            String conflictingPrefixes = String.join(", ", longestMatches);
             String message = String.format(
-                "Ambiguous configuration for case type '%s'. Multiple prefix matches found: [%s]",
+                "Ambiguous configuration for case type '%s'. Multiple longest prefix matches found: [%s]",
                 caseTypeId,
                 conflictingPrefixes
             );
@@ -137,21 +151,14 @@ public class PersistenceStrategyResolver {
             throw new IllegalStateException(message);
         }
 
-        Optional<String> matchingPrefixOptional = matchingPrefixes.stream().findFirst();
-
-        if (matchingPrefixOptional.isPresent()) {
-            String prefix = matchingPrefixOptional.get();
-            String template = caseTypeServiceUrls.get(prefix);
-            URI url = resolveTemplate(caseTypeId, prefix, template);
-            log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
-                caseTypeId,
-                prefix,
-                url);
-            return Optional.of(url);
-        } else {
-            log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
-            return Optional.empty();
-        }
+        String prefix = longestMatches.get(0);
+        String template = caseTypeServiceUrls.get(prefix);
+        URI url = resolveTemplate(caseTypeId, prefix, template);
+        log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
+            caseTypeId,
+            prefix,
+            url);
+        return Optional.of(url);
     }
 
     private URI resolveTemplate(String caseTypeId, String prefix, String template) {
