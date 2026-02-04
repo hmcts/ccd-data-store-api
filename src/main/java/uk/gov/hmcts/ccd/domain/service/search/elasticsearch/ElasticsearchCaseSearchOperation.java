@@ -151,7 +151,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 List<CaseDetails> mapped = caseDetailsMapper.dtosToCaseDetailsList(dtos);
                 allCaseDetails.addAll(mapped);
 
-                long count = Optional.of(result.hits().total())
+                long count = Optional.ofNullable(result.hits().total())
                     .map(TotalHits::value)
                     .orElse((long) mapped.size());
 

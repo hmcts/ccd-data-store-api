@@ -69,7 +69,6 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 @RestController
 @RequestMapping(path = "/",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Standard case API")
 public class CaseDetailsEndpoint {
@@ -260,7 +259,10 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
-    @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
+    @PostMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Submit case creation as Case worker",
@@ -288,7 +290,10 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
-    @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
+    @PostMapping(
+        value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Submit case creation as Citizen",
@@ -316,8 +321,11 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
-    @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
-        "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"})
+    @PostMapping(
+        value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
+            "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"},
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.OK)
     @Operation(
         summary = "Validate a set of fields as Case worker",
@@ -343,7 +351,10 @@ public class CaseDetailsEndpoint {
         return JacksonUtils.convertValueJsonNode(content.getData());
     }
 
-    @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
+    @PostMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Submit event creation as Case worker",
@@ -371,7 +382,10 @@ public class CaseDetailsEndpoint {
                                                     content);
     }
 
-    @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
+    @PostMapping(
+        value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Submit event creation as Citizen",
