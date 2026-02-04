@@ -37,7 +37,7 @@ ext {
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
     elasticVersion = '8.16.2'
-    testContainersVersion = '1.20.4'
+    testContainersVersion = '1.21.4'
     cucumber = '6.11.0'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
@@ -189,8 +189,8 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'                // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.7'                // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.24'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.24'              // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'          // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
@@ -206,7 +206,7 @@ dependencies {
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'                // spring-cloud-starter-contract-stub-runner
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockito        // spring-boot-starter-test
 
