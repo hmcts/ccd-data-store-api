@@ -62,10 +62,6 @@ class CaseTypeLiteTest {
     @Test
     @DisplayName("Should create CaseTypeLite with events and states from CaseTypeDefinition")
     void shouldCreateCaseTypeLiteWithEventsAndStates() {
-        // Note: Due to a bug in createLiteEvents (checks states != null instead of events != null),
-        // events will be empty when created from CaseTypeDefinition constructor since this.states
-        // is null when createLiteEvents is called. This test verifies states are created correctly.
-
         // Create states
         CaseStateDefinition state1 = new CaseStateDefinition();
         state1.setId("STATE_1");
@@ -80,18 +76,41 @@ class CaseTypeLiteTest {
         caseTypeDefinition.getStates().add(state1);
         caseTypeDefinition.getStates().add(state2);
 
-        // Create events (will be empty due to bug)
+        // Create events
         CaseEventDefinition event1 = new CaseEventDefinition();
         event1.setId("EVENT_1");
         event1.setName("Event 1");
+        event1.setDescription("Event 1 Description");
+        event1.setPreStates(Arrays.asList("State1", "State2"));
+
+        CaseEventDefinition event2 = new CaseEventDefinition();
+        event2.setId("EVENT_2");
+        event2.setName("Event 2");
+        event2.setDescription("Event 2 Description");
+
+        List<AccessControlList> acls = new ArrayList<>();
+        AccessControlList acl = new AccessControlList();
+        acl.setAccessProfile("profile1");
+        acl.setCreate(true);
+        acls.add(acl);
+        event1.setAccessControlLists(acls);
+
         caseTypeDefinition.getEvents().add(event1);
+        caseTypeDefinition.getEvents().add(event2);
 
         CaseTypeLite caseTypeLite = new CaseTypeLite(caseTypeDefinition);
 
         assertNotNull(caseTypeLite);
-        // Events will be empty due to bug in createLiteEvents
-        assertTrue(caseTypeLite.getEvents().isEmpty());
+        assertEquals(2, caseTypeLite.getEvents().size());
         assertEquals(2, caseTypeLite.getStates().size());
+
+        CaseEventLite eventLite1 = caseTypeLite.getEvents().get(0);
+        assertEquals("EVENT_1", eventLite1.getId());
+        assertEquals("Event 1", eventLite1.getName());
+        assertEquals("Event 1 Description", eventLite1.getDescription());
+        assertEquals(Arrays.asList("State1", "State2"), eventLite1.getPreStates());
+        assertNotNull(eventLite1.getAccessControlLists());
+        assertEquals(1, eventLite1.getAccessControlLists().size());
 
         CaseStateLite stateLite1 = caseTypeLite.getStates().get(0);
         assertEquals("STATE_1", stateLite1.getId());
@@ -200,7 +219,7 @@ class CaseTypeLiteTest {
             caseTypeDefinition.getStates().add(state);
         }
 
-        // Add multiple events (will be empty due to bug in createLiteEvents)
+        // Add multiple events
         for (int i = 1; i <= 5; i++) {
             CaseEventDefinition event = new CaseEventDefinition();
             event.setId("EVENT_" + i);
@@ -210,15 +229,14 @@ class CaseTypeLiteTest {
 
         CaseTypeLite caseTypeLite = new CaseTypeLite(caseTypeDefinition);
 
-        // Events will be empty due to bug in createLiteEvents
-        assertTrue(caseTypeLite.getEvents().isEmpty());
+        assertEquals(5, caseTypeLite.getEvents().size());
         assertEquals(3, caseTypeLite.getStates().size());
     }
 
     @Test
     @DisplayName("Should preserve event preStates and accessControlLists using JsonCreator")
     void shouldPreserveEventPreStatesAndAccessControlLists() {
-        // Test using JsonCreator constructor which allows proper event creation
+        // Test using JsonCreator constructor
         CaseStateDefinition state = new CaseStateDefinition();
         state.setId("STATE_1");
         state.setName("State 1");
@@ -247,8 +265,6 @@ class CaseTypeLiteTest {
         List<CaseEventDefinition> events = new ArrayList<>();
         events.add(event);
 
-        // Use JsonCreator constructor - events will still be empty due to bug
-        // but this test documents the expected behavior
         CaseTypeLite caseTypeLite = new CaseTypeLite(
             "TEST_ID",
             "Test Description",
@@ -259,8 +275,13 @@ class CaseTypeLiteTest {
             states
         );
 
-        // Due to bug: events will be empty because this.states is null when createLiteEvents is called
-        assertTrue(caseTypeLite.getEvents().isEmpty());
+        assertEquals(1, caseTypeLite.getEvents().size());
+        CaseEventLite eventLite = caseTypeLite.getEvents().get(0);
+        assertEquals("EVENT_1", eventLite.getId());
+        assertEquals("Event 1", eventLite.getName());
+        assertEquals(Arrays.asList("PreState1", "PreState2"), eventLite.getPreStates());
+        assertNotNull(eventLite.getAccessControlLists());
+        assertEquals(2, eventLite.getAccessControlLists().size());
         assertEquals(1, caseTypeLite.getStates().size());
     }
 
