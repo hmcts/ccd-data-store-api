@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
@@ -157,13 +157,13 @@ public class QueryEndpoint {
     @Operation(summary = "Get jurisdictions available to the user")
     @ApiResponse(responseCode = "200", description = "List of jurisdictions for the given access criteria")
     @ApiResponse(responseCode = "404", description = "No jurisdictions found for given access criteria")
-    public List<JurisdictionLiteDisplayProperties> getJurisdictionsLite(@RequestParam(value = "access") String access) {
+    public List<JurisdictionDisplayPropertiesLite> getJurisdictionsLite(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
-        JurisdictionLiteDisplayProperties[] liteJurisdictions = getUserProfileOperation
+        JurisdictionDisplayPropertiesLite[] liteJurisdictions = getUserProfileOperation
             .execute(accessMap.get(access)).getLiteJurisdictions();
-        List<JurisdictionLiteDisplayProperties> jurisdictions = liteJurisdictions == null
+        List<JurisdictionDisplayPropertiesLite> jurisdictions = liteJurisdictions == null
             ? new ArrayList<>()
             : Arrays.asList(liteJurisdictions);
         if (jurisdictions.isEmpty()) {

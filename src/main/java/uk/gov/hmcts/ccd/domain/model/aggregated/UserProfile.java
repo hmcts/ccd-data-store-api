@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 
 @ToString
 public class UserProfile {
@@ -9,7 +10,7 @@ public class UserProfile {
     private User user = new User();
     private String[] channels;
     private JurisdictionDisplayProperties[] jurisdictions;
-    private JurisdictionLiteDisplayProperties[] liteJurisdictions;
+    private JurisdictionDisplayPropertiesLite[] liteJurisdictions;
     @JsonProperty("default")
     private DefaultSettings defaultSettings = new DefaultSettings();
 
@@ -29,11 +30,11 @@ public class UserProfile {
         this.jurisdictions = jurisdictions;
     }
 
-    public JurisdictionLiteDisplayProperties[] getLiteJurisdictions() {
+    public JurisdictionDisplayPropertiesLite[] getLiteJurisdictions() {
         return liteJurisdictions;
     }
 
-    public void setLiteJurisdictions(JurisdictionLiteDisplayProperties[] liteJurisdictions) {
+    public void setLiteJurisdictions(JurisdictionDisplayPropertiesLite[] liteJurisdictions) {
         this.liteJurisdictions = liteJurisdictions;
     }
 

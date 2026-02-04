@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
@@ -65,7 +65,7 @@ public class UserService {
                                           List<JurisdictionDefinition> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
-        JurisdictionLiteDisplayProperties[] liteJurisdictions = toLiteResponse(jurisdictionsDefinition);
+        JurisdictionDisplayPropertiesLite[] liteJurisdictions = toLiteResponse(jurisdictionsDefinition);
 
         UserProfile userProfile = new UserProfile();
         userProfile.setJurisdictions(resultJurisdictions);
@@ -89,9 +89,9 @@ public class UserService {
         .toArray(JurisdictionDisplayProperties[]::new);
     }
 
-    private JurisdictionLiteDisplayProperties[] toLiteResponse(List<JurisdictionDefinition> jurisdictionsDefinition) {
+    private JurisdictionDisplayPropertiesLite[] toLiteResponse(List<JurisdictionDefinition> jurisdictionsDefinition) {
         return jurisdictionsDefinition.stream().map(jurisdictionMapper::toLiteResponse)
-            .toArray(JurisdictionLiteDisplayProperties[]::new);
+            .toArray(JurisdictionDisplayPropertiesLite[]::new);
     }
 
     public List<String> getUserRolesJurisdictions() {

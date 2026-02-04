@@ -50,26 +50,9 @@
 									"id": "REVIEW",
 									"name": "Review",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"*"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -84,26 +67,9 @@
                   "id": "UPDATE",
                   "name": "Update",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "*"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -121,26 +87,9 @@
 									"id": "COMPLETE",
 									"name": "Mark as done",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -155,26 +104,9 @@
                   "id": "STOP_PROGRESS",
                   "name": "Stop",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "IN_PROGRESS"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -189,26 +121,9 @@
                   "id": "START_PROGRESS",
                   "name": "Start",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "TODO"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -223,24 +138,7 @@
                   "id": "CREATE",
                   "name": "Create a new case",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -260,59 +158,17 @@
                 {
                   "id": "TODO",
                   "name": "To do",
-                  "description": null,
-                  "order": 1,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-										}
-									]
+                  "description": null
 								},
 								{
 									"id": "IN_PROGRESS",
 									"name": "In progress",
-									"description": null,
-									"order": 2,
-									"title_display": null,
-									"acls": [
-										{
-											"__ordering__": "unordered",
-											"__elementId__": "role"
-										},
-										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-										}
-									]
+									"description": null
 								},
 								{
 									"id": "DONE",
 									"name": "Done",
-									"description": null,
-									"order": 3,
-									"title_display": null,
-									"acls": [
-										{
-											"__ordering__": "unordered",
-											"__elementId__": "role"
-										},
-										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-										}
-									]
+									"description": null
 								}
 							],
 							"security_classification": null
@@ -331,26 +187,9 @@
                   "id": "REVIEW",
                   "name": "Review",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "*"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -365,26 +204,9 @@
                   "id": "UPDATE",
                   "name": "Update",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "*"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -402,26 +224,9 @@
                   "id": "COMPLETE",
                   "name": "Mark as done",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "IN_PROGRESS"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -436,26 +241,9 @@
                   "id": "STOP_PROGRESS",
                   "name": "Stop",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "IN_PROGRESS"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -470,26 +258,9 @@
                   "id": "START_PROGRESS",
                   "name": "Start",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [
                     "TODO"
                   ],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -504,24 +275,7 @@
                   "id": "CREATE",
                   "name": "Create a new case",
                   "description": null,
-                  "order": null,
-                  "case_fields": [],
                   "pre_states": [],
-                  "post_states": [],
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
                   "acls": [
                     {
                       "__ordering__": "unordered",
@@ -541,59 +295,17 @@
                 {
                   "id": "TODO",
                   "name": "To do",
-                  "description": null,
-                  "order": 1,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
+                  "description": null
                 },
                 {
                   "id": "IN_PROGRESS",
                   "name": "In progress",
-                  "description": null,
-                  "order": 2,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
+                  "description": null
                 },
                 {
                   "id": "DONE",
                   "name": "Done",
-                  "description": null,
-                  "order": 3,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
-                  ]
+                  "description": null
                 }
               ],
               "security_classification": null
@@ -603,7 +315,6 @@
 							"description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
 							"version": null,
 							"name": "CT With No Cases -Don't Create",
-							"jurisdiction": null,
 							"events": [
 								{
 									"__ordering__": "unordered"
@@ -612,26 +323,9 @@
 									"id": "REVIEW",
 									"name": "Review",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"*"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -642,26 +336,9 @@
 									"id": "UPDATE",
 									"name": "Update",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"*"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -672,26 +349,9 @@
 									"id": "COMPLETE",
 									"name": "Mark as done",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -702,26 +362,9 @@
 									"id": "STOP_PROGRESS",
 									"name": "Stop",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -732,26 +375,9 @@
 									"id": "START_PROGRESS",
 									"name": "Start",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [
 										"TODO"
 									],
-									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -762,24 +388,8 @@
 									"id": "CREATE",
 									"name": "Create a new case",
 									"description": null,
-									"order": null,
-									"case_fields": [],
 									"pre_states": [],
 									"post_states": [],
-									"callback_url_about_to_start_event": null,
-									"retries_timeout_about_to_start_event": null,
-									"callback_url_about_to_submit_event": null,
-									"retries_timeout_url_about_to_submit_event": null,
-									"callback_url_submitted_event": null,
-									"retries_timeout_url_submitted_event": null,
-									"security_classification": null,
-									"show_summary": null,
-									"show_event_notes": null,
-									"end_button_label": null,
-									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "ttl_increment": null,
-                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -794,38 +404,17 @@
 								{
 									"id": "TODO",
 									"name": "To do",
-									"description": null,
-									"order": 1,
-									"title_display": null,
-									"acls": [
-										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										}
-									]
+									"description": null
 								},
 								{
 									"id": "IN_PROGRESS",
 									"name": "In progress",
-									"description": null,
-									"order": 2,
-									"title_display": null,
-									"acls": [
-										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-									}
-									]
+									"description": null
 								},
 								{
 									"id": "DONE",
 									"name": "Done",
-									"description": null,
-									"order": 3,
-									"title_display": null,
-									"acls": [
-										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										}
-									]
+									"description": null
 								}
 							],
 							"security_classification": null

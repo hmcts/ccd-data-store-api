@@ -2,9 +2,9 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseTypeLiteDefinition;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.CaseTypeLite;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
@@ -23,8 +23,8 @@ public class JurisdictionMapper {
         return result;
     }
 
-    public JurisdictionLiteDisplayProperties toLiteResponse(JurisdictionDefinition jurisdictionDefinition) {
-        JurisdictionLiteDisplayProperties result = new JurisdictionLiteDisplayProperties();
+    public JurisdictionDisplayPropertiesLite toLiteResponse(JurisdictionDefinition jurisdictionDefinition) {
+        JurisdictionDisplayPropertiesLite result = new JurisdictionDisplayPropertiesLite();
         result.setId(jurisdictionDefinition.getId());
         result.setName(jurisdictionDefinition.getName());
         result.setDescription(jurisdictionDefinition.getDescription());
@@ -32,11 +32,11 @@ public class JurisdictionMapper {
         return result;
     }
 
-    public List<CaseTypeLiteDefinition> toCaseTypeResponse(List<CaseTypeDefinition> caseTypeDefinitions) {
-        List<CaseTypeLiteDefinition> list = new ArrayList<>();
+    public List<CaseTypeLite> toCaseTypeResponse(List<CaseTypeDefinition> caseTypeDefinitions) {
+        List<CaseTypeLite> list = new ArrayList<>();
         if (caseTypeDefinitions != null) {
             return caseTypeDefinitions.stream()
-                .map(CaseTypeLiteDefinition::new)
+                .map(CaseTypeLite::new)
                 .toList();
         }
         return list;

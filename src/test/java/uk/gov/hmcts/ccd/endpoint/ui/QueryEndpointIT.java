@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewJurisdiction;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -1597,14 +1597,14 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
-            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+        final JurisdictionDisplayPropertiesLite[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionDisplayPropertiesLite[].class);
 
         // match against wiremock:`/src/test/resources/mappings/jurisdictions.json`
         assertThat(jurisdictions.length, is(equalTo(4)));
 
         // find and verify 1
-        JurisdictionLiteDisplayProperties jurisdiction = Arrays.stream(jurisdictions)
+        JurisdictionDisplayPropertiesLite jurisdiction = Arrays.stream(jurisdictions)
             .filter(item -> item.getId().equalsIgnoreCase("PROBATE"))
             .findFirst().orElse(null);
         assertNotNull(jurisdiction);
@@ -1633,8 +1633,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
-            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+        final JurisdictionDisplayPropertiesLite[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionDisplayPropertiesLite[].class);
 
         assertNotNull("Jurisdictions should not be null", jurisdictions);
         assertThat("Jurisdictions should not be empty", jurisdictions.length, is(greaterThan(0)));
@@ -1649,8 +1649,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final JurisdictionLiteDisplayProperties[] jurisdictions = mapper.readValue(
-            result.getResponse().getContentAsString(), JurisdictionLiteDisplayProperties[].class);
+        final JurisdictionDisplayPropertiesLite[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionDisplayPropertiesLite[].class);
 
         assertNotNull("Jurisdictions should not be null", jurisdictions);
         assertThat("Jurisdictions should not be empty", jurisdictions.length, is(greaterThan(0)));

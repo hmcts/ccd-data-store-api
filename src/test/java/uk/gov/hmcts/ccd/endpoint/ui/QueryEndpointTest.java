@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionLiteDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.lite.JurisdictionDisplayPropertiesLite;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -157,16 +157,16 @@ class QueryEndpointTest {
     @Test
     @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions")
     void shouldCallGetUserProfileOperationForLiteJurisdictions() {
-        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        JurisdictionDisplayPropertiesLite j1 = new JurisdictionDisplayPropertiesLite();
         j1.setId("J1");
-        JurisdictionLiteDisplayProperties j2 = new JurisdictionLiteDisplayProperties();
+        JurisdictionDisplayPropertiesLite j2 = new JurisdictionDisplayPropertiesLite();
         j2.setId("J2");
-        JurisdictionLiteDisplayProperties[] jurisdictions = {j1, j2};
+        JurisdictionDisplayPropertiesLite[] jurisdictions = {j1, j2};
         UserProfile userProfile = new UserProfile();
         userProfile.setLiteJurisdictions(jurisdictions);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
 
-        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("create");
+        List<JurisdictionDisplayPropertiesLite> response = queryEndpoint.getJurisdictionsLite("create");
 
         assertEquals(jurisdictions.length, response.size());
         assertThat(response.get(0), is(j1));
@@ -177,14 +177,14 @@ class QueryEndpointTest {
     @Test
     @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions with read access")
     void shouldCallGetUserProfileOperationForLiteJurisdictionsWithReadAccess() {
-        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        JurisdictionDisplayPropertiesLite j1 = new JurisdictionDisplayPropertiesLite();
         j1.setId("J1");
-        JurisdictionLiteDisplayProperties[] jurisdictions = {j1};
+        JurisdictionDisplayPropertiesLite[] jurisdictions = {j1};
         UserProfile userProfile = new UserProfile();
         userProfile.setLiteJurisdictions(jurisdictions);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
 
-        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("read");
+        List<JurisdictionDisplayPropertiesLite> response = queryEndpoint.getJurisdictionsLite("read");
 
         assertEquals(jurisdictions.length, response.size());
         assertThat(response.get(0), is(j1));
@@ -194,14 +194,14 @@ class QueryEndpointTest {
     @Test
     @DisplayName("Should call Get User Profile Operation for Lite Jurisdictions with update access")
     void shouldCallGetUserProfileOperationForLiteJurisdictionsWithUpdateAccess() {
-        JurisdictionLiteDisplayProperties j1 = new JurisdictionLiteDisplayProperties();
+        JurisdictionDisplayPropertiesLite j1 = new JurisdictionDisplayPropertiesLite();
         j1.setId("J1");
-        JurisdictionLiteDisplayProperties[] jurisdictions = {j1};
+        JurisdictionDisplayPropertiesLite[] jurisdictions = {j1};
         UserProfile userProfile = new UserProfile();
         userProfile.setLiteJurisdictions(jurisdictions);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_UPDATE);
 
-        List<JurisdictionLiteDisplayProperties> response = queryEndpoint.getJurisdictionsLite("update");
+        List<JurisdictionDisplayPropertiesLite> response = queryEndpoint.getJurisdictionsLite("update");
 
         assertEquals(jurisdictions.length, response.size());
         assertThat(response.get(0), is(j1));
@@ -220,7 +220,7 @@ class QueryEndpointTest {
     @DisplayName("Should throw ResourceNotFoundException when Lite Jurisdictions are empty")
     void shouldThrowResourceNotFoundExceptionWhenLiteJurisdictionsAreEmpty() {
         UserProfile userProfile = new UserProfile();
-        userProfile.setLiteJurisdictions(new JurisdictionLiteDisplayProperties[0]);
+        userProfile.setLiteJurisdictions(new JurisdictionDisplayPropertiesLite[0]);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
 
         assertThrows(ResourceNotFoundException.class, () -> queryEndpoint.getJurisdictionsLite("read"));
