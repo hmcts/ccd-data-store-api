@@ -153,6 +153,7 @@ public class QueryEndpoint {
         }
     }
 
+    @SuppressWarnings("java:S6856")
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions-lite")
     @Operation(summary = "Get jurisdictions available to the user")
     @ApiResponse(responseCode = "200", description = "List of jurisdictions for the given access criteria")
