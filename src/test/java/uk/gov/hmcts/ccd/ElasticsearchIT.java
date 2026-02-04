@@ -206,6 +206,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         log.info("Starting Elastic search...");
         container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + elasticVersion)
             .withEnv("discovery.type", "single-node")
+            .withEnv("ES_JAVA_OPTS", "-Xms256m -Xmx256m")
             .withExposedPorts(9200)
             .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
                 new HostConfig().withPortBindings(
