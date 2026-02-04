@@ -23,6 +23,7 @@ import jakarta.inject.Named;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CASE_TYPE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.BASE_LOCATION;
@@ -125,10 +126,13 @@ public class GlobalSearchQueryBuilder {
 
     private void addTermsQuery(BoolQueryBuilder boolQueryBuilder, String term, List<String> values) {
         if (CollectionUtils.isNotEmpty(values)) {
-            boolQueryBuilder.must(
-                // NB: switch to lower case for terms query
-                QueryBuilders.termsQuery(term, values.stream().map(String::toLowerCase).collect(Collectors.toList()))
-            );
+            // Accept both original and lower-cased values to tolerate index casing differences.
+            List<String> normalisedValues = values.stream()
+                .filter(StringUtils::isNotBlank)
+                .flatMap(value -> Stream.of(value, value.toLowerCase()))
+                .distinct()
+                .collect(Collectors.toList());
+            boolQueryBuilder.must(QueryBuilders.termsQuery(term, normalisedValues));
         }
     }
 

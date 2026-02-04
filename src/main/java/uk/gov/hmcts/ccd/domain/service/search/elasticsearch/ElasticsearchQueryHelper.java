@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -67,8 +69,80 @@ public class ElasticsearchQueryHelper {
         } catch (ServiceException ex) {
             throw new BadRequestException("Request requires correctly formatted JSON, " + ex.getMessage());
         }
+        normaliseRangeQueries(searchRequestNode);
         validateSupplementaryData(searchRequestNode);
         return new ElasticsearchRequest(searchRequestNode);
+    }
+
+    private void normaliseRangeQueries(JsonNode node) {
+        if (node == null) {
+            return;
+        }
+
+        if (node.isObject()) {
+            ObjectNode objectNode = (ObjectNode) node;
+            JsonNode rangeNode = objectNode.get("range");
+            if (rangeNode != null && rangeNode.isObject()) {
+                normaliseRangeObject((ObjectNode) rangeNode);
+            }
+
+            Iterator<JsonNode> elements = objectNode.elements();
+            while (elements.hasNext()) {
+                normaliseRangeQueries(elements.next());
+            }
+            return;
+        }
+
+        if (node.isArray()) {
+            for (JsonNode element : node) {
+                normaliseRangeQueries(element);
+            }
+        }
+    }
+
+    private void normaliseRangeObject(ObjectNode rangeNode) {
+        Iterator<String> fieldNames = rangeNode.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            JsonNode fieldNode = rangeNode.get(fieldName);
+            if (fieldNode == null || !fieldNode.isObject()) {
+                continue;
+            }
+
+            ObjectNode fieldObject = (ObjectNode) fieldNode;
+            boolean hasFrom = fieldObject.has("from");
+            boolean hasTo = fieldObject.has("to");
+            boolean hasIncludeLower = fieldObject.has("include_lower");
+            boolean hasIncludeUpper = fieldObject.has("include_upper");
+
+            boolean includeLower = hasIncludeLower ? fieldObject.get("include_lower").asBoolean(true) : true;
+            boolean includeUpper = hasIncludeUpper ? fieldObject.get("include_upper").asBoolean(true) : true;
+
+            if (hasFrom) {
+                if (!fieldObject.has("gte") && !fieldObject.has("gt")) {
+                    JsonNode fromValue = fieldObject.get("from");
+                    if (fromValue != null && !fromValue.isNull()) {
+                        fieldObject.set(includeLower ? "gte" : "gt", fromValue);
+                    }
+                }
+                fieldObject.remove("from");
+            }
+
+            if (hasTo) {
+                if (!fieldObject.has("lte") && !fieldObject.has("lt")) {
+                    JsonNode toValue = fieldObject.get("to");
+                    if (toValue != null && !toValue.isNull()) {
+                        fieldObject.set(includeUpper ? "lte" : "lt", toValue);
+                    }
+                }
+                fieldObject.remove("to");
+            }
+
+            if (hasFrom || hasTo) {
+                fieldObject.remove("include_lower");
+                fieldObject.remove("include_upper");
+            }
+        }
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {

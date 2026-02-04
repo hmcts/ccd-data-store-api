@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hamcrest.MatcherAssert;
@@ -29,7 +30,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -210,6 +213,112 @@ class ElasticsearchQueryHelperTest {
             assertAll(
                 () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is("{\"query\":{}}")),
                 () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true))
+            );
+        }
+
+        @Test
+        void shouldNormaliseRangeQueryFromTo() {
+            String searchRequest = "{"
+                + "\"query\":{"
+                + "\"bool\":{\"must\":["
+                + "{\"range\":{\"data.created_date\":{\"from\":\"2020-01-01\",\"to\":\"2020-02-01\","
+                + "\"include_lower\":false,\"include_upper\":false}}}"
+                + "]}"
+                + "}"
+                + "}";
+
+            ElasticsearchRequest elasticsearchRequest
+                = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+
+            JsonNode rangeNode = elasticsearchRequest.getNativeSearchRequest()
+                .get("query").get("bool").get("must").get(0).get("range").get("data.created_date");
+
+            assertAll(
+                () -> assertTrue(rangeNode.has("gt")),
+                () -> assertTrue(rangeNode.has("lt")),
+                () -> assertFalse(rangeNode.has("from")),
+                () -> assertFalse(rangeNode.has("to")),
+                () -> assertFalse(rangeNode.has("include_lower")),
+                () -> assertFalse(rangeNode.has("include_upper")),
+                () -> assertThat(rangeNode.get("gt").asText(), is("2020-01-01")),
+                () -> assertThat(rangeNode.get("lt").asText(), is("2020-02-01"))
+            );
+        }
+
+        @Test
+        void shouldNormaliseRangeQueryComplex() {
+            String searchRequest = """
+                {
+                    "bool": {
+                      "must": [
+                        {
+                          "bool": {
+                            "must_not": [
+                              {
+                                "match": {
+                                  "data.bulkCaseDataVersion": {
+                                    "query": 0
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "bool": {
+                            "should": [
+                              {
+                                "bool": {
+                                  "must_not": [
+                                    {
+                                      "exists": {
+                                        "field": "data.bulkCaseDataVersion"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "bool": {
+                                  "must": [
+                                    {
+                                      "range": {
+                                        "data.bulkCaseDataVersion": {
+                                          "from": 10,
+                                           "to": 101,
+                                           "include_lower": true,
+                                           "include_upper": false,
+                                          "boost": 1.0
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                }
+                """;
+
+            ElasticsearchRequest elasticsearchRequest
+                = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+
+            JsonNode rangeNode = elasticsearchRequest.getNativeSearchRequest()
+                .get("bool").get("must").get(1).get("bool").get("should").get(1).get("bool").get("must").get(0)
+                .get("range").get("data.bulkCaseDataVersion");
+
+            assertAll(
+                () -> assertTrue(rangeNode.has("gte")),
+                () -> assertTrue(rangeNode.has("lt")),
+                () -> assertFalse(rangeNode.has("from")),
+                () -> assertFalse(rangeNode.has("to")),
+                () -> assertFalse(rangeNode.has("include_lower")),
+                () -> assertFalse(rangeNode.has("include_upper")),
+                () -> assertThat(rangeNode.get("gte").asText(), is("10")),
+                () -> assertThat(rangeNode.get("lt").asText(), is("101"))
             );
         }
 
