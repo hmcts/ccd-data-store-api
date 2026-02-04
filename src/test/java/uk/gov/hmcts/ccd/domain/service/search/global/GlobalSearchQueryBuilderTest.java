@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -110,37 +111,16 @@ class GlobalSearchQueryBuilderTest {
             GlobalSearchRequestPayload request = new GlobalSearchRequestPayload();
             request.setSearchCriteria(searchCriteria);
 
-            List<String> expectedJurisdictionTerms = new ArrayList<>(JURISDICTION_TERMS);
-            expectedJurisdictionTerms.addAll(
-                JURISDICTION_TERMS.stream().map(String::toLowerCase).collect(Collectors.toList())
-            );
-            List<String> expectedCaseTypeTerms = new ArrayList<>(CASE_TYPE_TERMS);
-            expectedCaseTypeTerms.addAll(
-                CASE_TYPE_TERMS.stream().map(String::toLowerCase).collect(Collectors.toList())
-            );
-            List<String> expectedStateTerms = new ArrayList<>(STATE_TERMS);
-            expectedStateTerms.addAll(
-                STATE_TERMS.stream().map(String::toLowerCase).collect(Collectors.toList())
-            );
-            List<String> expectedRegionTerms = new ArrayList<>(REGION_TERMS);
-            expectedRegionTerms.addAll(
-                REGION_TERMS.stream().map(String::toLowerCase).collect(Collectors.toList())
-            );
-            List<String> expectedBaseLocationTerms = new ArrayList<>(BASE_LOCATION_TERMS);
-            expectedBaseLocationTerms.addAll(
-                BASE_LOCATION_TERMS.stream().map(String::toLowerCase).collect(Collectors.toList())
-            );
-
             // ACT
             QueryBuilder output = classUnderTest.globalSearchQuery(request);
 
             // ASSERT
             assertAll(
-                () -> assertTermsQuery(output, GlobalSearchFields.JURISDICTION, expectedJurisdictionTerms),
-                () -> assertTermsQuery(output, GlobalSearchFields.CASE_TYPE, expectedCaseTypeTerms),
-                () -> assertTermsQuery(output, GlobalSearchFields.STATE, expectedStateTerms),
-                () -> assertTermsQuery(output, CaseDataPaths.REGION, expectedRegionTerms),
-                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, expectedBaseLocationTerms),
+                () -> assertTermsQuery(output, GlobalSearchFields.JURISDICTION, JURISDICTION_TERMS),
+                () -> assertTermsQuery(output, GlobalSearchFields.CASE_TYPE, CASE_TYPE_TERMS),
+                () -> assertTermsQuery(output, GlobalSearchFields.STATE, STATE_TERMS),
+                () -> assertTermsQuery(output, CaseDataPaths.REGION, REGION_TERMS),
+                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS),
                 () -> assertWildcardQuery(output, CaseDataPaths.OTHER_REFERENCE_VALUE + ".keyword",
                     OTHER_REFERENCE_TERMS),
                 () -> assertWildcardQuery(output, GlobalSearchFields.REFERENCE + ".keyword", REFERENCE_TERMS)
@@ -353,7 +333,7 @@ class GlobalSearchQueryBuilderTest {
             assertEquals(expectedTerms.size(), actualTerms.size());
             // NB: terms searches use: 'lowercase_normalizer'
             List<String> expectedTermsLowerCase
-                = expectedTerms.stream().map(String::toLowerCase).collect(Collectors.toList());
+                = expectedTerms.stream().map(String::toLowerCase).toList();
             assertTrue(actualTerms.containsAll(expectedTermsLowerCase));
         }
 
@@ -426,7 +406,7 @@ class GlobalSearchQueryBuilderTest {
 
         private BoolQueryBuilder toBoolQueryBuilder(QueryBuilder output) {
             assertNotNull(output);
-            assertTrue(output instanceof BoolQueryBuilder);
+            assertInstanceOf(BoolQueryBuilder.class, output);
             return (BoolQueryBuilder) output;
         }
 
@@ -441,7 +421,7 @@ class GlobalSearchQueryBuilderTest {
 
                     // if contains a should: check if Nested
                     if (CollectionUtils.isNotEmpty(shouldQueries)) {
-                        QueryBuilder firstShouldQuery = shouldQueries.get(0);
+                        QueryBuilder firstShouldQuery = shouldQueries.getFirst();
                         if (firstShouldQuery instanceof NestedQueryBuilder) {
                             if (nestedPath.equalsIgnoreCase(getNestedQueriesPathValue(firstShouldQuery))) {
                                 return shouldQueries;
@@ -674,7 +654,7 @@ class GlobalSearchQueryBuilderTest {
                 () -> assertSortCriteria(
                     GlobalSearchSortByCategory.CASE_NAME,
                     SortOrder.ASC,
-                    output.get(0)
+                    output.getFirst()
                 ),
                 () -> assertSortCriteria(
                     GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME,
