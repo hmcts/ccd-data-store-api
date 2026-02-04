@@ -7,25 +7,13 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class JurisdictionDisplayPropertiesLite {
-    @Setter
-    @Getter
+
     private String id;
-    @Setter
-    @Getter
     private String name;
-    @Setter
-    @Getter
     private String description;
-
-    private List<CaseTypeLite> caseTypeLiteDefinitons = new ArrayList<>();
-
     @JsonProperty("caseTypes")
-    public List<CaseTypeLite> getCaseTypeDefinitions() {
-        return caseTypeLiteDefinitons;
-    }
-
-    public void setCaseTypeDefinitions(List<CaseTypeLite> caseTypeDefinitions) {
-        this.caseTypeLiteDefinitons = caseTypeDefinitions;
-    }
+    private List<CaseTypeLite> caseTypeLiteDefinitions = new ArrayList<>();
 }

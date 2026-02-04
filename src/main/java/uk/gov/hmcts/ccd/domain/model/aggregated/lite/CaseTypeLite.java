@@ -15,22 +15,16 @@ import java.io.Serializable;
 import java.util.List;
 
 @ToString
+@Getter
 public class CaseTypeLite implements Serializable {
 
-    @Getter
     private final String id;
-    @Getter
     private final String description;
-    @Getter
     private final Version version;
-    @Getter
     private final String name;
-    @Getter
     @JsonProperty("security_classification")
     private final SecurityClassification securityClassification;
-    @Getter
     private final List<CaseEventLite> events;
-    @Getter
     private final List<CaseStateLite> states;
 
     public CaseTypeLite(CaseTypeDefinition caseTypeDefinition) {
