@@ -1610,17 +1610,17 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(jurisdiction);
 
         assertAll(
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().size(), is(equalTo(2))),
 
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(0),
                 hasProperty("id", equalTo("GrantOfRepresentation"))),
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getStates().size(), is(equalTo(2))),
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(0).getEvents().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(0).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(0).getEvents().size(), is(equalTo(2))),
 
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(1),
                 hasProperty("id", equalTo("TestAddressBookCaseCaseLinks"))),
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getStates().size(), is(equalTo(2))),
-            () -> assertThat(jurisdiction.getCaseTypeDefinitions().get(1).getEvents().size(), is(equalTo(3)))
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(1).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdiction.getCaseTypeLiteDefinitions().get(1).getEvents().size(), is(equalTo(3)))
         );
     }
 
