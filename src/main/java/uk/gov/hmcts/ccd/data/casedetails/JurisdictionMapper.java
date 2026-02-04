@@ -28,7 +28,7 @@ public class JurisdictionMapper {
         result.setId(jurisdictionDefinition.getId());
         result.setName(jurisdictionDefinition.getName());
         result.setDescription(jurisdictionDefinition.getDescription());
-        result.setCaseTypeDefinitions(toCaseTypeResponse(jurisdictionDefinition.getCaseTypeDefinitions()));
+        result.setCaseTypeLiteDefinitions(toCaseTypeResponse(jurisdictionDefinition.getCaseTypeDefinitions()));
         return result;
     }
 
