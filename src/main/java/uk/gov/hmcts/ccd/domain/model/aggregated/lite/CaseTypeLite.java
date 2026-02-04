@@ -56,7 +56,7 @@ public class CaseTypeLite implements Serializable {
     }
 
     private List<CaseEventLite> createLiteEvents(List<CaseEventDefinition> events) {
-        if (states != null) {
+        if (events != null) {
             return events.stream()
                 .map(event -> {
                     CaseEventLite caseEventLite = new CaseEventLite();
