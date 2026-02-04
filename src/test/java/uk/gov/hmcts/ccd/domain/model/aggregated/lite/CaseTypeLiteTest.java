@@ -25,14 +25,13 @@ class CaseTypeLiteTest {
 
     private CaseTypeDefinition caseTypeDefinition;
     private Version version;
-    private JurisdictionDefinition jurisdictionDefinition;
 
     @BeforeEach
     void setUp() {
         version = new Version();
         version.setNumber(1);
 
-        jurisdictionDefinition = new JurisdictionDefinition();
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId("TEST_JURISDICTION");
         jurisdictionDefinition.setName("Test Jurisdiction");
 
