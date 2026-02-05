@@ -178,7 +178,6 @@
               "description" : "Create a case of type BEFTA_CASETYPE_NO_READ",
               "version" : null,
               "name" : "BEFTA Case Type No Read",
-              "jurisdiction": null,
               "events": [
                 {
                   "__ordering__": "unordered"
@@ -389,7 +388,6 @@
 									"name": "Create a new case",
 									"description": null,
 									"pre_states": [],
-									"post_states": [],
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -418,7 +416,89 @@
 								}
 							],
 							"security_classification": null
-						}
+						},
+            {
+              "id" : "ROLE_TO_ACCESS_PROFILE_CASE_TYPE",
+              "description" : "For testing role to access profile case type",
+              "version" : null,
+              "name" : "RTAP_CASE_TYPE",
+              "security_classification" : null,
+              "events" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "CREATE",
+                "name" : "Create a new case",
+                "description" : null,
+                "pre_states" : [ ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : false,
+                  "role" : "caseworker-caa"
+                } ]
+              } ],
+              "states" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "TODO",
+                "name" : "To do",
+                "description" : null
+              } ]
+            },
+            {
+              "id" : "CaseAccessGroups_Casetype",
+              "description" : "For testing Case Access Group",
+              "version" : null,
+              "name" : "CaseAccessGroups_Casetype",
+              "security_classification" : null,
+              "events" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "updateCase",
+                "name" : "Update Case",
+                "description" : null,
+                "pre_states" : [ "CaseCreated" ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_jurisdiction_1"
+                } ]
+              }, {
+                "id" : "createCase",
+                "name" : "Create a new case",
+                "description" : null,
+                "pre_states" : [ ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_jurisdiction_1"
+                } ]
+              } ],
+              "states" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "CaseCreated",
+                "name" : "Create Case",
+                "description" : null
+              }, {
+                "id" : "CaseUpdated",
+                "name" : "Update Case",
+                "description" : null
+              } ]
+            }
 					]
 				}
 			]
