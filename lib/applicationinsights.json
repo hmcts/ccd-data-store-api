@@ -13,11 +13,6 @@
               "key": "http.url",
               "value": "https?://[^/]+/health.*",
               "matchType": "regexp"
-            },
-            {
-              "key": "http.url",
-              "value": "https?://[^/]+/metrics.*",
-              "matchType": "regexp"
             }
           ],
           "percentage": 1
