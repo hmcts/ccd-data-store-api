@@ -24,7 +24,7 @@ def versions = [
 ]
 
 ext {
-    set('springCloudVersion', '2025.0.1')
+    set('springCloudVersion', '2025.1.1')
     set('spring-security.version', '6.4.2')
     set('log4j2.version', '2.24.3')
     set('jackson.version', '2.16.0')
