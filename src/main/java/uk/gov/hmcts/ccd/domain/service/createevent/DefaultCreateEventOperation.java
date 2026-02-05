@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,9 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
-
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
@@ -101,6 +100,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             LOG.warn("Submitted callback failed", ex);
             // Exception occurred, e.g. call back service is unavailable,
             caseDetails.setIncompleteCallbackResponse();
+            caseDetails.setCallbackErrorMessage(ex.getMessage());
         }
         return caseDetails;
     }

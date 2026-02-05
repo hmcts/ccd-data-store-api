@@ -145,6 +145,7 @@
           "after_submit_callback_response": "[[ANY_NULLABLE]]",
           "callback_response_status_code": "[[ANY_NULLABLE]]",
           "callback_response_status": "[[ANY_NULLABLE]]",
+          "callback_error_message": "[[ANY_NULLABLE]]",
           "delete_draft_response_status_code": "[[ANY_NULLABLE]]",
           "delete_draft_response_status": "[[ANY_NULLABLE]]"
         }
