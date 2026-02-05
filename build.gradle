@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -40,7 +41,7 @@ ext {
     testContainersVersion = '1.21.4'
     cucumber = '6.11.0'
     beftaFwVersion = '9.2.4'
-    ccdTestDefinitionVersion = '7.25.4'
+    ccdTestDefinitionVersion = '7.26.7-prerelease-CCD-5329'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -314,6 +315,19 @@ dependencyManagement {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
+    }
+}
+
 pitest {
 
     targetClasses = ['uk.gov.hmcts.ccd.config.*',
@@ -577,6 +591,14 @@ compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
+idea.project.settings {
+    compiler {
+        javac {
+            javacAdditionalOptions "-parameters"
+        }
+    }
+}
+
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
@@ -754,6 +776,8 @@ task smoke() {
 }
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+//temporary to check feature working on its own in pipeline or not
+//tags = tags + " and (@S-164 or @S-1025.3)"
 
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
