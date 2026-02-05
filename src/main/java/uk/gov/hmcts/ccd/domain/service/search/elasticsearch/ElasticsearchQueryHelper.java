@@ -36,6 +36,16 @@ public class ElasticsearchQueryHelper {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
 
+    protected static final String FROM = "from";
+    protected static final String GT = "gt";
+    protected static final String GTE = "gte";
+    protected static final String LT = "lt";
+    protected static final String LTE = "lte";
+    protected static final String INCLUDE_LOWER = "include_lower";
+    protected static final String INCLUDE_UPPER = "include_upper";
+    protected static final String RANGE = "range";
+    protected static final String TO = "to";
+
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
                                     ObjectMapperService objectMapperService,
@@ -81,7 +91,7 @@ public class ElasticsearchQueryHelper {
 
         if (node.isObject()) {
             ObjectNode objectNode = (ObjectNode) node;
-            JsonNode rangeNode = objectNode.get("range");
+            JsonNode rangeNode = objectNode.get(RANGE);
             if (rangeNode != null && rangeNode.isObject()) {
                 normaliseRangeObject((ObjectNode) rangeNode);
             }
@@ -101,48 +111,46 @@ public class ElasticsearchQueryHelper {
     }
 
     private void normaliseRangeObject(ObjectNode rangeNode) {
-        Iterator<String> fieldNames = rangeNode.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
+        rangeNode.fieldNames().forEachRemaining(fieldName -> {
             JsonNode fieldNode = rangeNode.get(fieldName);
             if (fieldNode == null || !fieldNode.isObject()) {
-                continue;
+                return;
             }
 
             ObjectNode fieldObject = (ObjectNode) fieldNode;
-            boolean hasFrom = fieldObject.has("from");
-            boolean hasTo = fieldObject.has("to");
-            boolean hasIncludeLower = fieldObject.has("include_lower");
-            boolean hasIncludeUpper = fieldObject.has("include_upper");
+            boolean hasFrom = fieldObject.has(FROM);
+            boolean hasTo = fieldObject.has(TO);
+            if (!hasFrom && !hasTo) {
+                return;
+            }
 
-            boolean includeLower = hasIncludeLower ? fieldObject.get("include_lower").asBoolean(true) : true;
-            boolean includeUpper = hasIncludeUpper ? fieldObject.get("include_upper").asBoolean(true) : true;
+            boolean includeLower = !fieldObject.has(INCLUDE_LOWER)
+                || fieldObject.get(INCLUDE_LOWER).asBoolean(true);
+            boolean includeUpper = !fieldObject.has(INCLUDE_UPPER)
+                || fieldObject.get(INCLUDE_UPPER).asBoolean(true);
+
+            if (hasFrom && !fieldObject.has(GTE) && !fieldObject.has(GT)) {
+                JsonNode fromValue = fieldObject.get(FROM);
+                if (fromValue != null && !fromValue.isNull()) {
+                    fieldObject.set(includeLower ? GTE : GT, fromValue);
+                }
+            }
+            if (hasTo && !fieldObject.has(LTE) && !fieldObject.has(LT)) {
+                JsonNode toValue = fieldObject.get(TO);
+                if (toValue != null && !toValue.isNull()) {
+                    fieldObject.set(includeUpper ? LTE : LT, toValue);
+                }
+            }
 
             if (hasFrom) {
-                if (!fieldObject.has("gte") && !fieldObject.has("gt")) {
-                    JsonNode fromValue = fieldObject.get("from");
-                    if (fromValue != null && !fromValue.isNull()) {
-                        fieldObject.set(includeLower ? "gte" : "gt", fromValue);
-                    }
-                }
-                fieldObject.remove("from");
+                fieldObject.remove(FROM);
             }
-
             if (hasTo) {
-                if (!fieldObject.has("lte") && !fieldObject.has("lt")) {
-                    JsonNode toValue = fieldObject.get("to");
-                    if (toValue != null && !toValue.isNull()) {
-                        fieldObject.set(includeUpper ? "lte" : "lt", toValue);
-                    }
-                }
-                fieldObject.remove("to");
+                fieldObject.remove(TO);
             }
-
-            if (hasFrom || hasTo) {
-                fieldObject.remove("include_lower");
-                fieldObject.remove("include_upper");
-            }
-        }
+            fieldObject.remove(INCLUDE_LOWER);
+            fieldObject.remove(INCLUDE_UPPER);
+        });
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {
