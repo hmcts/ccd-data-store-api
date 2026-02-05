@@ -8,6 +8,5 @@
   "Expires" : "[[ANYTHING_PRESENT]]",
   "Pragma" : "no-cache",
   "X-Content-Type-Options" : "nosniff",
-  "X-Frame-Options" : "DENY",
-  "X-Xss-Protection" : "1; mode=block"
+  "X-Frame-Options" : "DENY"
 }
