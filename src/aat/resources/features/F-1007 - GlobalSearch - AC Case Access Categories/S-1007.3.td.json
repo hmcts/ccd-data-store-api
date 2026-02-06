@@ -14,11 +14,11 @@
   "request": {
     "body": {
       "searchCriteria": {
-        "ccdCaseTypeIds": [
-          "${[scenarioContext][childContexts][S-1007.3_CreateCase][testData][actualResponse][body][case_type]}"
+        "CCDCaseTypeIds": [
+          "${[scenarioContext][childContexts][S-1007.3_CreateCase][testData][actualResponse][body][case_type]}" 
         ],
         "caseReferences": [
-         "${[scenarioContext][childContexts][S-1007.3_CreateCase][testData][actualResponse][body][id]}"
+         "${[scenarioContext][childContexts][S-1007.3_CreateCase][testData][actualResponse][body][id]}" 
         ]
       }
     }

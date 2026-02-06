@@ -18,7 +18,7 @@
   "request": {
     "body": {
       "searchCriteria": {
-        "ccdCaseTypeIds": [
+        "CCDCaseTypeIds": [
           "FT_GlobalSearch"
         ]
       }
