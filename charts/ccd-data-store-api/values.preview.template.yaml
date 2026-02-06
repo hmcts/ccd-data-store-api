@@ -245,7 +245,7 @@ logstash:
                     clones => ["SearchCriteria"]
                 }
             }
-            if [tags] == "SearchCriteria" {
+            if "SearchCriteria" in [tags] {
                 if [data][SearchCriteria] {
                     mutate {
                       rename => {"[data][SearchCriteria]" => "[data_new][SearchCriteria]" }
