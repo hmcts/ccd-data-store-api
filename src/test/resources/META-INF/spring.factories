@@ -1,4 +1,0 @@
-# Application Listeners
-org.springframework.context.ApplicationListener=\
-uk.gov.hmcts.ccd.wiremock.SafeWireMockPortApplicationListener
-
