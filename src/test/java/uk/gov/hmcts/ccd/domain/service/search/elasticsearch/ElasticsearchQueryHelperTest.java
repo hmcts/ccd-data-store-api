@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
@@ -76,6 +80,17 @@ class ElasticsearchQueryHelperTest {
         .withFieldType(COLLECTION_TEXT_FIELD_TYPE).build();
     private static final CommonField COLLECTION_DATE_FIELD = newCaseField().withId(COLLECTION_DATE_FIELD_ID)
         .withFieldType(COLLECTION_DATE_FIELD_TYPE).build();
+
+
+    private static final String BOOST = "boost";
+    private static final String FROM = "from";
+    private static final String GT = "gt";
+    private static final String GTE = "gte";
+    private static final String LT = "lt";
+    private static final String LTE = "lte";
+    private static final String INCLUDE_LOWER = "include_lower";
+    private static final String INCLUDE_UPPER = "include_upper";
+    private static final String TO = "to";
 
     @InjectMocks
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
@@ -205,7 +220,9 @@ class ElasticsearchQueryHelperTest {
         @Test
         void shouldConvertWrappedQueryToElasticSearchRequest() {
             String searchRequest
-                = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}}";
+                = """
+                    {"native_es_query":{"query":{}},"supplementary_data":["Field1","Field2"]}}
+                """;
 
             ElasticsearchRequest elasticsearchRequest
                 = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
@@ -218,14 +235,16 @@ class ElasticsearchQueryHelperTest {
 
         @Test
         void shouldNormaliseRangeQueryFromTo() {
-            String searchRequest = "{"
-                + "\"query\":{"
-                + "\"bool\":{\"must\":["
-                + "{\"range\":{\"data.created_date\":{\"from\":\"2020-01-01\",\"to\":\"2020-02-01\","
-                + "\"include_lower\":false,\"include_upper\":false}}}"
-                + "]}"
-                + "}"
-                + "}";
+            String searchRequest = """
+                {
+                  "query":{
+                    "bool":{"must":[
+                    {"range":{"data.created_date":{"from":"2020-01-01","to":"2020-02-01",
+                    "include_lower":false,"include_upper":false}}}
+                    ]}
+                    }
+                 }
+                """;
 
             ElasticsearchRequest elasticsearchRequest
                 = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
@@ -234,14 +253,14 @@ class ElasticsearchQueryHelperTest {
                 .get("query").get("bool").get("must").get(0).get("range").get("data.created_date");
 
             assertAll(
-                () -> assertTrue(rangeNode.has("gt")),
-                () -> assertTrue(rangeNode.has("lt")),
-                () -> assertFalse(rangeNode.has("from")),
-                () -> assertFalse(rangeNode.has("to")),
-                () -> assertFalse(rangeNode.has("include_lower")),
-                () -> assertFalse(rangeNode.has("include_upper")),
-                () -> assertThat(rangeNode.get("gt").asText(), is("2020-01-01")),
-                () -> assertThat(rangeNode.get("lt").asText(), is("2020-02-01"))
+                () -> assertTrue(rangeNode.has(GT)),
+                () -> assertTrue(rangeNode.has(LT)),
+                () -> assertFalse(rangeNode.has(FROM)),
+                () -> assertFalse(rangeNode.has(TO)),
+                () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
+                () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
+                () -> assertThat(rangeNode.get(GT).asText(), is("2020-01-01")),
+                () -> assertThat(rangeNode.get(LT).asText(), is("2020-02-01"))
             );
         }
 
@@ -311,14 +330,37 @@ class ElasticsearchQueryHelperTest {
                 .get("range").get("data.bulkCaseDataVersion");
 
             assertAll(
-                () -> assertTrue(rangeNode.has("gte")),
-                () -> assertTrue(rangeNode.has("lt")),
-                () -> assertFalse(rangeNode.has("from")),
-                () -> assertFalse(rangeNode.has("to")),
-                () -> assertFalse(rangeNode.has("include_lower")),
-                () -> assertFalse(rangeNode.has("include_upper")),
-                () -> assertThat(rangeNode.get("gte").asText(), is("10")),
-                () -> assertThat(rangeNode.get("lt").asText(), is("101"))
+                () -> assertTrue(rangeNode.has(GTE)),
+                () -> assertTrue(rangeNode.has(LT)),
+                () -> assertFalse(rangeNode.has(FROM)),
+                () -> assertFalse(rangeNode.has(TO)),
+                () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
+                () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
+                () -> assertThat(rangeNode.get(GTE).asText(), is("10")),
+                () -> assertThat(rangeNode.get(LT).asText(), is("101"))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("rangeOperatorCombinations")
+        void shouldNormaliseRangeQueryComplexOperatorCombinations(String rangeFieldsJson,
+                                                                  String expectedLowerKey,
+                                                                  String expectedUpperKey,
+                                                                  String expectedLowerValue,
+                                                                  String expectedUpperValue) {
+            JsonNode rangeNode = normaliseComplexRange(rangeFieldsJson);
+
+            assertAll(
+                () -> assertTrue(rangeNode.has(expectedLowerKey)),
+                () -> assertTrue(rangeNode.has(expectedUpperKey)),
+                () -> assertFalse(rangeNode.has(otherLowerKey(expectedLowerKey))),
+                () -> assertFalse(rangeNode.has(otherUpperKey(expectedUpperKey))),
+                () -> assertFalse(rangeNode.has(FROM)),
+                () -> assertFalse(rangeNode.has(TO)),
+                () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
+                () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
+                () -> assertThat(rangeNode.get(expectedLowerKey).asText(), is(expectedLowerValue)),
+                () -> assertThat(rangeNode.get(expectedUpperKey).asText(), is(expectedUpperValue))
             );
         }
 
@@ -438,6 +480,103 @@ class ElasticsearchQueryHelperTest {
                 + "}";
         }
 
+        private static Stream<Arguments> rangeOperatorCombinations() {
+            return ElasticsearchQueryHelperTest.rangeOperatorCombinations();
+        }
+
+    }
+
+    private static Stream<Arguments> rangeOperatorCombinations() {
+        return Stream.of(
+            Arguments.of(rangeFieldsJson(true, true, 10, 101), GTE, LTE, "10", "101"),
+            Arguments.of(rangeFieldsJson(false, false, 20, 100), GT, LT, "20", "100"),
+            Arguments.of(rangeFieldsJson(true, false, 11, 101), GTE, LT, "11", "101"),
+            Arguments.of(rangeFieldsJson(false, true, 7, 90), GT, LTE, "7", "90"),
+            Arguments.of(rangeFieldsJson(null, null, 1, 80), GTE, LTE, "1", "80")
+        );
+    }
+
+    private static String rangeFieldsJson(Boolean includeLower, Boolean includeUpper, int intFrom, int intTo) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\"").append(FROM).append("\": ").append(intFrom).append(", \"").append(TO).append("\": ")
+            .append(intTo);
+        if (includeLower != null) {
+            builder.append(", \"").append(INCLUDE_LOWER).append("\": ").append(includeLower);
+        }
+        if (includeUpper != null) {
+            builder.append(", \"").append(INCLUDE_UPPER).append("\": ").append(includeUpper);
+        }
+        builder.append(", \"").append(BOOST).append("\": 1.0");
+        return builder.toString();
+    }
+
+    private JsonNode normaliseComplexRange(String rangeFieldsJson) {
+        String searchRequest = """
+            {
+                "bool": {
+                  "must": [
+                    {
+                      "bool": {
+                        "must_not": [
+                          {
+                            "match": {
+                              "data.bulkCaseDataVersion": {
+                                "query": 0
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "bool": {
+                        "should": [
+                          {
+                            "bool": {
+                              "must_not": [
+                                {
+                                  "exists": {
+                                    "field": "data.bulkCaseDataVersion"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "bool": {
+                              "must": [
+                                {
+                                  "range": {
+                                    "data.bulkCaseDataVersion": {
+                                      %s
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+            }
+            """.formatted(rangeFieldsJson);
+
+        ElasticsearchRequest elasticsearchRequest
+            = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+
+        return elasticsearchRequest.getNativeSearchRequest()
+            .get("bool").get("must").get(1).get("bool").get("should").get(1).get("bool").get("must").get(0)
+            .get("range").get("data.bulkCaseDataVersion");
+    }
+
+    private String otherLowerKey(String expectedLowerKey) {
+        return GTE.equals(expectedLowerKey) ? GT : GTE;
+    }
+
+    private String otherUpperKey(String expectedUpperKey) {
+        return LTE.equals(expectedUpperKey) ? LT : LTE;
     }
 
 }

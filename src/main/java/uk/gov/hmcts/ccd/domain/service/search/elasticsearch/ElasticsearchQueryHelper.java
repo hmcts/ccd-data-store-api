@@ -36,15 +36,15 @@ public class ElasticsearchQueryHelper {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
 
-    protected static final String FROM = "from";
-    protected static final String GT = "gt";
-    protected static final String GTE = "gte";
-    protected static final String LT = "lt";
-    protected static final String LTE = "lte";
-    protected static final String INCLUDE_LOWER = "include_lower";
-    protected static final String INCLUDE_UPPER = "include_upper";
-    protected static final String RANGE = "range";
-    protected static final String TO = "to";
+    private static final String FROM = "from";
+    private static final String GT = "gt";
+    private static final String GTE = "gte";
+    private static final String LT = "lt";
+    private static final String LTE = "lte";
+    private static final String INCLUDE_LOWER = "include_lower";
+    private static final String INCLUDE_UPPER = "include_upper";
+    private static final String RANGE = "range";
+    private static final String TO = "to";
 
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
@@ -112,45 +112,66 @@ public class ElasticsearchQueryHelper {
 
     private void normaliseRangeObject(ObjectNode rangeNode) {
         rangeNode.fieldNames().forEachRemaining(fieldName -> {
-            JsonNode fieldNode = rangeNode.get(fieldName);
-            if (fieldNode == null || !fieldNode.isObject()) {
+            ObjectNode fieldObject = asObject(rangeNode.get(fieldName));
+            if (fieldObject == null) {
                 return;
             }
-
-            ObjectNode fieldObject = (ObjectNode) fieldNode;
-            boolean hasFrom = fieldObject.has(FROM);
-            boolean hasTo = fieldObject.has(TO);
-            if (!hasFrom && !hasTo) {
-                return;
-            }
-
-            boolean includeLower = !fieldObject.has(INCLUDE_LOWER)
-                || fieldObject.get(INCLUDE_LOWER).asBoolean(true);
-            boolean includeUpper = !fieldObject.has(INCLUDE_UPPER)
-                || fieldObject.get(INCLUDE_UPPER).asBoolean(true);
-
-            if (hasFrom && !fieldObject.has(GTE) && !fieldObject.has(GT)) {
-                JsonNode fromValue = fieldObject.get(FROM);
-                if (fromValue != null && !fromValue.isNull()) {
-                    fieldObject.set(includeLower ? GTE : GT, fromValue);
-                }
-            }
-            if (hasTo && !fieldObject.has(LTE) && !fieldObject.has(LT)) {
-                JsonNode toValue = fieldObject.get(TO);
-                if (toValue != null && !toValue.isNull()) {
-                    fieldObject.set(includeUpper ? LTE : LT, toValue);
-                }
-            }
-
-            if (hasFrom) {
-                fieldObject.remove(FROM);
-            }
-            if (hasTo) {
-                fieldObject.remove(TO);
-            }
-            fieldObject.remove(INCLUDE_LOWER);
-            fieldObject.remove(INCLUDE_UPPER);
+            applyRangeFieldUpdates(fieldObject);
         });
+    }
+
+    private ObjectNode asObject(JsonNode node) {
+        if (node == null || !node.isObject()) {
+            return null;
+        }
+        return (ObjectNode) node;
+    }
+
+    private void applyRangeFieldUpdates(ObjectNode fieldObject) {
+        boolean hasFrom = fieldObject.has(FROM);
+        boolean hasTo = fieldObject.has(TO);
+        if (!hasFrom && !hasTo) {
+            return;
+        }
+
+        boolean includeLower = !fieldObject.has(INCLUDE_LOWER)
+            || fieldObject.get(INCLUDE_LOWER).asBoolean(true);
+        boolean includeUpper = !fieldObject.has(INCLUDE_UPPER)
+            || fieldObject.get(INCLUDE_UPPER).asBoolean(true);
+
+        if (hasFrom) {
+            setRangeValue(fieldObject, FROM, includeLower ? GTE : GT, GTE, GT);
+        }
+        if (hasTo) {
+            setRangeValue(fieldObject, TO, includeUpper ? LTE : LT, LTE, LT);
+        }
+
+        removeRangeMarkers(fieldObject, hasFrom, hasTo);
+    }
+
+    private void setRangeValue(ObjectNode fieldObject,
+                               String legacyKey,
+                               String targetKey,
+                               String inclusiveKey,
+                               String exclusiveKey) {
+        if (fieldObject.has(inclusiveKey) || fieldObject.has(exclusiveKey)) {
+            return;
+        }
+        JsonNode value = fieldObject.get(legacyKey);
+        if (value != null && !value.isNull()) {
+            fieldObject.set(targetKey, value);
+        }
+    }
+
+    private void removeRangeMarkers(ObjectNode fieldObject, boolean hasFrom, boolean hasTo) {
+        if (hasFrom) {
+            fieldObject.remove(FROM);
+        }
+        if (hasTo) {
+            fieldObject.remove(TO);
+        }
+        fieldObject.remove(INCLUDE_LOWER);
+        fieldObject.remove(INCLUDE_UPPER);
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {
