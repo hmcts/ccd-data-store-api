@@ -36,10 +36,10 @@
           "processForAccess": "NONE",
           "caseReference": "[[ANYTHING_PRESENT]]",
           "otherReferences": [],
-          "CCDJurisdictionId": "AUTOTEST1",
-          "CCDJurisdictionName": "Auto Test 1",
-          "CCDCaseTypeId": "SC_Restricted",
-          "CCDCaseTypeName": "SC_Restricted"
+          "ccdJurisdictionId": "AUTOTEST1",
+          "ccdJurisdictionName": "Auto Test 1",
+          "ccdCaseTypeId": "SC_Restricted",
+          "ccdCaseTypeName": "SC_Restricted"
         }
       ]
     }

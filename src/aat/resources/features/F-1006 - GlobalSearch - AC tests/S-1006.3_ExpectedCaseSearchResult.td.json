@@ -8,8 +8,8 @@
   "caseNameHmctsInternal" : "Name Internal",
   "caseManagementCategoryId" : "987",
   "caseManagementCategoryName" : "Category label",
-  "CCDJurisdictionId" : "BEFTA_MASTER",
-  "CCDJurisdictionName" : "BEFTA Master",
-  "CCDCaseTypeId" : "FT_GlobalSearch",
-  "CCDCaseTypeName" : "FT_GlobalSearch"
+  "ccdJurisdictionId" : "BEFTA_MASTER",
+  "ccdJurisdictionName" : "BEFTA Master",
+  "ccdCaseTypeId" : "FT_GlobalSearch",
+  "ccdCaseTypeName" : "FT_GlobalSearch"
 }

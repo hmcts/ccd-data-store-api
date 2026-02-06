@@ -16,8 +16,8 @@
   "request": {
     "body": {
       "searchCriteria": {
-        "CCDCaseTypeIds": [
-          "${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][case_type]}" 
+        "ccdCaseTypeIds": [
+          "${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][case_type]}"
         ],
         "caseReferences": [
           "${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][id]}"
@@ -40,10 +40,10 @@
           "processForAccess" : "NONE",
           "caseReference" : "${}${[scenarioContext][childContexts][S-1007.5_CreateCase][testData][actualResponse][body][id]}",
           "otherReferences" : [ ],
-          "CCDJurisdictionId" : "BEFTA_MASTER",
-          "CCDJurisdictionName" : "BEFTA Master",
-          "CCDCaseTypeId" : "FT_CaseAccessCategories_2",
-          "CCDCaseTypeName" : "FT_CaseAccessCategories_2"
+          "ccdJurisdictionId" : "BEFTA_MASTER",
+          "ccdJurisdictionName" : "BEFTA Master",
+          "ccdCaseTypeId" : "FT_CaseAccessCategories_2",
+          "ccdCaseTypeName" : "FT_CaseAccessCategories_2"
         }
       ]
     }
