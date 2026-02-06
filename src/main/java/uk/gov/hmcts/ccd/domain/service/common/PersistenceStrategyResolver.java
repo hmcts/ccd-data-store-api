@@ -151,7 +151,7 @@ public class PersistenceStrategyResolver {
             throw new IllegalStateException(message);
         }
 
-        String prefix = longestMatches.get(0);
+        String prefix = longestMatches.getFirst();
         String template = caseTypeServiceUrls.get(prefix);
         URI url = resolveTemplate(caseTypeId, prefix, template);
         log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
@@ -161,19 +161,25 @@ public class PersistenceStrategyResolver {
         return Optional.of(url);
     }
 
+    /**
+     * Template URLs can contain a single %s placeholder.
+     * If present, the placeholder will be replaced with the suffix of the case type ID (the part after the prefix).
+     * e.g., with a prefix of 'mycasetype' and a case type ID of 'MyCaseType-1234', the suffix would be '-1234'.
+     * This allows for dynamic routing based on the case type ID while still using a single configuration entry for
+     * reusing AAT instances of CCD from preview PRs.
+     */
     private URI resolveTemplate(String caseTypeId, String prefix, String template) {
         int firstPlaceholder = template.indexOf(TEMPLATE_PLACEHOLDER);
-        if (firstPlaceholder != -1
-            && template.indexOf(TEMPLATE_PLACEHOLDER, firstPlaceholder + TEMPLATE_PLACEHOLDER.length()) != -1) {
-            throw new IllegalStateException(String.format(
-                "Decentralised persistence URL template for prefix '%s' contains multiple '%s' placeholders",
-                prefix,
-                TEMPLATE_PLACEHOLDER
-            ));
-        }
-
         String resolved = template;
         if (firstPlaceholder != -1) {
+            if (firstPlaceholder != template.lastIndexOf(TEMPLATE_PLACEHOLDER)) {
+                throw new IllegalStateException(String.format(
+                    "Decentralised persistence URL template for prefix '%s' contains multiple '%s' placeholders",
+                    prefix,
+                    TEMPLATE_PLACEHOLDER
+                ));
+            }
+
             String suffix = caseTypeId.substring(prefix.length());
             if (suffix.isBlank()) {
                 throw new IllegalStateException(String.format(
