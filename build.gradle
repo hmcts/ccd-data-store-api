@@ -19,16 +19,14 @@ plugins {
 
 apply from: './gradle/suppress.gradle'
 
-def versions = [
-        pact_version    : '4.3.4',
-]
 
 ext {
     set('springCloudVersion', '2025.0.1')
     set('spring-security.version', '6.4.2')
     set('log4j2.version', '2.24.3')
-    set('jackson.version', '2.16.0')
+    set('jacksonVersion', '2.19.2')
     set('snakeyaml.version', '2.2')
+    elasticsearchVersion = '9.1.2'
     junit = '5.14.2'
     junitPlatform = '1.14.2'
     appInsightsVersion = '2.6.4'
@@ -36,8 +34,7 @@ ext {
     lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
-    elasticVersion = '8.16.2'
-    testContainersVersion = '1.21.4'
+    testContainersVersion = '2.0.2'
     cucumber = '6.11.0'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
@@ -47,7 +44,7 @@ ext {
             'line'       : 90,
             'complexity' : 88,
             'method'     : 90,
-            'class'      : 98
+            'class'      : 97
     ]
 }
 
@@ -194,7 +191,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
-    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'          // feign-form-spring
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'          // spring-cloud-starter-openfeign
     implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.6'             // service-auth-provider-java-client
@@ -266,7 +263,17 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.1'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
+
+    implementation (group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion) {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticsearchVersion
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticsearchVersion
+
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
@@ -282,19 +289,21 @@ dependencies {
     mockitoAgent(libs.mockito) {
         transitive = false;
     }
-    testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
+
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.1'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
+    testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
