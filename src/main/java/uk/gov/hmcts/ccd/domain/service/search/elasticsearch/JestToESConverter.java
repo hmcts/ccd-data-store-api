@@ -21,6 +21,9 @@ public class JestToESConverter {
 
     private static final JsonpMapper mapper = new JacksonJsonpMapper();
     private static final Gson GSON = new Gson();
+    private static final String FALSE = "false";
+    private static final String SOURCE = "_source";
+    private static final String TRUE = "true";
 
     public static MsearchRequest fromJest(List<Search> jestSearches) {
         List<RequestItem> items = jestSearches.stream()
@@ -84,7 +87,7 @@ public class JestToESConverter {
             jakarta.json.JsonObject obj = reader.readObject();
             JsonObjectBuilder builder = Json.createObjectBuilder();
             obj.forEach((k, v) -> {
-                if (!"_source".equals(k)) {
+                if (!SOURCE.equals(k)) {
                     builder.add(k, v);
                 }
             });
@@ -95,15 +98,15 @@ public class JestToESConverter {
     private static String extractSource(String json) {
         try (JsonReader reader = Json.createReader(new StringReader(json))) {
             JsonObject obj = reader.readObject();
-            if (obj.containsKey("_source")) {
-                return obj.get("_source").toString();
+            if (obj.containsKey(SOURCE)) {
+                return obj.get(SOURCE).toString();
             }
         }
         return "true";
     }
 
     private static SourceConfig parseSourceJson(String src) {
-        if (src.equals("true") || src.equals("false")) {
+        if (src.equals(TRUE) || src.equals(FALSE)) {
             return SourceConfig.of(s -> s.fetch(Boolean.valueOf(src)));
         }
         if (src.startsWith("[")) {
