@@ -119,7 +119,7 @@ public class CaseSearchEndpoint {
                 applicationParams.getGlobalSearchIndexType()
             );
             builder.withSearchIndex(searchIndex);
-            log.info("pointing to global search index...");
+            log.debug("pointing to global search index...");
         }
 
         return builder.build();
@@ -140,7 +140,7 @@ public class CaseSearchEndpoint {
     }
 
     private boolean isAllCaseTypesRequest(List<String> caseTypeIds) {
-        return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.get(0));
+        return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.getFirst());
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {

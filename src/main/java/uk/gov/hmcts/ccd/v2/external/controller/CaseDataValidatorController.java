@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,9 +40,7 @@ public class CaseDataValidatorController {
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
-        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = {
-            MediaType.APPLICATION_JSON_VALUE,
             V2.MediaType.CASE_DATA_VALIDATE
         }
     )
