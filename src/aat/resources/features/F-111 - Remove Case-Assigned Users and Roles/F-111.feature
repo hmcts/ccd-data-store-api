@@ -81,6 +81,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
     And the response has all the details as expected,
     And a call [to verify Olawale's loss of the role CR-2 over the case C1] will get the expected response as in [S-111.14_Get_Case_Roles_for_Case_C1_After_Remove],
     And a call [to verify the count of users unassigned to C1 has NOT changed] will get the expected response as in [S-111.14_Verify_User_Count_Assigned_To_Case_Equals_1].
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.15
   Scenario: must not decrease Assigned User Count when when no organisation ID is provided
@@ -118,6 +120,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.4
   Scenario: must return an error response for a empty Case ID
@@ -136,6 +140,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.5
   Scenario: must return an error response for a missing User ID
@@ -154,6 +160,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.6
   Scenario: must return an error response for a malformed User ID
@@ -172,6 +180,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.7
   Scenario: must return an error response when the request is made from an un-authorised application
@@ -190,6 +200,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.8
   Scenario: Must return an error response for a malformed Case Role
@@ -207,7 +219,9 @@ Feature: F-111: Remove Case-Assigned Users and Roles
 
      Then a negative response is received,
       And the response has all the details as expected,
-      And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add],
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.9
   Scenario: must return an error response for a missing Case Role
@@ -226,6 +240,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.10
   Scenario: must return an error response for missing case_users list
@@ -266,6 +282,8 @@ Feature: F-111: Remove Case-Assigned Users and Roles
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [to verify that Olawale hasn't lost the role CR-1 over the case C1] will get the expected response as in [F-111_Get_Case_Roles_for_Case_C1_After_Add].
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-111_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-111.16
   Scenario: must reject request when an empty Organisation ID is provided
@@ -286,3 +304,5 @@ Feature: F-111: Remove Case-Assigned Users and Roles
       And the response has all the details as expected,
       And a call [to verify that Olawale and Hemanth haven't lost the role CR-1 over the case C1] will get the expected response as in [S-111.16_Get_Case_Roles_for_Case_C1_After_Remove],
       And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [S-111.16_Verify_User_Count_Unchanged].
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role CR-1] as in [F-111.16_Remove_Case_Assigned_User_role_for_Case_C1].

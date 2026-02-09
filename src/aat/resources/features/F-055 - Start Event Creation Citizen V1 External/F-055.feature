@@ -21,6 +21,8 @@ Scenario: must return 200 if start event trigger is successful for a case
      Then a positive response is received,
       And the response [contains an event token for the triggered event, along with a HTTP 200 OK],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-055_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-252 @Ignore # expected 401 but got 403 (defect RDM-6628)
@@ -81,5 +83,7 @@ Scenario: must return 422 when start event trigger has failed
      Then a negative response is received,
       And the response [contains a HTTP 422 Unprocessable Entity],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-055_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
