@@ -18,6 +18,8 @@ Feature: F-105: Add Case-Assigned Users and Roles
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-105_Remove_Case_Assigned_User_role_for_Case_C1].
 
   # RDM-8606/8806 AC-2
   @S-105.2
@@ -182,7 +184,9 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.12_Get_Case_Roles_for_Case_C1].
+    And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.12_Get_Case_Roles_for_Case_C1],
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-105_Remove_Case_Assigned_User_role_for_Case_C1].
 
   # RDM-8606 multiple
   @S-105.13
@@ -198,7 +202,9 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
     Then a positive response is received,
     And the response has all the details as expected,
-    And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1].
+    And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1],
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_Remove_Case_Assigned_User_role_for_Case_C1_C2].
 
   # RDM-8842 AC-1
   @S-105.14
@@ -220,7 +226,9 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to repeat the same request as above] will get the expected response as in [S-105.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles],
     And a call [to verify the count of users assigned to C1 has NOT changed] will get the expected response as in [S-105.14_Verify_Counter_2],
     And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-105.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
-    And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_3].
+    And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_3],
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
 
    # RDM-8842 AC-2
    @S-105.15
@@ -238,7 +246,9 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [S-105.15_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged],
+      # Clean up role assignment made above
+     And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_15_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
 
    # RDM-8842 AC-3
    @S-105.16
@@ -255,7 +265,9 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged],
+      # Clean up role assignment made above
+     And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_16_Remove_Case_Assigned_User_role_Orgs_for_Case_C1].
 
    # RDM-8842 AC-4
    @S-105.17
@@ -274,7 +286,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      Then a negative response is received,
      And the response has all the details as expected,
      And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.17_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].,
 
    # RDM-8842 AC-5
    @S-105.18
@@ -293,6 +305,8 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [S-105.18_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has changed] will get the expected response as in [F-105_Verify_Counter_Changed].
+      # Clean up role assignment made above
+     And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_18_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
 
   # CCD-5333 AC-1
   @S-105.19
@@ -314,3 +328,5 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify newCase organisationId assigned to C1 is set to false in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_2],
     And a call [to repeat the same request as above this time with a different user, Hemanth] will get the expected response as in [S-105.19_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth],
     And a call [to verify the new_case of users assigned to a case is set to false in the supplementary data] will get the expected response as in [S-105.19_Verify_NewCase_3].
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_18_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
