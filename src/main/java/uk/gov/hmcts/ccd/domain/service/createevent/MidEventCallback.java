@@ -77,7 +77,11 @@ public class MidEventCallback {
                 } else {
                     currentOrNewCaseDetails =
                         caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
-                        content.getEventData() == null ? content.getData() : content.getEventData());
+                        content.getData());
+                    if (content.getEventData() != null) {
+                        currentOrNewCaseDetails =
+                            caseService.populateCurrentCaseDetailsWithEventFields(content, currentOrNewCaseDetails);
+                    }
                 }
                 removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
                     event.getEventId());
