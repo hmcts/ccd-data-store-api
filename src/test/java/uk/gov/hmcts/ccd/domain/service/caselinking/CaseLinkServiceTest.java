@@ -7,8 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity;
 import uk.gov.hmcts.ccd.data.caselinking.CaseLinkRepository;
@@ -23,8 +28,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,6 +53,9 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
 
     @Mock
     private CaseLinkMapper caseLinkMapper;
+
+    @Mock
+    private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
     private CaseLinkService caseLinkService;
@@ -263,6 +273,41 @@ class CaseLinkServiceTest extends CaseLinkTestFixtures {
                 LINKED_CASE_REFERENCE_01,
                 STANDARD_LINK
             );
+        }
+
+        @DisplayName("lockCaseDataRows issues the DB lock query and passes only the primary case reference plus "
+            + "distinct, non-null linked references")
+        @Test
+        void lockCaseDataRowsQueriesForPrimaryAndLinkedReferences() {
+
+            // GIVEN
+            List<CaseLink> caseLinks = List.of(
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, STANDARD_LINK),
+                createCaseLink(LINKED_CASE_REFERENCE_01, LINKED_CASE_DATA_ID_01, NON_STANDARD_LINK),
+                createCaseLink(null, LINKED_CASE_DATA_ID_02, NON_STANDARD_LINK)
+            );
+            when(caseLinkExtractor.getCaseLinksFromData(caseDetails, caseTypeDefinition.getCaseFieldDefinitions()))
+                .thenReturn(caseLinks);
+
+            // WHEN
+            try (MockedConstruction<NamedParameterJdbcTemplate> mocked =
+                     Mockito.mockConstruction(NamedParameterJdbcTemplate.class,
+                         (mock, context) -> when(mock.queryForList(anyString(), any(MapSqlParameterSource.class)))
+                             .thenReturn(List.of()))) {
+
+                caseLinkService.updateCaseLinks(caseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
+                // THEN
+                NamedParameterJdbcTemplate constructedTemplate = mocked.constructed().get(0);
+                ArgumentCaptor<MapSqlParameterSource> paramsCaptor = ArgumentCaptor
+                    .forClass(MapSqlParameterSource.class);
+                verify(constructedTemplate).queryForList(Mockito.contains("select id from case_data"),
+                    paramsCaptor.capture());
+
+                @SuppressWarnings("unchecked")
+                List<Long> references = (List<Long>) paramsCaptor.getValue().getValue("references");
+                assertEquals(List.of(CASE_REFERENCE, LINKED_CASE_REFERENCE_01), references);
+            }
         }
 
     }
