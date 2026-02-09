@@ -8,7 +8,7 @@
       "experimental": true
     },
 		"pathVariables": {
-      "CaseTypeID": "FT_CaseAccessGroups_Align_Befta"
+      "CaseTypeID": "FT_CaseProfessionalGroupAccess"
 		}
 	},
 
@@ -16,7 +16,7 @@
     "body" : {
       "_links" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
-      "case_type" : "FT_CaseAccessGroups_Align_Befta",
+      "case_type" : "FT_CaseProfessionalGroupAccess",
       "state" : "CaseCreated"
     }
   }

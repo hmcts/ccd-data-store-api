@@ -16,7 +16,7 @@
 	"request": {
 		"pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_CaseAccessGroups_Align_Befta",
+      "ctid": "FT_CaseProfessionalGroupAccess",
       "etid": "createCase"
 		}
 	},

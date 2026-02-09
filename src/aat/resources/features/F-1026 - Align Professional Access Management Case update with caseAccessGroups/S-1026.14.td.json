@@ -1,26 +1,26 @@
 {
-  "_guid_": "S-1026.9",
-  "_extends_": "F-1026_Test_Data_Citizen_Base",
-  "title": "Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId created",
+  "_guid_": "S-1026.14",
+  "_extends_": "F-1026_Test_Data_Base_V2",
+  "title": "Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1026_GetCitizenCreateToken"
+      "Token_Creation": "S-1026_GetCreateToken"
     }
   ],
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName",
-    "Submit case creation as Citizen",
+    "Submit case creation as Case worker (V2)",
     "contains correctly configured values",
-    "contains updated values for case_data and data_classification"
+    "contains updated values for data and data_classification"
 
   ],
   "request": {
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole2",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -62,16 +62,16 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
+      "_links" : "[[ANYTHING_PRESENT]]",
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
-      "case_type_id": "FT_CaseAccessGroups_Align_Befta",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "case_data": {
+      "data": {
         "OrganisationPolicyField" : {
-          "OrgPolicyCaseAssignedRole" : "GroupRole2",
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference" : "ref",
           "Organisation" : {
             "OrganisationID" : "orgID1",
@@ -81,7 +81,6 @@
       },
       "data_classification" : {}
     },
-    "supplementary_data" : null,
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
     "callback_response_status": null,

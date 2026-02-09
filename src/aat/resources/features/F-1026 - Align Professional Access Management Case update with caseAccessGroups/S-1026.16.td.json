@@ -1,25 +1,35 @@
 {
-  "_guid_": "S-1026.11",
-  "_extends_": "F-1026_Test_Data_Base_V2",
-  "title": "Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroupId created",
+  "_guid_": "S-1026.16",
+  "_extends_": "F-1026_Test_Data_Event_Caseworker",
 
+  "title": "CaseAccessGroups does not exist at present and caseAccessGroupId",
   "prerequisites" : [ {
-      "Token_Creation": "S-1026_GetCreateToken"
-    }
+    "Token_Creation": "S-1026_GetUpdateTokenCaseworker"
+  }
   ],
+
   "specs": [
     "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1026_CreateCasePreRequisiteCaseworker",
+    "contains an event token for the case just created above",
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access",
-    "Submit case creation as Case worker (V2)",
-    "contains correctly configured values",
-    "contains updated values for data and data_classification"
-  ],
+    "contains correctly configured CaseAccessGroups field in F-1026_CreateCasePreRequisiteCaseworker",
+    "specifying the case to be updated, as created in F-1026_CreateCasePreRequisiteCaseworker"
+   ],
+
   "request": {
+    "pathVariables": {
+      "ctid" : "FT_CaseProfessionalGroupAccess",
+      "cid": "${[scenarioContext][childContexts][F-1026_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -35,27 +45,29 @@
         } ]
       },
       "event": {
-        "id": "createCase"
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "vary": "accept-encoding",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
-    "body": {
-      "_links" : "[[ANYTHING_PRESENT]]",
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_MASTER",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PUBLIC",
-      "data": {
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "version" : 1,
+      "case_type_id" : "FT_CaseProfessionalGroupAccess",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "case_data": {
         "CaseAccessGroups": [
           {
             "__ordering__": "ordered"
@@ -76,7 +88,7 @@
           }
         ],
         "OrganisationPolicyField" : {
-          "OrgPolicyCaseAssignedRole" : "GroupRole1",
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference" : "ref",
           "Organisation" : {
             "OrganisationID" : "orgID1",
@@ -104,14 +116,15 @@
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
               }
-          }]
+            }]
         }
       },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
     }
   }
 }

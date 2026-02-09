@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-1026.15",
-  "_extends_": "F-1026_Test_Data_Base_V2",
-  "title": "Invoke v2_external#/case-controller/createCaseUsingPOST and caseAccessGroups field contains blank value",
+  "_guid_": "S-1026.5",
+  "_extends_": "F-1026_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value",
   "prerequisites": [
     {
       "Token_Creation": "S-1026_GetCreateToken"
@@ -10,14 +10,14 @@
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "Submit case creation as Case worker (V2)",
-    "contains updated values for data and data_classification"
+    "Submit case creation as Case worker",
+    "contains updated values for case_data and data_classification"
   ],
   "request": {
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -43,14 +43,14 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "_links" : "[[ANYTHING_PRESENT]]",
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on": "[[ANYTHING_PRESENT]]",
+      "case_type_id": "FT_CaseProfessionalGroupAccess",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "data": {
+      "case_data": {
         "CaseAccessGroups": [
           {
             "__ordering__": "ordered"
@@ -71,7 +71,7 @@
           }
         ],
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -104,6 +104,7 @@
         }
       }
     },
+    "supplementary_data": null,
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
     "callback_response_status": null,

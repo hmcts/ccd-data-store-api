@@ -1,37 +1,25 @@
 {
-  "_guid_": "S-1026.17",
-  "_extends_": "F-1026_Test_Data_Event_Citizen",
-
-  "title": "Submit Event Creation is invoked on on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
+  "_guid_": "S-1026.6",
+  "_extends_": "F-1026_Test_Data_Citizen_Base",
+  "title": "Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId created",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1026_GetUpdateTokenCitizen"
-  }
+      "Token_Creation": "S-1026_GetCitizenCreateToken"
+    }
   ],
-
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1026_CreateCasePreRequisiteCitizen",
-    "contains an event token for the case just created above",
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access",
-    "contains correctly configured CaseAccessGroups field in F-1026_CreateCasePreRequisiteCitizen",
-    "specifying the case to be updated, as created in F-1026_CreateCasePreRequisiteCitizen"
+    "Submit case creation as Citizen",
+    "contains correctly configured values",
+    "contains updated values for case_data and data_classification"
   ],
-
   "request": {
-    "pathVariables": {
-      "jid" : "BEFTA_MASTER",
-      "ctid" : "FT_CaseAccessGroups_Align_Befta",
-      "cid": "${[scenarioContext][childContexts][F-1026_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
-    },
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -47,28 +35,26 @@
         } ]
       },
       "event": {
-        "id": "updateCase",
-        "summary": "",
-        "description": ""
+        "id": "createCase"
       },
-      "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": true
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
-
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "body" : {
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_MASTER",
-      "state" : "CaseUpdated",
-      "version" : 1,
-      "case_type_id" : "FT_CaseAccessGroups_Align_Befta",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_CaseProfessionalGroupAccess",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
       "case_data": {
         "CaseAccessGroups": [
           {
@@ -90,7 +76,7 @@
           }
         ],
         "OrganisationPolicyField" : {
-          "OrgPolicyCaseAssignedRole" : "GroupRole1",
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference" : "ref",
           "Organisation" : {
             "OrganisationID" : "orgID1",
@@ -118,16 +104,15 @@
                 "caseAccessGroupType" : "PUBLIC",
                 "caseAccessGroupId" : "PUBLIC"
               }
-            }]
+          }]
         }
       },
-      "supplementary_data" : null,
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
     }
   }
-
 }

@@ -1,19 +1,19 @@
 {
-  "_guid_": "F-1026_Test_Data_Base",
-  "_extends_": "Case_Creation_Base",
+	"_guid_": "F-1026_Test_Data_Citizen_Base",
+  "_extends_": "Citizen_Case_Creation_Data_Base",
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+      "_extends_": "BeftaCitizen2"
     }
   },
 
-  "request": {
-    "pathVariables": {
+	"request": {
+		"pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_CaseAccessGroups_Align_Befta"
-    }
-  },
+      "ctid": "FT_CaseProfessionalGroupAccess"
+		}
+	},
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
@@ -24,7 +24,7 @@
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
       "state" : "CaseCreated",
-      "case_type_id" : "FT_CaseAccessGroups_Align_Befta",
+      "case_type_id" : "FT_CaseProfessionalGroupAccess",
       "version" : 0,
       "created_date" : "[[ANY_STRING_NOT_NULLABLE]]",
       "last_modified" : "[[ANY_STRING_NOT_NULLABLE]]",

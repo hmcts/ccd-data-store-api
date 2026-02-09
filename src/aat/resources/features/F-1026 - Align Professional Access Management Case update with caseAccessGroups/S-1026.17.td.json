@@ -1,38 +1,37 @@
 {
-  "_guid_": "S-1026.18",
-  "_extends_": "SubmitEvent_v2Ext__PositiveResponse_Base",
+  "_guid_": "S-1026.17",
+  "_extends_": "F-1026_Test_Data_Event_Citizen",
 
-  "title": "Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST and caseAccessGroupId",
+  "title": "Submit Event Creation is invoked on on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1026_GetUpdateTokenCaseworker"
+    "Token_Creation": "S-1026_GetUpdateTokenCitizen"
   }
   ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1026_CreateCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1026_CreateCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "contains some OrganisationPolicy fields with all correct values",
     "is of caseType where case_data has caseAccessGroupType of CCD:all-cases-access",
-    "contains correctly configured CaseAccessGroups field in F-1026_CreateCasePreRequisiteCaseworker",
-    "specifying the case to be updated, as created in F-1026_CreateCasePreRequisiteCaseworker"
-   ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
-  },
+    "contains correctly configured CaseAccessGroups field in F-1026_CreateCasePreRequisiteCitizen",
+    "specifying the case to be updated, as created in F-1026_CreateCasePreRequisiteCitizen"
+  ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1026_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "jid" : "BEFTA_MASTER",
+      "ctid" : "FT_CaseProfessionalGroupAccess",
+      "cid": "${[scenarioContext][childContexts][F-1026_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
     },
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -52,21 +51,26 @@
         "summary": "",
         "description": ""
       },
-      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
     }
   },
 
   "expectedResponse": {
+    "_extends_": "Common_201_Response",
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
-
       "jurisdiction" : "BEFTA_MASTER",
-      "case_type" : "FT_CaseAccessGroups_Align_Befta",
-
       "state" : "CaseUpdated",
-
-      "data" : {
-           "CaseAccessGroups": [
+      "version" : 1,
+      "case_type_id" : "FT_CaseProfessionalGroupAccess",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "case_data": {
+        "CaseAccessGroups": [
           {
             "__ordering__": "ordered"
           },
@@ -86,7 +90,7 @@
           }
         ],
         "OrganisationPolicyField" : {
-          "OrgPolicyCaseAssignedRole" : "GroupRole1",
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference" : "ref",
           "Organisation" : {
             "OrganisationID" : "orgID1",
@@ -116,7 +120,14 @@
               }
             }]
         }
-      }
+      },
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
     }
   }
+
 }

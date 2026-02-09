@@ -16,7 +16,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_CaseAccessGroups_Align_Befta",
+      "ctid": "FT_CaseProfessionalGroupAccess",
       "etid": "createCase"
     }
   },
@@ -25,7 +25,7 @@
     "body": {
       "case_details": {
         "jurisdiction": "BEFTA_MASTER",
-        "case_type_id": "FT_CaseAccessGroups_Align_Befta"
+        "case_type_id": "FT_CaseProfessionalGroupAccess"
       },
       "event_id": "createCase"
     }

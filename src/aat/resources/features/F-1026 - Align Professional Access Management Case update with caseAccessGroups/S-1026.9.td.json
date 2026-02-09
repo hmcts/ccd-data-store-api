@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1026.8",
+  "_guid_": "S-1026.9",
   "_extends_": "F-1026_Test_Data_Citizen_Base",
   "title": "Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId created",
 
@@ -10,8 +10,7 @@
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where caseAccessGroupType = CCD:all-cases-access",
-    "caseData Organisation.OrganisationID value is empty value",
+    "is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName",
     "Submit case creation as Citizen",
     "contains correctly configured values",
     "contains updated values for case_data and data_classification"
@@ -21,10 +20,10 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "",
+            "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
         },
@@ -41,7 +40,18 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "CaseAccessGroups": [
+          {
+            "value": {
+              "caseAccessGroupId": "test",
+              "caseAccessGroupType": "CCD:all-cases-access"
+            },
+            "id": null
+          }
+        ]
+      }
     }
   },
   "expectedResponse": {
@@ -54,18 +64,18 @@
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
-      "case_type_id": "FT_CaseAccessGroups_Align_Befta",
+      "case_type_id": "FT_CaseProfessionalGroupAccess",
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "GroupRole1",
-          "OrgPolicyReference": "ref",
-          "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": "orgName1"
+        "OrganisationPolicyField" : {
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
+          "OrgPolicyReference" : "ref",
+          "Organisation" : {
+            "OrganisationID" : "orgID1",
+            "OrganisationName" : "orgName1"
           }
         }
       },
