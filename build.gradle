@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -317,6 +318,19 @@ dependencyManagement {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
+    }
+}
+
 pitest {
 
     targetClasses = ['uk.gov.hmcts.ccd.config.*',
@@ -579,6 +593,14 @@ compileJava {
 
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+idea.project.settings {
+    compiler {
+        javac {
+            javacAdditionalOptions "-parameters"
+        }
+    }
 }
 
 // adopted from
