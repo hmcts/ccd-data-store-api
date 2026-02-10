@@ -40,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -213,8 +214,8 @@ class MidEventCallbackTest {
             null,
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
-        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, updatedCaseDetails)).willReturn(null);
+        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).thenReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails)).willReturn(caseDetails);
 
         Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
@@ -235,8 +236,66 @@ class MidEventCallbackTest {
                 null,
                 caseDetails,
                 IGNORE_WARNINGS),
-            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
-            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
+            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
+    }
+
+    @Test
+    @DisplayName("should keep both organisation policies when event data only contains current page fields")
+    void shouldMergeFullCaseDataWithEventDataDuringMidEvent() throws Exception {
+
+        Map<String, JsonNode> fullCaseData = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "ApplicantOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "APP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Applicant]"
+                  },
+                  "RespondentOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "RESP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Respondent]"
+                  }
+                }""")));
+
+        // Simulate UI sending only the current page data (losing the second organisation policy)
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "ApplicantOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "APP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Applicant]"
+                  }
+                }""")));
+
+        CaseDataContent content = newCaseDataContent()
+            .withEvent(event)
+            .withData(fullCaseData)
+            .withEventData(eventData)
+            .withIgnoreWarning(IGNORE_WARNINGS)
+            .build();
+
+        CaseDetails eventDataOnlyCaseDetails = caseDetails(fullCaseData);
+        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, fullCaseData))
+            .thenReturn(eventDataOnlyCaseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, eventDataOnlyCaseDetails))
+            .willReturn(eventDataOnlyCaseDetails);
+
+        when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            null,
+            eventDataOnlyCaseDetails,
+            IGNORE_WARNINGS)).thenAnswer(invocation -> {
+                CaseDetails detailsPassedToCallback = invocation.getArgument(4);
+                Map<String, JsonNode> callbackData = detailsPassedToCallback.getData();
+                assertNotNull(callbackData.get("RespondentOrganisationPolicy"));
+                return detailsPassedToCallback;
+            });
+
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
+            content,
+            "createCase1");
+
+        assertThat(result, is(fullCaseData));
     }
 
     @Test
