@@ -106,6 +106,14 @@ sourceSets {
             srcDir('src/contractTest/resources')
         }
     }
+    integrationTest {
+        java {
+            compileClasspath += main.output + sourceSets.test.output
+            runtimeClasspath += main.output + sourceSets.test.output
+            srcDir file('src/test/java/uk/gov/hmcts/ccd/integrations')
+        }
+        resources.srcDir file('src/test/resources')
+    }
 }
 
 // tag::repositories[]
@@ -148,6 +156,9 @@ configurations {
     contractTestAnnotationProcessor.extendsFrom(annotationProcessor)
     cucumberRuntime.extendsFrom(functionalRuntime)
     cucumberImplementation.extendsFrom(functionalImplementation)
+    integrationTestImplementation.extendsFrom(testImplementation)
+    integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
 
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
@@ -168,6 +179,14 @@ tasks.withType(Test) {
     testLogging {
         exceptionFormat = 'full'
     }
+}
+
+task integration(type: Test) {
+    description = "Runs integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    failFast = true
 }
 
 ext.libraries = [
@@ -606,6 +625,7 @@ idea.project.settings {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    executionData(test, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
     }
