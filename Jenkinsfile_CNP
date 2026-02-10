@@ -13,10 +13,14 @@ properties(
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
+
+GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
     'ccd-${env}': [
@@ -150,40 +154,46 @@ withPipeline(type, product, component) {
 
     afterAlways('test') {
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+
+    builder.gradle('integration')
+
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+      copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
-
+     
+      copyIgnore('./build/reports/tests/test', './Unit Tests/')
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+       
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
           keepAll              : true,
-          reportDir            : 'build/reports/jacoco/html',
+          reportDir            : "Unit Tests",
           reportFiles          : "index.html",
           reportName           : "Unit Test Report"
         ]
 
       publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'build/reports/tests/integration',
-      reportFiles          : "index.html",
-      reportName           : "Integration Test Report"
-      ]
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "Integration Tests",
+          reportFiles          : "index.html",
+          reportName           : "Integration Test Report"
+        ]
     }
 
     afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'BEFTA Report for Smoke Tests',
-      reportFiles          : "overview-features.html",
-      reportName           : "Smoke Test Report"
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Smoke Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Smoke Test Report"
       ]
     }
 
@@ -234,4 +244,11 @@ withPipeline(type, product, component) {
             reportName           : "Contract Tests Report"
         ]
     }
+}
+
+/**
+ * Forces a recursive copy by always returning 0 regardless of errors
+ */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }

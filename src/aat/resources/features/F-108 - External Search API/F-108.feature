@@ -273,6 +273,8 @@ Feature: F-108: Elasticsearch external endpoint
     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then the response [contains the previously created case],
     And the response has all other details as expected.
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-108_Remove_Case_Assigned_User_role_for_Case].
 
   @S-926
   Scenario: should NOT return the case for a solicitor role if not granted access to the case

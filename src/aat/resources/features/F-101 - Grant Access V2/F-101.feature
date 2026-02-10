@@ -16,8 +16,11 @@ Feature: F-101: Grant access to case by updating User Roles
     Then a positive response is received,
     And the response [has the 204 return code],
     And the response has all other details as expected.
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-101_Remove_Case_Assigned_User_role_for_Case].
 
-@S-531
+
+  @S-531
   Scenario: must return 204 when revoke is successful for a user to a valid case ID
     Given a user with [an active solicitor profile in CCD],
     And a user with [another active solicitor profile in CCD],

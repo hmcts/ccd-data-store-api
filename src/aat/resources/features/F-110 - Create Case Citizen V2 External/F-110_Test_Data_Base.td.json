@@ -22,7 +22,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token": "${[scenarioContext][childContexts][F-103_GetToken][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][S-110_GetToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
