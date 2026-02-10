@@ -218,6 +218,28 @@ class ElasticsearchQueryHelperTest {
         }
 
         @Test
+        void shouldPreserveSearchAfterInConvertedElasticSearchRequest() {
+            String searchRequest = """
+                {
+                  "query": {"match_all": {}},
+                  "sort": [{"id": {"order": "asc"}}],
+                  "search_after": [123456789, "case-2"]
+                }
+                """;
+
+            ElasticsearchRequest elasticsearchRequest
+                = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+
+            JsonNode searchAfterNode = elasticsearchRequest.getNativeSearchRequest().get("search_after");
+
+            assertAll(
+                () -> assertTrue(elasticsearchRequest.getNativeSearchRequest().has("search_after")),
+                () -> assertThat(searchAfterNode.get(0).asLong(), is(123456789L)),
+                () -> assertThat(searchAfterNode.get(1).asText(), is("case-2"))
+            );
+        }
+
+        @Test
         void shouldConvertWrappedQueryToElasticSearchRequest() {
             String searchRequest
                 = """
