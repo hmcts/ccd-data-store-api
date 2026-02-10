@@ -20,6 +20,8 @@ Feature: F-103.1: Search Case-Assigned Users and Roles
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
     And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-598.1
   Scenario: when the invoking user is not a privileged user but the request includes his/her own User ID, then the invoker's case roles for the case should be returned
@@ -37,6 +39,8 @@ Feature: F-103.1: Search Case-Assigned Users and Roles
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil, as per above],
     And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-599.1
   Scenario: when no User ID is supplied for a specific case ID, then the case roles relating to all  users with access to that case must be returned
@@ -56,6 +60,8 @@ Feature: F-103.1: Search Case-Assigned Users and Roles
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve, as per above],
     And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_S-599_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-600.1
   Scenario: when no User ID is supplied for a list of Case IDs, then the case roles relating to all users with access to all listed cases must be returned
@@ -81,6 +87,8 @@ Feature: F-103.1: Search Case-Assigned Users and Roles
     Then a positive response is received,
     And the response [contains the list of case roles just granted to Dil & Steve for C1, C2 & C3, as per above],
     And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_S-600_Remove_Case_Assigned_User_role_for_Case_C1].
 
   @S-601.1
   Scenario: must return an error response for a missing Case ID
