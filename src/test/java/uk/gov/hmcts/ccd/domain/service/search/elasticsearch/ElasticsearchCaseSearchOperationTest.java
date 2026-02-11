@@ -12,6 +12,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -317,9 +318,7 @@ class ElasticsearchCaseSearchOperationTest {
         when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
-        ObjectNode matchAllQuery = JsonNodeFactory.instance.objectNode();
-        matchAllQuery.set("match_all", JsonNodeFactory.instance.objectNode());
-        searchRequestJsonNode.set(QUERY, matchAllQuery);
+        searchRequestJsonNode.set(QUERY, new TextNode("queryVal"));
 
         searchOperation = new ElasticsearchCaseSearchOperation(
             elasticsearchClient,
