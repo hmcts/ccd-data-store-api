@@ -4,10 +4,10 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.searchbox.core.Search;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
@@ -80,38 +79,38 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MsearchRequest secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
-        final List<Search> securedSearches = request.getSearchIndex()
-            .map(searchIndex -> List.of(createSecuredSearch(searchIndex, request)))
-            .orElseGet(() -> buildSearchesByCaseType(request));
-        return JestToESConverter.fromJest(securedSearches);
+        final List<RequestItem> securedSearches = request.getSearchIndex()
+            .map(searchIndex -> List.of(createSecuredRequestItem(searchIndex, request)))
+            .orElseGet(() -> buildRequestItemsByCaseType(request));
+        return new MsearchRequest.Builder().searches(securedSearches).build();
     }
 
-    private List<Search> buildSearchesByCaseType(final CrossCaseTypeSearchRequest request) {
+    private List<RequestItem> buildRequestItemsByCaseType(final CrossCaseTypeSearchRequest request) {
         return request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
-            .collect(toList());
+            .map(caseTypeId -> createSecuredRequestItem(caseTypeId, request))
+            .toList();
     }
 
-    private Search createSecuredSearch(final SearchIndex searchIndex, final CrossCaseTypeSearchRequest request) {
+    private RequestItem createSecuredRequestItem(final SearchIndex searchIndex,
+                                                 final CrossCaseTypeSearchRequest request) {
         final CrossCaseTypeSearchRequest securedSearchRequest =
             caseSearchRequestSecurity.createSecuredSearchRequest(request);
 
         final ElasticsearchRequest elasticSearchRequest = securedSearchRequest.getElasticSearchRequest();
-
-        return new Search.Builder(elasticSearchRequest.toFinalRequest())
-            .addIndex(searchIndex.getIndexName())
-            .addType(searchIndex.getIndexType())
-            .build();
+        return ElasticsearchMsearchRequestBuilder.createRequestItem(
+            searchIndex.getIndexName(),
+            elasticSearchRequest.toFinalRequest()
+        );
     }
 
-    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
+    private RequestItem createSecuredRequestItem(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
             new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
-        return new Search.Builder(securedSearchRequest.toJsonString())
-            .addIndex(getCaseIndexName(caseTypeId))
-            .addType(getCaseIndexType())
-            .build();
+        return ElasticsearchMsearchRequestBuilder.createRequestItem(
+            getCaseIndexName(caseTypeId),
+            securedSearchRequest.toJsonString()
+        );
     }
 
     private CaseSearchResult toCaseDetailsSearchResult(MsearchResponse<ElasticSearchCaseDetailsDTO> multiSearchResult,
@@ -187,10 +186,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private String getCaseIndexName(String caseTypeId) {
         return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
-    }
-
-    private String getCaseIndexType() {
-        return applicationParams.getCasesIndexType();
     }
 
 }

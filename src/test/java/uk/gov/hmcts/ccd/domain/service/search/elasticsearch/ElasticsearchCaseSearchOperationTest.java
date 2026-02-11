@@ -5,11 +5,15 @@ import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.SearchRequestBody;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -17,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -30,6 +35,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -377,6 +383,54 @@ class ElasticsearchCaseSearchOperationTest {
                     eq(ElasticSearchCaseDetailsDTO.class)),
                 () -> verify(caseSearchRequestSecurity)
                     .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class))
+            );
+        }
+
+        @Test
+        @DisplayName("should preserve search_after in msearch request body")
+        void shouldPreserveSearchAfterInMsearchRequestBody() throws Exception {
+            final String indexName = "global_search";
+
+            ObjectNode searchRequestNode = JsonNodeFactory.instance.objectNode();
+            searchRequestNode.set(QUERY, JsonNodeFactory.instance.objectNode()
+                .set("match_all", JsonNodeFactory.instance.objectNode()));
+
+            ArrayNode sort = JsonNodeFactory.instance.arrayNode();
+            sort.add(JsonNodeFactory.instance.objectNode()
+                .set("id", JsonNodeFactory.instance.objectNode().put("order", "asc")));
+            searchRequestNode.set("sort", sort);
+
+            ArrayNode searchAfter = JsonNodeFactory.instance.arrayNode();
+            searchAfter.add(123456789L);
+            searchAfter.add("case-2");
+            searchRequestNode.set("search_after", searchAfter);
+
+            ElasticsearchRequest requestWithSearchAfter = new ElasticsearchRequest(searchRequestNode);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withSearchRequest(requestWithSearchAfter)
+                .withSearchIndex(new SearchIndex(indexName, "_doc"))
+                .build();
+
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class)))
+                .thenReturn(crossCaseTypeSearchRequest);
+
+            MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem = createSuccessItemWithNoHits(indexName);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> msearchResponse = createMsearchResponse(List.of(responseItem));
+            when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+                .thenReturn(msearchResponse);
+
+            searchOperation.execute(crossCaseTypeSearchRequest, true);
+
+            ArgumentCaptor<MsearchRequest> requestCaptor = ArgumentCaptor.forClass(MsearchRequest.class);
+            verify(elasticsearchClient).msearch(requestCaptor.capture(), eq(ElasticSearchCaseDetailsDTO.class));
+
+            JsonNode requestBody = toJson(requestCaptor.getValue().searches().getFirst().body());
+
+            assertAll(
+                () -> assertThat(requestBody.has("search_after")).isTrue(),
+                () -> assertThat(requestBody.get("search_after").get(0).asLong()).isEqualTo(123456789L),
+                () -> assertThat(requestBody.get("search_after").get(1).asText()).isEqualTo("case-2")
             );
         }
     }
@@ -820,6 +874,15 @@ class ElasticsearchCaseSearchOperationTest {
             );
         }
 
+    }
+
+    private JsonNode toJson(SearchRequestBody body) throws Exception {
+        StringWriter writer = new StringWriter();
+        var mapper = new JacksonJsonpMapper();
+        var generator = mapper.jsonProvider().createGenerator(writer);
+        body.serialize(generator, mapper);
+        generator.close();
+        return new ObjectMapper().readTree(writer.toString());
     }
 
 }
