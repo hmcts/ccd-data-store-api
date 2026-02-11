@@ -32,7 +32,7 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_GA_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "orgID1",
@@ -74,19 +74,19 @@
             "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
-              "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
+              "caseAccessGroupId" : "BEFTA_MASTER:FT_CaseProfessionalGroupAccess:CaseProfessionalGroupAccess_GA_Role:orgID1"
             }
           },
           {
             "id" : "[[ANY_STRING_NOT_NULLABLE]]",
             "value" : {
               "caseAccessGroupType" : "CCD:all-cases-access",
-              "caseAccessGroupId" : "BEFTA_MASTER:orgID1"
+              "caseAccessGroupId" : "BEFTA_MASTER:FT_CaseProfessionalGroupAccess:CaseProfessionalGroupAccess_GA_Role:orgID1"
             }
           }
         ],
         "OrganisationPolicyField" : {
-          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_Org_Role",
+          "OrgPolicyCaseAssignedRole" : "CaseProfessionalGroupAccess_GA_Role",
           "OrgPolicyReference" : "ref",
           "Organisation" : {
             "OrganisationID" : "orgID1",

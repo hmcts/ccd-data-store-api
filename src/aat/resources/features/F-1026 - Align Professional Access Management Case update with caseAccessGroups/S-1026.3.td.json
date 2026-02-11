@@ -21,7 +21,7 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_GA_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "",
@@ -61,7 +61,7 @@
       "security_classification": "PUBLIC",
       "case_data": {
         "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_Org_Role",
+          "OrgPolicyCaseAssignedRole": "CaseProfessionalGroupAccess_GA_Role",
           "OrgPolicyReference": "ref",
           "Organisation": {
             "OrganisationID": "",
