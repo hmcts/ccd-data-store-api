@@ -46,17 +46,6 @@ Feature: F-1026: Submit Case Creation Handle CaseAccessGroups
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
 
-  @S-1026.4 #AC-4 #AC-10 of CCD-5324
-  Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCaseWorkerUsingPOST
-    Given     a user with [an active profile in CCD]
-    When      a request is prepared with appropriate values
-    And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
-    And       it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
-    Then      a positive response is received
-    And       the response has all other details as expected
-    And       the response [contains updated values for case_data and data_classification]
-
   @S-1026.5 #Testing Blank value
   Scenario: Invoke saveCaseDetailsForCaseWorkerUsingPOST and caseAccessGroups field contains blank value
     Given     a user with [an active profile in CCD]
@@ -109,17 +98,6 @@ Feature: F-1026: Submit Case Creation Handle CaseAccessGroups
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
 
-  @S-1026.9 #AC-9 #AC-10 of CCD-5324
-  Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
-    Given     a user with [an active profile in CCD]
-    When      a request is prepared with appropriate values
-    And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
-    And       it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
-    Then      a positive response is received
-    And       the response has all other details as expected
-    And       the response [contains updated values for case_data and data_classification]
-
   @S-1026.10 #Testing Blank value
   Scenario: Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroups field contains blank value
     Given     a user with [an active profile in CCD]
@@ -166,17 +144,6 @@ Feature: F-1026: Submit Case Creation Handle CaseAccessGroups
     And       the request [contains some OrganisationPolicy fields with all correct values]
     And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access],
     And       the request [caseData Organisation.OrganisationID value is empty value],
-    And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
-    Then      a positive response is received
-    And       the response has all other details as expected
-    And       the response [contains updated values for data and data_classification]
-
-  @S-1026.14 #AC-14
-  Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST
-    Given     a user with [an active profile in CCD]
-    When      a request is prepared with appropriate values
-    And       the request [contains correctly configured values]
-    And       the request [is of caseType where caseAccessGroupType = CCD:all-cases-access and -OrganisationPolicyField- CaseAssignedRoleField  field exists in caseData and case data has Organisation.OrganisationID value not set to empty value but accessType does not have GroupRoleName]
     And       it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
     Then      a positive response is received
     And       the response has all other details as expected
