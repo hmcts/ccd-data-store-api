@@ -1,5 +1,5 @@
 @F-1026 # Aligning the Professional Access Management capability
-Feature: F-1026: Submit Case Creation Handle CaseAccessGroups
+Feature: F-1026: Align Professional Access Management Case update with caseAccessGroups
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
