@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.feign;
 
+import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +32,18 @@ public class FeignClientConfig {
     @Bean
     public ErrorDecoder errorDecoder(@Lazy SecurityUtils securityUtils) {
         return new FeignErrorDecoder(securityUtils);
+    }
+
+    /**
+     * Injects the ServiceAuthorization header dynamically.
+     * This is executed again for every retry, ensuring fresh tokens are used.
+     */
+    @Bean
+    public RequestInterceptor serviceAuthRequestInterceptor(SecurityUtils securityUtils) {
+        return template -> {
+            template.removeHeader("ServiceAuthorization");
+            String token = securityUtils.getServiceAuthorization(); 
+            template.header("ServiceAuthorization", token);
+        };
     }
 }
