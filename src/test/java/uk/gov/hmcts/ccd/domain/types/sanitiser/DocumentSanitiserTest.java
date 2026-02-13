@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClie
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document._links;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -310,6 +311,16 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ServiceException.class, () ->
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial));
+    }
+
+    @Test
+    @DisplayName("should fail when document cannot be retrieved")
+    void shouldFailWhenDocumentCannotBeRetrieved() {
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE,
+            CDAM_DOCUMENT_URL_VALUE)).thenThrow(new ApiException("Document unavailable"));
+
+        assertThrows(ApiException.class, () ->
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial));
     }
 

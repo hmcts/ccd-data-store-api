@@ -7,12 +7,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
@@ -35,7 +40,6 @@ class CaseDocumentTimestampServiceTest {
     @Mock
     private ApplicationParams applicationParams;
 
-    @InjectMocks
     private CaseDocumentTimestampService underTest;
 
     private final String urlGoogle = "https://www.google.com";
@@ -43,6 +47,11 @@ class CaseDocumentTimestampServiceTest {
     private final String urlMicrosoft = "https://www.microsoft.com";
     private final String urlElastic = "https://www.elastic.com";
     private final String urlApple = "https://www.apple.com";
+
+    @org.junit.jupiter.api.BeforeEach
+    void init() {
+        underTest = new CaseDocumentTimestampService(Clock.systemUTC(), applicationParams);
+    }
 
     @Test
     void testFindUrlsNotInOriginal() {
@@ -99,6 +108,7 @@ class CaseDocumentTimestampServiceTest {
         JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
         dataMapOriginal.put("testNode", resultOriginal);
         CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setCaseTypeId("CASE_TYPE_TIMESTAMP");
         caseDetailsDb.setReference(1L);
         caseDetailsDb.setData(dataMapOriginal);
 
@@ -106,8 +116,11 @@ class CaseDocumentTimestampServiceTest {
         JsonNode result = generateTestNode(jsonString);
         dataMap.put("testNode", result);
         CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("CASE_TYPE_TIMESTAMP");
         caseDetails.setReference(caseDetailsDb.getReference());
         caseDetails.setData(dataMap);
+
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of("CASE_TYPE_TIMESTAMP"));
 
         final int countExpectedChanges = 5;
 
@@ -196,6 +209,52 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
+    void shouldRejectHtmlWhenFieldDoesNotAllow() {
+        // CCD-6681 Scenario 1 AC1
+        final String caseTypeId = "CASE_TYPE_HTML_REJECT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/1", "test.html")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf,.docx");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldAllowHtmlWhenFieldAllows() {
+        // CCD-6681 Scenario 2: allow HTML when regex permits; AC3 (allow submission)
+        // + AC4 (associate HTML with case data)
+        final String caseTypeId = "CASE_TYPE_HTML_ALLOW";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/2", "test.html"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf,.html");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
     void testIsCaseTypeUploadTimestampFeatureEnabledForNullCaseType() {
         String caseType = "Case Type 1";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(null);
@@ -268,6 +327,28 @@ class CaseDocumentTimestampServiceTest {
         }
         return jsonNode;
 
+    }
+
+    private CaseTypeDefinition buildCaseTypeWithDocumentField(String fieldId, String regularExpression) {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(FieldTypeDefinition.DOCUMENT);
+        fieldTypeDefinition.setRegularExpression(regularExpression);
+
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(fieldId);
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(caseFieldDefinition));
+        return caseTypeDefinition;
+    }
+
+    private ObjectNode createDocumentNode(String url, String filename) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put(DOCUMENT_URL, url);
+        node.put("document_filename", filename);
+        return node;
     }
 
     private static final String jsonDocumentNode = """
