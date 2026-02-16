@@ -75,7 +75,6 @@ public class UICaseSearchController {
         this.applicationParams = applicationParams;
     }
 
-    @Deprecated
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
         @Parameter(name = "Case type ID for search.", required = true)
         @RequestParam(value = "ctid") String caseTypeId,

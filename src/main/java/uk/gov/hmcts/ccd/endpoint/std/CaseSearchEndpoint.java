@@ -59,7 +59,6 @@ public class CaseSearchEndpoint {
         this.applicationParams = applicationParams;
     }
 
-    @Deprecated
     public CaseSearchResult searchCases(List<String> caseTypeIds,
                                         String jsonSearchRequest,
                                         boolean dataClassification) {
