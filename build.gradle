@@ -152,11 +152,11 @@ configurations {
 }
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
 
     useJUnitPlatform()
@@ -399,7 +399,7 @@ pitest {
 
 project.tasks['pitest'].group = "Verification"
 
-task projectVersion {
+tasks.register('projectVersion') {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
@@ -702,7 +702,7 @@ test {
 
 check.dependsOn jacocoTestReport
 
-task fortifyScan(type: JavaExec)  {
+tasks.register('fortifyScan', JavaExec) {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -718,7 +718,7 @@ idea {
   }
 }
 
-task highLevelDataSetup(type: JavaExec) {
+tasks.register('highLevelDataSetup', JavaExec) {
     dependsOn aatClasses
 
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
@@ -726,7 +726,7 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task smoke() {
+tasks.register('smoke') {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -746,13 +746,13 @@ task smoke() {
                     '--tags', '@Smoke and not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
-            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+            jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
         }
     }
 
     finalizedBy {
         generateCucumberReports {
-            doLast{
+            doLast {
                 delete "${rootDir}/BEFTA Report for Smoke Tests/"
                 new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
@@ -766,7 +766,7 @@ task smoke() {
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
 
-task functional(type: JavaExec) {
+tasks.register('functional', JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
@@ -777,14 +777,14 @@ task functional(type: JavaExec) {
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
     args = [
-        '--threads', '1',
-        '--plugin', "json:${rootDir}/target/cucumber.json",
-        '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-        '--plugin',  "pretty",
-        '--tags',"${tags}",
-        '--glue', 'uk.gov.hmcts.befta.player',
-        '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
-        'src/aat/resources/features'
+            '--threads', '1',
+            '--plugin', "json:${rootDir}/target/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+            '--plugin', "pretty",
+            '--tags', "${tags}",
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
+            'src/aat/resources/features'
     ]
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
@@ -792,7 +792,7 @@ task functional(type: JavaExec) {
     finalizedBy {
         generateCucumberReports.enabled = true
         generateCucumberReports {
-            doLast{
+            doLast {
                 delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
@@ -838,13 +838,13 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
-task reloadEnvSecretsDemo {
+tasks.register('reloadEnvSecretsDemo') {
     doFirst {
         reloadEnvSecrets("demo")
     }
 }
 
-task reloadEnvSecretsAAT {
+tasks.register('reloadEnvSecretsAAT') {
     doFirst {
         reloadEnvSecrets("aat")
     }
@@ -856,7 +856,7 @@ void reloadEnvSecrets(String env) {
     }
 }
 
-task runRemoteDemo(type: JavaExec) {
+tasks.register('runRemoteDemo', JavaExec) {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
@@ -864,7 +864,7 @@ task runRemoteDemo(type: JavaExec) {
     }
 }
 
-task runRemoteAAT(type: JavaExec) {
+tasks.register('runRemoteAAT', JavaExec) {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
