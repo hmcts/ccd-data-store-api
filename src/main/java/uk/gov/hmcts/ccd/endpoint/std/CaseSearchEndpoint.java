@@ -62,6 +62,7 @@ public class CaseSearchEndpoint {
     public CaseSearchResult searchCases(List<String> caseTypeIds,
                                         String jsonSearchRequest,
                                         boolean dataClassification) {
+        log.debug("searchCases no global parameter specified");
         return searchCases(caseTypeIds, jsonSearchRequest, dataClassification, false);
     }
 
@@ -87,6 +88,8 @@ public class CaseSearchEndpoint {
         @RequestParam(value = "global", required = false, defaultValue = "false") boolean global) {
 
         final Instant start = Instant.now();
+        log.debug("searchCases : global={}", global);
+
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =

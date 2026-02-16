@@ -86,9 +86,9 @@ public class ElasticsearchITSetup {
     }
 
     void createIndex(String indexName, ElasticsearchIndexSettings settings) {
-        log.info("Looking at Index {}", indexName);
+        log.debug("Looking at Index {}", indexName);
         if (!indexExists(indexName)) {
-            log.info("Does not exist so creating Index {}", indexName);
+            log.debug("Does not exist so creating Index {}", indexName);
             HttpPut request = new HttpPut(url("/" + indexName));
             request.setEntity(new StringEntity(settings.toJson().toString(), APPLICATION_JSON));
             httpClient.execute(request, response -> {
@@ -110,7 +110,7 @@ public class ElasticsearchITSetup {
     private boolean indexExists(String indexName) {
         HttpHead request = new HttpHead(url("/" + indexName));
         boolean indexExists = httpClient.execute(request, response -> response.getStatusLine().getStatusCode() == 200);
-        log.info("Index {} exists: {} ", indexName, indexExists);
+        log.debug("Index {} exists: {} ", indexName, indexExists);
         return indexExists;
     }
 

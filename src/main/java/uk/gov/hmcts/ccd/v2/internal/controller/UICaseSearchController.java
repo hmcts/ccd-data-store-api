@@ -84,6 +84,7 @@ public class UICaseSearchController {
         @RequestParam(value = "use_case", required = false) final String useCase,
         @RequestBody String jsonSearchRequest) {
 
+        log.debug("searchCases no global parameter specified");
         return searchCases(caseTypeId, useCase, false, jsonSearchRequest);
     }
 
@@ -162,6 +163,7 @@ public class UICaseSearchController {
                                      @RequestParam(value = "global", required = false, defaultValue = "false") boolean global,
                                      @RequestBody String jsonSearchRequest) {
         final Instant start = Instant.now();
+        log.debug("searchCases : global={}", global);
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())
