@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.util.Lists;
@@ -29,7 +30,7 @@ class DefaultGetJurisdictionUiConfigDefinitionOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -55,7 +56,7 @@ class DefaultGetJurisdictionUiConfigDefinitionOperationTest {
     }
 
     private JurisdictionUiConfigResult createConfigResultWithEmptyCollection() {
-        JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult(Lists.emptyList());
+        JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult(Collections.emptyList());
         return jurisdictionUiConfigResult;
     }
 

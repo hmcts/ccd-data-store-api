@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -77,6 +78,7 @@ import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
@@ -137,6 +139,9 @@ class CallbackInvokerTest {
     @Mock
     private AppInsights appinsights;
 
+    @Mock
+    private PersistenceStrategyResolver persistenceStrategyResolver;
+
     @InjectMocks
     private CallbackInvoker callbackInvoker;
 
@@ -149,7 +154,7 @@ class CallbackInvokerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);
@@ -670,6 +675,26 @@ class CallbackInvokerTest {
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
             verifyNoMoreInteractions(callbackService);
+        }
+
+        @Test
+        @DisplayName("should return stored after submit response for decentralised case types")
+        void shouldReturnStoredAfterSubmitResponseForDecentralisedCaseTypes() {
+            when(persistenceStrategyResolver.isDecentralised(caseDetails)).thenReturn(true);
+
+            AfterSubmitCallbackResponse storedResponse = new AfterSubmitCallbackResponse();
+            storedResponse.setConfirmationHeader("Header");
+            storedResponse.setConfirmationBody("Body");
+            caseDetails.setAfterSubmitCallbackResponseEntity(ResponseEntity.ok(storedResponse));
+
+            ResponseEntity<AfterSubmitCallbackResponse> response =
+                callbackInvoker.invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, caseDetails);
+
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(storedResponse, response.getBody())
+            );
+            verifyNoInteractions(callbackService);
         }
     }
 

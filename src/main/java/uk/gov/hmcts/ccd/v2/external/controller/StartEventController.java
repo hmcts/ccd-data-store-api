@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -47,26 +49,21 @@ public class StartEventController {
             V2.MediaType.START_CASE_EVENT
         }
     )
-    @ApiOperation(
-        value = "Retrieve a trigger by ID",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(summary = "Retrieve a trigger by ID", description = V2.EXPERIMENTAL_WARNING)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = StartEventResource.class))
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = StartEventResource.class
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document"
-                + " for case field or missing user roles"
-            ),
-        @ApiResponse(
-            code = 404,
-            message = EVENT_TRIGGER_NOT_FOUND
-            )
-    })
+    @ApiResponse(
+        responseCode = "422",
+        description = "One of: Case event has no pre states, callback validation errors, unable to sanitize document"
+            + " for case field or missing user roles"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = EVENT_TRIGGER_NOT_FOUND
+    )
     public ResponseEntity<StartEventResource> getStartCaseEvent(@PathVariable("caseTypeId") String caseTypeId,
                                                                 @PathVariable("triggerId") String triggerId,
                                                                 @RequestParam(value = "ignore-warning",
@@ -85,42 +82,40 @@ public class StartEventController {
             V2.MediaType.START_EVENT
         }
     )
-    @ApiOperation(
-        value = "Retrieve an Event Trigger for a Case by Event ID",
-        notes = "This operation creates an event token for a specific event to be started for a case and returns the "
-        + "token, along with the visible case details to the invoking user as per their configured access levels."
+    @Operation(
+        summary = "Retrieve an Event Trigger for a Case by Event ID",
+        description = "This operation creates an event token for a specific event to be started for a case and returns"
+        + " the token, along with the visible case details to the invoking user as per their configured access levels."
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = StartEventResource.class
-            ),
-        @ApiResponse(
-            code = 400,
-            message = ERROR_CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 401,
-            message = AUTHENTICATION_TOKEN_INVALID
-            ),
-        @ApiResponse(
-            code = 403,
-            message = V2.Error.UNAUTHORISED_S2S_SERVICE
-            ),
-        @ApiResponse(
-            code = 404,
-            message = EVENT_TRIGGER_NOT_FOUND
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "One of the following reasons:\n"
-                + "1. Case event has no pre states\n"
-                + "2. Callback validation errors\n"
-                + "3. Unable to sanitize document for case field\n"
-                + "4. Missing user roles"
-            ),
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = StartEventResource.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = ERROR_CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = AUTHENTICATION_TOKEN_INVALID
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = V2.Error.UNAUTHORISED_S2S_SERVICE
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = EVENT_TRIGGER_NOT_FOUND
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "One of the following reasons:\n"
+            + "1. Case event has no pre states\n"
+            + "2. Callback validation errors\n"
+            + "3. Unable to sanitize document for case field\n"
+            + "4. Missing user roles"
+    )
     public ResponseEntity<StartEventResource> getStartEventTrigger(@PathVariable("caseId") String caseId,
                                                                    @PathVariable("eventId") String eventId,
                                                                    @RequestParam(value = "ignore-warning",

@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
-import org.powermock.reflect.Whitebox;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -77,10 +77,10 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    @MockBean
+    @MockitoBean
     private JestClient jestClient;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private List<String> validFields;
@@ -405,7 +405,7 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        Whitebox.setInternalState(response, "searchResult", searchResult);
+        ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);
     }

@@ -20,9 +20,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
 
@@ -80,6 +80,7 @@ public class DocumentsOperation {
     private CaseDetails getCaseDetails(String caseReference) {
         CaseDetails caseDetails = null;
         try {
+            Long.parseLong(caseReference); // Check if case reference is a number
             caseDetails = caseDetailsRepository.findByReference(caseReference)
                 .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
         } catch (NumberFormatException nfe) {

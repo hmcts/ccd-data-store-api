@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.util.HashMap;
