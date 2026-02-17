@@ -83,6 +83,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1023.7 #AC-7 #AC-08 of CCD-5324
   Scenario: Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroupId not created when caseGroupType != CCD:all-cases-access
@@ -95,6 +97,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1023.8 #AC-8 #AC-09 of CCD-5324
   Scenario: CaseAccessGroups field contains Invalid caseAccessGroupType value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
@@ -108,6 +112,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1023.9 #AC-9 #AC-10 of CCD-5324
   Scenario: CaseAccessGroups field contains valid caseAccessGroupType value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
@@ -119,6 +125,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1023.10 #Testing Blank value
   Scenario: Invoke saveCaseDetailsForCitizenUsingPOST and caseAccessGroups field contains blank value
@@ -129,6 +137,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
     Then      a positive response is received
     And       the response has all other details as expected
     And       the response [contains updated values for case_data and data_classification]
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
    #=======================================
    # Submit Event Creation: v2_external#/case-controller/createCaseUsingPOST
@@ -230,6 +240,8 @@ Feature: F-1023: Submit Case Creation Handle CaseAccessGroups
 
     Then  a positive response is received
     And   the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1023_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # v2_external#/case-controller/createEventUsingPOST

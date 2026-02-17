@@ -19,6 +19,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import jakarta.inject.Inject;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
@@ -34,7 +36,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestPropertySource(properties =
     {
-    "http.client.read.timeout=500"
+    "http.client.read.timeout=500",
+    "http.client.connection.timeout=200"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
@@ -99,6 +102,44 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         MatcherAssert.assertThat(callbackException.getMessage(),
             CoreMatchers.containsString("Callback to service has been unsuccessful for event Test url"));
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
+    }
+
+    @Test
+    public void aboutToSubmitShouldRespectReadTimeout() throws Exception {
+        String submitUrl = hostUrl + "/about-to-submit-timeout";
+        caseEventDefinition.setCallBackURLAboutToSubmitEvent(submitUrl);
+        caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
+        stubFor(post(urlMatching("/about-to-submit-timeout.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(700)));
+
+        Instant start = Instant.now();
+        CallbackException ex = assertThrows(CallbackException.class, () ->
+            callbackInvoker.invokeAboutToSubmitCallback(
+                caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
+        Duration duration = Duration.between(start, Instant.now());
+
+        MatcherAssert.assertThat("should fail fast on read timeout", duration.toMillis() < 2_000L);
+        MatcherAssert.assertThat("exception should mention unsuccessful callback",
+            ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
+        verify(exactly(1), postRequestedFor(urlMatching("/about-to-submit-timeout.*")));
+    }
+
+    @Test
+    public void aboutToSubmitShouldFailFastOnConnectTimeout() {
+        String unreachableUrl = "http://10.255.255.1:9/unreachable-callback";
+        caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);
+        caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
+
+        Instant start = Instant.now();
+        CallbackException ex = assertThrows(CallbackException.class, () ->
+            callbackInvoker.invokeAboutToSubmitCallback(
+                caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
+        Duration duration = Duration.between(start, Instant.now());
+
+        MatcherAssert.assertThat("connect timeout should not wait for default 30s",
+            duration.toMillis() < 2_000L);
+        MatcherAssert.assertThat("exception should mention unsuccessful callback",
+            ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
     }
 
 }
