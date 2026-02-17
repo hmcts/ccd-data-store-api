@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
@@ -55,6 +54,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CaseSearchEndpointIT extends WireMockBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";
+
+    private static final String GLOBAL_INDEX = "global_index";
+    private static final String TEST_ADDRESS_INDEX = "TestAddressBookCase_cases-000001";
 
     @Inject
     private WebApplicationContext wac;
@@ -112,7 +114,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         final long referenceId = 1535450291607660L;
         String caseDetailElastic = create1CaseDetailsElastic(referenceId);
-        stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic, GLOBAL_INDEX);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -186,7 +188,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         final long reference2 = 1535450291607670L;
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
-        stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic1, GLOBAL_INDEX);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -270,13 +272,17 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws Exception {
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic, TEST_ADDRESS_INDEX);
+    }
+
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic, String indexName) throws Exception {
         List<ElasticSearchCaseDetailsDTO> caseDetailsList = parseSources(caseDetailElastic);
 
         List<Hit<ElasticSearchCaseDetailsDTO>> hits = new ArrayList<>();
         for (ElasticSearchCaseDetailsDTO caseDetails : caseDetailsList) {
             Hit<ElasticSearchCaseDetailsDTO> hit = mock(Hit.class);
             when(hit.source()).thenReturn(caseDetails);
-            when(hit.index()).thenReturn("TestAddressBookCase_cases-000001");
+            when(hit.index()).thenReturn(indexName);
             hits.add(hit);
         }
 
