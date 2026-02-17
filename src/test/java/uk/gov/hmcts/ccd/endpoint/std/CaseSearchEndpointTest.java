@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
@@ -31,6 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
@@ -42,6 +44,7 @@ class CaseSearchEndpointTest {
 
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
+    private static final String GLOBAL_INDEX = "global_index";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -107,12 +110,13 @@ class CaseSearchEndpointTest {
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getSearchIndex(), is(Optional.empty()));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }), anyBoolean());
+        }), eq(true));
         assertThat(caseSearchResult, is(result));
     }
 
@@ -120,6 +124,8 @@ class CaseSearchEndpointTest {
     void searchCaseDetailsGlobalInvokesOperation() throws JsonProcessingException {
 
         // ARRANGE
+        when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
+        when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
@@ -135,12 +141,15 @@ class CaseSearchEndpointTest {
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            SearchIndex idx = crossCaseTypeSearchRequest.getSearchIndex().get();
+            assertThat(idx.getIndexName(), is(GLOBAL_INDEX));
+            assertThat(idx.getIndexType(), is("_doc"));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }), anyBoolean());
+        }), eq(true));
         assertThat(caseSearchResult, is(result));
     }
 
@@ -165,19 +174,20 @@ class CaseSearchEndpointTest {
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getSearchIndex(), is(Optional.empty()));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(2));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds(), is(List.of(CASE_TYPE_ID, CASE_TYPE_ID_2)));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(true));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }), anyBoolean());
+        }), eq(true));
         assertThat(caseSearchResult, is(result));
     }
 
     @Test
     void searchCases_usesGlobalIndexWhenGlobalTrue() throws Exception {
         // ARRANGE
-        when(applicationParams.getGlobalSearchIndexName()).thenReturn("global_index");
+        when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
         when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
 
         String searchRequest = "{\"query\": {\"match\": {\"reference\": {\"query\": \"123\"}}}}";
@@ -205,14 +215,14 @@ class CaseSearchEndpointTest {
             assertThat(idx.getIndexName(), is("global_index"));
             assertThat(idx.getIndexType(), is("_doc"));
             return true;
-        }), anyBoolean());
+        }), eq(true));
         assertThat(actual, is(expected));
     }
 
     @Test
     void searchCases_globalTrueAndWildcardExpandsCaseTypes() throws Exception {
         // ARRANGE
-        when(applicationParams.getGlobalSearchIndexName()).thenReturn("global_index");
+        when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
         when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
@@ -236,14 +246,14 @@ class CaseSearchEndpointTest {
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(req -> {
             assertThat(req.getSearchRequestJsonNode(), is(searchRequestNode));
-            // ✅ wildcard was expanded
+            // wildcard was expanded
             assertThat(req.getCaseTypeIds(), is(List.of(CASE_TYPE_ID, CASE_TYPE_ID_2)));
-            // ✅ global index is selected
+            // global index is selected
             SearchIndex idx = req.getSearchIndex().get();
             assertThat(idx.getIndexName(), is("global_index"));
             assertThat(idx.getIndexType(), is("_doc"));
             return true;
-        }), anyBoolean());
+        }), eq(true));
         assertThat(actual, is(expected));
     }
 
