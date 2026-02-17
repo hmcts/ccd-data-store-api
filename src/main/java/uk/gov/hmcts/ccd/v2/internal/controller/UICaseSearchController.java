@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -29,9 +28,9 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequestHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
@@ -57,7 +56,7 @@ public class UICaseSearchController {
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
     private final ElasticsearchSortService elasticsearchSortService;
-    private final ApplicationParams applicationParams;
+    private final CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
 
     @Autowired
     @SuppressWarnings("checkstyle:LineLength") //don't want to break message
@@ -67,12 +66,12 @@ public class UICaseSearchController {
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
         ElasticsearchSortService elasticsearchSortService,
-        ApplicationParams applicationParams) {
+        CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
         this.elasticsearchSortService = elasticsearchSortService;
-        this.applicationParams = applicationParams;
+        this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
     }
 
     public ResponseEntity<CaseSearchResultViewResource> searchCases(
@@ -175,20 +174,11 @@ public class UICaseSearchController {
             searchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
         }
 
-        CrossCaseTypeSearchRequest.Builder builder = new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(Collections.singletonList(caseTypeId))
-            .withSearchRequest(searchRequest);
-
-        if (global) {
-            SearchIndex searchIndex = new SearchIndex(
-                applicationParams.getGlobalSearchIndexName(),
-                applicationParams.getGlobalSearchIndexType()
-            );
-            builder.withSearchIndex(searchIndex);
-            log.info("pointing to global search index...");
-        }
-
-        CrossCaseTypeSearchRequest request = builder.build();
+        CrossCaseTypeSearchRequest request = crossCaseTypeSearchRequestHelper.buildCrossCaseTypeSearchRequest(
+            Collections.singletonList(caseTypeId),
+            searchRequest,
+            global
+        );
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
@@ -208,4 +198,5 @@ public class UICaseSearchController {
                 .map(SearchResultViewItem::getCaseId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
+
 }
