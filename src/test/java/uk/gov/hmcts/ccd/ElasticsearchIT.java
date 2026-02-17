@@ -416,7 +416,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         void shouldReturnLastPartialPageCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
             final int PAGE_SIZE = 10;
             final long total = getCasesTotal();
-            int pageFrom = Math.toIntExact(Math.max(0L, total - 5));
+            int pageFrom = (int) Math.max(0L, total -5);
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(baseQuery)
