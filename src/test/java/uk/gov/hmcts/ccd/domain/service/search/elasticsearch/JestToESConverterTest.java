@@ -50,6 +50,16 @@ class JestToESConverterTest {
     }
 
     @Test
+    void toRequestItem_shouldThrowOnNullBody() {
+        Search jestSearch = new Search.Builder(null)
+            .build();
+
+        assertThrows(IllegalArgumentException.class, () ->
+            JestToESConverter.fromJest(List.of(jestSearch))
+        );
+    }
+
+    @Test
     void fromJest_shouldPreserveSearchAfterInConvertedBody() throws Exception {
         Search jestSearch = new Search.Builder("""
             {
