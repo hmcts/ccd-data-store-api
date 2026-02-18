@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -54,14 +52,13 @@ public class ElasticsearchITSetup {
     private void waitForClusterYellow(int tries) {
         for (int i = 0; i < 5; i++) {
             HttpGet request = new HttpGet(url("/_cluster/health?wait_for_status=yellow&timeout=50s"));
-            httpClient.execute(request, (Consumer<CloseableHttpResponse>) response -> {
+            httpClient.execute(request, response -> {
                     if (response.getStatusLine().getStatusCode() != 200) {
                         Assertions.assertTrue(tries > 0,
                             "Cluster does not reached yellow status in specified timeout");
                         waitForClusterYellow(tries - 1);
                     }
                 }
-
             );
         }
     }
@@ -89,7 +86,9 @@ public class ElasticsearchITSetup {
     }
 
     void createIndex(String indexName, ElasticsearchIndexSettings settings) {
+        log.debug("Looking at Index {}", indexName);
         if (!indexExists(indexName)) {
+            log.debug("Does not exist so creating Index {}", indexName);
             HttpPut request = new HttpPut(url("/" + indexName));
             request.setEntity(new StringEntity(settings.toJson().toString(), APPLICATION_JSON));
             httpClient.execute(request, response -> {
@@ -110,7 +109,9 @@ public class ElasticsearchITSetup {
 
     private boolean indexExists(String indexName) {
         HttpHead request = new HttpHead(url("/" + indexName));
-        return httpClient.execute(request, response -> response.getStatusLine().getStatusCode() == 200);
+        boolean indexExists = httpClient.execute(request, response -> response.getStatusLine().getStatusCode() == 200);
+        log.debug("Index {} exists: {} ", indexName, indexExists);
+        return indexExists;
     }
 
     // * * * * * * * * * * * * * * Initializing data * * * * * * * * * * * * * * * * * * * * * * * *

@@ -777,14 +777,14 @@ task functional(type: JavaExec) {
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
     args = [
-        '--threads', '1',
-        '--plugin', "json:${rootDir}/target/cucumber.json",
-        '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-        '--plugin',  "pretty",
-        '--tags',"${tags}",
-        '--glue', 'uk.gov.hmcts.befta.player',
-        '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
-        'src/aat/resources/features'
+            '--threads', '1',
+            '--plugin', "json:${rootDir}/target/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+            '--plugin', "pretty",
+            '--tags', "${tags}",
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
+            'src/aat/resources/features'
     ]
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'

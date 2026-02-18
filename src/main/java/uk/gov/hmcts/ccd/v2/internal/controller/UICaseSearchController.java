@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequestHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
@@ -55,6 +56,7 @@ public class UICaseSearchController {
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
     private final ElasticsearchSortService elasticsearchSortService;
+    private final CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
 
     @Autowired
     @SuppressWarnings("checkstyle:LineLength") //don't want to break message
@@ -63,11 +65,26 @@ public class UICaseSearchController {
         @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
-        ElasticsearchSortService elasticsearchSortService) {
+        ElasticsearchSortService elasticsearchSortService,
+        CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
         this.elasticsearchSortService = elasticsearchSortService;
+        this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
+    }
+
+    public ResponseEntity<CaseSearchResultViewResource> searchCases(
+        @Parameter(name = "Case type ID for search.", required = true)
+        @RequestParam(value = "ctid") String caseTypeId,
+        @Parameter(name = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
+            + "or `orgCases`. Used when the list of fields to return is configured in the "
+            + "CCD definition.\nIf omitted, all case fields are returned.")
+        @RequestParam(value = "use_case", required = false) final String useCase,
+        @RequestBody String jsonSearchRequest) {
+
+        log.debug("searchCases no global parameter specified");
+        return searchCases(caseTypeId, useCase, false, jsonSearchRequest);
     }
 
     @PostMapping(path = "")
@@ -142,8 +159,10 @@ public class UICaseSearchController {
                                          + "or `orgCases`. Used when the list of fields to return is configured in the "
                                          + "CCD definition.\nIf omitted, all case fields are returned.")
                                      @RequestParam(value = "use_case", required = false) final String useCase,
+                                     @RequestParam(value = "global", required = false, defaultValue = "false") boolean global,
                                      @RequestBody String jsonSearchRequest) {
-        Instant start = Instant.now();
+        final Instant start = Instant.now();
+        log.debug("searchCases : global={}", global);
 
         ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())
@@ -155,10 +174,11 @@ public class UICaseSearchController {
             searchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
         }
 
-        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(Collections.singletonList(caseTypeId))
-            .withSearchRequest(searchRequest)
-            .build();
+        CrossCaseTypeSearchRequest request = crossCaseTypeSearchRequestHelper.buildCrossCaseTypeSearchRequest(
+            Collections.singletonList(caseTypeId),
+            searchRequest,
+            global
+        );
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
@@ -178,4 +198,5 @@ public class UICaseSearchController {
                 .map(SearchResultViewItem::getCaseId)
                 .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
+
 }

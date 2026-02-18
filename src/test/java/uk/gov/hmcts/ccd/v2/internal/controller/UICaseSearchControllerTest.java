@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequestHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
@@ -55,12 +56,20 @@ class UICaseSearchControllerTest {
     @Mock
     private ElasticsearchSortService elasticsearchSortService;
 
-    @InjectMocks
+    @Mock
+    private ApplicationParams applicationParams;
+
+    private CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
+
     private UICaseSearchController controller;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        crossCaseTypeSearchRequestHelper = new CrossCaseTypeSearchRequestHelper(applicationParams);
+
+        controller = new UICaseSearchController(caseSearchOperation, elasticsearchQueryHelper,
+            caseSearchResultViewGenerator,elasticsearchSortService, crossCaseTypeSearchRequestHelper);
     }
 
     @Test

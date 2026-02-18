@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
@@ -23,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequestHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -45,15 +45,24 @@ public class CaseSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
+    private final CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
                                   CaseSearchOperation caseSearchOperation,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper,
-                              ApplicationParams applicationParams) {
+                              CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
+        this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
+    }
+
+    public CaseSearchResult searchCases(List<String> caseTypeIds,
+                                        String jsonSearchRequest,
+                                        boolean dataClassification) {
+        log.debug("searchCases no global parameter specified");
+        return searchCases(caseTypeIds, jsonSearchRequest, dataClassification, false);
     }
 
     @PostMapping(value = "/searchCases")
@@ -74,9 +83,12 @@ public class CaseSearchEndpoint {
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
         @RequestBody String jsonSearchRequest,
-        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification) {
+        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification,
+        @RequestParam(value = "global", required = false, defaultValue = "false") boolean global) {
 
-        Instant start = Instant.now();
+        final Instant start = Instant.now();
+        log.debug("searchCases : global={}", global);
+
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =
@@ -86,10 +98,11 @@ public class CaseSearchEndpoint {
             elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
         }
 
-        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(getCaseTypeIds(caseTypeIds))
-            .withSearchRequest(elasticsearchRequest)
-            .build();
+        CrossCaseTypeSearchRequest request = crossCaseTypeSearchRequestHelper.buildCrossCaseTypeSearchRequest(
+            getCaseTypeIds(caseTypeIds),
+            elasticsearchRequest,
+            global
+        );
 
         CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
 
@@ -113,7 +126,7 @@ public class CaseSearchEndpoint {
     }
 
     private boolean isAllCaseTypesRequest(List<String> caseTypeIds) {
-        return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.get(0));
+        return ElasticsearchRequest.WILDCARD.equals(caseTypeIds.getFirst());
     }
 
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {
