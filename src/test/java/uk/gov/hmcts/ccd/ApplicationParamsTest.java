@@ -43,13 +43,17 @@ class ApplicationParamsTest {
         final var elasticsearchNodeDiscoveryFrequencyMillis = 1L;
         final var elasticsearchNodeDiscoveryFilter = "filter";
         ReflectionTestUtils.setField(applicationParams, "elasticSearchDataHosts", elasticSearchDataHosts);
-        ReflectionTestUtils.setField(applicationParams, "elasticsearchNodeDiscoveryEnabled", elasticsearchNodeDiscoveryEnabled);
-        ReflectionTestUtils.setField(applicationParams, "elasticsearchNodeDiscoveryFrequencyMillis", elasticsearchNodeDiscoveryFrequencyMillis);
-        ReflectionTestUtils.setField(applicationParams, "elasticsearchNodeDiscoveryFilter", elasticsearchNodeDiscoveryFilter);
+        ReflectionTestUtils.setField(applicationParams,
+            "elasticsearchNodeDiscoveryEnabled", elasticsearchNodeDiscoveryEnabled);
+        ReflectionTestUtils.setField(applicationParams,
+            "elasticsearchNodeDiscoveryFrequencyMillis", elasticsearchNodeDiscoveryFrequencyMillis);
+        ReflectionTestUtils.setField(applicationParams,
+            "elasticsearchNodeDiscoveryFilter", elasticsearchNodeDiscoveryFilter);
 
         assertEquals(elasticSearchDataHosts, applicationParams.getElasticSearchDataHosts());
         assertEquals(elasticsearchNodeDiscoveryEnabled, applicationParams.isElasticsearchNodeDiscoveryEnabled());
-        assertEquals(elasticsearchNodeDiscoveryFrequencyMillis, applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis());
+        assertEquals(elasticsearchNodeDiscoveryFrequencyMillis,
+            applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis());
         assertEquals(elasticsearchNodeDiscoveryFilter, applicationParams.getElasticsearchNodeDiscoveryFilter());
     }
 }
