@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.lau;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -29,6 +31,9 @@ import uk.gov.hmcts.ccd.domain.model.lau.ActionLog;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseSearchPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.SearchLog;
+
+import jakarta.inject.Inject;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -49,8 +54,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.doReturn;
 
+@Import(AuditCaseRemoteOperationIT.MockConfig.class)
 public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     private static int ASYNC_DELAY_TIMEOUT_MILLISECONDS = 2000;
@@ -69,8 +76,12 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final String CASE_ID = "1504259907353529";
     private static final String IDAM_ID = "1234";
 
+
     @Autowired
-    private SecurityUtils securityUtils;
+    SecurityUtils securityUtils;
+
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
 
     @Autowired
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
@@ -117,6 +128,15 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final Clock fixedClock = Clock.fixed(Instant.parse(TIMESTAMP_AS_TEXT), ZoneOffset.UTC);
     private static final ZonedDateTime LOG_TIMESTAMP =
         ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+
+    @TestConfiguration
+    static class MockConfig {
+
+        @Bean
+        public AuthTokenGenerator authTokenGenerator() {
+            return Mockito.mock(AuthTokenGenerator.class);
+        }
+    }
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -249,7 +269,6 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Test
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
         throws JsonProcessingException, InterruptedException {
-
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
         searchLog.setCaseRefs(SEARCH_LOG_CASE_REFS);
@@ -391,6 +410,47 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         return getAllServeEvents().stream()
             .filter(serveEvent -> serveEvent.getRequest().getUrl().startsWith(pathPrefix))
             .count();
+    }
+
+    @Test
+    void shouldUseNewTokenOnRetryWithInterceptor() throws Exception {
+        Mockito.when(authTokenGenerator.generate())
+            .thenReturn("Bearer originalToken")
+            .thenReturn("Bearer refreshedToken");
+
+        stubFor(WireMock.post(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .willReturn(aResponse().withStatus(AUDIT_UNAUTHORISED_HTTP_STATUS)));
+
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CASE_ACCESSED)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        // Act: make call (will retry 3 times)
+        auditService.audit(auditContext);
+        waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT, 3);
+
+        // Assert: all 3 requests
+        var requests = getAllServeEvents().stream()
+            .filter(e -> e.getRequest().getUrl().equals(ACTION_AUDIT_ENDPOINT))
+            .toList();
+
+        assertThat(requests.size(), is(3));
+
+        var originalRequest = requests.stream()
+            .filter(r -> r.getRequest().getHeader("ServiceAuthorization").equals("Bearer originalToken"))
+            .toList();
+
+        var retryRequests = requests.stream()
+            .filter(r -> r.getRequest().getHeader("ServiceAuthorization").equals("Bearer refreshedToken"))
+            .toList();
+
+        assertThat(retryRequests.size(), is(2));
+        assertThat(originalRequest.size(), is(1));
+        assertThat(originalRequest.getFirst(), is(notNullValue()));
     }
 
 }
