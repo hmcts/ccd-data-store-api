@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-125.5",
+  "title": "Must return a positive appropriate response when Swagger config URL is accessed",
+  "_extends_": "F-125_Test_Swagger_Config_Base_Data",
+
+  "specs": [
+    "to observe the swagger config json content"
+  ],
+
+  "request" :{
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "configUrl" : "[[ANYTHING_PRESENT]]",
+      "url" : "[[ANYTHING_PRESENT]]",
+      "oauth2RedirectUrl" : "[[ANYTHING_PRESENT]]",
+      "validatorUrl" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-125_Test_Swagger_Config_Base_Data",
+  "title": "Verify swagger Config",
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Swagger Config JSON Page",
+
+  "method": "GET",
+  "uri": "/v2/api-docs/swagger-config",
+
+  "expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Accept-Ranges" : "bytes",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json"
+    }
+  }
+}
