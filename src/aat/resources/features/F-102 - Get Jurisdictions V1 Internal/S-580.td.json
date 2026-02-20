@@ -416,10 +416,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaNoReadAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 },
@@ -575,10 +575,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaNoReadAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 },
@@ -594,10 +594,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaNoReadAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 },
@@ -613,10 +613,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaNoReadAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 }
