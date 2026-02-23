@@ -209,7 +209,7 @@ dependencies {
 
     // put CVE Vulnerability (sub)dependency overrides here e.g.
     // implementation group: 'com.example', name: 'example-lib', version: '1.0.0' //  parent dependency name
-    
+
     // end::CVE Vulnerability dependency overrides
 
     // Lombok
@@ -265,7 +265,8 @@ dependencies {
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.1'
-    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5'
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
+    implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
@@ -285,7 +286,7 @@ dependencies {
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6' 
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
