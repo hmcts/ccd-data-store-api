@@ -1,9 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,14 +37,12 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
@@ -86,7 +90,7 @@ class CallbackServiceTest {
     private CallbackResponse callbackResponse = new CallbackResponse();
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
-    public static final JSONObject responseAttrJson1 = new JSONObject("""
+    public static final String responseAttrJson1 = """
         {
             "user_task": {
                 "task_data": {
@@ -96,8 +100,8 @@ class CallbackServiceTest {
                 "complete_task": "false"
             }
         }
-        """);
-    public static final JSONObject responseAttrJson2 = new JSONObject("""
+        """;
+    public static final String responseAttrJson2 = """
         {
             "user_task": {
                 "task_data": {
@@ -107,9 +111,9 @@ class CallbackServiceTest {
                 "complete_task": "false"
             }
         }
-        """);
+        """;
 
-    public static final JSONObject responseHdrJson1 = new JSONObject("""
+    public static final String responseHdrJson1 = """
         {
             "user_task": {
                 "task_data": {
@@ -119,8 +123,8 @@ class CallbackServiceTest {
                 "complete_task": "false"
             }
         }
-        """);
-    public static final JSONObject responseHdrJson2 = new JSONObject("""
+        """;
+    public static final String responseHdrJson2 = """
         {
             "user_task": {
                 "task_data": {
@@ -130,7 +134,7 @@ class CallbackServiceTest {
                 "complete_task": "false"
             }
         }
-        """);
+        """;
 
     @BeforeEach
     void setUp() {
@@ -302,17 +306,21 @@ class CallbackServiceTest {
     @DisplayName("Should add callback passthru headers from request attribute")
     void shouldAddCallbackPassthruHeadersFromRequestAttribute() throws Exception {
         List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
-        List<String> customHeaderValues = List.of(ClientContextUtil.encodeToBase64(responseAttrJson1.toString()),
-            ClientContextUtil.encodeToBase64(responseAttrJson2.toString()));
+        JSONObject responseAttr1 = new JSONObject(responseAttrJson1);
+        JSONObject responseAttr2 = new JSONObject(responseAttrJson2);
+        JSONObject responseHdr1 = new JSONObject(responseHdrJson1);
+        JSONObject responseHdr2 = new JSONObject(responseHdrJson2);
+        List<String> customHeaderValues = List.of(ClientContextUtil.encodeToBase64(responseAttr1.toString()),
+            ClientContextUtil.encodeToBase64(responseAttr2.toString()));
 
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
         when(request.getAttribute(customHeaders.get(0))).thenReturn(customHeaderValues.get(0));
         when(request.getAttribute(customHeaders.get(1))).thenReturn(customHeaderValues.get(1));
         when(request.getAttribute(customHeaders.get(2))).thenReturn(null);
         when(request.getHeader(customHeaders.get(0)))
-            .thenReturn(ClientContextUtil.encodeToBase64(responseHdrJson1.toString()));
+            .thenReturn(ClientContextUtil.encodeToBase64(responseHdr1.toString()));
         when(request.getHeader(customHeaders.get(1)))
-            .thenReturn(ClientContextUtil.encodeToBase64(responseHdrJson2.toString()));
+            .thenReturn(ClientContextUtil.encodeToBase64(responseHdr2.toString()));
         when(request.getHeader(customHeaders.get(2))).thenReturn(null);
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -324,6 +332,81 @@ class CallbackServiceTest {
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+    }
+
+    @Test
+    @DisplayName("Should not throw ApiException when no error or warning fields set in response")
+    void shouldNotThrowApiExceptionWhenNoErrorOrWarningFieldsSet() {
+        assertThatNoException().isThrownBy(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should not throw ApiException when only warning fields set in response and warnings ignored")
+    void shouldNotThrowApiExceptionWhenIgnorableWarningsSet() {
+        callbackResponse.setWarnings(List.of("Warning 1"));
+
+        assertThatNoException().isThrownBy(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException when only warning fields set in response and warnings not ignored")
+    void shouldThrowApiExceptionWhenNonIgnorableWarningsSet() {
+        List<String> expectedWarnings = List.of("Warning 1");
+        callbackResponse.setWarnings(expectedWarnings);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage("Unable to proceed because there are one or more callback Errors or Warnings");
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEqualTo(expectedWarnings);
+        Assertions.assertThat(apiException.getCallbackErrors()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException when only error fields set in response")
+    void shouldThrowApiExceptionWhenErrorsSet() {
+        List<String> expectedErrors = List.of("Error 1");
+        callbackResponse.setErrors(expectedErrors);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage("Unable to proceed because there are one or more callback Errors or Warnings");
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackErrors()).isEqualTo(expectedErrors);
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should throw ApiException with custom error message")
+    void shouldThrowApiExceptionWithCustomMessageWhenErrorMessageOverrideSet() {
+        String expectedErrorMessage = "Some custom error message";
+        callbackResponse.setErrorMessageOverride(expectedErrorMessage);
+
+        Throwable throwable = catchThrowable(
+            () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false)
+        );
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ApiException.class)
+            .hasMessage(expectedErrorMessage);
+
+        ApiException apiException = (ApiException) throwable;
+        Assertions.assertThat(apiException.getCallbackErrors()).isEmpty();
+        Assertions.assertThat(apiException.getCallbackWarnings()).isEmpty();
     }
 
     private void initSecurityContext() {
