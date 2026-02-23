@@ -77,7 +77,3 @@ where cd.id = ce.case_data_id
                      'LondonSouth', 'Manchester', 'MidlandsEast', 'MidlandsWest', 
                      'Newcastle', 'Scotland', 'Wales', 'Watford')
 	and ce.event_id = 'generateCorrespondence'
-
-
-    
-
