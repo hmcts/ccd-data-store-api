@@ -304,6 +304,418 @@ class CaseDocumentTimestampServiceTest {
         assertFalse(underTest.isToBeUpdatedWithTimestamp(node));
     }
 
+    @Test
+    void shouldRejectHtmlWithHtmExtension() {
+        final String caseTypeId = "CASE_TYPE_HTML_HTM_REJECT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/1", "test.htm")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf,.docx");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldRejectHtmlWithUpperCaseExtension() {
+        final String caseTypeId = "CASE_TYPE_HTML_UPPER_REJECT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/1", "test.HTML")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf,.docx");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldAllowNonHtmlDocumentWithoutRegex() {
+        final String caseTypeId = "CASE_TYPE_NO_REGEX";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/1", "test.pdf"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", null);
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldAllowHtmlWithRegexPattern() {
+        final String caseTypeId = "CASE_TYPE_HTML_REGEX";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/2", "test.html"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".*\\.(html|pdf|docx)$");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldRejectHtmlWithRegexPatternNotMatching() {
+        final String caseTypeId = "CASE_TYPE_HTML_REGEX_REJECT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/1", "test.html")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".*\\.(pdf|docx)$");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldAllowHtmlWithCommaDelimitedExtensionsList() {
+        final String caseTypeId = "CASE_TYPE_HTML_COMMA_LIST";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/3", "test.htm"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", "pdf, htm, docx");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldAllowHtmlWithExtensionListWithoutDots() {
+        final String caseTypeId = "CASE_TYPE_HTML_NO_DOTS";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/4", "test.html"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", "html,pdf,docx");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldHandleDocumentWithoutFilename() {
+        final String caseTypeId = "CASE_TYPE_NO_FILENAME";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put(DOCUMENT_URL, "http://dm/documents/5");
+        // No document_filename field
+        data.put("documentField", node);
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldHandleDocumentWithNullFilename() {
+        final String caseTypeId = "CASE_TYPE_NULL_FILENAME";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put(DOCUMENT_URL, "http://dm/documents/6");
+        node.putNull("document_filename");
+        data.put("documentField", node);
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".pdf");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldHandleInvalidRegexPattern() {
+        final String caseTypeId = "CASE_TYPE_INVALID_REGEX";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/7", "test.html")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", "[invalid(regex");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleEmptyRegexString() {
+        final String caseTypeId = "CASE_TYPE_EMPTY_REGEX";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/8", "test.html"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", "");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleBlankRegexString() {
+        final String caseTypeId = "CASE_TYPE_BLANK_REGEX";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/9", "test.html"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", "   ");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleCommaOnlyRegexString() {
+        final String caseTypeId = "CASE_TYPE_COMMA_ONLY";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        caseDetailsModified.setData(Map.of(
+            "documentField", createDocumentNode("http://dm/documents/10", "test.html")
+        ));
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ",,,");
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleComplexFieldWithDocumentInside() {
+        final String caseTypeId = "CASE_TYPE_COMPLEX_FIELD";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode complexNode = objectMapper.createObjectNode();
+        complexNode.set("nestedDocument", createDocumentNode("http://dm/documents/11", "test.html"));
+        data.put("complexField", complexNode);
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        FieldTypeDefinition nestedDocType = new FieldTypeDefinition();
+        nestedDocType.setType(FieldTypeDefinition.DOCUMENT);
+        nestedDocType.setRegularExpression(".pdf");
+
+        CaseFieldDefinition nestedField = new CaseFieldDefinition();
+        nestedField.setId("nestedDocument");
+        nestedField.setFieldTypeDefinition(nestedDocType);
+
+        FieldTypeDefinition complexType = new FieldTypeDefinition();
+        complexType.setType(FieldTypeDefinition.COMPLEX);
+        complexType.setComplexFields(List.of(nestedField));
+
+        CaseFieldDefinition complexField = new CaseFieldDefinition();
+        complexField.setId("complexField");
+        complexField.setFieldTypeDefinition(complexType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(complexField));
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleCollectionOfDocumentsWithHtml() {
+        final String caseTypeId = "CASE_TYPE_COLLECTION";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode collectionNode = objectMapper.createArrayNode().addObject();
+        collectionNode.set("value", createDocumentNode("http://dm/documents/12", "test.html"));
+
+        ObjectNode arrayWrapper = objectMapper.createObjectNode();
+        arrayWrapper.set("docCollection", objectMapper.createArrayNode().add(collectionNode));
+        data.put("docCollection", arrayWrapper.get("docCollection"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        FieldTypeDefinition documentType = new FieldTypeDefinition();
+        documentType.setType(FieldTypeDefinition.DOCUMENT);
+        documentType.setRegularExpression(".pdf");
+
+        FieldTypeDefinition collectionType = new FieldTypeDefinition();
+        collectionType.setType(FieldTypeDefinition.COLLECTION);
+        collectionType.setCollectionFieldTypeDefinition(documentType);
+
+        CaseFieldDefinition collectionField = new CaseFieldDefinition();
+        collectionField.setId("docCollection");
+        collectionField.setFieldTypeDefinition(collectionType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(collectionField));
+
+        assertThrows(CaseValidationException.class, () ->
+            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldHandleMixedCaseHtmlInExtensionList() {
+        final String caseTypeId = "CASE_TYPE_MIXED_CASE";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/13", "test.HTML"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".PDF,.HTML,.DOCX");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldHandleCaseInsensitiveRegexMatching() {
+        final String caseTypeId = "CASE_TYPE_CASE_INSENSITIVE";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/14", "TEST.HTML"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".*\\.(html|pdf)$");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
     private List<String> generateListOfUrls(String jsonString) {
         JsonNode result = generateTestNode(jsonString);
         Map<String, JsonNode> dataMap = Maps.newHashMap();
