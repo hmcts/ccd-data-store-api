@@ -716,6 +716,41 @@ class CaseDocumentTimestampServiceTest {
         assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
     }
 
+    @Test
+    void shouldAddTimestampWhenCaseFieldDefinitionsEmpty() {
+        final String caseTypeId = "CASE_TYPE_EMPTY_FIELD_DEFS";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        // Arrange data with a new document so addUploadTimestamps has work to do
+        JsonNode requestNode = generateTestNode(jsonDocumentNode);
+        CaseDetails modified = new CaseDetails();
+        modified.setCaseTypeId(caseTypeId);
+        modified.setData(Map.of("doc", requestNode));
+
+        CaseDetails original = new CaseDetails();
+        original.setCaseTypeId(caseTypeId);
+        original.setData(Map.of());
+
+        // Empty field definitions should fall back to non-schema processing branch
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of());
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        JsonNode documentNode = modified.getData().get("doc").get("document");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void getDocumentUrlsHandlesNullAndEmptyCaseDetails() {
+        assertTrue(underTest.getDocumentUrls((CaseDetails) null).isEmpty());
+
+        CaseDetails emptyDataCase = new CaseDetails();
+        emptyDataCase.setData(null);
+
+        assertTrue(underTest.getDocumentUrls(emptyDataCase).isEmpty());
+    }
+
     private List<String> generateListOfUrls(String jsonString) {
         JsonNode result = generateTestNode(jsonString);
         Map<String, JsonNode> dataMap = Maps.newHashMap();
