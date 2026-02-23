@@ -12,7 +12,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'uk.gov.hmcts.java' version '0.12.67'
-    id 'au.com.dius.pact' version '4.6.19'
+    id 'au.com.dius.pact' version '4.6.20'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '12.1.3'
 }
