@@ -24,7 +24,7 @@
 				"summary": "",
 				"description": ""
 			},
-			"event_token": "${[scenarioContext][parentContext][childContexts][Standard_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][parentContext][childContexts][Befta_Default_Full_Case_Creation_Data_Token_Creation][testData][actualResponse][body][token]}",
 			"ignore_warning": false,
 			"draft_id": null
 		}

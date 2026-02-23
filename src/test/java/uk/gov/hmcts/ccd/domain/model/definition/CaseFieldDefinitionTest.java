@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
@@ -181,27 +180,42 @@ public class CaseFieldDefinitionTest {
 
     private final FieldTypeDefinition familyFieldTypeDefinition =
         aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyInfo).withComplexField(members).build();
-    private final AccessControlList acl1 =
-        anAcl().withRole(ROLE1).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
-    private final AccessControlList acl2 =
-        anAcl().withRole(ROLE2).withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
-    private final AccessControlList acl3 =
-        anAcl().withRole(ROLE3).withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
-    private final ComplexACL complexACL1
-        = aComplexACL().withListElementCode(MEMBERS).withRole(ROLE1).withCreate(false).withRead(true).withUpdate(true)
-        .withDelete(false).build();
-    private final ComplexACL complexACL2
-        = aComplexACL().withListElementCode(MEMBERS + "." + PERSON).withRole(ROLE1).withCreate(false).withRead(true)
-        .withUpdate(false).withDelete(false).build();
-    private final ComplexACL complexACL3
-        = aComplexACL().withListElementCode(MEMBERS + "." + PERSON + "." + NAME).withRole(ROLE1).withCreate(false)
-        .withRead(true).withUpdate(false).withDelete(false).build();
-    private final ComplexACL complexACL4
-        = aComplexACL().withListElementCode(FAMILY_INFO).withRole(ROLE1).withCreate(true).withRead(true)
-        .withUpdate(true).withDelete(false).build();
-    private final ComplexACL complexACL5
-        = aComplexACL().withListElementCode(FAMILY_INFO + "." + FAMILY_ADDRESS).withRole(ROLE1).withCreate(true)
-        .withRead(true).withUpdate(false).withDelete(false).build();
+    private AccessControlList acl1 = AccessControlList.builder()
+        .accessProfile(ROLE1)
+        .create(true)
+        .read(true)
+        .update(true)
+        .delete(false)
+        .build();
+    private AccessControlList acl2 = AccessControlList.builder()
+        .accessProfile(ROLE2)
+        .create(true)
+        .read(true)
+        .update(false)
+        .delete(true)
+        .build();
+    private AccessControlList acl3 = AccessControlList.builder()
+        .accessProfile(ROLE3)
+        .create(false)
+        .read(false)
+        .update(true)
+        .delete(false)
+        .build();
+    private ComplexACL complexACL1
+        = aComplexACL().listElementCode(MEMBERS).accessProfile(ROLE1).create(false).read(true).update(true)
+        .delete(false).build();
+    private ComplexACL complexACL2
+        = aComplexACL().listElementCode(MEMBERS + "." + PERSON).accessProfile(ROLE1).create(false).read(true)
+        .update(false).delete(false).build();
+    private ComplexACL complexACL3
+        = aComplexACL().listElementCode(MEMBERS + "." + PERSON + "." + NAME).accessProfile(ROLE1).create(false)
+        .read(true).update(false).delete(false).build();
+    private ComplexACL complexACL4
+        = aComplexACL().listElementCode(FAMILY_INFO).accessProfile(ROLE1).create(true).read(true)
+        .update(true).delete(false).build();
+    private ComplexACL complexACL5
+        = aComplexACL().listElementCode(FAMILY_INFO + "." + FAMILY_ADDRESS).accessProfile(ROLE1).create(true)
+        .read(true).update(false).delete(false).build();
     private CaseFieldDefinition family;
 
     @BeforeEach

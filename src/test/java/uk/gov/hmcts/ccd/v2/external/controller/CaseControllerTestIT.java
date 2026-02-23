@@ -490,7 +490,8 @@ class CaseControllerTestIT extends WireMockBaseTest {
                 .withEventId("HAS_PRE_STATES_EVENT")
                 .withSummary("Short comment")
                 .build())
-            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "HAS_PRE_STATES_EVENT"))
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION,
+                "MultipleSearchCriteriaAndSearchParties", "HAS_PRE_STATES_EVENT"))
             .withData(GlobalSearchTestFixture.createCaseData())
             .build();
 

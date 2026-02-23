@@ -164,12 +164,13 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
     private static List<AccessControlList> createAccessControlList(Set<String> userRoles) {
         return userRoles.stream()
-            .map(userRole -> {
-                AccessControlList controlList = new AccessControlList();
-                controlList.setAccessProfile(userRole);
-                controlList.setRead(true);
-                return controlList;
-            })
+            .map(userRole -> AccessControlList.builder()
+                .accessProfile(userRole)
+                .create(false)
+                .read(true)
+                .update(false)
+                .delete(false)
+                .build())
             .toList();
     }
 
