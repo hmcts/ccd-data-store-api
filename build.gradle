@@ -248,7 +248,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.1'
     implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
