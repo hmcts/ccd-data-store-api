@@ -1029,6 +1029,52 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
+    void shouldTreatPlainStringAsNotRegexViaReflection() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
+        method.setAccessible(true);
+
+        assertFalse((boolean) method.invoke(underTest, "pdf,docx"));
+        assertFalse((boolean) method.invoke(underTest, (String) null));
+    }
+
+    @Test
+    void processDocumentNodeSkipsWhenNoDocumentUrlField() throws Exception {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(FieldTypeDefinition.DOCUMENT);
+
+        ObjectNode docWithoutUrl = objectMapper.createObjectNode();
+        docWithoutUrl.put("document_filename", "file.pdf");
+
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
+            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        method.invoke(underTest, docWithoutUrl, fieldTypeDefinition, "doc",
+            List.of("http://dm/documents/missing"), "ts");
+
+        assertFalse(docWithoutUrl.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void addUploadTimestampToDocumentSkipsNonObjectNode() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
+            JsonNode.class, List.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        JsonNode nonObjectNode = objectMapper.getNodeFactory().textNode("notObject");
+        method.invoke(underTest, nonObjectNode, List.of(), "", List.of(), "ts");
+    }
+
+    @Test
+    void addUploadTimestampToDocumentHandlesNullDataNode() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
+            JsonNode.class, List.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        method.invoke(underTest, null, List.of(), "", List.of(), "ts");
+    }
+
+    @Test
     void shouldUseExtensionListPathWhenRegexBlank() {
         final String caseTypeId = "CASE_TYPE_BLANK_REGEX_NONHTML";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
@@ -1043,6 +1089,208 @@ class CaseDocumentTimestampServiceTest {
         underTest.addUploadTimestamps(modified, original, docDef);
 
         assertTrue(pdfDoc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldHandleNullDataAndNullFieldDefinitions() {
+        final String caseTypeId = "CASE_TYPE_NULL_DATA";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails modified = new CaseDetails();
+        modified.setCaseTypeId(caseTypeId);
+        modified.setData(null); // triggers jsonNodes empty branch at line 66
+
+        CaseDetails original = new CaseDetails();
+        original.setCaseTypeId(caseTypeId);
+        original.setData(Map.of());
+
+        CaseTypeDefinition typeWithNullFields = new CaseTypeDefinition();
+        typeWithNullFields.setCaseFieldDefinitions(null); // triggers null list branch at line 74
+
+        underTest.addUploadTimestamps(modified, original, typeWithNullFields);
+    }
+
+    @Test
+    void shouldHandleEmptyDataWithNullCaseTypeDefinition() {
+        final String caseTypeId = "CASE_TYPE_EMPTY_DATA";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails modified = new CaseDetails();
+        modified.setCaseTypeId(caseTypeId);
+        modified.setData(Map.of()); // exercises line 66 true branch with empty map
+
+        CaseDetails original = new CaseDetails();
+        original.setCaseTypeId(caseTypeId);
+        original.setData(Map.of());
+
+        underTest.addUploadTimestamps(modified, original, null); // triggers caseTypeDefinition null path
+    }
+
+    @Test
+    void shouldHandleNullDataWithNullCaseTypeDefinition() {
+        final String caseTypeId = "CASE_TYPE_NULL_DATA_NULL_DEF";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails modified = new CaseDetails();
+        modified.setCaseTypeId(caseTypeId);
+        modified.setData(null); // exercises line 66 false branch (second operand)
+
+        CaseDetails original = new CaseDetails();
+        original.setCaseTypeId(caseTypeId);
+        original.setData(Map.of());
+
+        underTest.addUploadTimestamps(modified, original, null);
+    }
+
+    @Test
+    void shouldSkipFieldWhenValueNullAndCollectionItemValueNull() {
+        final String caseTypeId = "CASE_TYPE_NULL_FIELD";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        // fieldValue null branch (handleCaseField)
+        CaseFieldDefinition nullValueField = caseField("absent", FieldTypeDefinition.DOCUMENT, null);
+
+        // collection item with null value branch (handleCollectionItem)
+        ObjectNode collectionItem = objectMapper.createObjectNode();
+        collectionItem.putNull("value");
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("collectionField", objectMapper.createArrayNode().add(collectionItem));
+
+        CaseFieldDefinition collectionField = new CaseFieldDefinition();
+        collectionField.setId("collectionField");
+        FieldTypeDefinition collectionType = new FieldTypeDefinition();
+        collectionType.setType(FieldTypeDefinition.COLLECTION);
+        FieldTypeDefinition innerDoc = new FieldTypeDefinition();
+        innerDoc.setType(FieldTypeDefinition.DOCUMENT);
+        collectionType.setCollectionFieldTypeDefinition(innerDoc);
+        collectionField.setFieldTypeDefinition(collectionType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(nullValueField, collectionField));
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, data);
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        // ensure no timestamp added to null-value collection item
+        JsonNode itemNode = modified.getData().get("collectionField").get(0);
+        assertFalse(itemNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void looksLikeRegexTrueBranchCovered() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
+        method.setAccessible(true);
+        assertTrue((boolean) method.invoke(underTest, ".*\\.pdf$"));
+    }
+
+    @Test
+    void looksLikeRegexEmptyStringBranchCovered() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
+        method.setAccessible(true);
+        assertFalse((boolean) method.invoke(underTest, ""));
+    }
+
+    @Test
+    void isToBeUpdatedReturnsFalseWhenTimestampPresent() {
+        ObjectNode doc = createDocumentNode("http://dm/documents/withts", "file.pdf");
+        doc.put(UPLOAD_TIMESTAMP, "2023-02-01T00:00:00");
+        assertFalse(underTest.isToBeUpdatedWithTimestamp(doc));
+    }
+
+    @Test
+    void processDocumentNodeHandlesNullDocumentNode() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
+            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        method.invoke(underTest, null, new FieldTypeDefinition(), "doc", List.of(), "ts");
+    }
+
+    @Test
+    void addUploadTimestampToDocumentCollectionBranchHandlesMissingUrl() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
+            Collection.class, List.class, String.class);
+        method.setAccessible(true);
+
+        ObjectNode nodeWithoutUrl = objectMapper.createObjectNode();
+        nodeWithoutUrl.putNull(DOCUMENT_URL);
+        method.invoke(underTest, List.of(nodeWithoutUrl), List.of("http://dm/documents/none"), "ts");
+    }
+
+    @Test
+    void fieldAllowsHtmlFiltersEmptyRegexSegments() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("fieldAllowsHtml",
+            FieldTypeDefinition.class, String.class);
+        method.setAccessible(true);
+
+        FieldTypeDefinition def = new FieldTypeDefinition();
+        def.setRegularExpression("pdf,,html");
+        assertTrue((boolean) method.invoke(underTest, def, "test.html"));
+    }
+
+    @Test
+    void fieldAllowsHtmlReturnsFalseWhenFilenameBlank() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("fieldAllowsHtml",
+            FieldTypeDefinition.class, String.class);
+        method.setAccessible(true);
+
+        FieldTypeDefinition def = new FieldTypeDefinition();
+        def.setRegularExpression(".pdf");
+        assertFalse((boolean) method.invoke(underTest, def, "   "));
+    }
+
+    @Test
+    void looksLikeRegexCoversAllMetacharacters() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
+        method.setAccessible(true);
+        assertTrue((boolean) method.invoke(underTest, "[abc]"));
+        assertTrue((boolean) method.invoke(underTest, "a+b"));
+        assertTrue((boolean) method.invoke(underTest, "a|b"));
+        assertTrue((boolean) method.invoke(underTest, "(a)"));
+        assertTrue((boolean) method.invoke(underTest, "a?b"));
+    }
+
+    @Test
+    void processDocumentNodeHandlesNullUrlNode() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
+            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        ObjectNode docWithNullUrl = objectMapper.createObjectNode();
+        docWithNullUrl.putNull(DOCUMENT_URL);
+        method.invoke(underTest, docWithNullUrl, new FieldTypeDefinition(), "doc", List.of("x"), "ts");
+    }
+
+    @Test
+    void handleCaseFieldCollectionBranchCovered() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("handleCaseField",
+            JsonNode.class, CaseFieldDefinition.class, String.class, List.class, String.class);
+        method.setAccessible(true);
+
+        ObjectNode root = objectMapper.createObjectNode();
+        ObjectNode item = objectMapper.createObjectNode();
+        item.set("value", createDocumentNode("http://dm/documents/col", "file.pdf"));
+        root.set("coll", objectMapper.createArrayNode().add(item));
+
+        FieldTypeDefinition innerDoc = new FieldTypeDefinition();
+        innerDoc.setType(FieldTypeDefinition.DOCUMENT);
+        FieldTypeDefinition collType = new FieldTypeDefinition();
+        collType.setType(FieldTypeDefinition.COLLECTION);
+        collType.setCollectionFieldTypeDefinition(innerDoc);
+
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId("coll");
+        caseFieldDefinition.setFieldTypeDefinition(collType);
+
+        method.invoke(underTest, root, caseFieldDefinition, "coll", List.of("http://dm/documents/col"), "ts");
+    }
+
+    @Test
+    void isToBeUpdatedTrueWhenTimestampMissing() {
+        ObjectNode doc = createDocumentNode("http://dm/documents/notimestamp", "file.pdf");
+        assertTrue(underTest.isToBeUpdatedWithTimestamp(doc));
     }
 
     private List<String> generateListOfUrls(JsonNode node) {
