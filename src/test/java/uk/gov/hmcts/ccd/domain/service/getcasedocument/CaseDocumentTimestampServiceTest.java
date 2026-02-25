@@ -475,7 +475,7 @@ class CaseDocumentTimestampServiceTest {
         CaseDetails caseDetailsModified = new CaseDetails();
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
-        ObjectNode node = objectMapper.createObjectNode();
+        ObjectNode node = this.objectMapper.createObjectNode();
         node.put(DOCUMENT_URL, "http://dm/documents/5");
         // No document_filename field
         data.put("documentField", node);
@@ -500,7 +500,6 @@ class CaseDocumentTimestampServiceTest {
         CaseDetails caseDetailsModified = new CaseDetails();
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         node.put(DOCUMENT_URL, "http://dm/documents/6");
         node.putNull("document_filename");
@@ -611,7 +610,7 @@ class CaseDocumentTimestampServiceTest {
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
 
-        ObjectNode complexNode = objectMapper.createObjectNode();
+        ObjectNode complexNode = this.objectMapper.createObjectNode();
         complexNode.set("nestedDocument", createDocumentNode("http://dm/documents/11", "test.html"));
         data.put("complexField", complexNode);
         caseDetailsModified.setData(data);
@@ -651,11 +650,11 @@ class CaseDocumentTimestampServiceTest {
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
 
-        ObjectNode collectionNode = objectMapper.createArrayNode().addObject();
+        ObjectNode collectionNode = this.objectMapper.createArrayNode().addObject();
         collectionNode.set("value", createDocumentNode("http://dm/documents/12", "test.html"));
 
-        ObjectNode arrayWrapper = objectMapper.createObjectNode();
-        arrayWrapper.set("docCollection", objectMapper.createArrayNode().add(collectionNode));
+        ObjectNode arrayWrapper = this.objectMapper.createObjectNode();
+        arrayWrapper.set("docCollection", this.objectMapper.createArrayNode().add(collectionNode));
         data.put("docCollection", arrayWrapper.get("docCollection"));
         caseDetailsModified.setData(data);
 
