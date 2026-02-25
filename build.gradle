@@ -285,7 +285,7 @@ dependencies {
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
