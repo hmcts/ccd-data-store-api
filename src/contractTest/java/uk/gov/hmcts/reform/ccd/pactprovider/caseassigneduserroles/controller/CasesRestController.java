@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.pactprovider.caseassigneduserroles.controller;
 
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -10,12 +10,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
@@ -101,9 +101,9 @@ public class CasesRestController {
     })
     @DeleteMapping(path = "/case-users", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<CaseAssignedUserRolesResponse> removeCaseUserRoles(
-        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @Parameter(name = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
-        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
+        @Parameter(name = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);

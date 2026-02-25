@@ -208,7 +208,7 @@ dependencies {
 
     // put CVE Vulnerability (sub)dependency overrides here e.g.
     // implementation group: 'com.example', name: 'example-lib', version: '1.0.0' //  parent dependency name
-    
+
     // end::CVE Vulnerability dependency overrides
 
     // Lombok
@@ -284,7 +284,7 @@ dependencies {
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6' 
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.4.3'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
@@ -803,20 +803,20 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-//task runProviderPactVerification(type:Test) {
-//    logger.lifecycle("Runs provider pact Tests")
-//    useJUnitPlatform()
-//    testClassesDirs = sourceSets.contractTest.output.classesDirs
-//    classpath = sourceSets.contractTest.runtimeClasspath
-//    if (project.hasProperty('pact.verifier.publishResults')) {
-//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-//    }
-//    systemProperty 'pact.provider.version', project.pactVersion
-//    include "uk/gov/hmcts/reform/**"
-//    include "uk/gov/hmcts/ccd/**"
-//}
+task runProviderPactVerification(type:Test) {
+    logger.lifecycle("Runs provider pact Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    if (project.hasProperty('pact.verifier.publishResults')) {
+        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+    }
+    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/reform/**"
+    include "uk/gov/hmcts/ccd/**"
+}
 
-//runProviderPactVerification.finalizedBy pactVerify
+runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()
