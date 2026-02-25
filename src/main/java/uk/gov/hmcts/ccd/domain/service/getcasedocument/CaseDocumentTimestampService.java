@@ -160,24 +160,29 @@ public class CaseDocumentTimestampService {
             return;
         }
         for (CaseFieldDefinition caseFieldDefinition : caseFieldDefinitions) {
-            JsonNode fieldValue = dataNode.get(caseFieldDefinition.getId());
-            if (fieldValue == null || fieldValue.isNull()) {
-                continue;
-            }
-            FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
-            if (fieldTypeDefinition == null) {
-                continue;
-            }
-            String fieldPath = fieldPathPrefix + caseFieldDefinition.getId();
+            handleCaseField(dataNode, caseFieldDefinition, fieldPathPrefix, documentUrlsNew, uploadTimestamp);
+        }
+    }
 
-            if (FieldTypeDefinition.DOCUMENT.equalsIgnoreCase(fieldTypeDefinition.getType())) {
-                processDocumentNode(fieldValue, fieldTypeDefinition, fieldPath, documentUrlsNew, uploadTimestamp);
-            } else if (fieldTypeDefinition.isComplexFieldType()) {
-                addUploadTimestampToDocument(fieldValue, fieldTypeDefinition.getComplexFields(),
-                    fieldPath + ".", documentUrlsNew, uploadTimestamp);
-            } else if (fieldTypeDefinition.isCollectionFieldType()) {
-                processCollection(fieldValue, fieldTypeDefinition, fieldPath, documentUrlsNew, uploadTimestamp);
-            }
+    private void handleCaseField(JsonNode dataNode,
+                                 CaseFieldDefinition caseFieldDefinition,
+                                 String fieldPathPrefix,
+                                 List<String> documentUrlsNew,
+                                 String uploadTimestamp) {
+        JsonNode fieldValue = dataNode.get(caseFieldDefinition.getId());
+        FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
+        if (fieldValue == null || fieldValue.isNull() || fieldTypeDefinition == null) {
+            return;
+        }
+        String fieldPath = fieldPathPrefix + caseFieldDefinition.getId();
+
+        if (FieldTypeDefinition.DOCUMENT.equalsIgnoreCase(fieldTypeDefinition.getType())) {
+            processDocumentNode(fieldValue, fieldTypeDefinition, fieldPath, documentUrlsNew, uploadTimestamp);
+        } else if (fieldTypeDefinition.isComplexFieldType()) {
+            addUploadTimestampToDocument(fieldValue, fieldTypeDefinition.getComplexFields(),
+                fieldPath + ".", documentUrlsNew, uploadTimestamp);
+        } else if (fieldTypeDefinition.isCollectionFieldType()) {
+            processCollection(fieldValue, fieldTypeDefinition, fieldPath, documentUrlsNew, uploadTimestamp);
         }
     }
 
@@ -205,24 +210,31 @@ public class CaseDocumentTimestampService {
         }
         int index = 0;
         for (JsonNode item : fieldValue) {
-            JsonNode itemValue = item.get(VALUE);
-            if (itemValue == null || itemValue.isNull()) {
-                index++;
-                continue;
-            }
-            String itemPath = fieldPath + "." + index;
-            FieldTypeDefinition collectionType = fieldTypeDefinition.getCollectionFieldTypeDefinition();
-            if (collectionType == null) {
-                index++;
-                continue;
-            }
-            if (FieldTypeDefinition.DOCUMENT.equalsIgnoreCase(collectionType.getType())) {
-                processDocumentNode(itemValue, collectionType, itemPath, documentUrlsNew, uploadTimestamp);
-            } else if (collectionType.isComplexFieldType()) {
-                addUploadTimestampToDocument(itemValue, collectionType.getComplexFields(),
-                    itemPath + ".", documentUrlsNew, uploadTimestamp);
-            }
+            handleCollectionItem(item, fieldTypeDefinition, fieldPath, index, documentUrlsNew, uploadTimestamp);
             index++;
+        }
+    }
+
+    private void handleCollectionItem(JsonNode item,
+                                      FieldTypeDefinition fieldTypeDefinition,
+                                      String fieldPath,
+                                      int index,
+                                      List<String> documentUrlsNew,
+                                      String uploadTimestamp) {
+        JsonNode itemValue = item.get(VALUE);
+        if (itemValue == null || itemValue.isNull()) {
+            return;
+        }
+        FieldTypeDefinition collectionType = fieldTypeDefinition.getCollectionFieldTypeDefinition();
+        if (collectionType == null) {
+            return;
+        }
+        String itemPath = fieldPath + "." + index;
+        if (FieldTypeDefinition.DOCUMENT.equalsIgnoreCase(collectionType.getType())) {
+            processDocumentNode(itemValue, collectionType, itemPath, documentUrlsNew, uploadTimestamp);
+        } else if (collectionType.isComplexFieldType()) {
+            addUploadTimestampToDocument(itemValue, collectionType.getComplexFields(),
+                itemPath + ".", documentUrlsNew, uploadTimestamp);
         }
     }
 
@@ -290,8 +302,16 @@ public class CaseDocumentTimestampService {
     }
 
     private boolean looksLikeRegex(String value) {
-        // Heuristic: if it contains regex metacharacters, treat it as regex.
-        return value.matches(".*[\\[\\]\\(\\)\\|\\+\\*\\?].*");
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        // Heuristic: if it contains common regex metacharacters, treat it as regex.
+        for (char c : value.toCharArray()) {
+            if (c == '[' || c == ']' || c == '(' || c == ')' || c == '|' || c == '+' || c == '*' || c == '?') {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void insertUploadTimestamp(JsonNode node, String uploadTimestamp) {

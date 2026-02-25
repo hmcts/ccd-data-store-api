@@ -475,7 +475,6 @@ class CaseDocumentTimestampServiceTest {
         CaseDetails caseDetailsModified = new CaseDetails();
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         node.put(DOCUMENT_URL, "http://dm/documents/5");
         // No document_filename field
@@ -612,7 +611,6 @@ class CaseDocumentTimestampServiceTest {
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode complexNode = objectMapper.createObjectNode();
         complexNode.set("nestedDocument", createDocumentNode("http://dm/documents/11", "test.html"));
         data.put("complexField", complexNode);
@@ -653,7 +651,6 @@ class CaseDocumentTimestampServiceTest {
         caseDetailsModified.setCaseTypeId(caseTypeId);
         Map<String, JsonNode> data = new HashMap<>();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode collectionNode = objectMapper.createArrayNode().addObject();
         collectionNode.set("value", createDocumentNode("http://dm/documents/12", "test.html"));
 
@@ -969,6 +966,10 @@ class CaseDocumentTimestampServiceTest {
 
         // Should simply skip the missing field without exception
         underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        // Ensure no timestamp added to absent field entry
+        JsonNode absentNode = modified.getData().get("absent");
+        assertTrue(absentNode.isNull());
     }
 
     private List<String> generateListOfUrls(JsonNode node) {
