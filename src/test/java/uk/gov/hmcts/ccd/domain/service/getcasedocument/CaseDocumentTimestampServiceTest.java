@@ -972,6 +972,80 @@ class CaseDocumentTimestampServiceTest {
         assertTrue(absentNode.isNull());
     }
 
+    @Test
+    void shouldHandleNullRootDataAndNullDocumentUrl() {
+        final String caseTypeId = "CASE_TYPE_NULL_ROOT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        // Null data map triggers dataNode guard
+        CaseDetails modifiedNullData = new CaseDetails();
+        modifiedNullData.setCaseTypeId(caseTypeId);
+        modifiedNullData.setData(null);
+
+        CaseDetails originalEmpty = caseDetailsWithData(caseTypeId, Map.of());
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", null);
+
+        underTest.addUploadTimestamps(modifiedNullData, originalEmpty, docDef);
+
+        // Document with null document_url exercises processDocumentNode null guard
+        ObjectNode docMissingUrl = objectMapper.createObjectNode();
+        docMissingUrl.putNull(DOCUMENT_URL);
+        modifiedNullData.setData(Map.of("doc", docMissingUrl));
+        underTest.addUploadTimestamps(modifiedNullData, originalEmpty, docDef);
+        assertFalse(docMissingUrl.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldNotOverwriteExistingTimestamp() {
+        final String caseTypeId = "CASE_TYPE_TIMESTAMP_PRESENT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode docWithTimestamp = createDocumentNode("http://dm/documents/exists", "file.pdf");
+        docWithTimestamp.put(UPLOAD_TIMESTAMP, "2023-01-01T00:00:00");
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", docWithTimestamp));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", null);
+
+        underTest.addUploadTimestamps(modified, original, docDef);
+
+        assertEquals("2023-01-01T00:00:00", docWithTimestamp.get(UPLOAD_TIMESTAMP).asText());
+    }
+
+    @Test
+    void shouldTreatExtensionListAsNonRegex() {
+        final String caseTypeId = "CASE_TYPE_EXTENSION_LIST";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode pdfDoc = createDocumentNode("http://dm/documents/extension", "doc.pdf");
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", pdfDoc));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        // Regex string without metacharacters should hit looksLikeRegex == false branch
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", "pdf, docx");
+
+        underTest.addUploadTimestamps(modified, original, docDef);
+
+        assertTrue(pdfDoc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldUseExtensionListPathWhenRegexBlank() {
+        final String caseTypeId = "CASE_TYPE_BLANK_REGEX_NONHTML";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode pdfDoc = createDocumentNode("http://dm/documents/pdf", "test.pdf");
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", pdfDoc));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        // Blank regex -> should take extension list path and allow non-html
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", "   ");
+
+        underTest.addUploadTimestamps(modified, original, docDef);
+
+        assertTrue(pdfDoc.has(UPLOAD_TIMESTAMP));
+    }
+
     private List<String> generateListOfUrls(JsonNode node) {
         JsonNode result = TestFixtures.copyJsonNode(node);
         Map<String, JsonNode> dataMap = Maps.newHashMap();
