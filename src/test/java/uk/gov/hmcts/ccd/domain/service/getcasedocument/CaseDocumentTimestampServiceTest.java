@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,15 +17,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
+import uk.gov.hmcts.ccd.TestFixtures;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,10 +54,23 @@ class CaseDocumentTimestampServiceTest {
     private final String urlMicrosoft = "https://www.microsoft.com";
     private final String urlElastic = "https://www.elastic.com";
     private final String urlApple = "https://www.apple.com";
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Clock FIXED_CLOCK =
+        Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneOffset.UTC);
+    private final JsonNode jsonRequestNode =
+        TestFixtures.readJsonTestsResource("case-document-timestamp-request.json");
+    private final JsonNode jsonOriginalNode =
+        TestFixtures.readJsonTestsResource("case-document-timestamp-original.json");
+    private final JsonNode jsonDocumentNode =
+        TestFixtures.readJsonTestsResource("case-document-node.json");
+    private final JsonNode jsonDocumentNodeWithNullTimestamp =
+        TestFixtures.readJsonTestsResource("case-document-node-null-timestamp.json");
+    private final JsonNode jsonDocumentNodeWithValidTimestamp =
+        TestFixtures.readJsonTestsResource("case-document-node-with-timestamp.json");
 
     @org.junit.jupiter.api.BeforeEach
     void init() {
-        underTest = new CaseDocumentTimestampService(Clock.systemUTC(), applicationParams);
+        underTest = new CaseDocumentTimestampService(FIXED_CLOCK, applicationParams);
     }
 
     @Test
@@ -90,7 +110,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testFindDocuments() {
         Map<String, JsonNode> dataMap = new HashMap<>();
-        JsonNode result = generateTestNode(jsonString);
+        JsonNode result = TestFixtures.copyJsonNode(jsonRequestNode);
         dataMap.put("testNode", result);
 
         List<JsonNode> listDocuments = underTest.findNodes(dataMap.values());
@@ -105,7 +125,7 @@ class CaseDocumentTimestampServiceTest {
     void testAddTimestamp() {
 
         Map<String, JsonNode> dataMapOriginal = new HashMap<>();
-        JsonNode resultOriginal = generateTestNode(jsonStringOriginal);
+        JsonNode resultOriginal = TestFixtures.copyJsonNode(jsonOriginalNode);
         dataMapOriginal.put("testNode", resultOriginal);
         CaseDetails caseDetailsDb = new CaseDetails();
         caseDetailsDb.setCaseTypeId("CASE_TYPE_TIMESTAMP");
@@ -113,7 +133,7 @@ class CaseDocumentTimestampServiceTest {
         caseDetailsDb.setData(dataMapOriginal);
 
         Map<String, JsonNode> dataMap = new HashMap<>();
-        JsonNode result = generateTestNode(jsonString);
+        JsonNode result = TestFixtures.copyJsonNode(jsonRequestNode);
         dataMap.put("testNode", result);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("CASE_TYPE_TIMESTAMP");
@@ -147,7 +167,7 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void testInsertTimestampIfNotAlreadyPresent() {
-        JsonNode jsonNode = generateTestNode(jsonDocumentNode);
+        JsonNode jsonNode = TestFixtures.copyJsonNode(jsonDocumentNode);
         String uploadTimestamp = LocalDateTime.now().toString();
         assertFalse(jsonNode.has(UPLOAD_TIMESTAMP));
 
@@ -160,7 +180,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void testDoNotInsertTimestampIfAlreadyPresent() {
         final String uploadTimestamp = LocalDateTime.now().minusNanos(5).toString();
-        JsonNode jsonNode = generateTestNode(jsonDocumentNodeWithValidTimestamp);
+        JsonNode jsonNode = TestFixtures.copyJsonNode(jsonDocumentNodeWithValidTimestamp);
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
@@ -177,7 +197,7 @@ class CaseDocumentTimestampServiceTest {
     @Test
     void insertTimestampIfPresentButNull() {
         final String uploadTimestamp = LocalDateTime.now().minusNanos(5).toString();
-        JsonNode jsonNode = generateTestNode(jsonDocumentNodeWithNullTimestamp);
+        JsonNode jsonNode = TestFixtures.copyJsonNode(jsonDocumentNodeWithNullTimestamp);
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
@@ -194,10 +214,10 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void testFindNewDocuments() {
-        List<String> listUrlsDb = generateListOfUrls(jsonStringOriginal);
+        List<String> listUrlsDb = generateListOfUrls(jsonOriginalNode);
         assertEquals(13, listUrlsDb.size());
 
-        List<String> listUrlsRequest = generateListOfUrls(jsonString);
+        List<String> listUrlsRequest = generateListOfUrls(jsonRequestNode);
         assertEquals(18, listUrlsRequest.size());
 
         List<String> listUrlsNew = underTest.findUrlsNotInOriginal(listUrlsDb, listUrlsRequest);
@@ -208,51 +228,43 @@ class CaseDocumentTimestampServiceTest {
         listUrlsNew.forEach(System.out::println);
     }
 
-    @Test
-    void shouldRejectHtmlWhenFieldDoesNotAllow() {
-        // CCD-6681 Scenario 1 AC1
-        final String caseTypeId = "CASE_TYPE_HTML_REJECT";
+    @ParameterizedTest
+    @MethodSource("htmlValidationCases")
+    void htmlValidation(String regex, String filename, boolean allowed) {
+        final String caseTypeId = "CASE_TYPE_HTML_PARAM";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
 
-        CaseDetails caseDetailsModified = new CaseDetails();
-        caseDetailsModified.setCaseTypeId(caseTypeId);
-        caseDetailsModified.setData(Map.of(
-            "documentField", createDocumentNode("http://dm/documents/1", "test.html")
-        ));
+        CaseDetails modified = caseDetailsWithData(caseTypeId,
+            Map.of("documentField", createDocumentNode("http://dm/documents/param", filename)));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
 
-        CaseDetails caseDetailsDb = new CaseDetails();
-        caseDetailsDb.setData(Map.of());
+        CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", regex);
 
-        final CaseTypeDefinition caseTypeDefinition =
-            buildCaseTypeWithDocumentField("documentField", ".pdf,.docx");
-
-        assertThrows(CaseValidationException.class, () ->
-            underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
+        if (allowed) {
+            underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+            assertTrue(modified.getData().get("documentField").has(UPLOAD_TIMESTAMP));
+        } else {
+            assertThrows(CaseValidationException.class, () ->
+                underTest.addUploadTimestamps(modified, original, caseTypeDefinition));
+        }
     }
 
-    @Test
-    void shouldAllowHtmlWhenFieldAllows() {
-        // CCD-6681 Scenario 2: allow HTML when regex permits; AC3 (allow submission)
-        // + AC4 (associate HTML with case data)
-        final String caseTypeId = "CASE_TYPE_HTML_ALLOW";
-        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
-
-        CaseDetails caseDetailsModified = new CaseDetails();
-        caseDetailsModified.setCaseTypeId(caseTypeId);
-        Map<String, JsonNode> data = new HashMap<>();
-        data.put("documentField", createDocumentNode("http://dm/documents/2", "test.html"));
-        caseDetailsModified.setData(data);
-
-        CaseDetails caseDetailsDb = new CaseDetails();
-        caseDetailsDb.setData(Map.of());
-
-        final CaseTypeDefinition caseTypeDefinition =
-            buildCaseTypeWithDocumentField("documentField", ".pdf,.html");
-
-        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
-        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
-        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    private static Stream<Arguments> htmlValidationCases() {
+        return Stream.of(
+            Arguments.of(".pdf,.docx", "test.html", false),
+            Arguments.of(".pdf,.html", "test.html", true),
+            Arguments.of(".pdf,.docx", "test.HTML", false),
+            Arguments.of(".PDF,.HTML,.DOCX", "test.HTML", true),
+            Arguments.of("html,pdf,docx", "test.html", true),
+            Arguments.of("pdf, htm, docx", "test.htm", true),
+            Arguments.of(".*\\.(html|pdf|docx)$", "test.html", true),
+            Arguments.of(".*\\.(pdf|docx)$", "test.html", false),
+            Arguments.of(".*\\.(HTML|PDF)$", "TEST.HTML", true),
+            Arguments.of("", "test.html", false)
+        );
     }
+
 
     @Test
     void testIsCaseTypeUploadTimestampFeatureEnabledForNullCaseType() {
@@ -283,14 +295,14 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void isToBeUpdatedWithTimestampForNoUploadTimestamp() {
-        JsonNode node = generateTestNode(jsonDocumentNode);
+        JsonNode node = TestFixtures.copyJsonNode(jsonDocumentNode);
 
         assertTrue(underTest.isToBeUpdatedWithTimestamp(node));
     }
 
     @Test
     void isToBeUpdatedWithTimestampForUploadTimestampWithNullValue() {
-        JsonNode node = generateTestNode(jsonDocumentNode);
+        JsonNode node = TestFixtures.copyJsonNode(jsonDocumentNode);
         ((ObjectNode) node).put(UPLOAD_TIMESTAMP, (String) null);
 
         assertTrue(underTest.isToBeUpdatedWithTimestamp(node));
@@ -298,7 +310,7 @@ class CaseDocumentTimestampServiceTest {
 
     @Test
     void isNotToBeUpdatedWithTimestampForUploadTimestampWithValue() {
-        JsonNode node = generateTestNode(jsonDocumentNode);
+        JsonNode node = TestFixtures.copyJsonNode(jsonDocumentNode);
         ((ObjectNode) node).put(UPLOAD_TIMESTAMP, "2010-11-12T00:00:00Z");
 
         assertFalse(underTest.isToBeUpdatedWithTimestamp(node));
@@ -722,7 +734,7 @@ class CaseDocumentTimestampServiceTest {
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
 
         // Arrange data with a new document so addUploadTimestamps has work to do
-        JsonNode requestNode = generateTestNode(jsonDocumentNode);
+        JsonNode requestNode = TestFixtures.copyJsonNode(jsonDocumentNode);
         CaseDetails modified = new CaseDetails();
         modified.setCaseTypeId(caseTypeId);
         modified.setData(Map.of("doc", requestNode));
@@ -751,29 +763,219 @@ class CaseDocumentTimestampServiceTest {
         assertTrue(underTest.getDocumentUrls(emptyDataCase).isEmpty());
     }
 
-    private List<String> generateListOfUrls(String jsonString) {
-        JsonNode result = generateTestNode(jsonString);
+    @Test
+    void shouldExerciseGuardClausesAndNonNewDocuments() {
+        final String caseTypeId = "CASE_TYPE_GUARDS";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        Map<String, JsonNode> data = new HashMap<>();
+
+        // Field present but missing document_url -> hits documentNode null/!has(DOCUMENT_URL)
+        ObjectNode docNoUrl = objectMapper.createObjectNode();
+        docNoUrl.put("document_filename", "file.pdf");
+        data.put("docNoUrl", docNoUrl);
+
+        // Field missing entirely -> fieldValue null branch
+        // (no entry for missingDoc)
+
+        // Field with null type definition -> fieldTypeDefinition null branch
+        ObjectNode nullTypeNode = objectMapper.createObjectNode();
+        nullTypeNode.put(DOCUMENT_URL, "http://dm/documents/nulltype");
+        data.put("nullTypeField", nullTypeNode);
+
+        // Complex field whose value is not an object -> non-object guard
+        data.put("complexField", objectMapper.getNodeFactory().textNode("notAnObject"));
+
+        // Collection field that is not an array -> !isArray guard
+        data.put("collectionNotArray", objectMapper.getNodeFactory().textNode("notArray"));
+
+        // Collection with item missing \"value\" -> itemValue null branch
+        ObjectNode arrayItemNoValue = objectMapper.createObjectNode();
+        data.put("collectionMissingValue", objectMapper.createArrayNode().add(arrayItemNoValue));
+
+        // Collection with null collection type definition -> collectionType null branch
+        ObjectNode arrayItemWithValue = objectMapper.createObjectNode();
+        arrayItemWithValue.set("value", createDocumentNode("http://dm/documents/notnew", "doc.pdf"));
+        data.put("collectionNullType", objectMapper.createArrayNode().add(arrayItemWithValue));
+
+        // Document that exists in DB already -> documentUrlsNew does not contain -> early return
+        ObjectNode existingDoc = createDocumentNode("http://dm/documents/already", "existing.pdf");
+        data.put("existingDoc", existingDoc);
+
+        final CaseDetails modified = caseDetailsWithData(caseTypeId, data);
+
+        // DB has the same document URL to make it "not new"
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of("existingDoc", existingDoc));
+
+        // Build field definitions covering each guard
+        List<CaseFieldDefinition> fieldDefinitions = new ArrayList<>();
+
+        fieldDefinitions.add(caseField("docNoUrl", FieldTypeDefinition.DOCUMENT, null));
+
+        CaseFieldDefinition missingDocDef = new CaseFieldDefinition();
+        missingDocDef.setId("missingDoc");
+        FieldTypeDefinition missingDocType = new FieldTypeDefinition();
+        missingDocType.setType(FieldTypeDefinition.DOCUMENT);
+        missingDocDef.setFieldTypeDefinition(missingDocType);
+        fieldDefinitions.add(missingDocDef);
+
+        CaseFieldDefinition nullTypeDef = new CaseFieldDefinition();
+        nullTypeDef.setId("nullTypeField");
+        nullTypeDef.setFieldTypeDefinition(null);
+        fieldDefinitions.add(nullTypeDef);
+
+        FieldTypeDefinition complexType = new FieldTypeDefinition();
+        complexType.setType(FieldTypeDefinition.COMPLEX);
+        CaseFieldDefinition complexDef = new CaseFieldDefinition();
+        complexDef.setId("complexField");
+        complexDef.setFieldTypeDefinition(complexType);
+        fieldDefinitions.add(complexDef);
+
+        FieldTypeDefinition collectionNoArrayType = new FieldTypeDefinition();
+        collectionNoArrayType.setType(FieldTypeDefinition.COLLECTION);
+        CaseFieldDefinition collectionNoArrayDef = new CaseFieldDefinition();
+        collectionNoArrayDef.setId("collectionNotArray");
+        collectionNoArrayDef.setFieldTypeDefinition(collectionNoArrayType);
+        fieldDefinitions.add(collectionNoArrayDef);
+
+        FieldTypeDefinition collectionWithDocType = new FieldTypeDefinition();
+        collectionWithDocType.setType(FieldTypeDefinition.COLLECTION);
+        FieldTypeDefinition innerDocType = new FieldTypeDefinition();
+        innerDocType.setType(FieldTypeDefinition.DOCUMENT);
+        collectionWithDocType.setCollectionFieldTypeDefinition(innerDocType);
+        CaseFieldDefinition collectionMissingValueDef = new CaseFieldDefinition();
+        collectionMissingValueDef.setId("collectionMissingValue");
+        collectionMissingValueDef.setFieldTypeDefinition(collectionWithDocType);
+        fieldDefinitions.add(collectionMissingValueDef);
+
+        FieldTypeDefinition collectionNullInnerType = new FieldTypeDefinition();
+        collectionNullInnerType.setType(FieldTypeDefinition.COLLECTION);
+        collectionNullInnerType.setCollectionFieldTypeDefinition(null);
+        CaseFieldDefinition collectionNullTypeDef = new CaseFieldDefinition();
+        collectionNullTypeDef.setId("collectionNullType");
+        collectionNullTypeDef.setFieldTypeDefinition(collectionNullInnerType);
+        fieldDefinitions.add(collectionNullTypeDef);
+
+        fieldDefinitions.add(caseField("existingDoc", FieldTypeDefinition.DOCUMENT, null));
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(fieldDefinitions);
+
+        // Should complete without throwing; guards exercised, existing doc not timestamped
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        // Ensure existing doc not updated (since not new)
+        JsonNode existing = modified.getData().get("existingDoc");
+        assertFalse(existing.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldCoverRemainingBranchesAndDisabledFeature() {
+        // Feature disabled path
+        underTest.addUploadTimestamps(new CaseDetails(), new CaseDetails());
+
+        final String caseTypeId = "CASE_TYPE_GUARDS_2";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        // Null data map should be ignored gracefully (data == null guard)
+        CaseDetails nullDataDetails = new CaseDetails();
+        nullDataDetails.setCaseTypeId(caseTypeId);
+        nullDataDetails.setData(null);
+
+        CaseTypeDefinition docOnlyDef = new CaseTypeDefinition();
+        docOnlyDef.setCaseFieldDefinitions(List.of(caseField("missingDoc", FieldTypeDefinition.DOCUMENT, null)));
+
+        underTest.addUploadTimestamps(nullDataDetails, new CaseDetails(), docOnlyDef);
+
+        // Build dataset to hit remaining branches
+        Map<String, JsonNode> data = new HashMap<>();
+
+        // Missing field (fieldValue null) -> line 165
+        // no entry for "missingDoc" in data map
+
+        // Collection with Document items (processCollection happy path)
+        ObjectNode collectionItemVal = createDocumentNode("http://dm/documents/collectionDoc", "file.pdf");
+        ObjectNode wrapper = objectMapper.createObjectNode();
+        wrapper.set("value", collectionItemVal);
+        data.put("collectionWithDoc", objectMapper.createArrayNode().add(wrapper));
+
+        // Collection with Complex items (branch to addUploadTimestampToDocument inside collection)
+        ObjectNode nestedDoc = createDocumentNode("http://dm/documents/complexDoc", "file.pdf");
+        ObjectNode complexValue = objectMapper.createObjectNode();
+        complexValue.set("nested", nestedDoc);
+        ObjectNode complexWrapper = objectMapper.createObjectNode();
+        complexWrapper.set("value", complexValue);
+        data.put("collectionWithComplex", objectMapper.createArrayNode().add(complexWrapper));
+
+        // Document with null document_url -> line 239
+        ObjectNode docNullUrl = objectMapper.createObjectNode();
+        docNullUrl.putNull(DOCUMENT_URL);
+        docNullUrl.put("document_filename", "file.pdf");
+        data.put("docNullUrl", docNullUrl);
+
+        final CaseDetails modified = caseDetailsWithData(caseTypeId, data);
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        FieldTypeDefinition collectionDocType = new FieldTypeDefinition();
+        collectionDocType.setType(FieldTypeDefinition.COLLECTION);
+        FieldTypeDefinition docType = new FieldTypeDefinition();
+        docType.setType(FieldTypeDefinition.DOCUMENT);
+        collectionDocType.setCollectionFieldTypeDefinition(docType);
+        CaseFieldDefinition collectionDocDef = new CaseFieldDefinition();
+        collectionDocDef.setId("collectionWithDoc");
+        collectionDocDef.setFieldTypeDefinition(collectionDocType);
+
+        FieldTypeDefinition innerComplex = new FieldTypeDefinition();
+        innerComplex.setType(FieldTypeDefinition.COMPLEX);
+        innerComplex.setComplexFields(List.of(caseField("nested", FieldTypeDefinition.DOCUMENT, null)));
+        FieldTypeDefinition collectionComplexType = new FieldTypeDefinition();
+        collectionComplexType.setType(FieldTypeDefinition.COLLECTION);
+        collectionComplexType.setCollectionFieldTypeDefinition(innerComplex);
+        CaseFieldDefinition collectionComplexDef = new CaseFieldDefinition();
+        collectionComplexDef.setId("collectionWithComplex");
+        collectionComplexDef.setFieldTypeDefinition(collectionComplexType);
+
+        CaseFieldDefinition docNullUrlDef = caseField("docNullUrl", FieldTypeDefinition.DOCUMENT, null);
+        CaseFieldDefinition missingDocDef = caseField("missingDoc", FieldTypeDefinition.DOCUMENT, null);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(
+            List.of(missingDocDef, collectionDocDef, collectionComplexDef, docNullUrlDef)
+        );
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        // Document with null url should not gain timestamp
+        assertFalse(modified.getData().get("docNullUrl").has(UPLOAD_TIMESTAMP));
+        // Collection document should get timestamp as it's new
+        JsonNode collectionDoc = modified.getData().get("collectionWithDoc").get(0).get("value");
+        assertTrue(collectionDoc.has(UPLOAD_TIMESTAMP));
+        // Nested complex collection document should also be timestamped
+        JsonNode nested = modified.getData().get("collectionWithComplex").get(0).get("value").get("nested");
+        assertTrue(nested.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldSkipFieldWhenValueMissing() {
+        final String caseTypeId = "CASE_TYPE_MISSING_VALUE";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("absent", objectMapper.nullNode()));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        CaseFieldDefinition missingField = caseField("absent", FieldTypeDefinition.DOCUMENT, null);
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(missingField));
+
+        // Should simply skip the missing field without exception
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+    }
+
+    private List<String> generateListOfUrls(JsonNode node) {
+        JsonNode result = TestFixtures.copyJsonNode(node);
         Map<String, JsonNode> dataMap = Maps.newHashMap();
         dataMap.put("testNode", result);
         return underTest.findDocumentUrls(dataMap.values());
-    }
-
-    private JsonNode generateTestNode(String json) {
-
-        // Create ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode jsonNode;
-
-        try {
-            // Parse JSON string to JsonNode
-            jsonNode = objectMapper.readTree(json);
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return jsonNode;
-
     }
 
     private CaseTypeDefinition buildCaseTypeWithDocumentField(String fieldId, String regularExpression) {
@@ -791,240 +993,25 @@ class CaseDocumentTimestampServiceTest {
     }
 
     private ObjectNode createDocumentNode(String url, String filename) {
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         node.put(DOCUMENT_URL, url);
         node.put("document_filename", filename);
         return node;
     }
 
-    private static final String jsonDocumentNode = """
-            {
-              "document": {
-                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
-                 "document_filename": "PD36Q letter.pdf",
-                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary"
-               }
-            }""";
+    private CaseDetails caseDetailsWithData(String caseTypeId, Map<String, JsonNode> data) {
+        CaseDetails details = new CaseDetails();
+        details.setCaseTypeId(caseTypeId);
+        details.setData(data);
+        return details;
+    }
 
-    private static final String jsonDocumentNodeWithNullTimestamp = """
-            {
-              "document": {
-                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
-                 "document_filename": "PD36Q letter.pdf",
-                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
-                 "upload_timestamp": null
-               }
-            }""";
+    private CaseFieldDefinition caseField(String id, String type, String regularExpression) {
+        return new CaseFieldDefinitionBuilder(id)
+            .withType(type)
+            .withRegExp(regularExpression)
+            .build();
+    }
 
-    private static final String jsonDocumentNodeWithValidTimestamp = """
-            {
-              "document": {
-                 "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
-                 "document_filename": "PD36Q letter.pdf",
-                 "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
-                 "upload_timestamp": "2010-11-12T01:02:03.000000000"
-               }
-            }""";
-
-    private static final String jsonString = """
-            {
-                "id": "1675936805799936",
-                "additionalApplicationsBundle": [
-                    {
-                        "id": "6f5418ac-e59a-42f6-84d0-a9d97c519a4a",
-                        "uploadedDateTime": "27-Feb-2023 09:44:18 am",
-                        "otherApplicationsBundle": {
-                            "author": "prl_aat_solicitor@mailinator.com",
-                            "document": {
-                                "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
-                                "document_filename": "PD36Q letter.pdf",
-                                "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
-                                "upload_timestamp": "2023-03-01T12:34:56.000000000"
-                            },
-                            "newDocument4": {
-                                "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1aaa",
-                                "document_filename": "NewDoc4.pdf",
-                                "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1aaa/binary",
-                                "upload_timestamp": "2024-01-11T17:22:30"
-                            }
-                        }
-                    }
-                ],
-               "orderCollection":    [
-               {
-                   "id": "14cadd3a-1afd-46c1-8805-bd16bdcdb489",
-                   "orderDocument": {
-                   "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f94d7ea6-fbed-4b5d-8155-4c4851c277c8",
-                   "document_filename": "Welsh_ChildArrangements_Specific_Prohibited_Steps_C43.pdf",
-                   "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f94d7ea6-fbed-4b5d-8155-4c4851c277c8/binary"
-                   },
-                   "newDocument5": {
-                   "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1bbb",
-                   "document_filename": "NewDoc5.pdf",
-                   "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1bbb/binary",
-                   "upload_timestamp": "2024-01-11T17:22:30"
-                   }
-               }
-               ],
-            "previewOrderDoc": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/20555d12-2ee7-4cf3-b827-3a0d9f13753c",
-               "document_filename": "ChildArrangements_Specific_Prohibited_Steps_C43_Draft.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/20555d12-2ee7-4cf3-b827-3a0d9f13753c/binary"
-            },
-            "finalWelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/d6172765-31b2-4985-bbf5-e70ff3280459",
-               "document_filename": "C100FinalDocumentWelsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/d6172765-31b2-4985-bbf5-e70ff3280459/binary"
-            },
-            "submitAndPayDownloadApplicationLink": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/31d4c664-c8a8-447e-a5ea-57c3594ee78e",
-               "document_filename": "Draft_C100_application.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/31d4c664-c8a8-447e-a5ea-57c3594ee78e/binary"
-            },
-            "draftConsentOrderFile": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ebefdc86-b523-474e-a3bc-c06a931f1174",
-               "document_filename": "Draft consent order - Smith.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ebefdc86-b523-474e-a3bc-c06a931f1174/binary"
-            },
-            "c8WelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/40101fec-d005-47a6-b9e9-13c6a97f1dae",
-               "document_filename": "C8Document_Welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/40101fec-d005-47a6-b9e9-13c6a97f1dae/binary"
-            },
-            "newDocument3": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1zzz",
-               "document_filename": "NewDoc3.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1yyy/zzz",
-               "upload_timestamp": "2024-01-11T17:22:30"
-            },
-            "previewOrderDocWelsh": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/01f852b8-edaa-488e-8463-2acefad20c87",
-               "document_filename": "Welsh_ChildArrangements_Specific_Prohibited_Steps_C43_Draft.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/01f852b8-edaa-488e-8463-2acefad20c87/binary"
-            },
-            "c1AWelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e81c1756-d7c1-4c9a-8d0d-45d96a13b417",
-               "document_filename": "C1A_Document_Welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e81c1756-d7c1-4c9a-8d0d-45d96a13b417/binary"
-            },
-            "c8Document": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c2300009-51ec-405d-9770-df67ec4e6bc2",
-               "document_filename": "C8Document.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c2300009-51ec-405d-9770-df67ec4e6bc2/binary"
-            },
-            "finalDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2cfd7aff-37f6-4b6d-9104-770331d0ee06",
-               "document_filename": "C100FinalDocument.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2cfd7aff-37f6-4b6d-9104-770331d0ee06/binary"
-            },
-            "submitAndPayDownloadApplicationWelshLink": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1b6b",
-               "document_filename": "Draft_C100_application_welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1b6b/binary"
-            },
-            "newDocument1": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1xxx",
-               "document_filename": "NewDoc1.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1xxx/binary",
-               "upload_timestamp": "2024-01-11T17:22:30"
-            },
-            "newDocument2": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1yyy",
-               "document_filename": "NewDoc2.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1yyy/binary",
-               "upload_timestamp": "2024-01-11T17:22:30"
-            },
-            "c1ADocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ca1f2ba2-21a6-4b75-9c6f-3f1c5b5564be",
-               "document_filename": "C1A_Document.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ca1f2ba2-21a6-4b75-9c6f-3f1c5b5564be/binary"
-            }
-            }""";
-
-    private static final String jsonStringOriginal = """
-            {
-                "id": "1675936805799936",
-                "additionalApplicationsBundle": [
-                    {
-                        "id": "6f5418ac-e59a-42f6-84d0-a9d97c519a4a",
-                        "uploadedDateTime": "27-Feb-2023 09:44:18 am",
-                        "otherApplicationsBundle": {
-                            "author": "prl_aat_solicitor@mailinator.com",
-                            "document": {
-                                "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4",
-                                "document_filename": "PD36Q letter.pdf",
-                                "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/63122c23-3665-4dd1-8f81-03d0cb86cac4/binary",
-                                "upload_timestamp": "2023-03-01T12:34:56"
-                            }
-                        }
-                    }
-                ],
-               "orderCollection":    [
-               {
-                   "id": "14cadd3a-1afd-46c1-8805-bd16bdcdb489",
-                   "orderDocument": {
-                   "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f94d7ea6-fbed-4b5d-8155-4c4851c277c8",
-                   "document_filename": "Welsh_ChildArrangements_Specific_Prohibited_Steps_C43.pdf",
-                   "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f94d7ea6-fbed-4b5d-8155-4c4851c277c8/binary"
-                   }
-               }
-               ],
-            "previewOrderDoc": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/20555d12-2ee7-4cf3-b827-3a0d9f13753c",
-               "document_filename": "ChildArrangements_Specific_Prohibited_Steps_C43_Draft.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/20555d12-2ee7-4cf3-b827-3a0d9f13753c/binary"
-            },
-            "finalWelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/d6172765-31b2-4985-bbf5-e70ff3280459",
-               "document_filename": "C100FinalDocumentWelsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/d6172765-31b2-4985-bbf5-e70ff3280459/binary"
-            },
-            "submitAndPayDownloadApplicationLink": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/31d4c664-c8a8-447e-a5ea-57c3594ee78e",
-               "document_filename": "Draft_C100_application.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/31d4c664-c8a8-447e-a5ea-57c3594ee78e/binary"
-            },
-            "draftConsentOrderFile": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ebefdc86-b523-474e-a3bc-c06a931f1174",
-               "document_filename": "Draft consent order - Smith.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ebefdc86-b523-474e-a3bc-c06a931f1174/binary"
-            },
-            "c8WelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/40101fec-d005-47a6-b9e9-13c6a97f1dae",
-               "document_filename": "C8Document_Welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/40101fec-d005-47a6-b9e9-13c6a97f1dae/binary"
-            },
-            "previewOrderDocWelsh": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/01f852b8-edaa-488e-8463-2acefad20c87",
-               "document_filename": "Welsh_ChildArrangements_Specific_Prohibited_Steps_C43_Draft.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/01f852b8-edaa-488e-8463-2acefad20c87/binary"
-            },
-            "c1AWelshDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e81c1756-d7c1-4c9a-8d0d-45d96a13b417",
-               "document_filename": "C1A_Document_Welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e81c1756-d7c1-4c9a-8d0d-45d96a13b417/binary"
-            },
-            "c8Document": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c2300009-51ec-405d-9770-df67ec4e6bc2",
-               "document_filename": "C8Document.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c2300009-51ec-405d-9770-df67ec4e6bc2/binary"
-            },
-            "finalDocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2cfd7aff-37f6-4b6d-9104-770331d0ee06",
-               "document_filename": "C100FinalDocument.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2cfd7aff-37f6-4b6d-9104-770331d0ee06/binary"
-            },
-            "submitAndPayDownloadApplicationWelshLink": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1b6b",
-               "document_filename": "Draft_C100_application_welsh.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c50985d5-04cd-4f36-a9db-630bcd4c1b6b/binary"
-            },
-            "c1ADocument": {
-               "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ca1f2ba2-21a6-4b75-9c6f-3f1c5b5564be",
-               "document_filename": "C1A_Document.pdf",
-               "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ca1f2ba2-21a6-4b75-9c6f-3f1c5b5564be/binary"
-            }
-            }""";
 
 }
