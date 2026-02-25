@@ -47,6 +47,7 @@ public class CasesProviderTest {
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(new CasesRestController(applicationParams, caseReferenceService,
                                                           caseAssignedUserRolesOperation, securityUtils));
