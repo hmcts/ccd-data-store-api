@@ -812,6 +812,7 @@ task runProviderPactVerification(type:Test) {
     if (project.hasProperty('pact.verifier.publishResults')) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
     }
+    systemProperty 'pact.verifier.publishResults', true
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
     include "uk/gov/hmcts/ccd/**"
