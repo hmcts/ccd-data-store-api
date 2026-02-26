@@ -565,6 +565,7 @@ sonarqube {
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
             "**/AppInsightsConfiguration.java," +
             "**/TestingSupportController.java"
+        property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.organization", System.getenv("SONAR_ORGANIZATION") ?: "hmcts"
