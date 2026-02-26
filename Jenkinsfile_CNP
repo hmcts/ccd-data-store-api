@@ -158,6 +158,7 @@ withPipeline(type, product, component) {
 
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+      archiveSonarArtifacts()
 
       copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
@@ -250,4 +251,27 @@ withPipeline(type, product, component) {
  */
 def copyIgnore(filePath, destinationDir) {
   steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
+}
+
+def archiveSonarArtifacts() {
+  def sonarTaskReport = 'build/sonar/report-task.txt'
+  steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/sonar/**,.scannerwork/report-task.txt'
+
+  if (steps.fileExists(sonarTaskReport)) {
+    def dashboardLine = steps.readFile(sonarTaskReport).readLines().find { it.startsWith('dashboardUrl=') }
+    if (dashboardLine) {
+      steps.echo "SonarQube dashboard: ${dashboardLine.substring('dashboardUrl='.length())}"
+    } else {
+      steps.echo "Sonar report task file archived but dashboardUrl is missing in ${sonarTaskReport}"
+    }
+  } else if (steps.fileExists('.scannerwork/report-task.txt')) {
+    def dashboardLine = steps.readFile('.scannerwork/report-task.txt').readLines().find { it.startsWith('dashboardUrl=') }
+    if (dashboardLine) {
+      steps.echo "SonarQube dashboard: ${dashboardLine.substring('dashboardUrl='.length())}"
+    } else {
+      steps.echo "Sonar report task file archived but dashboardUrl is missing in .scannerwork/report-task.txt"
+    }
+  } else {
+    steps.echo 'Sonar task report not found to archive.'
+  }
 }
