@@ -301,6 +301,7 @@ dependencies {
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pactProviderVersion
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '4.3.1'
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     aatAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
