@@ -1,0 +1,25 @@
+{
+	"_guid_": "F-1026_Test_Data_Base",
+	"title": "Get jurisdictions available to the user",
+	"productName": "CCD Data Store",
+	"operationName": "Get jurisdictions available to the user",
+	"method": "GET",
+	"uri": "/aggregated/caseworkers/{uid}/jurisdictions-lite",
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"user": {
+    "_extends_": "BeftaCaseworker1"
+	},
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}
