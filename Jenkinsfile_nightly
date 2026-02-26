@@ -269,6 +269,7 @@ withNightlyPipeline(type, product, component) {
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+        archiveSonarArtifacts()
     }
 
     enableFullFunctionalTest(200)
@@ -277,4 +278,27 @@ withNightlyPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
     enableSlackNotifications('#ccd-nightly-builds')
+}
+
+def archiveSonarArtifacts() {
+    def sonarTaskReport = 'build/sonar/report-task.txt'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/sonar/**,.scannerwork/report-task.txt'
+
+    if (steps.fileExists(sonarTaskReport)) {
+        def dashboardLine = steps.readFile(sonarTaskReport).readLines().find { it.startsWith('dashboardUrl=') }
+        if (dashboardLine) {
+            steps.echo "SonarQube dashboard: ${dashboardLine.substring('dashboardUrl='.length())}"
+        } else {
+            steps.echo "Sonar report task file archived but dashboardUrl is missing in ${sonarTaskReport}"
+        }
+    } else if (steps.fileExists('.scannerwork/report-task.txt')) {
+        def dashboardLine = steps.readFile('.scannerwork/report-task.txt').readLines().find { it.startsWith('dashboardUrl=') }
+        if (dashboardLine) {
+            steps.echo "SonarQube dashboard: ${dashboardLine.substring('dashboardUrl='.length())}"
+        } else {
+            steps.echo "Sonar report task file archived but dashboardUrl is missing in .scannerwork/report-task.txt"
+        }
+    } else {
+        steps.echo 'Sonar task report not found to archive.'
+    }
 }
