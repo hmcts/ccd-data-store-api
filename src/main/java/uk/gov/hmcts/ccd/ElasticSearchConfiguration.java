@@ -1,21 +1,35 @@
 package uk.gov.hmcts.ccd;
 
-import java.util.concurrent.TimeUnit;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.elasticsearch.client.Node;
+import org.elasticsearch.client.NodeSelector;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchMappings;
 
 @Configuration
 @EnableConfigurationProperties(ElasticsearchMappings.class)
+@Slf4j
 public class ElasticSearchConfiguration {
 
     private final ApplicationParams applicationParams;
@@ -25,24 +39,75 @@ public class ElasticSearchConfiguration {
         this.applicationParams = applicationParams;
     }
 
-    @Bean
-    public JestClient jestClient() {
+    @Bean(name = "DefaultObjectMapper")
+    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+    public ObjectMapper objectMapper() {
+        return new Jackson2ObjectMapperBuilder()
+            .featuresToEnable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .featuresToEnable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+            .featuresToEnable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+            .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .modulesToInstall(JavaTimeModule.class)
+            .build();
+    }
 
-        JestClientFactory factory = new JestClientFactory();
-        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchDataHosts())
-                                        .multiThreaded(true)
-                                        .maxConnectionIdleTime(15, TimeUnit.SECONDS)
-                                        .connTimeout(4000)
-                                        .readTimeout(applicationParams.getElasticSearchRequestTimeout())
-                                        .gson(gson)
-                                        .discoveryEnabled(applicationParams.isElasticsearchNodeDiscoveryEnabled())
-                                        .discoveryFrequency(
-                                            applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(),
-                                            TimeUnit.MILLISECONDS)
-                                        .discoveryFilter(applicationParams.getElasticsearchNodeDiscoveryFilter())
-                                        .build());
-        return factory.getObject();
+    @Bean
+    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+    public JacksonJsonpMapper jsonpMapper(ObjectMapper objectMapper) {
+        return new JacksonJsonpMapper(objectMapper);
+    }
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient(ObjectMapper objectMapper) {
+
+        RestClientBuilder builder = RestClient.builder(
+                new HttpHost(
+                    getElasticsearchHost(),
+                    applicationParams.getElasticSearchPort(),
+                    HttpHost.DEFAULT_SCHEME_NAME))
+            .setFailureListener(new RestClient.FailureListener() {
+                @Override
+                public void onFailure(Node node) {
+                    log.warn("Node marked as dead: {}", node);
+                }
+            })
+            .setNodeSelector(NodeSelector.SKIP_DEDICATED_MASTERS)
+            .setRequestConfigCallback(requestConfigBuilder ->
+                requestConfigBuilder
+                    .setConnectTimeout(5000)
+                    .setSocketTimeout(60000)
+            )
+            .setHttpClientConfigCallback(this::customizeHttpClient);
+
+        RestClient restClient = builder.build();
+
+        ElasticsearchTransport transport = new RestClientTransport(
+            restClient,
+            new JacksonJsonpMapper(objectMapper)
+        );
+
+        return new ElasticsearchClient(transport);
+    }
+
+    private HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+        return httpClientBuilder
+            .setDefaultIOReactorConfig(
+                IOReactorConfig.custom()
+                    .setSoTimeout(applicationParams.getElasticSearchRequestTimeout())
+                    .build()
+            );
+    }
+
+    private String getElasticsearchHost() {
+        String esHost = stripProtocolAndPort(applicationParams.getElasticSearchHosts().getFirst());
+        log.info("esHost: {}", esHost);
+        return esHost;
+    }
+
+    public String stripProtocolAndPort(String url) {
+        String noProtocol = url.replaceFirst("^https?://", "");
+        // Remove port (e.g., :9200)
+        return noProtocol.replaceFirst(":\\d+$", "");
     }
 
 }

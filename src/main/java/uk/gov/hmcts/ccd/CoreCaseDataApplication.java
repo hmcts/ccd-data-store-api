@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ 
+@ComponentScan({
     "uk.gov.hmcts.ccd",
     "uk.gov.hmcts.reform.ccd.document.am"
 })
