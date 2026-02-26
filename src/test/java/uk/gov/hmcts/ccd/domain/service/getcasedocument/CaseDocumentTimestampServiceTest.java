@@ -69,6 +69,8 @@ class CaseDocumentTimestampServiceTest {
     private final JsonNode jsonDocumentNodeWithValidTimestamp =
         TestFixtures.readJsonTestsResource("case-document-node-with-timestamp.json");
 
+    // -------- Happy-path / functional behaviour tests --------
+
     @org.junit.jupiter.api.BeforeEach
     void init() {
         underTest = new CaseDocumentTimestampService(FIXED_CLOCK, applicationParams);
@@ -642,6 +644,8 @@ class CaseDocumentTimestampServiceTest {
             underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition));
     }
 
+    // -------- Guard / edge-case coverage tests --------
+
     @Test
     void shouldHandleCollectionOfDocumentsWithHtml() {
         final String caseTypeId = "CASE_TYPE_COLLECTION";
@@ -1150,6 +1154,12 @@ class CaseDocumentTimestampServiceTest {
         FieldTypeDefinition def = new FieldTypeDefinition();
         def.setRegularExpression(".pdf");
         assertFalse((boolean) method.invoke(underTest, def, "   "));
+    }
+
+    @Test
+    void shouldDetectRegexCandidatesNullAndEmpty() {
+        assertFalse(underTest.isRegexCandidate(null));
+        assertFalse(underTest.isRegexCandidate(""));
     }
 
     @Test

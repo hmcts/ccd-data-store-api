@@ -315,6 +315,11 @@ public class CaseDocumentTimestampService {
         return false;
     }
 
+    // Package-visible for tests that need to exercise the heuristic without reflection.
+    boolean isRegexCandidate(String value) {
+        return looksLikeRegex(value);
+    }
+
     protected void insertUploadTimestamp(JsonNode node, String uploadTimestamp) {
         if (isToBeUpdatedWithTimestamp(node)) {
             ((ObjectNode) node).put(UPLOAD_TIMESTAMP, uploadTimestamp);
