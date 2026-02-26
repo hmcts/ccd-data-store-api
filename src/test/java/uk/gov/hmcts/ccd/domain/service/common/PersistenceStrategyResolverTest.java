@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 class PersistenceStrategyResolverTest {
 
     private static final URI TEST_URI = URI.create("http://example.com");
+    private static final String TEMPLATE_URL = "http://pcs-api-pr-%s.preview.platform";
 
     @Mock
     private CasePointerRepository casePointerRepository;
@@ -42,7 +43,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldStorePrefixesInLowercase() {
-        resolver.setCaseTypeServiceUrls(Map.of("MyCase", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("MyCase", TEST_URI.toString()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("MYCASE-Type");
 
@@ -53,7 +54,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldReturnFalseWhenCaseTypeIsNull() {
-        resolver.setCaseTypeServiceUrls(Map.of("mycase", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("mycase", TEST_URI.toString()));
         CaseDetails caseDetails = new CaseDetails();
 
         assertFalse(resolver.isDecentralised(caseDetails));
@@ -61,7 +62,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldReturnFalseWhenCaseTypeIsBlank() {
-        resolver.setCaseTypeServiceUrls(Map.of("mycase", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("mycase", TEST_URI.toString()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("   ");
 
@@ -69,20 +70,22 @@ class PersistenceStrategyResolverTest {
     }
 
     @Test
-    void shouldThrowWhenMultiplePrefixesMatch() {
+    void shouldPreferLongestMatchingPrefix() {
         resolver.setCaseTypeServiceUrls(Map.of(
-            "pre", URI.create("http://one.test"),
-            "prefix", URI.create("http://two.test")
+            "pre", "http://one.test",
+            "prefix", "http://two.test"
         ));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("Prefix-Case");
 
-        assertThrows(IllegalStateException.class, () -> resolver.isDecentralised(caseDetails));
+        URI result = resolver.resolveUriOrThrow(caseDetails);
+
+        assertEquals(URI.create("http://two.test"), result);
     }
 
     @Test
     void shouldReturnFalseWhenNoConfiguredPrefixMatches() {
-        resolver.setCaseTypeServiceUrls(Map.of("configured", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("configured", TEST_URI.toString()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("UnconfiguredCase");
 
@@ -92,7 +95,7 @@ class PersistenceStrategyResolverTest {
     @Test
     void shouldResolveUriForCaseReferenceAndCacheCaseType() {
         Long reference = 1234567890123456L;
-        resolver.setCaseTypeServiceUrls(Map.of("testcase", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("testcase", TEST_URI.toString()));
         when(casePointerRepository.findCaseTypeByReference(reference)).thenReturn("TestCase");
 
         URI firstResolution = resolver.resolveUriOrThrow(reference);
@@ -116,7 +119,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldThrowWhenNoRouteConfiguredForCaseDetails() {
-        resolver.setCaseTypeServiceUrls(Map.of("known", TEST_URI));
+        resolver.setCaseTypeServiceUrls(Map.of("known", TEST_URI.toString()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("OtherType");
 
@@ -124,5 +127,34 @@ class PersistenceStrategyResolverTest {
             () -> resolver.resolveUriOrThrow(caseDetails));
 
         assertTrue(exception.getMessage().contains("OtherType"));
+    }
+
+    @Test
+    void shouldResolveUriFromTemplate() {
+        resolver.setCaseTypeServiceUrls(Map.of("pcs_pr_", TEMPLATE_URL));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("PCS_PR_1234");
+
+        URI result = resolver.resolveUriOrThrow(caseDetails);
+
+        assertEquals(URI.create("http://pcs-api-pr-1234.preview.platform"), result);
+    }
+
+    @Test
+    void shouldThrowWhenTemplateHasMultiplePlaceholders() {
+        resolver.setCaseTypeServiceUrls(Map.of("pcs_pr_", "http://%s.%s.preview.platform"));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("PCS_PR_1234");
+
+        assertThrows(IllegalStateException.class, () -> resolver.resolveUriOrThrow(caseDetails));
+    }
+
+    @Test
+    void shouldThrowWhenTemplateSuffixIsMissing() {
+        resolver.setCaseTypeServiceUrls(Map.of("pcs_pr_", TEMPLATE_URL));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("PCS_PR_");
+
+        assertThrows(IllegalStateException.class, () -> resolver.resolveUriOrThrow(caseDetails));
     }
 }
