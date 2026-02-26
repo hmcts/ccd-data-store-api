@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -161,6 +162,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
                 caseTypeDefinition);
         }
+
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         CaseDetails savedCaseDetails;
         if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {

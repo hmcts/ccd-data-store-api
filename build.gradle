@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -42,7 +43,7 @@ ext {
     testContainersVersion = '1.21.4'
     cucumber = '7.28.2'
     beftaFwVersion = '9.2.4'
-    ccdTestDefinitionVersion = '7.25.4'
+    ccdTestDefinitionVersion = '7.26.7-prerelease-CCD-5329'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -313,6 +314,19 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
     }
 }
 
@@ -757,6 +771,8 @@ task smoke() {
 }
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+//temporary to check feature working on its own in pipeline or not
+//tags = tags + " and (@S-164 or @S-1025.3)"
 
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"

@@ -20,6 +20,11 @@ def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
+// Variables to switch pipeline logic and wiring per type of build.
+def definitionStoreDevelopPr = "PR-1529"
+def dataStoreApiDevelopPr = "PR-2578"
+def prsToUseAat = "PR-1793,PR-1888"
+
 GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
@@ -116,12 +121,21 @@ env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
+//enable BEFTA logging
+env.LOGGING_LEVEL_UK_GOV_HMCTS_CCD = "DEBUG"
+env.BEFTA_HTTP_LOGGING_ENABLED = "true"
+
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
 //        enablePactAs([
 //            AppPipelineDsl.PactRoles.PROVIDER
 //        ])
+    }
+    if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
+        enableSlackNotifications('#ccd-develop-builds')
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
@@ -134,10 +148,12 @@ withPipeline(type, product, component) {
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        //env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
 
