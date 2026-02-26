@@ -37,6 +37,7 @@ import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 public class CaseDocumentTimestampService {
     private final Clock clock;
     private final ApplicationParams applicationParams;
+    private static final String REGEX_META_CHARS = "[]()|+*?^${}\\\\";
     private static final String UPLOAD_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS";
     private static final String DOCUMENT_FILENAME = "document_filename";
     private static final String HTML_NOT_ALLOWED_MSG = "HTML documents are not permitted for this field";
@@ -307,7 +308,7 @@ public class CaseDocumentTimestampService {
         }
         // Heuristic: if it contains common regex metacharacters, treat it as regex.
         for (char c : value.toCharArray()) {
-            if (c == '[' || c == ']' || c == '(' || c == ')' || c == '|' || c == '+' || c == '*' || c == '?') {
+            if (REGEX_META_CHARS.indexOf(c) >= 0) {
                 return true;
             }
         }
@@ -321,8 +322,10 @@ public class CaseDocumentTimestampService {
     }
 
     protected boolean isToBeUpdatedWithTimestamp(JsonNode node) {
-        return (!node.has(UPLOAD_TIMESTAMP)
-            || (node.has(UPLOAD_TIMESTAMP) && node.get(UPLOAD_TIMESTAMP).isNull()));
+        if (!node.has(UPLOAD_TIMESTAMP)) {
+            return true;
+        }
+        return node.get(UPLOAD_TIMESTAMP).isNull();
     }
 
     public boolean isCaseTypeUploadTimestampFeatureEnabled(String caseTypeId) {

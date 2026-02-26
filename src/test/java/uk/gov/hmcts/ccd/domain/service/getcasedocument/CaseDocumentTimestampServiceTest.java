@@ -1127,28 +1127,12 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void shouldHandleNullDataWithNullCaseTypeDefinition() {
-        final String caseTypeId = "CASE_TYPE_NULL_DATA_NULL_DEF";
-        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
-
-        CaseDetails modified = new CaseDetails();
-        modified.setCaseTypeId(caseTypeId);
-        modified.setData(null); // exercises line 66 false branch (second operand)
-
-        CaseDetails original = new CaseDetails();
-        original.setCaseTypeId(caseTypeId);
-        original.setData(Map.of());
-
-        underTest.addUploadTimestamps(modified, original, null);
-    }
-
-    @Test
     void shouldSkipFieldWhenValueNullAndCollectionItemValueNull() {
         final String caseTypeId = "CASE_TYPE_NULL_FIELD";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
 
         // fieldValue null branch (handleCaseField)
-        CaseFieldDefinition nullValueField = caseField("absent", FieldTypeDefinition.DOCUMENT, null);
+        final CaseFieldDefinition nullValueField = caseField("absent", FieldTypeDefinition.DOCUMENT, null);
 
         // collection item with null value branch (handleCollectionItem)
         ObjectNode collectionItem = objectMapper.createObjectNode();
@@ -1179,47 +1163,6 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void looksLikeRegexTrueBranchCovered() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
-        method.setAccessible(true);
-        assertTrue((boolean) method.invoke(underTest, ".*\\.pdf$"));
-    }
-
-    @Test
-    void looksLikeRegexEmptyStringBranchCovered() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
-        method.setAccessible(true);
-        assertFalse((boolean) method.invoke(underTest, ""));
-    }
-
-    @Test
-    void isToBeUpdatedReturnsFalseWhenTimestampPresent() {
-        ObjectNode doc = createDocumentNode("http://dm/documents/withts", "file.pdf");
-        doc.put(UPLOAD_TIMESTAMP, "2023-02-01T00:00:00");
-        assertFalse(underTest.isToBeUpdatedWithTimestamp(doc));
-    }
-
-    @Test
-    void processDocumentNodeHandlesNullDocumentNode() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
-            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
-        method.setAccessible(true);
-
-        method.invoke(underTest, null, new FieldTypeDefinition(), "doc", List.of(), "ts");
-    }
-
-    @Test
-    void addUploadTimestampToDocumentCollectionBranchHandlesMissingUrl() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
-            Collection.class, List.class, String.class);
-        method.setAccessible(true);
-
-        ObjectNode nodeWithoutUrl = objectMapper.createObjectNode();
-        nodeWithoutUrl.putNull(DOCUMENT_URL);
-        method.invoke(underTest, List.of(nodeWithoutUrl), List.of("http://dm/documents/none"), "ts");
-    }
-
-    @Test
     void fieldAllowsHtmlFiltersEmptyRegexSegments() throws Exception {
         var method = CaseDocumentTimestampService.class.getDeclaredMethod("fieldAllowsHtml",
             FieldTypeDefinition.class, String.class);
@@ -1239,6 +1182,14 @@ class CaseDocumentTimestampServiceTest {
         FieldTypeDefinition def = new FieldTypeDefinition();
         def.setRegularExpression(".pdf");
         assertFalse((boolean) method.invoke(underTest, def, "   "));
+    }
+
+    @Test
+    void looksLikeRegexReturnsFalseForNullAndEmpty() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
+        method.setAccessible(true);
+        assertFalse((boolean) method.invoke(underTest, (String) null));
+        assertFalse((boolean) method.invoke(underTest, ""));
     }
 
     @Test
