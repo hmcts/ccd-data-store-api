@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
@@ -708,63 +710,6 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void shouldHandleCaseInsensitiveRegexMatching() {
-        final String caseTypeId = "CASE_TYPE_CASE_INSENSITIVE";
-        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
-
-        CaseDetails caseDetailsModified = new CaseDetails();
-        caseDetailsModified.setCaseTypeId(caseTypeId);
-        Map<String, JsonNode> data = new HashMap<>();
-        data.put("documentField", createDocumentNode("http://dm/documents/14", "TEST.HTML"));
-        caseDetailsModified.setData(data);
-
-        CaseDetails caseDetailsDb = new CaseDetails();
-        caseDetailsDb.setData(Map.of());
-
-        final CaseTypeDefinition caseTypeDefinition =
-            buildCaseTypeWithDocumentField("documentField", ".*\\.(html|pdf)$");
-
-        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
-        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
-        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
-    }
-
-    @Test
-    void shouldAddTimestampWhenCaseFieldDefinitionsEmpty() {
-        final String caseTypeId = "CASE_TYPE_EMPTY_FIELD_DEFS";
-        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
-
-        // Arrange data with a new document so addUploadTimestamps has work to do
-        JsonNode requestNode = TestFixtures.copyJsonNode(jsonDocumentNode);
-        CaseDetails modified = new CaseDetails();
-        modified.setCaseTypeId(caseTypeId);
-        modified.setData(Map.of("doc", requestNode));
-
-        CaseDetails original = new CaseDetails();
-        original.setCaseTypeId(caseTypeId);
-        original.setData(Map.of());
-
-        // Empty field definitions should fall back to non-schema processing branch
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setCaseFieldDefinitions(List.of());
-
-        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
-
-        JsonNode documentNode = modified.getData().get("doc").get("document");
-        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
-    }
-
-    @Test
-    void getDocumentUrlsHandlesNullAndEmptyCaseDetails() {
-        assertTrue(underTest.getDocumentUrls((CaseDetails) null).isEmpty());
-
-        CaseDetails emptyDataCase = new CaseDetails();
-        emptyDataCase.setData(null);
-
-        assertTrue(underTest.getDocumentUrls(emptyDataCase).isEmpty());
-    }
-
-    @Test
     void shouldExerciseGuardClausesAndNonNewDocuments() {
         final String caseTypeId = "CASE_TYPE_GUARDS";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
@@ -891,7 +836,7 @@ class CaseDocumentTimestampServiceTest {
         // Build dataset to hit remaining branches
         Map<String, JsonNode> data = new HashMap<>();
 
-        // Missing field (fieldValue null) -> line 165
+        // Missing field (fieldValue null)
         // no entry for "missingDoc" in data map
 
         // Collection with Document items (processCollection happy path)
@@ -908,7 +853,7 @@ class CaseDocumentTimestampServiceTest {
         complexWrapper.set("value", complexValue);
         data.put("collectionWithComplex", objectMapper.createArrayNode().add(complexWrapper));
 
-        // Document with null document_url -> line 239
+        // Document with null document_url
         ObjectNode docNullUrl = objectMapper.createObjectNode();
         docNullUrl.putNull(DOCUMENT_URL);
         docNullUrl.put("document_filename", "file.pdf");
@@ -954,6 +899,62 @@ class CaseDocumentTimestampServiceTest {
         // Nested complex collection document should also be timestamped
         JsonNode nested = modified.getData().get("collectionWithComplex").get(0).get("value").get("nested");
         assertTrue(nested.has(UPLOAD_TIMESTAMP));
+    }
+    @Test
+    void shouldHandleCaseInsensitiveRegexMatching() {
+        final String caseTypeId = "CASE_TYPE_CASE_INSENSITIVE";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        CaseDetails caseDetailsModified = new CaseDetails();
+        caseDetailsModified.setCaseTypeId(caseTypeId);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("documentField", createDocumentNode("http://dm/documents/14", "TEST.HTML"));
+        caseDetailsModified.setData(data);
+
+        CaseDetails caseDetailsDb = new CaseDetails();
+        caseDetailsDb.setData(Map.of());
+
+        final CaseTypeDefinition caseTypeDefinition =
+            buildCaseTypeWithDocumentField("documentField", ".*\\.(html|pdf)$");
+
+        underTest.addUploadTimestamps(caseDetailsModified, caseDetailsDb, caseTypeDefinition);
+        JsonNode documentNode = caseDetailsModified.getData().get("documentField");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldAddTimestampWhenCaseFieldDefinitionsEmpty() {
+        final String caseTypeId = "CASE_TYPE_EMPTY_FIELD_DEFS";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        // Arrange data with a new document so addUploadTimestamps has work to do
+        JsonNode requestNode = TestFixtures.copyJsonNode(jsonDocumentNode);
+        CaseDetails modified = new CaseDetails();
+        modified.setCaseTypeId(caseTypeId);
+        modified.setData(Map.of("doc", requestNode));
+
+        CaseDetails original = new CaseDetails();
+        original.setCaseTypeId(caseTypeId);
+        original.setData(Map.of());
+
+        // Empty field definitions should fall back to non-schema processing branch
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of());
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        JsonNode documentNode = modified.getData().get("doc").get("document");
+        assertTrue(documentNode.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void getDocumentUrlsHandlesNullAndEmptyCaseDetails() {
+        assertTrue(underTest.getDocumentUrls((CaseDetails) null).isEmpty());
+
+        CaseDetails emptyDataCase = new CaseDetails();
+        emptyDataCase.setData(null);
+
+        assertTrue(underTest.getDocumentUrls(emptyDataCase).isEmpty());
     }
 
     @Test
@@ -1099,6 +1100,11 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
+    void shouldReturnWhenCaseDetailsModifiedNull() {
+        assertDoesNotThrow(() -> underTest.addUploadTimestamps(null, new CaseDetails(), null));
+    }
+
+    @Test
     void shouldSkipFieldWhenValueNullAndCollectionItemValueNull() {
         final String caseTypeId = "CASE_TYPE_NULL_FIELD";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
@@ -1157,9 +1163,14 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void shouldDetectRegexCandidatesNullAndEmpty() {
-        assertFalse(underTest.isRegexCandidate(null));
-        assertFalse(underTest.isRegexCandidate(""));
+    void fieldAllowsHtmlReturnsFalseWhenEmpty() throws Exception {
+        var method = CaseDocumentTimestampService.class.getDeclaredMethod("fieldAllowsHtml",
+            FieldTypeDefinition.class, String.class);
+        method.setAccessible(true);
+
+        FieldTypeDefinition def = new FieldTypeDefinition();
+        def.setRegularExpression("");
+        assertFalse((boolean) method.invoke(underTest, def, "   "));
     }
 
     @Test
@@ -1239,6 +1250,31 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
+    void shouldNotTimestampWhenUrlAlreadyInDbNonSchemaPath() {
+        final String caseTypeId = "CASE_TYPE_ALREADY_IN_DB";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode doc = createDocumentNode("http://dm/documents/existing", "file.pdf");
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", doc));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of("doc", doc));
+
+        // No caseTypeDefinition -> non-schema path
+        underTest.addUploadTimestamps(modified, original, null);
+
+        assertFalse(doc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void findUrlsNotInOriginalHandlesNullModified() {
+        CaseDetails original = new CaseDetails();
+        original.setData(Map.of());
+
+        List<String> urls = underTest.findUrlsNotInOriginal(null, original);
+        assertTrue(urls.isEmpty());
+    }
+
+    @Test
     void shouldSkipDocumentWithoutUrlFieldPublicPath() {
         final String caseTypeId = "CASE_TYPE_MISSING_URL";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
@@ -1273,6 +1309,97 @@ class CaseDocumentTimestampServiceTest {
         underTest.addUploadTimestamps(modified, original, docDef);
 
         assertFalse(docWithNullUrl.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void addUploadTimestampToDocumentSkipsWhenUrlNotNew() {
+        ObjectNode doc = createDocumentNode("http://dm/documents/not-new-public", "file.pdf");
+        underTest.addUploadTimestampToDocument(List.of(doc), List.of(), "ts");
+        assertFalse(doc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void addUploadTimestampToDocumentSkipsWhenUrlMissing() {
+        ObjectNode doc = objectMapper.createObjectNode(); // no document_url
+        underTest.addUploadTimestampToDocument(List.of(doc), List.of("http://dm/documents/any"), "ts");
+        assertFalse(doc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void addUploadTimestampToDocumentSkipsWhenUrlNull() {
+        ObjectNode doc = objectMapper.createObjectNode();
+        doc.putNull(DOCUMENT_URL);
+        underTest.addUploadTimestampToDocument(List.of(doc), List.of("http://dm/documents/any"), "ts");
+        assertFalse(doc.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldIgnoreNonCollectionFieldTypeBranch() {
+        final String caseTypeId = "CASE_TYPE_NON_COLLECTION";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode textNode = objectMapper.createObjectNode();
+        textNode.put("text", "value");
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("textField", textNode));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        FieldTypeDefinition textType = new FieldTypeDefinition();
+        textType.setType("Text");
+        CaseFieldDefinition textField = new CaseFieldDefinition();
+        textField.setId("textField");
+        textField.setFieldTypeDefinition(textType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(textField));
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        assertFalse(modified.getData().get("textField").has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldIgnoreCollectionWithNonComplexOrDocumentItems() {
+        final String caseTypeId = "CASE_TYPE_COLLECTION_TEXT";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode item = objectMapper.createObjectNode();
+        item.put("value", "text value");
+        CaseDetails modified = caseDetailsWithData(caseTypeId,
+            Map.of("textCollection", objectMapper.createArrayNode().add(item)));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        FieldTypeDefinition textItemType = new FieldTypeDefinition();
+        textItemType.setType("Text");
+
+        FieldTypeDefinition collectionType = new FieldTypeDefinition();
+        collectionType.setType(FieldTypeDefinition.COLLECTION);
+        collectionType.setCollectionFieldTypeDefinition(textItemType);
+
+        CaseFieldDefinition collectionField = new CaseFieldDefinition();
+        collectionField.setId("textCollection");
+        collectionField.setFieldTypeDefinition(collectionType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(collectionField));
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        JsonNode valueNode = modified.getData().get("textCollection").get(0).get("value");
+        assertTrue(valueNode.isTextual());
+    }
+
+    @Test
+    void shouldReturnWhenFeatureDisabled() {
+        final String caseTypeId = "CASE_TYPE_FEATURE_DISABLED";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of());
+
+        ObjectNode doc = createDocumentNode("http://dm/documents/disabled", "file.pdf");
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", doc));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        underTest.addUploadTimestamps(modified, original, null);
+
+        assertFalse(doc.has(UPLOAD_TIMESTAMP));
     }
 
     @Test

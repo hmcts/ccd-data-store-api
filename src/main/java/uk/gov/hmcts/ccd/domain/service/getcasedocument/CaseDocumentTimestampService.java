@@ -59,12 +59,16 @@ public class CaseDocumentTimestampService {
                                     CaseDetails caseDetailsInDb,
                                     CaseTypeDefinition caseTypeDefinition) {
 
+        if (caseDetailsModified == null) {
+            return;
+        }
+
         if (!isCaseTypeUploadTimestampFeatureEnabled(caseDetailsModified.getCaseTypeId())) {
             return;
         }
 
         List<JsonNode> jsonNodes = new ArrayList<>();
-        if (null != caseDetailsModified && null != caseDetailsModified.getData()) {
+        if (caseDetailsModified.getData() != null) {
             jsonNodes = findNodes(caseDetailsModified.getData().values());
         }
         List<String> documentUrlsNew = findUrlsNotInOriginal(caseDetailsModified, caseDetailsInDb);
@@ -77,7 +81,7 @@ public class CaseDocumentTimestampService {
             addUploadTimestampToDocument(jsonNodes, documentUrlsNew, uploadTimestamp);
             return;
         }
-        addUploadTimestampToDocument(caseDetailsModified.getData(),
+        addUploadTimestampToDocumentFromMap(caseDetailsModified.getData(),
             caseTypeDefinition.getCaseFieldDefinitions(),
             EMPTY_PATH,
             documentUrlsNew,
@@ -139,11 +143,12 @@ public class CaseDocumentTimestampService {
             .toList();
     }
 
-    private void addUploadTimestampToDocument(Map<String, JsonNode> data,
-                                              List<CaseFieldDefinition> caseFieldDefinitions,
-                                              String fieldPathPrefix,
-                                              List<String> documentUrlsNew,
-                                              String uploadTimestamp) {
+    // Convenience wrapper to handle map-based data
+    private void addUploadTimestampToDocumentFromMap(Map<String, JsonNode> data,
+                                                     List<CaseFieldDefinition> caseFieldDefinitions,
+                                                     String fieldPathPrefix,
+                                                     List<String> documentUrlsNew,
+                                                     String uploadTimestamp) {
         if (data == null) {
             return;
         }
@@ -157,7 +162,7 @@ public class CaseDocumentTimestampService {
                                               String fieldPathPrefix,
                                               List<String> documentUrlsNew,
                                               String uploadTimestamp) {
-        if (dataNode == null || !dataNode.isObject()) {
+        if (!isProcessableObjectNode(dataNode)) {
             return;
         }
         for (CaseFieldDefinition caseFieldDefinition : caseFieldDefinitions) {
@@ -222,11 +227,20 @@ public class CaseDocumentTimestampService {
                                       int index,
                                       List<String> documentUrlsNew,
                                       String uploadTimestamp) {
+        processCollectionItemValue(item, fieldTypeDefinition, fieldPath, index, documentUrlsNew, uploadTimestamp);
+    }
+
+    private void processCollectionItemValue(JsonNode item,
+                                            FieldTypeDefinition collectionFieldType,
+                                            String fieldPath,
+                                            int index,
+                                            List<String> documentUrlsNew,
+                                            String uploadTimestamp) {
         JsonNode itemValue = item.get(VALUE);
         if (itemValue == null || itemValue.isNull()) {
             return;
         }
-        FieldTypeDefinition collectionType = fieldTypeDefinition.getCollectionFieldTypeDefinition();
+        FieldTypeDefinition collectionType = collectionFieldType.getCollectionFieldTypeDefinition();
         if (collectionType == null) {
             return;
         }
@@ -244,15 +258,8 @@ public class CaseDocumentTimestampService {
                                      String fieldPath,
                                      List<String> documentUrlsNew,
                                      String uploadTimestamp) {
-        if (documentNode == null || !documentNode.has(DOCUMENT_URL)) {
-            return;
-        }
-        final JsonNode documentUrlNode = documentNode.get(DOCUMENT_URL);
-        if (documentUrlNode == null || documentUrlNode.isNull()) {
-            return;
-        }
-        final String documentUrl = documentUrlNode.asText();
-        if (!documentUrlsNew.contains(documentUrl)) {
+        String documentUrl = extractDocumentUrl(documentNode);
+        if (documentUrl == null || !documentUrlsNew.contains(documentUrl)) {
             return;
         }
 
@@ -264,6 +271,17 @@ public class CaseDocumentTimestampService {
         if (isToBeUpdatedWithTimestamp(documentNode)) {
             insertUploadTimestamp(documentNode, uploadTimestamp);
         }
+    }
+
+    private String extractDocumentUrl(JsonNode documentNode) {
+        if (documentNode == null || !documentNode.has(DOCUMENT_URL)) {
+            return null;
+        }
+        JsonNode urlNode = documentNode.get(DOCUMENT_URL);
+        if (urlNode == null || urlNode.isNull()) {
+            return null;
+        }
+        return urlNode.asText();
     }
 
     private String getDocumentFilename(JsonNode documentNode) {
@@ -315,9 +333,8 @@ public class CaseDocumentTimestampService {
         return false;
     }
 
-    // Package-visible for tests that need to exercise the heuristic without reflection.
-    boolean isRegexCandidate(String value) {
-        return looksLikeRegex(value);
+    private boolean isProcessableObjectNode(JsonNode node) {
+        return node != null && node.isObject();
     }
 
     protected void insertUploadTimestamp(JsonNode node, String uploadTimestamp) {
