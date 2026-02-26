@@ -43,8 +43,6 @@ class DocumentControllerTest {
     @Mock
     private UIDService caseReferenceService;
 
-    private List<Document> documents;
-
     @InjectMocks
     private DocumentController documentController;
 
@@ -57,7 +55,7 @@ class DocumentControllerTest {
         document.setDescription("desc1");
         document.setType("type1");
         document.setUrl("url1");
-        documents = Lists.newArrayList(document);
+        List<Document> documents = Lists.newArrayList(document);
 
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(documentsOperation.getPrintableDocumentsForCase(CASE_REFERENCE)).thenReturn(documents);
@@ -94,4 +92,27 @@ class DocumentControllerTest {
         assertThrows(RuntimeException.class, () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
+    @Test
+    @DisplayName("should propagate ResourceNotFoundException when user has no access to case")
+    void shouldPropagateResourceNotFoundException() {
+        when(documentsOperation.getPrintableDocumentsForCase(CASE_REFERENCE))
+            .thenThrow(new uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException("Case not found"));
+
+        assertThrows(
+            uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException.class,
+            () -> documentController.getDocuments(CASE_REFERENCE)
+        );
+    }
+
+    @Test
+    @DisplayName("should propagate ServiceException when document retrieval fails")
+    void shouldPropagateServiceException() {
+        when(documentsOperation.getPrintableDocumentsForCase(CASE_REFERENCE))
+            .thenThrow(new uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException("Unable to retrieve documents"));
+
+        assertThrows(
+            uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException.class,
+            () -> documentController.getDocuments(CASE_REFERENCE)
+        );
+    }
 }
