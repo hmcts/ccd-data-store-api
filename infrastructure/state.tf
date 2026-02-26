@@ -1,4 +1,4 @@
- provider "azurerm" {
+provider "azurerm" {
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -9,7 +9,7 @@
   subscription_id            = var.aks_subscription_id
 }
 
- terraform {
+terraform {
   backend "azurerm" {}
 
   required_providers {
