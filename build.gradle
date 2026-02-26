@@ -28,7 +28,6 @@ ext {
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
-    set('jackson.version', '2.16.0')
     set('snakeyaml.version', '2.2')
     junit = '5.14.2'
     junitPlatform = '1.14.2'
