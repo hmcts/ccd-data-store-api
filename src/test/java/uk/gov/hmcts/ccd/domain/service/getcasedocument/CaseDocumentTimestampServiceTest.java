@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -1038,43 +1039,6 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void processDocumentNodeSkipsWhenNoDocumentUrlField() throws Exception {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setType(FieldTypeDefinition.DOCUMENT);
-
-        ObjectNode docWithoutUrl = objectMapper.createObjectNode();
-        docWithoutUrl.put("document_filename", "file.pdf");
-
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
-            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
-        method.setAccessible(true);
-
-        method.invoke(underTest, docWithoutUrl, fieldTypeDefinition, "doc",
-            List.of("http://dm/documents/missing"), "ts");
-
-        assertFalse(docWithoutUrl.has(UPLOAD_TIMESTAMP));
-    }
-
-    @Test
-    void addUploadTimestampToDocumentSkipsNonObjectNode() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
-            JsonNode.class, List.class, String.class, List.class, String.class);
-        method.setAccessible(true);
-
-        JsonNode nonObjectNode = objectMapper.getNodeFactory().textNode("notObject");
-        method.invoke(underTest, nonObjectNode, List.of(), "", List.of(), "ts");
-    }
-
-    @Test
-    void addUploadTimestampToDocumentHandlesNullDataNode() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("addUploadTimestampToDocument",
-            JsonNode.class, List.class, String.class, List.class, String.class);
-        method.setAccessible(true);
-
-        method.invoke(underTest, null, List.of(), "", List.of(), "ts");
-    }
-
-    @Test
     void shouldUseExtensionListPathWhenRegexBlank() {
         final String caseTypeId = "CASE_TYPE_BLANK_REGEX_NONHTML";
         when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
@@ -1108,6 +1072,8 @@ class CaseDocumentTimestampServiceTest {
         typeWithNullFields.setCaseFieldDefinitions(null); // triggers null list branch at line 74
 
         underTest.addUploadTimestamps(modified, original, typeWithNullFields);
+
+        assertNull(modified.getData());
     }
 
     @Test
@@ -1124,6 +1090,8 @@ class CaseDocumentTimestampServiceTest {
         original.setData(Map.of());
 
         underTest.addUploadTimestamps(modified, original, null); // triggers caseTypeDefinition null path
+
+        assertTrue(modified.getData().isEmpty());
     }
 
     @Test
@@ -1185,45 +1153,128 @@ class CaseDocumentTimestampServiceTest {
     }
 
     @Test
-    void looksLikeRegexReturnsFalseForNullAndEmpty() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
-        method.setAccessible(true);
-        assertFalse((boolean) method.invoke(underTest, (String) null));
-        assertFalse((boolean) method.invoke(underTest, ""));
+    void shouldTimestampCollectionOfDocumentsViaPublicPath() {
+        final String caseTypeId = "CASE_TYPE_COLLECTION_PUBLIC";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode itemValue = createDocumentNode("http://dm/documents/new-collection", "file.pdf");
+        ObjectNode wrapper = objectMapper.createObjectNode();
+        wrapper.set("value", itemValue);
+
+        final CaseDetails modified = caseDetailsWithData(caseTypeId,
+            Map.of("docCollection", objectMapper.createArrayNode().add(wrapper)));
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        FieldTypeDefinition docType = new FieldTypeDefinition();
+        docType.setType(FieldTypeDefinition.DOCUMENT);
+
+        FieldTypeDefinition collType = new FieldTypeDefinition();
+        collType.setType(FieldTypeDefinition.COLLECTION);
+        collType.setCollectionFieldTypeDefinition(docType);
+
+        CaseFieldDefinition collectionField = new CaseFieldDefinition();
+        collectionField.setId("docCollection");
+        collectionField.setFieldTypeDefinition(collType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(collectionField));
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        JsonNode stamped = modified.getData().get("docCollection").get(0).get("value");
+        assertTrue(stamped.has(UPLOAD_TIMESTAMP));
     }
 
     @Test
-    void looksLikeRegexCoversAllMetacharacters() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("looksLikeRegex", String.class);
-        method.setAccessible(true);
-        assertTrue((boolean) method.invoke(underTest, "[abc]"));
-        assertTrue((boolean) method.invoke(underTest, "a+b"));
-        assertTrue((boolean) method.invoke(underTest, "a|b"));
-        assertTrue((boolean) method.invoke(underTest, "(a)"));
-        assertTrue((boolean) method.invoke(underTest, "a?b"));
+    void shouldTimestampComplexCollectionViaPublicPath() {
+        final String caseTypeId = "CASE_TYPE_COMPLEX_COLLECTION_PUBLIC";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode nestedDoc = createDocumentNode("http://dm/documents/complex-public", "file.pdf");
+        ObjectNode complexValue = objectMapper.createObjectNode();
+        complexValue.set("nested", nestedDoc);
+        ObjectNode wrapper = objectMapper.createObjectNode();
+        wrapper.set("value", complexValue);
+
+        final CaseDetails modified = caseDetailsWithData(caseTypeId,
+            Map.of("complexCollection", objectMapper.createArrayNode().add(wrapper)));
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        FieldTypeDefinition innerDoc = new FieldTypeDefinition();
+        innerDoc.setType(FieldTypeDefinition.DOCUMENT);
+
+        CaseFieldDefinition nestedField = new CaseFieldDefinition();
+        nestedField.setId("nested");
+        nestedField.setFieldTypeDefinition(innerDoc);
+
+        FieldTypeDefinition complexType = new FieldTypeDefinition();
+        complexType.setType(FieldTypeDefinition.COMPLEX);
+        complexType.setComplexFields(List.of(nestedField));
+
+        FieldTypeDefinition collType = new FieldTypeDefinition();
+        collType.setType(FieldTypeDefinition.COLLECTION);
+        collType.setCollectionFieldTypeDefinition(complexType);
+
+        CaseFieldDefinition collectionField = new CaseFieldDefinition();
+        collectionField.setId("complexCollection");
+        collectionField.setFieldTypeDefinition(collType);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(collectionField));
+
+        underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
+
+        JsonNode stamped = modified.getData().get("complexCollection").get(0).get("value").get("nested");
+        assertTrue(stamped.has(UPLOAD_TIMESTAMP));
     }
 
     @Test
-    void processDocumentNodeHandlesNullUrlNode() throws Exception {
-        var method = CaseDocumentTimestampService.class.getDeclaredMethod("processDocumentNode",
-            JsonNode.class, FieldTypeDefinition.class, String.class, List.class, String.class);
-        method.setAccessible(true);
+    void shouldSkipDocumentWithoutUrlFieldPublicPath() {
+        final String caseTypeId = "CASE_TYPE_MISSING_URL";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
+
+        ObjectNode docWithoutUrl = objectMapper.createObjectNode();
+        docWithoutUrl.put("document_filename", "file.pdf");
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", docWithoutUrl));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", null);
+
+        underTest.addUploadTimestamps(modified, original, docDef);
+
+        assertFalse(docWithoutUrl.has(UPLOAD_TIMESTAMP));
+    }
+
+    @Test
+    void shouldSkipDocumentWithNullUrlFieldPublicPath() {
+        final String caseTypeId = "CASE_TYPE_NULL_URL";
+        when(applicationParams.getUploadTimestampFeaturedCaseTypes()).thenReturn(List.of(caseTypeId));
 
         ObjectNode docWithNullUrl = objectMapper.createObjectNode();
         docWithNullUrl.putNull(DOCUMENT_URL);
-        method.invoke(underTest, docWithNullUrl, new FieldTypeDefinition(), "doc", List.of("x"), "ts");
+        docWithNullUrl.put("document_filename", "file.pdf");
+
+        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("doc", docWithNullUrl));
+        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+
+        CaseTypeDefinition docDef = buildCaseTypeWithDocumentField("doc", null);
+
+        underTest.addUploadTimestamps(modified, original, docDef);
+
+        assertFalse(docWithNullUrl.has(UPLOAD_TIMESTAMP));
     }
 
     @Test
-    void handleCaseFieldCollectionBranchCovered() throws Exception {
+    void handleCaseFieldCollectionBranchCoveredWithNewUrl() throws Exception {
         var method = CaseDocumentTimestampService.class.getDeclaredMethod("handleCaseField",
             JsonNode.class, CaseFieldDefinition.class, String.class, List.class, String.class);
         method.setAccessible(true);
 
         ObjectNode root = objectMapper.createObjectNode();
         ObjectNode item = objectMapper.createObjectNode();
-        item.set("value", createDocumentNode("http://dm/documents/col", "file.pdf"));
-        root.set("coll", objectMapper.createArrayNode().add(item));
+        item.set("value", createDocumentNode("http://dm/documents/collection-new", "file.pdf"));
+        root.set("collectionField", objectMapper.createArrayNode().add(item));
 
         FieldTypeDefinition innerDoc = new FieldTypeDefinition();
         innerDoc.setType(FieldTypeDefinition.DOCUMENT);
@@ -1232,10 +1283,14 @@ class CaseDocumentTimestampServiceTest {
         collType.setCollectionFieldTypeDefinition(innerDoc);
 
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
-        caseFieldDefinition.setId("coll");
+        caseFieldDefinition.setId("collectionField");
         caseFieldDefinition.setFieldTypeDefinition(collType);
 
-        method.invoke(underTest, root, caseFieldDefinition, "coll", List.of("http://dm/documents/col"), "ts");
+        method.invoke(underTest, root, caseFieldDefinition, "collectionField",
+            List.of("http://dm/documents/collection-new"), "ts");
+
+        JsonNode stamped = root.get("collectionField").get(0).get("value");
+        assertTrue(stamped.has(UPLOAD_TIMESTAMP));
     }
 
     @Test
