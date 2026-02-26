@@ -297,11 +297,11 @@ dependencies {
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '4.3.1'
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pactProviderVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '4.3.1'
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     aatAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
