@@ -474,12 +474,17 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);
         given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
+        given(applicationParams.getCallbackAllowedHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackAllowedHttpHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackAllowPrivateHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackPassthruHeaderContexts()).willReturn(Collections.emptyList());
+        given(applicationParams.getCcdCallbackLogControl()).willReturn(Collections.emptyList());
         given(restTemplate.exchange(anyString(), eq(POST), isA(HttpEntity.class), eq(String.class)))
             .willThrow(new RestClientException("Fail to process"));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
-            Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class),
+            applicationParams, Mockito.mock(AppInsights.class),
             Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class));
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();

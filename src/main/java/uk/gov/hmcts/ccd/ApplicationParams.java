@@ -242,6 +242,15 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
+    @Value("#{'${ccd.callback.allowed-hosts}'.split(',')}")
+    private List<String> callbackAllowedHosts;
+
+    @Value("#{'${ccd.callback.allowed-http-hosts}'.split(',')}")
+    private List<String> callbackAllowedHttpHosts;
+
+    @Value("#{'${ccd.callback.allow-private-hosts}'.split(',')}")
+    private List<String> callbackAllowPrivateHosts;
+
     @Value("#{'${case.data.exclude.verifyaccess.casetype.validate}'.split(',')}")
     private List<String> excludeVerifyAccessCaseTypesForValidate;
 
@@ -650,6 +659,18 @@ public class ApplicationParams {
 
     public List<String> getCallbackPassthruHeaderContexts() {
         return callbackPassthruHeaderContexts;
+    }
+
+    public List<String> getCallbackAllowedHosts() {
+        return callbackAllowedHosts;
+    }
+
+    public List<String> getCallbackAllowedHttpHosts() {
+        return callbackAllowedHttpHosts;
+    }
+
+    public List<String> getCallbackAllowPrivateHosts() {
+        return callbackAllowPrivateHosts;
     }
 
     public List<String> getUploadTimestampFeaturedCaseTypes() {

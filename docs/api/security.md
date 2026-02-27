@@ -66,3 +66,28 @@ Once a service has been authenticated, it has to be authorised.
 CCD's APIs can only be called by a list of authorised `microservice_name`. This authorisation is achieved by comparing the service JWT token with the list of authorised services provided as part of the API's configuration.
 
 To get your micro-service authorised, please raise a ticket with CCD.
+
+## Callback security hardening
+
+Event callback URLs are validated before outbound requests are sent. This is required to reduce SSRF and token leakage risk when callback URLs originate from case definition data.
+
+### Objective
+
+Prevent untrusted callback destinations from being invoked and prevent sensitive credential/context headers from being leaked during callback execution.
+
+- Callback hosts must be allowlisted (`CCD_CALLBACK_ALLOWED_HOSTS`).
+- Callback URLs must use `https` unless the host is explicitly approved for `http` (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
+- Callback hosts that resolve to local/private ranges are blocked unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Sensitive inbound/user headers are not forwarded to callbacks (`Authorization`, `ServiceAuthorization`, `user-id`, `user-roles`).
+
+### Service rollout checklist
+
+After enabling callback hardening, service teams should:
+
+1. Ensure callback URLs do not contain embedded credentials (`user:pass@host`).
+2. Configure trusted callback destinations with:
+   - `CCD_CALLBACK_ALLOWED_HOSTS`
+   - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
+   - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
+3. Re-run callback integration tests and verify expected callback hosts are accepted.
+4. Update alerting/log triage rules to use redacted callback URL output (query and credentials are not logged).

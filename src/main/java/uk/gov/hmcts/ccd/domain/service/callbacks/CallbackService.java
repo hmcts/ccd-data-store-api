@@ -31,8 +31,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.Inet6Address;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -46,6 +52,15 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+    private static final String HTTPS_SCHEME = "https";
+    private static final String HTTP_SCHEME = "http";
+    private static final String METADATA_ENDPOINT = "169.254.169.254";
+    private static final List<String> SENSITIVE_HEADERS = List.of(
+        HttpHeaders.AUTHORIZATION,
+        SecurityUtils.SERVICE_AUTHORIZATION,
+        "user-id",
+        "user-roles"
+    );
     private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
         = "Unable to proceed because there are one or more callback Errors or Warnings";
 
@@ -108,11 +123,13 @@ public class CallbackService {
         final Optional<ResponseEntity<CallbackResponse>> responseEntity =
             sendRequest(url, callbackType, CallbackResponse.class, callbackRequest);
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+            final String safeUrl = sanitizeUrl(url);
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", safeUrl, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             String callbackTypeString = callbackType != null ? callbackType.getValue() : "null";
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName()
-                + " url " + url + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id " + caseEvent.getId()
+                + " url " + safeUrl + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id "
+                + caseEvent.getId()
                 + " callbackType " + callbackTypeString);
         });
     }
@@ -126,7 +143,8 @@ public class CallbackService {
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, callbackType, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", sanitizeUrl(url),
+                caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
         });
@@ -136,8 +154,8 @@ public class CallbackService {
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
-
-        HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
+        validateCallbackUrl(url);
+        final String safeUrl = sanitizeUrl(url);
 
         CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
         int httpStatus = 0;
@@ -146,18 +164,16 @@ public class CallbackService {
         try {
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
+            httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
             addPassThroughHeaders(httpHeaders);
-            if (null != securityHeaders) {
-                httpHeaders.putAll(securityHeaders);
-            }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
-                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType,
+                LOG.info("Invoking callback {} of type {} with request: {}", safeUrl, callbackType,
                     printCallbackDetails(requestEntity));
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (logCallbackDetails(url)) {
-                LOG.info("Callback {} response received: {}", url, printCallbackDetails(responseEntity));
+                LOG.info("Callback {} response received: {}", safeUrl, printCallbackDetails(responseEntity));
             }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
@@ -166,7 +182,7 @@ public class CallbackService {
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
-                url, e.getClass().getSimpleName(), e.getMessage());
+                safeUrl, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
                 httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
@@ -174,7 +190,7 @@ public class CallbackService {
             return Optional.empty();
         } finally {
             Duration duration = Duration.between(startTime, Instant.now());
-            appinsights.trackCallbackEvent(callbackType, url, String.valueOf(httpStatus), duration);
+            appinsights.trackCallbackEvent(callbackType, safeUrl, String.valueOf(httpStatus), duration);
         }
     }
 
@@ -208,7 +224,109 @@ public class CallbackService {
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
+                .filter(this::isAllowedPassThroughHeader)
                 .forEach(context -> addPassThruContextValuesToHttpHeaders(httpHeaders, context));
+        }
+    }
+
+    private boolean isAllowedPassThroughHeader(String headerName) {
+        return StringUtils.hasLength(headerName)
+            && SENSITIVE_HEADERS.stream().noneMatch(sensitive -> sensitive.equalsIgnoreCase(headerName));
+    }
+
+    private void validateCallbackUrl(String url) {
+        final URI callbackUri;
+        try {
+            callbackUri = new URI(url);
+        } catch (URISyntaxException e) {
+            throw new CallbackException("Invalid callback URL: " + sanitizeUrl(url));
+        }
+
+        final String scheme = Optional.ofNullable(callbackUri.getScheme()).orElse("").toLowerCase(Locale.UK);
+        final String host = callbackUri.getHost();
+        if (!StringUtils.hasLength(host)) {
+            throw new CallbackException("Callback URL must include a host: " + sanitizeUrl(url));
+        }
+        if (StringUtils.hasLength(callbackUri.getUserInfo())) {
+            throw new CallbackException("Callback URL must not include credentials: " + sanitizeUrl(url));
+        }
+        if (!isAllowedHost(host, applicationParams.getCallbackAllowedHosts())) {
+            throw new CallbackException("Callback URL host is not allowlisted: " + host);
+        }
+        if (!HTTPS_SCHEME.equals(scheme)
+            && !(HTTP_SCHEME.equals(scheme) && isAllowedHost(host, applicationParams.getCallbackAllowedHttpHosts()))) {
+            throw new CallbackException("Callback URL scheme is not permitted: " + scheme);
+        }
+        if (resolvesToPrivateAddress(host) && !isAllowedHost(host, applicationParams.getCallbackAllowPrivateHosts())) {
+            throw new CallbackException("Callback URL resolves to a private or local network address: " + host);
+        }
+    }
+
+    private boolean isAllowedHost(String host, List<String> allowedHosts) {
+        if (!StringUtils.hasLength(host) || allowedHosts == null) {
+            return false;
+        }
+        return allowedHosts.stream()
+            .filter(StringUtils::hasLength)
+            .map(String::trim)
+            .anyMatch(allowed -> hostMatches(host, allowed));
+    }
+
+    private boolean hostMatches(String host, String allowedHost) {
+        if (WILDCARD.equals(allowedHost)) {
+            return true;
+        }
+        final String normalisedHost = host.toLowerCase(Locale.UK);
+        final String normalisedAllowedHost = allowedHost.toLowerCase(Locale.UK);
+        if (normalisedAllowedHost.startsWith("*.")) {
+            String suffix = normalisedAllowedHost.substring(1);
+            return normalisedHost.endsWith(suffix);
+        }
+        return normalisedHost.equals(normalisedAllowedHost);
+    }
+
+    private boolean resolvesToPrivateAddress(String host) {
+        try {
+            for (InetAddress address : InetAddress.getAllByName(host)) {
+                if (isPrivateOrLocal(address)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            throw new CallbackException("Unable to resolve callback host: " + host);
+        }
+    }
+
+    private boolean isPrivateOrLocal(InetAddress address) {
+        if (address instanceof Inet6Address) {
+            final byte[] addressBytes = address.getAddress();
+            if (addressBytes.length > 0 && (addressBytes[0] & (byte) 0xFE) == (byte) 0xFC) {
+                return true; // IPv6 unique local addresses fc00::/7, including fd00::/8
+            }
+        }
+        return address.isAnyLocalAddress()
+            || address.isLoopbackAddress()
+            || address.isLinkLocalAddress()
+            || address.isSiteLocalAddress()
+            || address.isMulticastAddress()
+            || METADATA_ENDPOINT.equals(address.getHostAddress());
+    }
+
+    private String sanitizeUrl(String url) {
+        if (!StringUtils.hasLength(url)) {
+            return "<empty>";
+        }
+        try {
+            URI uri = new URI(url);
+            String scheme = Optional.ofNullable(uri.getScheme()).orElse("unknown");
+            String host = Optional.ofNullable(uri.getHost()).orElse("unknown-host");
+            int port = uri.getPort();
+            String path = Optional.ofNullable(uri.getPath()).orElse("");
+            String portPart = port > -1 ? ":" + port : "";
+            return scheme + "://" + host + portPart + path;
+        } catch (URISyntaxException e) {
+            return "<invalid-url>";
         }
     }
 

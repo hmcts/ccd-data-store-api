@@ -47,6 +47,9 @@ The following environment variables are required:
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
 | DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| CCD_CALLBACK_ALLOWED_HOSTS | localhost,127.0.0.1 | Comma-separated callback destination host allowlist (`*` and `*.domain.tld` supported). |
+| CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to use `http` for callbacks (all other callback hosts must use `https`). |
+| CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to resolve to private/local addresses for callbacks. |
 
 ### Building
 
