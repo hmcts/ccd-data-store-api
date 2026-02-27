@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
@@ -900,6 +899,7 @@ class CaseDocumentTimestampServiceTest {
         JsonNode nested = modified.getData().get("collectionWithComplex").get(0).get("value").get("nested");
         assertTrue(nested.has(UPLOAD_TIMESTAMP));
     }
+
     @Test
     void shouldHandleCaseInsensitiveRegexMatching() {
         final String caseTypeId = "CASE_TYPE_CASE_INSENSITIVE";
@@ -1340,8 +1340,8 @@ class CaseDocumentTimestampServiceTest {
 
         ObjectNode textNode = objectMapper.createObjectNode();
         textNode.put("text", "value");
-        CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("textField", textNode));
-        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+        final CaseDetails modified = caseDetailsWithData(caseTypeId, Map.of("textField", textNode));
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
 
         FieldTypeDefinition textType = new FieldTypeDefinition();
         textType.setType("Text");
@@ -1364,9 +1364,9 @@ class CaseDocumentTimestampServiceTest {
 
         ObjectNode item = objectMapper.createObjectNode();
         item.put("value", "text value");
-        CaseDetails modified = caseDetailsWithData(caseTypeId,
+        final CaseDetails modified = caseDetailsWithData(caseTypeId,
             Map.of("textCollection", objectMapper.createArrayNode().add(item)));
-        CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
+        final CaseDetails original = caseDetailsWithData(caseTypeId, Map.of());
 
         FieldTypeDefinition textItemType = new FieldTypeDefinition();
         textItemType.setType("Text");
