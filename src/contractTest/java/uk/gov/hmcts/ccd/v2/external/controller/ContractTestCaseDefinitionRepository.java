@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
 
 @Service
 @Primary
@@ -15,8 +16,9 @@ import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
 @Profile("SECURITY_MOCK")
 public class ContractTestCaseDefinitionRepository extends DefaultCaseDefinitionRepository {
     public ContractTestCaseDefinitionRepository(ApplicationParams applicationParams,
-                                                DefinitionStoreClient definitionStoreClient) {
-        super(applicationParams, definitionStoreClient);
+                                                DefinitionStoreClient definitionStoreClient,
+                                                CallbackUrlValidator callbackUrlValidator) {
+        super(applicationParams, definitionStoreClient, callbackUrlValidator);
     }
 
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {

@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.util.ClientContextUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -46,6 +47,15 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+    private static final String HTTPS_SCHEME = "https";
+    private static final String HTTP_SCHEME = "http";
+    private static final String METADATA_ENDPOINT = "169.254.169.254";
+    private static final List<String> SENSITIVE_HEADERS = List.of(
+        HttpHeaders.AUTHORIZATION,
+        SecurityUtils.SERVICE_AUTHORIZATION,
+        "user-id",
+        "user-roles"
+    );
     private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
         = "Unable to proceed because there are one or more callback Errors or Warnings";
 
@@ -55,6 +65,7 @@ public class CallbackService {
     private final AppInsights appinsights;
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
+    private final CallbackUrlValidator callbackUrlValidator;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
@@ -62,13 +73,15 @@ public class CallbackService {
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
                            HttpServletRequest request,
-                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+                           CallbackUrlValidator callbackUrlValidator) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.appinsights = appinsights;
         this.request = request;
         this.objectMapper = objectMapper;
+        this.callbackUrlValidator = callbackUrlValidator;
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -108,11 +121,13 @@ public class CallbackService {
         final Optional<ResponseEntity<CallbackResponse>> responseEntity =
             sendRequest(url, callbackType, CallbackResponse.class, callbackRequest);
         return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+            final String safeUrl = callbackUrlValidator.sanitizeUrl(url);
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", safeUrl, caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             String callbackTypeString = callbackType != null ? callbackType.getValue() : "null";
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName()
-                + " url " + url + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id " + caseEvent.getId()
+                + " url " + safeUrl + " caseTypeId " + caseDetails.getCaseTypeId() + " caseEvent Id "
+                + caseEvent.getId()
                 + " callbackType " + callbackTypeString);
         });
     }
@@ -126,7 +141,8 @@ public class CallbackService {
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, callbackType, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {
-            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(),
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", callbackUrlValidator.sanitizeUrl(url),
+                caseDetails.getCaseTypeId(),
                 caseEvent.getId());
             return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
         });
@@ -136,8 +152,8 @@ public class CallbackService {
                                                         final CallbackType callbackType,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
-
-        HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
+        callbackUrlValidator.validateCallbackUrl(url);
+        final String safeUrl = callbackUrlValidator.sanitizeUrl(url);
 
         CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
         int httpStatus = 0;
@@ -146,18 +162,16 @@ public class CallbackService {
         try {
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
+            httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
             addPassThroughHeaders(httpHeaders);
-            if (null != securityHeaders) {
-                httpHeaders.putAll(securityHeaders);
-            }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
-                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType,
+                LOG.info("Invoking callback {} of type {} with request: {}", safeUrl, callbackType,
                     printCallbackDetails(requestEntity));
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (logCallbackDetails(url)) {
-                LOG.info("Callback {} response received: {}", url, printCallbackDetails(responseEntity));
+                LOG.info("Callback {} response received: {}", safeUrl, printCallbackDetails(responseEntity));
             }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
@@ -166,7 +180,7 @@ public class CallbackService {
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
-                url, e.getClass().getSimpleName(), e.getMessage());
+                safeUrl, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
                 httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
@@ -174,7 +188,7 @@ public class CallbackService {
             return Optional.empty();
         } finally {
             Duration duration = Duration.between(startTime, Instant.now());
-            appinsights.trackCallbackEvent(callbackType, url, String.valueOf(httpStatus), duration);
+            appinsights.trackCallbackEvent(callbackType, safeUrl, String.valueOf(httpStatus), duration);
         }
     }
 
@@ -208,8 +222,14 @@ public class CallbackService {
         if (null != request && null != applicationParams
             && null != applicationParams.getCallbackPassthruHeaderContexts()) {
             applicationParams.getCallbackPassthruHeaderContexts().stream()
+                .filter(this::isAllowedPassThroughHeader)
                 .forEach(context -> addPassThruContextValuesToHttpHeaders(httpHeaders, context));
         }
+    }
+
+    private boolean isAllowedPassThroughHeader(String headerName) {
+        return StringUtils.hasLength(headerName)
+            && SENSITIVE_HEADERS.stream().noneMatch(sensitive -> sensitive.equalsIgnoreCase(headerName));
     }
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {

@@ -49,17 +49,19 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CallbackServiceTest {
 
-    public static final String URL = "/test-callback.*";
+    public static final String URL = "https://localhost/test-callback";
     public static final CallbackType CALLBACK_TYPE = CallbackType.ABOUT_TO_START;
     @Mock
     private SecurityUtils securityUtils;
@@ -79,6 +81,8 @@ class CallbackServiceTest {
     private Jwt principal;
     @Mock
     private ObjectMapper objectMapper;
+    @Mock
+    private CallbackUrlValidator callbackUrlValidator;
 
     @Captor
     private ArgumentCaptor<HttpEntity> argument;
@@ -149,12 +153,42 @@ class CallbackServiceTest {
 
         initSecurityContext();
         callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights, request,
-            objectMapper);
+            objectMapper, callbackUrlValidator);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate
             .exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
             .thenReturn(responseEntity);
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("localhost"));
+        when(applicationParams.getCcdCallbackLogControl()).thenReturn(List.of());
+        when(callbackUrlValidator.sanitizeUrl(URL)).thenReturn(URL);
+        when(callbackUrlValidator.sanitizeUrl("https://evil.example.com/callback"))
+            .thenReturn("https://evil.example.com/callback");
+        when(callbackUrlValidator.sanitizeUrl("http://trusted.example.com/callback"))
+            .thenReturn("http://trusted.example.com/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://localhost/callback"))
+            .thenReturn("https://localhost/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://[fd00::1]/callback"))
+            .thenReturn("https://[fd00::1]/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://user:pass@localhost/callback"))
+            .thenReturn("https://localhost/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://evil.example.com/callback?token=secret-value"))
+            .thenReturn("https://evil.example.com/callback");
+
+        doThrow(new CallbackException("Callback URL host is not allowlisted: evil.example.com"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://evil.example.com/callback");
+        doThrow(new CallbackException("Callback URL scheme is not permitted: http"))
+            .when(callbackUrlValidator).validateCallbackUrl("http://trusted.example.com/callback");
+        doThrow(new CallbackException("Callback URL resolves to a private or local network address: localhost"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://localhost/callback");
+        doThrow(new CallbackException("Callback URL resolves to a private or local network address: fd00::1"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://[fd00::1]/callback");
+        doThrow(new CallbackException("Callback URL must not include credentials: https://localhost/callback"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://user:pass@localhost/callback");
+        doThrow(new CallbackException("Callback URL host is not allowlisted: evil.example.com"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://evil.example.com/callback?token=secret-value");
 
         logger = (Logger) LoggerFactory.getLogger(CallbackService.class);
         listAppender = new ListAppender<>();
@@ -192,6 +226,101 @@ class CallbackServiceTest {
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));
+    }
+
+    @Test
+    @DisplayName("Should not forward sensitive security headers to callback")
+    void shouldNotForwardSensitiveSecurityHeadersToCallback() throws Exception {
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, false);
+
+        verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+        HttpHeaders headers = argument.getValue().getHeaders();
+        assertTrue(headers.containsKey(SecurityUtils.SERVICE_AUTHORIZATION));
+        assertFalse(headers.containsKey(HttpHeaders.AUTHORIZATION));
+        assertFalse(headers.containsKey("user-id"));
+        assertFalse(headers.containsKey("user-roles"));
+    }
+
+    @Test
+    @DisplayName("Should reject callback URL when host not allowlisted")
+    void shouldRejectCallbackHostWhenNotAllowlisted() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("trusted.example.com"));
+
+        assertThrows(CallbackException.class, () ->
+            callbackService.send("https://evil.example.com/callback", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should reject callback URL when non-https host not in approved HTTP host list")
+    void shouldRejectHttpCallbackHostWhenNotApproved() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(List.of("localhost"));
+
+        assertThrows(CallbackException.class, () ->
+            callbackService.send("http://trusted.example.com/callback", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should reject callback URL when resolving to localhost and private hosts are not approved")
+    void shouldRejectLocalhostCallbackWhenPrivateHostNotApproved() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("trusted.example.com"));
+
+        assertThrows(CallbackException.class, () ->
+            callbackService.send("https://localhost/callback", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should reject callback URL when host is IPv6 unique local address")
+    void shouldRejectIpv6UlaCallbackWhenPrivateHostNotApproved() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("trusted.example.com"));
+
+        CallbackException callbackException = assertThrows(CallbackException.class, () ->
+            callbackService.send("https://[fd00::1]/callback", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+
+        assertTrue(callbackException.getMessage().contains("private or local network address"));
+    }
+
+    @Test
+    @DisplayName("Should reject callback URL when it includes embedded credentials")
+    void shouldRejectCallbackUrlWithEmbeddedCredentials() {
+        assertThrows(CallbackException.class, () ->
+            callbackService.send("https://user:pass@localhost/callback", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+    }
+
+    @Test
+    @DisplayName("Should redact callback URL query from validation exception message")
+    void shouldRedactCallbackUrlQueryFromValidationException() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("trusted.example.com"));
+
+        CallbackException callbackException = assertThrows(CallbackException.class, () ->
+            callbackService.send("https://evil.example.com/callback?token=secret-value", CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
+
+        assertFalse(callbackException.getMessage().contains("secret-value"));
+    }
+
+    @Test
+    @DisplayName("Should allow callback URL when host is allowlisted and HTTPS")
+    void shouldAllowAllowlistedHttpsHost() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("localhost"));
+
+        assertThatNoException().isThrownBy(() ->
+            callbackService.send(URL, CALLBACK_TYPE,
+                caseEventDefinition, null, caseDetails, false)
+        );
     }
 
     @Test
@@ -300,6 +429,25 @@ class CallbackServiceTest {
         assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+    }
+
+    @Test
+    @DisplayName("Should block sensitive callback passthru header contexts")
+    void shouldBlockSensitiveCallbackPassthruHeaderContexts() {
+        List<String> customHeaders = List.of("Client-Context", "Authorization", "user-id", "ServiceAuthorization");
+        when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
+        when(request.getHeader("Client-Context")).thenReturn("{ctx:true}");
+        when(request.getHeader("Authorization")).thenReturn("Bearer leaked");
+        when(request.getHeader("user-id")).thenReturn("u123");
+        when(request.getHeader("ServiceAuthorization")).thenReturn("s2s-token");
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        callbackService.addPassThroughHeaders(httpHeaders);
+
+        assertTrue(httpHeaders.containsKey("Client-Context"));
+        assertFalse(httpHeaders.containsKey("Authorization"));
+        assertFalse(httpHeaders.containsKey("user-id"));
+        assertFalse(httpHeaders.containsKey("ServiceAuthorization"));
     }
 
     @Test
