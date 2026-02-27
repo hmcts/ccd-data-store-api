@@ -603,6 +603,7 @@ jacocoTestReport {
     }
 
     doLast {
+        logger.lifecycle("JaCoCo HTML report: file://${buildDir}/reports/jacoco/test/html/index.html")
         def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 

@@ -28,8 +28,10 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -69,6 +71,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -655,6 +658,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         ObjectNode objectNode = createBasicDoc();
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(buildDocumentCaseField("dataKey1")));
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
         doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
@@ -674,6 +678,16 @@ class CreateCaseEventServiceTest extends TestFixtures {
             assertTrue(node.has(UPLOAD_TIMESTAMP));
         });
         assertEquals(1, countChanges.get());
+    }
+
+    private CaseFieldDefinition buildDocumentCaseField(String id) {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(FieldTypeDefinition.DOCUMENT);
+        fieldTypeDefinition.setRegularExpression(".pdf,.docx,.html,.htm");
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(id);
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        return caseFieldDefinition;
     }
 
     @Test
