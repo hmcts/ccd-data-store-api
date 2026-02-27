@@ -10,10 +10,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -42,11 +44,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
+    private final CallbackUrlValidator callbackUrlValidator;
 
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams,
-                                           final DefinitionStoreClient definitionStoreClient) {
+                                           final DefinitionStoreClient definitionStoreClient,
+                                           final CallbackUrlValidator callbackUrlValidator) {
         this.applicationParams = applicationParams;
         this.definitionStoreClient = definitionStoreClient;
+        this.callbackUrlValidator = callbackUrlValidator;
     }
 
     /**
@@ -57,9 +62,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
-            return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeGetRequest(
+            List<CaseTypeDefinition> caseTypeDefinitions = Arrays.asList(Objects.requireNonNull(definitionStoreClient
+                .invokeGetRequest(
                 applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
                 CaseTypeDefinition[].class).getBody()));
+            caseTypeDefinitions.forEach(this::validateCaseTypeCallbackUrls);
+            return caseTypeDefinitions;
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
@@ -89,6 +97,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (caseTypeDefinition != null) {
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+                validateCaseTypeCallbackUrls(caseTypeDefinition);
             }
             return caseTypeDefinition;
 
@@ -237,6 +246,33 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return jurisdictionDefinitions.stream()
                 .flatMap(jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()).distinct()
                 .collect(Collectors.toList());
+    }
+
+    private void validateCaseTypeCallbackUrls(CaseTypeDefinition caseTypeDefinition) {
+        if (caseTypeDefinition == null) {
+            return;
+        }
+        validateCallbackUrlIfPresent(caseTypeDefinition.getCallbackGetCaseUrl());
+        if (caseTypeDefinition.getEvents() != null) {
+            for (CaseEventDefinition eventDefinition : caseTypeDefinition.getEvents()) {
+                validateEventCallbackUrls(eventDefinition);
+            }
+        }
+    }
+
+    private void validateEventCallbackUrls(CaseEventDefinition eventDefinition) {
+        if (eventDefinition == null) {
+            return;
+        }
+        validateCallbackUrlIfPresent(eventDefinition.getCallBackURLAboutToStartEvent());
+        validateCallbackUrlIfPresent(eventDefinition.getCallBackURLAboutToSubmitEvent());
+        validateCallbackUrlIfPresent(eventDefinition.getCallBackURLSubmittedEvent());
+    }
+
+    private void validateCallbackUrlIfPresent(String callbackUrl) {
+        if (StringUtils.isNotBlank(callbackUrl)) {
+            callbackUrlValidator.validateCallbackUrl(callbackUrl);
+        }
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {

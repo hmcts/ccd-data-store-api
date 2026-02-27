@@ -69,7 +69,7 @@ To get your micro-service authorised, please raise a ticket with CCD.
 
 ## Callback security hardening
 
-Event callback URLs are validated before outbound requests are sent. This is required to reduce SSRF and token leakage risk when callback URLs originate from case definition data.
+Event callback URLs are validated both at definition ingestion/read-time and again before outbound requests are sent (defense in depth). This is required to reduce SSRF and token leakage risk when callback URLs originate from case definition data.
 
 ### Objective
 
@@ -78,6 +78,7 @@ Prevent untrusted callback destinations from being invoked and prevent sensitive
 - Callback hosts must be allowlisted (`CCD_CALLBACK_ALLOWED_HOSTS`).
 - Callback URLs must use `https` unless the host is explicitly approved for `http` (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
 - Callback hosts that resolve to local/private ranges are blocked unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Callback URLs with embedded credentials are rejected (`https://user:pass@host/...`).
 - Sensitive inbound/user headers are not forwarded to callbacks (`Authorization`, `ServiceAuthorization`, `user-id`, `user-roles`).
 
 ### Service rollout checklist
@@ -89,5 +90,6 @@ After enabling callback hardening, service teams should:
    - `CCD_CALLBACK_ALLOWED_HOSTS`
    - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
    - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
-3. Re-run callback integration tests and verify expected callback hosts are accepted.
-4. Update alerting/log triage rules to use redacted callback URL output (query and credentials are not logged).
+3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
+4. Re-run callback integration tests and verify expected callback hosts are accepted.
+5. Update alerting/log triage rules to use redacted callback URL output (query and credentials are not logged).

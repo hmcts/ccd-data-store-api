@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,6 +81,8 @@ class CallbackServiceTest {
     private Jwt principal;
     @Mock
     private ObjectMapper objectMapper;
+    @Mock
+    private CallbackUrlValidator callbackUrlValidator;
 
     @Captor
     private ArgumentCaptor<HttpEntity> argument;
@@ -150,7 +153,7 @@ class CallbackServiceTest {
 
         initSecurityContext();
         callbackService = new CallbackService(securityUtils, restTemplate, applicationParams, appinsights, request,
-            objectMapper);
+            objectMapper, callbackUrlValidator);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate
@@ -160,6 +163,32 @@ class CallbackServiceTest {
         when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(List.of("*"));
         when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("localhost"));
         when(applicationParams.getCcdCallbackLogControl()).thenReturn(List.of());
+        when(callbackUrlValidator.sanitizeUrl(URL)).thenReturn(URL);
+        when(callbackUrlValidator.sanitizeUrl("https://evil.example.com/callback"))
+            .thenReturn("https://evil.example.com/callback");
+        when(callbackUrlValidator.sanitizeUrl("http://trusted.example.com/callback"))
+            .thenReturn("http://trusted.example.com/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://localhost/callback"))
+            .thenReturn("https://localhost/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://[fd00::1]/callback"))
+            .thenReturn("https://[fd00::1]/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://user:pass@localhost/callback"))
+            .thenReturn("https://localhost/callback");
+        when(callbackUrlValidator.sanitizeUrl("https://evil.example.com/callback?token=secret-value"))
+            .thenReturn("https://evil.example.com/callback");
+
+        doThrow(new CallbackException("Callback URL host is not allowlisted: evil.example.com"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://evil.example.com/callback");
+        doThrow(new CallbackException("Callback URL scheme is not permitted: http"))
+            .when(callbackUrlValidator).validateCallbackUrl("http://trusted.example.com/callback");
+        doThrow(new CallbackException("Callback URL resolves to a private or local network address: localhost"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://localhost/callback");
+        doThrow(new CallbackException("Callback URL resolves to a private or local network address: fd00::1"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://[fd00::1]/callback");
+        doThrow(new CallbackException("Callback URL must not include credentials: https://localhost/callback"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://user:pass@localhost/callback");
+        doThrow(new CallbackException("Callback URL host is not allowlisted: evil.example.com"))
+            .when(callbackUrlValidator).validateCallbackUrl("https://evil.example.com/callback?token=secret-value");
 
         logger = (Logger) LoggerFactory.getLogger(CallbackService.class);
         listAppender = new ListAppender<>();

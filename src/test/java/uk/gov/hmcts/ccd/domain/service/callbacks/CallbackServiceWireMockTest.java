@@ -483,9 +483,10 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             .willThrow(new RestClientException("Fail to process"));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
+        final CallbackUrlValidator callbackUrlValidator = new CallbackUrlValidator(applicationParams);
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
             applicationParams, Mockito.mock(AppInsights.class),
-            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class));
+            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class), callbackUrlValidator);
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
