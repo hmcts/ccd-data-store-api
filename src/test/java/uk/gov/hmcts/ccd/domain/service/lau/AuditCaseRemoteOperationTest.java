@@ -35,7 +35,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -94,7 +93,7 @@ class AuditCaseRemoteOperationTest {
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
-        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
+        auditCaseRemoteOperation = new AuditCaseRemoteOperation(feignClient,
             auditCaseRemoteConfiguration);
     }
 
@@ -113,10 +112,10 @@ class AuditCaseRemoteOperationTest {
         // Verify asyncRequestService interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture())
+            verify(feignClient).postCaseAction(requestCaptor.capture())
         );
         // Verify headers and endpoint
-        verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
+        verify(feignClient).postCaseAction(any(CaseActionPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
 
         // Assert the captured request
@@ -147,9 +146,9 @@ class AuditCaseRemoteOperationTest {
         // Verify FeignClient interaction
         ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture())
+            verify(feignClient).postCaseSearch(requestCaptor.capture())
         );
-        verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
+        verify(feignClient).postCaseSearch(any(CaseSearchPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
 
         // Assert the captured request
@@ -186,13 +185,13 @@ class AuditCaseRemoteOperationTest {
 
         // Simulate exception in FeignClient
         doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+            .postCaseAction(any(CaseActionPostRequest.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class))
+            verify(feignClient).postCaseAction(any(CaseActionPostRequest.class))
         );
     }
 
@@ -208,13 +207,13 @@ class AuditCaseRemoteOperationTest {
 
         // Simulate exception in FeignClient
         doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+            .postCaseSearch(any(CaseSearchPostRequest.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class))
+            verify(feignClient).postCaseSearch(any(CaseSearchPostRequest.class))
         );
     }
 
