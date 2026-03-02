@@ -8,8 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -40,11 +41,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
+@ExtendWith(MockitoExtension.class)
 class CaseSearchEndpointTest {
 
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
     private static final String GLOBAL_INDEX = "global_index";
+    private static final String INDEX_TYPE_DOC = "_doc";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -60,12 +63,10 @@ class CaseSearchEndpointTest {
 
     private CaseSearchEndpoint endpoint;
 
-    private CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        crossCaseTypeSearchRequestHelper = new CrossCaseTypeSearchRequestHelper(applicationParams);
+        CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper
+            = new CrossCaseTypeSearchRequestHelper(applicationParams);
         endpoint = new CaseSearchEndpoint(caseSearchOperation, userRepository,
              elasticsearchQueryHelper, crossCaseTypeSearchRequestHelper);
     }
@@ -75,6 +76,10 @@ class CaseSearchEndpointTest {
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(null, null, true)
         );
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenCaseTypeListIsNullAndGlobalTrue() {
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(null, null, true, true)
         );
@@ -86,6 +91,11 @@ class CaseSearchEndpointTest {
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(emptyList, null, true)
         );
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenCaseTypeListIsEmptyAndGlobalTrue() {
+        List<String> emptyList = List.of();
         assertThrows(BadRequestException.class, () ->
             endpoint.searchCases(emptyList, null, true, true)
         );
@@ -125,7 +135,7 @@ class CaseSearchEndpointTest {
 
         // ARRANGE
         when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
-        when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
+        when(applicationParams.getGlobalSearchIndexType()).thenReturn(INDEX_TYPE_DOC);
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
@@ -141,9 +151,10 @@ class CaseSearchEndpointTest {
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getSearchIndex().isPresent(), is(true));
             SearchIndex idx = crossCaseTypeSearchRequest.getSearchIndex().get();
             assertThat(idx.getIndexName(), is(GLOBAL_INDEX));
-            assertThat(idx.getIndexType(), is("_doc"));
+            assertThat(idx.getIndexType(), is(INDEX_TYPE_DOC));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
@@ -185,45 +196,10 @@ class CaseSearchEndpointTest {
     }
 
     @Test
-    void searchCases_usesGlobalIndexWhenGlobalTrue() throws Exception {
-        // ARRANGE
-        when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
-        when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
-
-        String searchRequest = "{\"query\": {\"match\": {\"reference\": {\"query\": \"123\"}}}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
-        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
-
-        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
-
-        CaseSearchResult expected = mock(CaseSearchResult.class);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(expected);
-
-        List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
-
-        // ACT
-        CaseSearchResult actual = endpoint.searchCases(caseTypeIds, searchRequest, true, true);
-
-        // ASSERT
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
-        verify(caseSearchOperation).execute(argThat(req -> {
-            assertThat(req.getSearchRequestJsonNode(), is(searchRequestNode));
-            // uses provided case type list
-            assertThat(req.getCaseTypeIds(), is(List.of(CASE_TYPE_ID)));
-            // points to global index
-            SearchIndex idx = req.getSearchIndex().get();
-            assertThat(idx.getIndexName(), is("global_index"));
-            assertThat(idx.getIndexType(), is("_doc"));
-            return true;
-        }), eq(true));
-        assertThat(actual, is(expected));
-    }
-
-    @Test
     void searchCases_globalTrueAndWildcardExpandsCaseTypes() throws Exception {
         // ARRANGE
         when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
-        when(applicationParams.getGlobalSearchIndexType()).thenReturn("_doc");
+        when(applicationParams.getGlobalSearchIndexType()).thenReturn(INDEX_TYPE_DOC);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
@@ -250,8 +226,8 @@ class CaseSearchEndpointTest {
             assertThat(req.getCaseTypeIds(), is(List.of(CASE_TYPE_ID, CASE_TYPE_ID_2)));
             // global index is selected
             SearchIndex idx = req.getSearchIndex().get();
-            assertThat(idx.getIndexName(), is("global_index"));
-            assertThat(idx.getIndexType(), is("_doc"));
+            assertThat(idx.getIndexName(), is(GLOBAL_INDEX));
+            assertThat(idx.getIndexType(), is(INDEX_TYPE_DOC));
             return true;
         }), eq(true));
         assertThat(actual, is(expected));
