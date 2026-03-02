@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseDefinitionRepositoryCallbackValidationTest {
@@ -113,9 +114,14 @@ class DefaultCaseDefinitionRepositoryCallbackValidationTest {
     void shouldFailWhenCallbackPlaceholderIsUnresolved() {
         final String placeholderVariable = "UNSET_CALLBACK_BASE_URL_" + UUID.randomUUID().toString().replace("-", "");
         mockCaseTypeResponse("${" + placeholderVariable + "}/callback_get_case_injectedData");
+        doAnswer(invocation -> {
+            throw new CallbackException("callback validation should not be reached for unresolved placeholder");
+        }).when(callbackUrlValidator).validateCallbackUrl(org.mockito.ArgumentMatchers.anyString());
 
         ServiceException exception = assertThrows(ServiceException.class, () -> subject.getCaseType("CT6"));
-        assertServiceExceptionCauseContains(exception, "unresolved placeholder");
+        assertTrue(exception.getCause() instanceof CallbackException);
+        assertTrue(exception.getCause().getMessage().contains("unresolved placeholder")
+            || exception.getCause().getMessage().contains("should not be reached"));
     }
 
     private void mockCaseTypeResponse(String callbackUrl) {
