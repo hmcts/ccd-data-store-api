@@ -4,9 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
+import java.net.InetAddress;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -90,5 +92,89 @@ class CallbackUrlValidatorTest {
     @Test
     void shouldFailWhenHostCannotBeResolved() {
         assertThrows(CallbackException.class, () -> subject.validateCallbackUrl("https://nonexistent.invalid/x"));
+    }
+
+    @Test
+    void shouldAllowWhenHostAllowlistContainsWildcard() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(List.of("*"));
+        when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("*"));
+
+        assertDoesNotThrow(() -> subject.validateCallbackUrl("http://localhost/x"));
+        assertDoesNotThrow(() -> subject.validateCallbackUrl("https://example.com/x"));
+    }
+
+    @Test
+    void shouldRejectWhenAllowlistIsNull() {
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(null);
+        assertThrows(CallbackException.class, () -> subject.validateCallbackUrl("https://localhost/x"));
+    }
+
+    @Test
+    void shouldRejectWhenSchemeMissing() {
+        assertThrows(CallbackException.class, () -> subject.validateCallbackUrl("localhost/path"));
+    }
+
+    @Test
+    void shouldSanitizeValidUrlWithoutQueryAndCredentials() {
+        String sanitized = subject.sanitizeUrl("https://user:pass@example.com:8443/path?q=1");
+        assertTrue(sanitized.startsWith("https://example.com:8443/path"));
+        assertFalse(sanitized.contains("user:pass"));
+        assertFalse(sanitized.contains("?q=1"));
+    }
+
+    @Test
+    void shouldClassifyIpv6UlaAsPrivate() throws Exception {
+        InetAddress ula = InetAddress.getByAddress(new byte[] {
+            (byte) 0xfd, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+        });
+
+        boolean isPrivate = (Boolean) ReflectionTestUtils.invokeMethod(subject, "isPrivateOrLocal", ula);
+        assertTrue(isPrivate);
+    }
+
+    @Test
+    void shouldClassifyMetadataEndpointAsPrivate() throws Exception {
+        InetAddress metadata = InetAddress.getByName("169.254.169.254");
+
+        boolean isPrivate = (Boolean) ReflectionTestUtils.invokeMethod(subject, "isPrivateOrLocal", metadata);
+        assertTrue(isPrivate);
+    }
+
+    @Test
+    void shouldReturnFalseWhenHostMissingOrAllowlistNull() {
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "isAllowedHost", "", List.of("*")));
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "isAllowedHost", "example.com", null));
+    }
+
+    @Test
+    void shouldMatchAllowlistWildcardDirectly() {
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "any.host", "*"));
+    }
+
+    @Test
+    void shouldResolvePublicAddressAsNonPrivate() {
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "resolvesToPrivateAddress", "8.8.8.8"));
+    }
+
+    @Test
+    void shouldThrowWhenHostResolutionFailsInPrivateAddressCheck() {
+        CallbackException exception = assertThrows(CallbackException.class,
+            () -> ReflectionTestUtils.invokeMethod(subject, "resolvesToPrivateAddress", "%%%"));
+        assertTrue(exception.getMessage().contains("Unable to resolve callback host"));
+    }
+
+    @Test
+    void shouldEvaluateMetadataEndpointClauseWhenEarlierChecksAreFalse() {
+        InetAddress address = Mockito.mock(InetAddress.class);
+        when(address.isAnyLocalAddress()).thenReturn(false);
+        when(address.isLoopbackAddress()).thenReturn(false);
+        when(address.isLinkLocalAddress()).thenReturn(false);
+        when(address.isSiteLocalAddress()).thenReturn(false);
+        when(address.isMulticastAddress()).thenReturn(false);
+        when(address.getHostAddress()).thenReturn("169.254.169.254");
+
+        boolean isPrivate = (Boolean) ReflectionTestUtils.invokeMethod(subject, "isPrivateOrLocal", address);
+        assertTrue(isPrivate);
     }
 }
