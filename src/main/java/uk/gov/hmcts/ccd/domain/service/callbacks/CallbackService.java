@@ -57,7 +57,8 @@ public class CallbackService {
     private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
         = "Unable to proceed because there are one or more callback Errors or Warnings";
     private static final Pattern SENSITIVE_JSON_FIELD_PATTERN = Pattern.compile(
-        "(?i)\"(authorization|serviceauthorization|user-id|user-roles|token|access_token|refresh_token|password|secret)\"\\s*:\\s*\"[^\"]*\"");
+        "(?i)\"(authorization|serviceauthorization|user-id|user-roles|token|access_token|refresh_token|"
+            + "password|secret)\"\\s*:\\s*\"[^\"]*\"");
     private static final Pattern BEARER_TOKEN_PATTERN = Pattern.compile("(?i)Bearer\\s+[A-Za-z0-9._\\-+/=]+");
 
     private final SecurityUtils securityUtils;
