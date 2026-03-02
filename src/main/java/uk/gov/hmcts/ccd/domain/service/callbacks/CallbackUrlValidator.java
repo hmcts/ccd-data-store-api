@@ -19,6 +19,7 @@ public class CallbackUrlValidator {
     private static final String HTTPS_SCHEME = "https";
     private static final String HTTP_SCHEME = "http";
     // Cloud instance metadata endpoint; explicitly blocked to prevent SSRF credential exfiltration.
+    @SuppressWarnings("java:S1313")
     private static final String METADATA_ENDPOINT = "169.254.169.254";
 
     private final ApplicationParams applicationParams;

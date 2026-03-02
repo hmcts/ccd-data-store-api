@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Mockito;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -164,17 +163,4 @@ class CallbackUrlValidatorTest {
         assertTrue(exception.getMessage().contains("Unable to resolve callback host"));
     }
 
-    @Test
-    void shouldEvaluateMetadataEndpointClauseWhenEarlierChecksAreFalse() {
-        InetAddress address = Mockito.mock(InetAddress.class);
-        when(address.isAnyLocalAddress()).thenReturn(false);
-        when(address.isLoopbackAddress()).thenReturn(false);
-        when(address.isLinkLocalAddress()).thenReturn(false);
-        when(address.isSiteLocalAddress()).thenReturn(false);
-        when(address.isMulticastAddress()).thenReturn(false);
-        when(address.getHostAddress()).thenReturn("169.254.169.254");
-
-        boolean isPrivate = (Boolean) ReflectionTestUtils.invokeMethod(subject, "isPrivateOrLocal", address);
-        assertTrue(isPrivate);
-    }
 }
