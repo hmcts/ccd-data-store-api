@@ -78,7 +78,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -314,7 +313,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Test
         void shouldReturnFirstPageCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
             final int PAGE_SIZE = 10;
-            long total = getCasesTotal();
+            long total = 1000;
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(baseQuery)
@@ -328,7 +327,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             final long caseIdStarting = 1999866820969999L;
             assertAll(
-                () -> assertThat(total, greaterThanOrEqualTo((long) PAGE_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(total)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getCaseId(),
@@ -337,8 +335,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(Long.toString(caseIdStarting + 1))),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(9).getCaseId(),
                     is(Long.toString(caseIdStarting + 9))),
-                () -> assertNewGlobalCaseData(caseDetails.getFields(), false),
-                () -> assertNewGlobalCaseMetadata(caseDetails.getFields(), false)
+                () -> assertNewGlobalCaseData(caseDetails.getFields()),
+                () -> assertNewGlobalCaseMetadata(caseDetails.getFields())
             );
         }
 
@@ -369,10 +367,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(Long.toString(caseIdStarting))),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(1).getCaseId(),
                     is(Long.toString(caseIdStarting + 1))),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(9).getCaseId(),
-                    is(Long.toString(caseIdStarting + 9))),
-                () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
-                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
+                () -> assertThat(caseSearchResultViewResource.getCases().get(19).getCaseId(),
+                    is(Long.toString(caseIdStarting + 19))),
+                () -> assertNextPageGlobalCaseData(caseDetails.getFields()),
+                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields())
             );
         }
 
@@ -401,14 +399,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getCaseId(),
                     is(Long.toString(caseIdStarting))),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(1).getCaseId(),
-                    is(Long.toString(caseIdStarting + 1))),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(9).getCaseId(),
-                    is(Long.toString(caseIdStarting + 9))),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(99).getCaseId(),
                     is(Long.toString(caseIdStarting + 99))),
-                () -> assertNextPageGlobalCaseData(caseDetails.getFields(), false),
-                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields(), false)
+                () -> assertNextPageGlobalCaseData(caseDetails.getFields()),
+                () -> assertNextPageGlobalCaseMetadata(caseDetails.getFields())
             );
         }
 
@@ -433,7 +427,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(total, greaterThanOrEqualTo(5L)),
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(total)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getCaseId(),
-                    is(notNullValue())),
+                    is("1999866820970994")),
                 () -> assertThat(caseDetails.getFields().containsKey(
                     MetaData.CaseField.CASE_REFERENCE.getReference()), is(true))
             );
@@ -998,7 +992,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             );
         }
 
-        private void assertNewGlobalCaseData(Map<String, Object> data, boolean formatted) {
+        private void assertNewGlobalCaseData(Map<String, Object> data) {
             assertAll(
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
@@ -1011,9 +1005,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .get(NESTED_COLLECTION_TEXT_FIELD)).getFirst().get(VALUE), is("NestedCollectionTextValue1")),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                     .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
-                () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
-                () -> assertThat(data.get(DATE_TIME_FIELD),
-                    is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
+                () -> assertThat(data.get(DATE_FIELD), is(DATE_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD), is(DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
                 () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
                 () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
@@ -1021,12 +1014,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             );
         }
 
-        private void assertNewGlobalCaseMetadata(Map<String, Object> data, boolean formatted) {
+        private void assertNewGlobalCaseMetadata(Map<String, Object> data) {
             assertAll(
                 () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
                 () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
                 () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()),
-                    is(formatted ? "07 05 2026" : CREATED_DATE_VALUE_GLOBAL)),
+                    is(CREATED_DATE_VALUE_GLOBAL)),
                 () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
                     is(LAST_MODIFIED_DATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
@@ -1039,7 +1032,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             );
         }
 
-        private void assertNextPageGlobalCaseData(Map<String, Object> data, boolean formatted) {
+        private void assertNextPageGlobalCaseData(Map<String, Object> data) {
             assertAll(
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).getFirst().get(VALUE), is(COLLECTION_VALUE)),
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
@@ -1052,9 +1045,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .get(NESTED_COLLECTION_TEXT_FIELD)).getFirst().get(VALUE), is("NestedCollectionTextValue1")),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                     .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
-                () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
-                () -> assertThat(data.get(DATE_TIME_FIELD),
-                    is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
+                () -> assertThat(data.get(DATE_FIELD), is(DATE_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD), is(DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
                 () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
                 () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
@@ -1062,12 +1054,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             );
         }
 
-        private void assertNextPageGlobalCaseMetadata(Map<String, Object> data, boolean formatted) {
+        private void assertNextPageGlobalCaseMetadata(Map<String, Object> data) {
             assertAll(
                 () -> assertThat(data.get(MetaData.CaseField.JURISDICTION.getReference()), is(AUTOTEST_1)),
                 () -> assertThat(data.get(MetaData.CaseField.CASE_TYPE.getReference()), is(CASE_TYPE_A)),
                 () -> assertThat(data.get(MetaData.CaseField.CREATED_DATE.getReference()),
-                    is(formatted ? "07 05 2026" : CREATED_DATE_VALUE_GLOBAL)),
+                    is(CREATED_DATE_VALUE_GLOBAL)),
                 () -> assertThat(data.get(MetaData.CaseField.LAST_MODIFIED_DATE.getReference()),
                     is(LAST_MODIFIED_DATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),

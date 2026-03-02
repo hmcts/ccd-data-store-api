@@ -58,13 +58,6 @@ public class CaseSearchEndpoint {
         this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
     }
 
-    public CaseSearchResult searchCases(List<String> caseTypeIds,
-                                        String jsonSearchRequest,
-                                        boolean dataClassification) {
-        log.debug("searchCases no global parameter specified");
-        return searchCases(caseTypeIds, jsonSearchRequest, dataClassification, false);
-    }
-
     @PostMapping(value = "/searchCases")
     @Operation(description = "Search cases according to the provided ElasticSearch query. "
         + "Supports searching across multiple case types.")

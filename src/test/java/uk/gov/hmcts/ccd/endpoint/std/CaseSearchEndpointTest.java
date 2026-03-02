@@ -74,7 +74,7 @@ class CaseSearchEndpointTest {
     @Test
     void shouldThrowBadRequestExceptionWhenCaseTypeListIsNull() {
         assertThrows(BadRequestException.class, () ->
-            endpoint.searchCases(null, null, true)
+            endpoint.searchCases(null, null, true, false)
         );
     }
 
@@ -89,7 +89,7 @@ class CaseSearchEndpointTest {
     void shouldThrowBadRequestExceptionWhenCaseTypeListIsEmpty() {
         List<String> emptyList = List.of();
         assertThrows(BadRequestException.class, () ->
-            endpoint.searchCases(emptyList, null, true)
+            endpoint.searchCases(emptyList, null, true, false)
         );
     }
 
@@ -114,7 +114,7 @@ class CaseSearchEndpointTest {
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
         // ACT
-        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true, false);
 
         // ASSERT
         verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);

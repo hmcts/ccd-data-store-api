@@ -36,6 +36,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
@@ -85,7 +86,7 @@ class UICaseSearchControllerTest {
         when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
-            .searchCases(CASE_TYPE_ID, WORKBASKET, searchRequest);
+            .searchCases(CASE_TYPE_ID, WORKBASKET, false, searchRequest);
 
         verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
@@ -98,6 +99,8 @@ class UICaseSearchControllerTest {
         }), anyBoolean());
         verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
             eq(Collections.emptyList()));
+        verify(applicationParams, never()).getGlobalSearchIndexName();
+        verify(applicationParams, never()).getGlobalSearchIndexType();
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),

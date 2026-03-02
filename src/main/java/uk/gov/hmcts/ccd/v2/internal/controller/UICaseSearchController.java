@@ -74,19 +74,6 @@ public class UICaseSearchController {
         this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
     }
 
-    public ResponseEntity<CaseSearchResultViewResource> searchCases(
-        @Parameter(name = "Case type ID for search.", required = true)
-        @RequestParam(value = "ctid") String caseTypeId,
-        @Parameter(name = "Use case for search. Examples include `WORKBASKET`, `SEARCH` "
-            + "or `orgCases`. Used when the list of fields to return is configured in the "
-            + "CCD definition.\nIf omitted, all case fields are returned.")
-        @RequestParam(value = "use_case", required = false) final String useCase,
-        @RequestBody String jsonSearchRequest) {
-
-        log.debug("searchCases no global parameter specified");
-        return searchCases(caseTypeId, useCase, false, jsonSearchRequest);
-    }
-
     @PostMapping(path = "")
     @Operation(
         description = "Search cases according to the provided ElasticSearch query. Supports searching a single"
