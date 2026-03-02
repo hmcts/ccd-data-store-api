@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -50,17 +51,29 @@ public class ElasticsearchITSetup {
     }
 
     private void waitForClusterYellow(int tries) {
-        for (int i = 0; i < 5; i++) {
+        long baseSleepMs = 250L;
+        for (int attempt = 0; attempt < tries; attempt++) {
             HttpGet request = new HttpGet(url("/_cluster/health?wait_for_status=yellow&timeout=50s"));
-            httpClient.execute(request, response -> {
-                    if (response.getStatusLine().getStatusCode() != 200) {
-                        Assertions.assertTrue(tries > 0,
-                            "Cluster does not reached yellow status in specified timeout");
-                        waitForClusterYellow(tries - 1);
-                    }
+            boolean ok = httpClient.execute(request, response -> {
+                EntityUtils.consumeQuietly(response.getEntity());
+                return response.getStatusLine().getStatusCode() == 200;
+            });
+            if (ok) {
+                log.info("Cluster is yellow");
+                return;
+            }
+            if (attempt < tries - 1) {
+                log.info("Cluster is NOI yellow, waiting for {}ms...", baseSleepMs);
+                long sleepMs = baseSleepMs * (1L << attempt);
+                try {
+                    Thread.sleep(sleepMs);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Assertions.fail("Interrupted while waiting for cluster to reach yellow status");
                 }
-            );
+            }
         }
+        Assertions.fail("Cluster did not reach yellow status within the specified timeout");
     }
 
     private String url(String path) {
