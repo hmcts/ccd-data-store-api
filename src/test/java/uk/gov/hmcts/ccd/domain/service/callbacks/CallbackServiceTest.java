@@ -410,6 +410,25 @@ class CallbackServiceTest {
     }
 
     @Test
+    @DisplayName("Should redact sensitive values in callback detail logs")
+    void shouldRedactSensitiveValuesInCallbackLogs() throws Exception {
+        doReturn(List.of("*")).when(applicationParams).getCcdCallbackLogControl();
+        when(objectMapper.writeValueAsString(any()))
+            .thenReturn("{\"Authorization\":\"Bearer secret-value\",\"token\":\"abc123\",\"password\":\"pw\"}");
+
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        String logs = listAppender.list.stream()
+            .map(ILoggingEvent::getFormattedMessage)
+            .reduce("", (a, b) -> a + "\n" + b);
+
+        assertTrue(logs.contains("<redacted>"));
+        assertFalse(logs.contains("secret-value"));
+        assertFalse(logs.contains("abc123"));
+        assertFalse(logs.contains("\"password\":\"pw\""));
+    }
+
+    @Test
     @DisplayName("Should add callback passthru headers from request header")
     void shouldAddCallbackPassthruHeadersFromRequestHeader() throws Exception {
         List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");

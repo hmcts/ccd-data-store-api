@@ -49,6 +49,7 @@ class DefaultCaseDefinitionRepositoryCoreTest {
     }
 
     @Test
+    @SuppressWarnings("java:S1874") // Intentional: verify behavior of deprecated path until removal.
     void shouldGetCaseTypesForJurisdictionAndValidateCallbacks() {
         when(applicationParams.jurisdictionCaseTypesDefURL("J1")).thenReturn("http://localhost/j1");
         CaseTypeDefinition ct = new CaseTypeDefinition();
@@ -68,6 +69,7 @@ class DefaultCaseDefinitionRepositoryCoreTest {
     }
 
     @Test
+    @SuppressWarnings("java:S1874") // Intentional: verify behavior of deprecated path until removal.
     void shouldThrowNotFoundForCaseTypesForJurisdiction() {
         when(applicationParams.jurisdictionCaseTypesDefURL("J1")).thenReturn("http://localhost/j1");
         doThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND))
@@ -77,6 +79,7 @@ class DefaultCaseDefinitionRepositoryCoreTest {
     }
 
     @Test
+    @SuppressWarnings("java:S1874") // Intentional: verify behavior of deprecated path until removal.
     void shouldThrowServiceExceptionForCaseTypesForJurisdiction() {
         when(applicationParams.jurisdictionCaseTypesDefURL("J1")).thenReturn("http://localhost/j1");
         doThrow(new RuntimeException("boom"))

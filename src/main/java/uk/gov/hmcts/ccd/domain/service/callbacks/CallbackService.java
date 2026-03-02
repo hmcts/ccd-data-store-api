@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -55,6 +56,9 @@ public class CallbackService {
     );
     private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
         = "Unable to proceed because there are one or more callback Errors or Warnings";
+    private static final Pattern SENSITIVE_JSON_FIELD_PATTERN = Pattern.compile(
+        "(?i)\"(authorization|serviceauthorization|user-id|user-roles|token|access_token|refresh_token|password|secret)\"\\s*:\\s*\"[^\"]*\"");
+    private static final Pattern BEARER_TOKEN_PATTERN = Pattern.compile("(?i)Bearer\\s+[A-Za-z0-9._\\-+/=]+");
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -164,12 +168,14 @@ public class CallbackService {
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             final boolean shouldLogCallbackDetails = LOG.isInfoEnabled() && logCallbackDetails(url);
             if (shouldLogCallbackDetails) {
+                String requestDetails = printCallbackDetails(requestEntity);
                 LOG.info("Invoking callback {} of type {} with request: {}", safeUrl, callbackType,
-                    printCallbackDetails(requestEntity));
+                    requestDetails);
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (shouldLogCallbackDetails) {
-                LOG.info("Callback {} response received: {}", safeUrl, printCallbackDetails(responseEntity));
+                String responseDetails = printCallbackDetails(responseEntity);
+                LOG.info("Callback {} response received: {}", safeUrl, responseDetails);
             }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
@@ -192,12 +198,21 @@ public class CallbackService {
 
     private String printCallbackDetails(HttpEntity<?> callbackHttpEntity) {
         try {
-            return objectMapper.writeValueAsString(callbackHttpEntity);
+            return redactSensitiveLogContent(objectMapper.writeValueAsString(callbackHttpEntity));
         } catch (Exception ex) {
             LOG.warn("Unexpected error while logging callback: {}", ex.getMessage());
         }
 
         return null;
+    }
+
+    private String redactSensitiveLogContent(String content) {
+        if (!StringUtils.hasLength(content)) {
+            return content;
+        }
+        String redacted = SENSITIVE_JSON_FIELD_PATTERN.matcher(content)
+            .replaceAll("\"$1\":\"<redacted>\"");
+        return BEARER_TOKEN_PATTERN.matcher(redacted).replaceAll("Bearer <redacted>");
     }
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,

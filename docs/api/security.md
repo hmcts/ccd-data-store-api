@@ -81,6 +81,7 @@ Prevent untrusted callback destinations from being invoked and prevent sensitive
 - Cloud instance metadata endpoint targets are explicitly blocked (for example `169.254.169.254`).
 - Callback URLs with embedded credentials are rejected (`https://user:pass@host/...`).
 - Sensitive inbound/user headers are not forwarded to callbacks (`Authorization`, `ServiceAuthorization`, `user-id`, `user-roles`).
+- Callback detail logging redacts sensitive values (for example auth/token/password/secret fields and bearer tokens).
 
 ### Service rollout checklist
 
@@ -93,4 +94,4 @@ After enabling callback hardening, service teams should:
    - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
 3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
 4. Re-run callback integration tests and verify expected callback hosts are accepted.
-5. Update alerting/log triage rules to use redacted callback URL output (query and credentials are not logged).
+5. Update alerting/log triage rules to use redacted callback logs (sensitive URL/auth/token/password values are masked).
