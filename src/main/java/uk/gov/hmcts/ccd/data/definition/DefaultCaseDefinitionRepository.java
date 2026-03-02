@@ -252,6 +252,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         if (caseTypeDefinition == null) {
             return;
         }
+        // Ingestion/read-time validation scope: case-level and event-level callback URLs from case definitions.
+        // WizardPage mid-event callback URLs are still validated at runtime by CallbackService before invocation.
         validateCallbackUrlIfPresent(caseTypeDefinition.getCallbackGetCaseUrl());
         if (caseTypeDefinition.getEvents() != null) {
             for (CaseEventDefinition eventDefinition : caseTypeDefinition.getEvents()) {

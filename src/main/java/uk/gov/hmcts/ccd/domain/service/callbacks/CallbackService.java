@@ -45,11 +45,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
-    private static final String WILDCARD = "*";
+    private static final String LOG_CONTROL_WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
-    private static final String HTTPS_SCHEME = "https";
-    private static final String HTTP_SCHEME = "http";
-    private static final String METADATA_ENDPOINT = "169.254.169.254";
     private static final List<String> SENSITIVE_HEADERS = List.of(
         HttpHeaders.AUTHORIZATION,
         SecurityUtils.SERVICE_AUTHORIZATION,
@@ -73,7 +70,7 @@ public class CallbackService {
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
                            HttpServletRequest request,
-                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+                           @Qualifier("defaultObjectMapper") ObjectMapper objectMapper,
                            CallbackUrlValidator callbackUrlValidator) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
@@ -165,12 +162,13 @@ public class CallbackService {
             httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
             addPassThroughHeaders(httpHeaders);
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-            if (logCallbackDetails(url)) {
+            final boolean shouldLogCallbackDetails = LOG.isInfoEnabled() && logCallbackDetails(url);
+            if (shouldLogCallbackDetails) {
                 LOG.info("Invoking callback {} of type {} with request: {}", safeUrl, callbackType,
                     printCallbackDetails(requestEntity));
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
-            if (logCallbackDetails(url)) {
+            if (shouldLogCallbackDetails) {
                 LOG.info("Callback {} response received: {}", safeUrl, printCallbackDetails(responseEntity));
             }
 
@@ -280,8 +278,9 @@ public class CallbackService {
     }
 
     private boolean logCallbackDetails(final String url) {
+        // Operational caution: when enabled, callback request/response payloads are logged for matching URLs.
         return (!applicationParams.getCcdCallbackLogControl().isEmpty()
-            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().getFirst())
+            && (LOG_CONTROL_WILDCARD.equals(applicationParams.getCcdCallbackLogControl().getFirst())
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
     }

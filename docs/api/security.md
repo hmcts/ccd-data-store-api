@@ -78,6 +78,7 @@ Prevent untrusted callback destinations from being invoked and prevent sensitive
 - Callback hosts must be allowlisted (`CCD_CALLBACK_ALLOWED_HOSTS`).
 - Callback URLs must use `https` unless the host is explicitly approved for `http` (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
 - Callback hosts that resolve to local/private ranges are blocked unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Cloud instance metadata endpoint targets are explicitly blocked (for example `169.254.169.254`).
 - Callback URLs with embedded credentials are rejected (`https://user:pass@host/...`).
 - Sensitive inbound/user headers are not forwarded to callbacks (`Authorization`, `ServiceAuthorization`, `user-id`, `user-roles`).
 

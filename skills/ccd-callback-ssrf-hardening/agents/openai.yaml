@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCD Callback SSRF Hardening"
+  short_description: "Secure CCD callbacks against SSRF and token leakage"
+  default_prompt: "Use ccd-callback-ssrf-hardening to audit and fix CCD event callback risks in hmcts/ccd-data-store-api: enforce callback URL validation in callback execution paths (host allowlist, HTTPS policy, private/local target blocking), prevent forwarding of Authorization/ServiceAuthorization/user-id/user-roles headers, update/add regression tests for hardened behavior, and ensure deployment/docs are updated for callback security settings (CCD_CALLBACK_ALLOWED_HOSTS, CCD_CALLBACK_ALLOWED_HTTP_HOSTS, CCD_CALLBACK_ALLOW_PRIVATE_HOSTS)."

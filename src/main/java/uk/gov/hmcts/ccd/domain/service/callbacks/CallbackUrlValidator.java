@@ -15,9 +15,10 @@ import java.util.Optional;
 
 @Component
 public class CallbackUrlValidator {
-    private static final String WILDCARD = "*";
+    private static final String ALLOWLIST_WILDCARD = "*";
     private static final String HTTPS_SCHEME = "https";
     private static final String HTTP_SCHEME = "http";
+    // Cloud instance metadata endpoint; explicitly blocked to prevent SSRF credential exfiltration.
     private static final String METADATA_ENDPOINT = "169.254.169.254";
 
     private final ApplicationParams applicationParams;
@@ -82,12 +83,13 @@ public class CallbackUrlValidator {
     }
 
     private boolean hostMatches(String host, String allowedHost) {
-        if (WILDCARD.equals(allowedHost)) {
+        if (ALLOWLIST_WILDCARD.equals(allowedHost)) {
             return true;
         }
         final String normalisedHost = host.toLowerCase(Locale.UK);
         final String normalisedAllowedHost = allowedHost.toLowerCase(Locale.UK);
         if (normalisedAllowedHost.startsWith("*.")) {
+            // Wildcard matches only subdomains (e.g. *.example.com -> a.example.com), not the apex domain.
             String suffix = normalisedAllowedHost.substring(1);
             return normalisedHost.endsWith(suffix);
         }
