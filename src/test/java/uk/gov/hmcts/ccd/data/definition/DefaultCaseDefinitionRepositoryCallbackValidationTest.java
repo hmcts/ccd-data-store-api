@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -110,7 +111,8 @@ class DefaultCaseDefinitionRepositoryCallbackValidationTest {
     @Test
     @DisplayName("should fail case type retrieval when callback placeholder is unresolved")
     void shouldFailWhenCallbackPlaceholderIsUnresolved() {
-        mockCaseTypeResponse("${MISSING_CALLBACK_BASE_URL}/callback_get_case_injectedData");
+        final String placeholderVariable = "UNSET_CALLBACK_BASE_URL_" + UUID.randomUUID().toString().replace("-", "");
+        mockCaseTypeResponse("${" + placeholderVariable + "}/callback_get_case_injectedData");
 
         ServiceException exception = assertThrows(ServiceException.class, () -> subject.getCaseType("CT6"));
         assertServiceExceptionCauseContains(exception, "unresolved placeholder");
