@@ -107,6 +107,15 @@ class DefaultCaseDefinitionRepositoryCallbackValidationTest {
         assertServiceExceptionCauseContains(exception, "host is not allowlisted");
     }
 
+    @Test
+    @DisplayName("should fail case type retrieval when callback placeholder is unresolved")
+    void shouldFailWhenCallbackPlaceholderIsUnresolved() {
+        mockCaseTypeResponse("${MISSING_CALLBACK_BASE_URL}/callback_get_case_injectedData");
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> subject.getCaseType("CT6"));
+        assertServiceExceptionCauseContains(exception, "unresolved placeholder");
+    }
+
     private void mockCaseTypeResponse(String callbackUrl) {
         when(definitionStoreClient.invokeGetRequest(nullable(String.class), eq(CaseTypeDefinition.class)))
             .thenReturn(new ResponseEntity<>(buildCaseTypeWithCallback(callbackUrl), HttpStatus.OK));

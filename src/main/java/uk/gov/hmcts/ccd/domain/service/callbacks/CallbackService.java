@@ -59,7 +59,7 @@ public class CallbackService {
     private static final Pattern SENSITIVE_JSON_FIELD_PATTERN = Pattern.compile(
         "(?i)\"(authorization|serviceauthorization|user-id|user-roles|token|access_token|refresh_token|"
             + "password|secret)\"\\s*:\\s*\"[^\"]*\"");
-    private static final Pattern BEARER_TOKEN_PATTERN = Pattern.compile("(?i)Bearer\\s+[A-Za-z0-9._\\-+/=]+");
+    private static final Pattern BEARER_TOKEN_PATTERN = Pattern.compile("(?i)Bearer\\s+[\\p{Alnum}._/+=-]+");
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
