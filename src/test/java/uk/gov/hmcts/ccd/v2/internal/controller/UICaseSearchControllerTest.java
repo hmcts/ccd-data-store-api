@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -101,6 +102,42 @@ class UICaseSearchControllerTest {
             eq(Collections.emptyList()));
         verify(applicationParams, never()).getGlobalSearchIndexName();
         verify(applicationParams, never()).getGlobalSearchIndexType();
+        assertAll(
+            () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+            () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),
+            () -> assertThat(response.getBody().getCases(), is(caseSearchResultView.getCases())),
+            () -> assertThat(response.getBody().getTotal(), is(caseSearchResultView.getTotal()))
+        );
+    }
+
+    @Test
+    void shouldSearchCaseDetailsGlobal() throws JsonProcessingException {
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        CaseSearchResultView caseSearchResultView = mock(CaseSearchResultView.class);
+        String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
+        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+            anyBoolean())).thenReturn(caseSearchResult);
+        when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
+
+        final ResponseEntity<CaseSearchResultViewResource> response = controller
+            .searchCases(CASE_TYPE_ID, WORKBASKET, true, searchRequest);
+
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
+            assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
+            assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
+            return true;
+        }), anyBoolean());
+        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
+            eq(Collections.emptyList()));
+        verify(applicationParams, atLeastOnce()).getGlobalSearchIndexName();
+        verify(applicationParams, atLeastOnce()).getGlobalSearchIndexType();
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getHeaders(), is(caseSearchResultView.getHeaders())),

@@ -294,7 +294,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
-                () -> assertThat(caseSearchResultViewResource.getTotal(), greaterThanOrEqualTo(1L)),
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(1)),
                 () -> assertExampleCaseData(caseDetails.getFields(), false),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
@@ -313,7 +313,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Test
         void shouldReturnFirstPageCaseDetailsForDefaultUseCaseFromGlobalIndex() throws Exception {
             final int PAGE_SIZE = 10;
-            long total = 1000;
+            long total = 1000L;
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(baseQuery)
@@ -345,7 +345,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             final int PAGE_FROM = 10;
             final int PAGE_SIZE = 20;
 
-            long total = getCasesTotal();
+            long total = 1000L;
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(baseQuery)
@@ -360,7 +360,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             final long caseIdStarting = 1999866820970009L;
             assertAll(
-                () -> assertThat(total, greaterThanOrEqualTo((long) (PAGE_FROM + PAGE_SIZE))),
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(total)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getCaseId(),
@@ -379,7 +378,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             final int PAGE_FROM = 10;
             final int PAGE_SIZE = 100;
 
-            final long total = getCasesTotal();
+            final long total = 1000L;
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(baseQuery)
@@ -394,7 +393,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             final long caseIdStarting = 1999866820970009L;
             assertAll(
-                () -> assertThat(total, greaterThanOrEqualTo((long) (PAGE_FROM + PAGE_SIZE))),
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(total)),
                 () -> assertThat(caseSearchResultViewResource.getCases().size(), is(PAGE_SIZE)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getCaseId(),
@@ -436,7 +434,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Test
         void shouldReturnEmptyPageWhenFromEqualsTotalForDefaultUseCaseFromGlobalIndex() throws Exception {
             final int PAGE_SIZE = 10;
-            final long total = getCasesTotal();
+            final long total = 1000L;
             int pageFrom = Math.toIntExact(total);
 
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()

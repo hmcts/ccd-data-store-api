@@ -63,17 +63,16 @@ public class ElasticsearchITSetup {
                 return;
             }
             if (attempt < tries - 1) {
-                log.info("Cluster is NOI yellow, waiting for {}ms...", baseSleepMs);
                 long sleepMs = baseSleepMs * (1L << attempt);
+                log.info("Cluster is NOT yellow, waiting for {}ms...", sleepMs);
                 try {
                     Thread.sleep(sleepMs);
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
                     Assertions.fail("Interrupted while waiting for cluster to reach yellow status");
                 }
             }
         }
-        Assertions.fail("Cluster did not reach yellow status within the specified timeout");
+        Assertions.fail("Cluster did not reach yellow status within the specified time limit");
     }
 
     private String url(String path) {

@@ -225,6 +225,7 @@ class CaseSearchEndpointTest {
             // wildcard was expanded
             assertThat(req.getCaseTypeIds(), is(List.of(CASE_TYPE_ID, CASE_TYPE_ID_2)));
             // global index is selected
+            assertThat(req.getSearchIndex().isPresent(), is(true));
             SearchIndex idx = req.getSearchIndex().get();
             assertThat(idx.getIndexName(), is(GLOBAL_INDEX));
             assertThat(idx.getIndexType(), is(INDEX_TYPE_DOC));
