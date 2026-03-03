@@ -15,6 +15,40 @@ properties(
 
 import uk.gov.hmcts.contino.GradleBuilder
 
+// ---------------------------------------------------------
+// 🚦 Stage 0: File change check (SKIP if irrelevant)
+// ---------------------------------------------------------
+node {
+    stage('Check Relevant Changes') {
+        checkout scm
+
+        def changedFiles = sh(
+            script: "git diff --name-only HEAD~1 HEAD",
+            returnStdout: true
+        ).trim().split("\n")
+
+        // ✅ Adjust these patterns to your needs
+        def triggers = [
+            ~/^src\/.*/,       // any file under src/
+            ~/^app\/.*/,       // any file under app/
+            ~/^pom\.xml$/      // pom.xml specifically
+        ]
+
+        def shouldBuild = changedFiles.any { file ->
+            triggers.any { pattern -> file ==~ pattern }
+        }
+
+        if (!shouldBuild) {
+            echo "No relevant changes detected. Skipping pipeline."
+            currentBuild.result = 'NOT_BUILT'
+            error("Stopping pipeline early.")
+        } else {
+            echo "Relevant changes found: ${changedFiles}"
+        }
+    }
+}
+
+
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
