@@ -186,7 +186,6 @@ withPipeline(type, product, component) {
 
     afterAlways('smoketest:preview') {
         steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-smoke.json; fi")
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-smoke.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/smoke/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
@@ -202,7 +201,6 @@ withPipeline(type, product, component) {
 
     afterAlways('smoketest:aat') {
         steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-smoke.json; fi")
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-smoke.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/smoke/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
@@ -218,7 +216,6 @@ withPipeline(type, product, component) {
 
     afterAlways('functionalTest:preview') {
         steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-functional.json; fi")
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-functional.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/functional/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
@@ -234,7 +231,6 @@ withPipeline(type, product, component) {
 
     afterAlways('functionalTest:aat') {
         steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-functional.json; fi")
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-functional.json'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/functional/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
