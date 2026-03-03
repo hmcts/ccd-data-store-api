@@ -53,6 +53,7 @@ Tasks:
 2. Patch with minimal behavior change and clear naming/structure.
 3. Update affected tests and fixtures if constructor/bean wiring changes.
 4. Add/update tests so coverage for new/changed code is at least 80%.
-5. Run targeted Gradle compile/tests and checkstyle for touched areas.
-6. Summarize risks, behavior impact, and follow-up actions.
+5. Run targeted Gradle compile/tests plus `checkstyleMain` and `checkstyleTest` for touched areas.
+6. Verify SonarQube quality gate status and that blocker/critical issues introduced by the change are zero.
+7. Summarize risks, behavior impact, and follow-up actions.
 ```

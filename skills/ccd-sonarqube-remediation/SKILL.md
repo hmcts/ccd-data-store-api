@@ -17,8 +17,9 @@ Prioritize behavior-preserving changes, then verify with focused compile/tests.
 3. Apply the smallest safe code change that satisfies the rule.
 4. Update dependent wiring/tests/fixtures when constructor or bean names change.
 5. Add or update tests so new/changed code paths meet at least 80% coverage.
-6. Run targeted Gradle compile/tests and checkstyle for changed areas.
-7. Report behavior impact, risk, and any residual items.
+6. Run targeted Gradle compile/tests plus `checkstyleMain` and `checkstyleTest` for changed areas.
+7. Verify SonarQube quality gate result for the branch/PR and confirm no new blocker/critical issues.
+8. Report behavior impact, risk, and any residual items.
 
 ## Typical Findings In This Repository
 
@@ -65,6 +66,8 @@ rg -n "sonar|@Qualifier\\(|@Bean\\(name|unused|WILDCARD|printCallbackDetails" sr
 ./gradlew compileJava compileTestJava
 ./gradlew test --tests <affected.test.ClassName>
 ./gradlew checkstyleMain checkstyleTest
+# optional, if configured in CI/local:
+# ./gradlew sonarqube
 ```
 
 ## Deliverable Checklist
@@ -74,5 +77,6 @@ rg -n "sonar|@Qualifier\\(|@Bean\\(name|unused|WILDCARD|printCallbackDetails" sr
 - Main and test wiring updated for any renamed beans/constructors.
 - Coverage for new/changed code is >=80%.
 - Checkstyle warnings/errors are resolved for touched files.
+- SonarQube quality gate is green (or any failing conditions are explicitly documented with rationale).
 - Targeted compile/tests pass for modified areas.
 - Residual risks and deferred items are documented.

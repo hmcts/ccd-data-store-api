@@ -582,6 +582,8 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    dependsOn generateJsonSchema2Pojo, compileJava, processResources, test, integration
+    mustRunAfter generateJsonSchema2Pojo, compileJava, processResources
     executionData(test, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())

@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -66,6 +67,37 @@ class DefaultCaseDefinitionRepositoryCoreTest {
         assertEquals(1, result.size());
         verify(callbackUrlValidator).validateCallbackUrl("https://localhost/get");
         verify(callbackUrlValidator).validateCallbackUrl("https://localhost/start");
+    }
+
+    @Test
+    void shouldResolveCallbackUrlPlaceholderBeforeValidationForCaseTypeAndEvent() {
+        System.setProperty("UNIT_TEST_CALLBACK_BASE_URL", "https://stub.example.test");
+        try {
+            when(applicationParams.caseTypeDefURL("CT1")).thenReturn("http://localhost/ct1");
+
+            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition.setCaseFieldDefinitions(List.of());
+            caseTypeDefinition.setCallbackGetCaseUrl(
+                "${UNIT_TEST_CALLBACK_BASE_URL}/callback_get_case_injectedData"
+            );
+            CaseEventDefinition eventDefinition = new CaseEventDefinition();
+            eventDefinition.setCallBackURLAboutToSubmitEvent("${UNIT_TEST_CALLBACK_BASE_URL}/event-callback");
+            caseTypeDefinition.setEvents(List.of(eventDefinition));
+
+            when(definitionStoreClient.invokeGetRequest("http://localhost/ct1", CaseTypeDefinition.class))
+                .thenReturn(new ResponseEntity<>(caseTypeDefinition, HttpStatus.OK));
+
+            CaseTypeDefinition result = subject.getCaseType("CT1");
+
+            assertEquals("https://stub.example.test/callback_get_case_injectedData", result.getCallbackGetCaseUrl());
+            assertEquals("https://stub.example.test/event-callback",
+                result.getEvents().get(0).getCallBackURLAboutToSubmitEvent());
+            verify(callbackUrlValidator)
+                .validateCallbackUrl("https://stub.example.test/callback_get_case_injectedData");
+            verify(callbackUrlValidator).validateCallbackUrl("https://stub.example.test/event-callback");
+        } finally {
+            System.clearProperty("UNIT_TEST_CALLBACK_BASE_URL");
+        }
     }
 
     @Test
@@ -177,5 +209,81 @@ class DefaultCaseDefinitionRepositoryCoreTest {
             .thenThrow(new RuntimeException("boom"));
 
         assertThrows(ServiceException.class, subject::getAllJurisdictionsFromDefinitionStore);
+    }
+
+    @Test
+    void shouldReturnNullWhenCaseTypeBodyIsNull() {
+        when(applicationParams.caseTypeDefURL("CT-NULL")).thenReturn("http://localhost/ct-null");
+        when(definitionStoreClient.invokeGetRequest("http://localhost/ct-null", CaseTypeDefinition.class))
+            .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+
+        assertNull(subject.getCaseType("CT-NULL"));
+    }
+
+    @Test
+    void shouldThrowServiceExceptionForGetCaseTypeWhenNon404() {
+        when(applicationParams.caseTypeDefURL("CT-ERR")).thenReturn("http://localhost/ct-err");
+        when(definitionStoreClient.invokeGetRequest("http://localhost/ct-err", CaseTypeDefinition.class))
+            .thenThrow(new RuntimeException("boom"));
+
+        assertThrows(ServiceException.class, () -> subject.getCaseType("CT-ERR"));
+    }
+
+    @Test
+    void shouldThrowServiceExceptionForBaseTypesWhenNon404() {
+        when(applicationParams.baseTypesURL()).thenReturn("http://localhost/base");
+        doThrow(new RuntimeException("boom"))
+            .when(definitionStoreClient).invokeGetRequest("http://localhost/base", FieldTypeDefinition[].class);
+
+        assertThrows(ServiceException.class, subject::getBaseTypes);
+    }
+
+    @Test
+    void shouldReturnFirstJurisdictionWhenFound() {
+        when(applicationParams.jurisdictionDefURL()).thenReturn("http://localhost/jurisdictions");
+        JurisdictionDefinition j1 = new JurisdictionDefinition();
+        j1.setId("J1");
+        when(definitionStoreClient.invokeGetRequest(anyString(), eq(JurisdictionDefinition[].class)))
+            .thenReturn(new ResponseEntity<>(new JurisdictionDefinition[] {j1}, HttpStatus.OK));
+
+        JurisdictionDefinition result = subject.getJurisdiction("J1");
+        assertNotNull(result);
+        assertEquals("J1", result.getId());
+    }
+
+    @Test
+    void shouldBuildEncodedUserRoleQueryParam() {
+        when(applicationParams.userRoleClassification()).thenReturn("http://localhost/role");
+        when(definitionStoreClient.invokeGetRequest(anyString(), eq(UserRole.class), anyMap()))
+            .thenReturn(new ResponseEntity<>(new UserRole(), HttpStatus.OK));
+
+        subject.getUserRoleClassifications("role-x");
+
+        verify(definitionStoreClient).invokeGetRequest(eq("http://localhost/role"), eq(UserRole.class), anyMap());
+    }
+
+    @Test
+    void shouldNoOpWhenValidatingNullCaseTypeDefinition() {
+        ReflectionTestUtils.invokeMethod(subject, "validateCaseTypeCallbackUrls", new Object[] {null});
+    }
+
+    @Test
+    void shouldResolvePlaceholderBufferAndValidateEventCallbacks() {
+        System.setProperty("UNIT_TEST_CALLBACK_BASE_URL_2", "https://stub2.example.test");
+        try {
+            CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition.setCallbackGetCaseUrl("${UNIT_TEST_CALLBACK_BASE_URL_2}/get-case");
+            CaseEventDefinition event = new CaseEventDefinition();
+            event.setCallBackURLAboutToStartEvent("${UNIT_TEST_CALLBACK_BASE_URL_2}/about-to-start");
+            caseTypeDefinition.setEvents(List.of(event));
+
+            ReflectionTestUtils.invokeMethod(subject, "validateCaseTypeCallbackUrls", caseTypeDefinition);
+
+            verify(callbackUrlValidator).validateCallbackUrl("https://stub2.example.test/get-case");
+            verify(callbackUrlValidator).validateCallbackUrl("https://stub2.example.test/about-to-start");
+            assertEquals("https://stub2.example.test/about-to-start", event.getCallBackURLAboutToStartEvent());
+        } finally {
+            System.clearProperty("UNIT_TEST_CALLBACK_BASE_URL_2");
+        }
     }
 }

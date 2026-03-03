@@ -14,3 +14,7 @@ When loading case definition fixtures in integration tests, ensure callback URL 
 
 Callback URL hardening validates definition callback URLs at ingestion/read-time, so unresolved placeholders will now
 be rejected as invalid URLs before callback execution.
+
+For BEFTA/AAT definitions that use environment placeholders (for example
+`${TEST_STUB_SERVICE_BASE_URL:...}/callback_get_case_injectedData`), ensure placeholder resolution happens before
+callback URL validation in the import path.

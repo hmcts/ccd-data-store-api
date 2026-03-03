@@ -48,12 +48,7 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String LOG_CONTROL_WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
-    private static final List<String> SENSITIVE_HEADERS = List.of(
-        HttpHeaders.AUTHORIZATION,
-        SecurityUtils.SERVICE_AUTHORIZATION,
-        "user-id",
-        "user-roles"
-    );
+    private static final List<String> ALLOWED_PASSTHRU_HEADERS = List.of(CLIENT_CONTEXT);
     private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
         = "Unable to proceed because there are one or more callback Errors or Warnings";
     private static final Pattern SENSITIVE_JSON_FIELD_PATTERN = Pattern.compile(
@@ -178,6 +173,11 @@ public class CallbackService {
                 String responseDetails = printCallbackDetails(responseEntity);
                 LOG.info("Callback {} response received: {}", safeUrl, responseDetails);
             }
+            if (responseEntity.getStatusCode().is3xxRedirection()) {
+                LOG.warn("Rejecting callback redirect response from {} with status {}",
+                    safeUrl, responseEntity.getStatusCode().value());
+                throw new CallbackException("Callback redirect responses are not permitted for url " + safeUrl);
+            }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
             responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
@@ -243,7 +243,7 @@ public class CallbackService {
 
     private boolean isAllowedPassThroughHeader(String headerName) {
         return StringUtils.hasLength(headerName)
-            && SENSITIVE_HEADERS.stream().noneMatch(sensitive -> sensitive.equalsIgnoreCase(headerName));
+            && ALLOWED_PASSTHRU_HEADERS.stream().anyMatch(allowed -> allowed.equalsIgnoreCase(headerName));
     }
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {

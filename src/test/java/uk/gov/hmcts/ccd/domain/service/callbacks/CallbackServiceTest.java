@@ -442,11 +442,10 @@ class CallbackServiceTest {
         HttpHeaders httpHeaders = new HttpHeaders();
         callbackService.addPassThroughHeaders(httpHeaders);
 
-        assertEquals(2, httpHeaders.size());
+        assertEquals(1, httpHeaders.size());
         assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
         assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
-        assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
-        assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
+        assertFalse(httpHeaders.containsKey(customHeaders.get(1)));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
     }
 
@@ -493,12 +492,23 @@ class CallbackServiceTest {
         HttpHeaders httpHeaders = new HttpHeaders();
         callbackService.addPassThroughHeaders(httpHeaders);
 
-        assertEquals(2, httpHeaders.size());
+        assertEquals(1, httpHeaders.size());
         assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
         assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
-        assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
-        assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
+        assertFalse(httpHeaders.containsKey(customHeaders.get(1)));
         assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+    }
+
+    @Test
+    @DisplayName("Should reject callback redirect responses")
+    void shouldRejectCallbackRedirectResponses() {
+        ResponseEntity<CallbackResponse> redirectResponse = ResponseEntity.status(HttpStatus.FOUND).build();
+        when(restTemplate.exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
+            .thenReturn(redirectResponse);
+
+        assertThrows(CallbackException.class, () ->
+            callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, false)
+        );
     }
 
     @Test
