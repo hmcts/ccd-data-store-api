@@ -57,3 +57,8 @@ Tasks:
 6. Verify SonarQube quality gate status and that blocker/critical issues introduced by the change are zero.
 7. Summarize risks, behavior impact, and follow-up actions.
 ```
+
+### Testing Workflow Note
+
+- WireMock-backed integration tests now use class-level Spring context teardown via `@DirtiesContext(AFTER_CLASS)` in `WireMockBaseTest` to reduce intermittent `WireMockServer` port-bind failures.
+- This improves stability but can increase test runtime because affected test classes do not reuse the same Spring context across classes.
