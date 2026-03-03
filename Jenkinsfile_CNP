@@ -142,6 +142,10 @@ withPipeline(type, product, component) {
     }
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+    echo "CCD_CALLBACK_ALLOWED_HOSTS = ${env.CCD_CALLBACK_ALLOWED_HOSTS} on branch ${env.BRANCH_NAME}"
+    echo "CCD_CALLBACK_ALLOWED_HTTP_HOSTS = ${env.CCD_CALLBACK_ALLOWED_HTTP_HOSTS} on branch ${env.BRANCH_NAME}"
+    echo "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS = ${env.CCD_CALLBACK_ALLOW_PRIVATE_HOSTS} on branch ${env.BRANCH_NAME}"
+
 
     syncBranchesWithMaster(branchesToSync)
     overrideVaultEnvironments(vaultOverrides)
@@ -161,10 +165,10 @@ withPipeline(type, product, component) {
 
       copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
-     
+
       copyIgnore('./build/reports/tests/test', './Unit Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
-       
+
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
