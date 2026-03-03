@@ -119,18 +119,18 @@ env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
