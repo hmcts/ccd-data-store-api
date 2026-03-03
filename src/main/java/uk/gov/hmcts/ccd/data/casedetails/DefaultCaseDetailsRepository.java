@@ -76,7 +76,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             mergedEntity = em.merge(newCaseDetailsEntity);
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
-            LOG.info("Optimistic Lock Exception: Case data has been altered, UUID={}", caseDetails.getReference(), e);
+            LOG.info("Optimistic Lock Exception: Case data has been altered, caseType={} UUID={}",
+                caseDetails.getCaseTypeId(), caseDetails.getReference(), e);
             throw new CaseConcurrencyException("""
                 Unfortunately we were unable to save your work to the case as \
                 another action happened at the same time.
