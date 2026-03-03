@@ -205,6 +205,43 @@ test {
 
 check.dependsOn testUnit, testIt
 
+task verifyBefTaStubHostConfigConsistency {
+    group = "Verification"
+    description = "Ensures Helm values keep BEFTA stub host and callback allowlists aligned."
+
+    doLast {
+        def valuesFiles = [
+            file("charts/ccd-data-store-api/values.yaml"),
+            file("charts/ccd-data-store-api/values.preview.template.yaml"),
+            file("charts/ccd-data-store-api/values.aat.template.yaml")
+        ]
+        def issues = []
+
+        valuesFiles.each { valuesFile ->
+            if (!valuesFile.exists()) {
+                return
+            }
+            def content = valuesFile.getText("UTF-8")
+            if (!content.contains("beftaTestStubServiceHost")) {
+                issues << "${project.relativePath(valuesFile)}: missing beftaTestStubServiceHost"
+            }
+            if (content.contains("CCD_CALLBACK_ALLOWED_HOSTS:")
+                && !content.contains("{{ .Values.beftaTestStubServiceHost }}")) {
+                issues << "${project.relativePath(valuesFile)}: callback allowlists not using shared befta host value"
+            }
+            if (content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL:")
+                && !content.contains("http://{{ .Values.beftaTestStubServiceHost }}/")) {
+                issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL not using shared befta host value"
+            }
+        }
+
+        if (!issues.isEmpty()) {
+            throw new GradleException("BEFTA callback/stub host config drift detected:\n - " + issues.join("\n - "))
+        }
+    }
+}
+check.dependsOn verifyBefTaStubHostConfigConsistency
+
 task integration(type: Test) {
     description = "Runs integration tests"
     group = "Verification"
@@ -750,12 +787,49 @@ task preSmokeDiagnostics {
     doLast {
         def env = System.getenv()
         def testUrl = env.get("TEST_URL")
+        def beftaStubBaseUrl = env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL")
+        def callbackAllowedHosts = env.get("CCD_CALLBACK_ALLOWED_HOSTS")
+        def callbackAllowedHttpHosts = env.get("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+        def callbackAllowPrivateHosts = env.get("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
         logger.quiet("Smoke diagnostics: TEST_URL=${testUrl ?: '<unset>'}")
         logger.quiet("Smoke diagnostics: IDAM_API_URL_BASE=${env.get('IDAM_API_URL_BASE') ?: '<unset>'}")
         logger.quiet("Smoke diagnostics: S2S_URL_BASE=${env.get('S2S_URL_BASE') ?: '<unset>'}")
-        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HOSTS=${env.get('CCD_CALLBACK_ALLOWED_HOSTS') ?: '<unset>'}")
-        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HTTP_HOSTS=${env.get('CCD_CALLBACK_ALLOWED_HTTP_HOSTS') ?: '<unset>'}")
-        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOW_PRIVATE_HOSTS=${env.get('CCD_CALLBACK_ALLOW_PRIVATE_HOSTS') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: BEFTA_TEST_STUB_SERVICE_BASE_URL=${beftaStubBaseUrl ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HOSTS=${callbackAllowedHosts ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HTTP_HOSTS=${callbackAllowedHttpHosts ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOW_PRIVATE_HOSTS=${callbackAllowPrivateHosts ?: '<unset>'}")
+
+        if (beftaStubBaseUrl) {
+            try {
+                String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
+                boolean callbackAllowlistsProvided = callbackAllowedHosts != null
+                    && callbackAllowedHttpHosts != null
+                    && callbackAllowPrivateHosts != null
+                if (!callbackAllowlistsProvided) {
+                    logger.quiet("Smoke diagnostics: callback allowlist env vars are not fully set; "
+                        + "skipping strict BEFTA stub host membership check.")
+                } else {
+                List<String> missing = []
+                if (!(callbackAllowedHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOWED_HOSTS")
+                }
+                if (!(callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+                }
+                if (!(callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+                }
+                if (!missing.isEmpty()) {
+                    throw new GradleException("Smoke preflight failed: BEFTA stub host '" + beftaStubHost
+                        + "' is missing from " + missing + ".")
+                }
+                logger.quiet("Smoke diagnostics: BEFTA stub host '${beftaStubHost}' present in callback allowlists.")
+                }
+            } catch (MalformedURLException malformedURLException) {
+                throw new GradleException("Smoke preflight failed: invalid BEFTA_TEST_STUB_SERVICE_BASE_URL: "
+                    + beftaStubBaseUrl, malformedURLException)
+            }
+        }
 
         if (!testUrl) {
             logger.quiet("Smoke diagnostics: TEST_URL is not set; skipping health probe.")

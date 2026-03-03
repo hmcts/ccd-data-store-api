@@ -93,6 +93,7 @@ After enabling callback hardening, service teams should:
    - `CCD_CALLBACK_ALLOWED_HOSTS`
    - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
    - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
+   - For Helm-based preview/AAT deployments, keep callback/stub host config aligned via the shared chart value `beftaTestStubServiceHost` (used by both callback allowlists and `BEFTA_TEST_STUB_SERVICE_BASE_URL`).
 3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
 4. Re-run callback integration tests and verify expected callback hosts are accepted.
 5. Ensure callback endpoints do not return redirects (`3xx`) and instead return final responses directly.

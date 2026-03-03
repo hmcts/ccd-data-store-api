@@ -64,3 +64,5 @@ Tasks:
 - This improves stability but can increase test runtime because affected test classes do not reuse the same Spring context across classes.
 - Build verification is split into `testUnit` (parallel unit tests) and `testIt` (serialized `*IT`/`*ITest` tests for stability).
 - The default `test` task is disabled to avoid duplicate execution; `check`/`build` run `testUnit` and `testIt`.
+- Smoke test execution now includes `preSmokeDiagnostics`, which logs `TEST_URL`, key auth/callback env values, and probes `${TEST_URL}/actuator/health` before BEFTA starts.
+- Jenkins archives stage-specific BEFTA outputs as `target/cucumber-smoke.json` and `target/cucumber-functional.json` (plus corresponding JUnit XML), so smoke/functional failures can be triaged independently.
