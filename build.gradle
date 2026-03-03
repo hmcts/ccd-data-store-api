@@ -743,9 +743,44 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task preSmokeDiagnostics {
+    group = "Verification"
+    description = "Logs key smoke-test env values and probes TEST_URL health endpoint."
+
+    doLast {
+        def env = System.getenv()
+        def testUrl = env.get("TEST_URL")
+        logger.quiet("Smoke diagnostics: TEST_URL=${testUrl ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: IDAM_API_URL_BASE=${env.get('IDAM_API_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: S2S_URL_BASE=${env.get('S2S_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HOSTS=${env.get('CCD_CALLBACK_ALLOWED_HOSTS') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HTTP_HOSTS=${env.get('CCD_CALLBACK_ALLOWED_HTTP_HOSTS') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOW_PRIVATE_HOSTS=${env.get('CCD_CALLBACK_ALLOW_PRIVATE_HOSTS') ?: '<unset>'}")
+
+        if (!testUrl) {
+            logger.quiet("Smoke diagnostics: TEST_URL is not set; skipping health probe.")
+            return
+        }
+
+        def healthUrl = testUrl.endsWith("/") ? "${testUrl}actuator/health" : "${testUrl}/actuator/health"
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(healthUrl).openConnection()
+            connection.setRequestMethod("GET")
+            connection.setConnectTimeout(5000)
+            connection.setReadTimeout(5000)
+            connection.connect()
+            int statusCode = connection.getResponseCode()
+            logger.quiet("Smoke diagnostics: health probe ${healthUrl} -> HTTP ${statusCode}")
+        } catch (Exception exception) {
+            logger.quiet("Smoke diagnostics: health probe failed for ${healthUrl}: ${exception.getClass().getSimpleName()} - ${exception.getMessage()}")
+        }
+    }
+}
+
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
+    dependsOn preSmokeDiagnostics
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
