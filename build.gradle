@@ -28,7 +28,7 @@ ext {
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
-    set('jackson.version', '2.16.0')
+    set('jacksonVersion', '2.19.2')
     set('snakeyaml.version', '2.2')
     junit = '5.14.2'
     junitPlatform = '1.14.2'
@@ -38,8 +38,8 @@ ext {
     lombokVersion = '1.18.42'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
-    elasticVersion = '8.16.2'
-    testContainersVersion = '1.21.4'
+    elasticVersion = '9.2.4'
+    testContainersVersion = '2.0.2'
     cucumber = '7.28.2'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.25.4'
@@ -267,7 +267,16 @@ dependencies {
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
+
+    // Elasticsearch
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: elasticVersion
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
+
+//    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+//    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+//    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
@@ -290,13 +299,15 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
+//    testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+//    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+//    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
@@ -607,7 +618,7 @@ jacocoTestReport {
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
 
@@ -894,7 +905,7 @@ void loadEnvSecrets(String env) {
                 }
                 standardOutput = os
             }
-            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
         }
     }
 }
