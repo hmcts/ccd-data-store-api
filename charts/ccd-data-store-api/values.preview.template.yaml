@@ -33,7 +33,7 @@ java:
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     ELASTIC_SEARCH_ENABLED: true
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
