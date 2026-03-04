@@ -317,9 +317,9 @@ class ElasticsearchCaseSearchOperationTest {
         when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
-        ObjectNode matchAllQuery = JsonNodeFactory.instance.objectNode();
-        matchAllQuery.set("match_all", JsonNodeFactory.instance.objectNode());
-        searchRequestJsonNode.set(QUERY, matchAllQuery);
+        ObjectNode query = JsonNodeFactory.instance.objectNode();
+        query.set("match_all", JsonNodeFactory.instance.objectNode());
+        searchRequestJsonNode.set(QUERY, query);
 
         searchOperation = new ElasticsearchCaseSearchOperation(
             elasticsearchClient,
