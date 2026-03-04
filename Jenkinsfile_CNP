@@ -106,6 +106,10 @@ env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.BEFTA_TEST_STUB_SERVICE_HOST = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.CCD_CALLBACK_ALLOWED_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST}"
+env.CCD_CALLBACK_ALLOWED_HTTP_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST}"
+env.CCD_CALLBACK_ALLOW_PRIVATE_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST}"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 // BEFTA retry env variables
@@ -140,6 +144,7 @@ withPipeline(type, product, component) {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
+    echo "Effective TEST_URL=${env.TEST_URL}"
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
