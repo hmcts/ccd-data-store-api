@@ -26,6 +26,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchMappings;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableConfigurationProperties(ElasticsearchMappings.class)
 @Slf4j
@@ -61,6 +63,7 @@ public class ElasticSearchConfiguration {
         HttpHost[] esHosts = applicationParams.getElasticSearchDataHosts().stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
+        Arrays.stream(esHosts).forEach(host -> log.info("ES Host: {}", host));
 
         RestClientBuilder builder = RestClient.builder(esHosts)
             .setFailureListener(new RestClient.FailureListener() {
