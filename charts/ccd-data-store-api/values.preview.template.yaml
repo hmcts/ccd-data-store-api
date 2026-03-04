@@ -1,5 +1,3 @@
-beftaTestStubServiceHost: ccd-test-stubs-service-aat.service.core-compute-aat.internal
-
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
@@ -47,9 +45,9 @@ java:
     CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
     CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
     DEFAULT_CACHE_TTL_SEC: 1
-    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://{{ .Values.beftaTestStubServiceHost }}/"
+    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
     SPRING_APPLICATION_JSON: |
-      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://{{ .Values.beftaTestStubServiceHost }}/"}}}}
+      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
     enabled: true
     primary:

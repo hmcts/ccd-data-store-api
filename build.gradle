@@ -210,6 +210,8 @@ task verifyBefTaStubHostConfigConsistency {
     description = "Ensures Helm values keep BEFTA stub host and callback allowlists aligned."
 
     doLast {
+        def expectedStubHost = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+        def templatedStubHost = "{{ .Values.beftaTestStubServiceHost }}"
         def valuesFiles = [
             file("charts/ccd-data-store-api/values.yaml"),
             file("charts/ccd-data-store-api/values.preview.template.yaml"),
@@ -222,16 +224,30 @@ task verifyBefTaStubHostConfigConsistency {
                 return
             }
             def content = valuesFile.getText("UTF-8")
-            if (!content.contains("beftaTestStubServiceHost")) {
-                issues << "${project.relativePath(valuesFile)}: missing beftaTestStubServiceHost"
+            boolean containsSharedHostKey = content.contains("beftaTestStubServiceHost")
+            boolean containsExpectedHostLiteral = content.contains(expectedStubHost)
+            if (!containsSharedHostKey && !containsExpectedHostLiteral) {
+                issues << "${project.relativePath(valuesFile)}: missing BEFTA stub host definition"
             }
-            if (content.contains("CCD_CALLBACK_ALLOWED_HOSTS:")
-                && !content.contains("{{ .Values.beftaTestStubServiceHost }}")) {
-                issues << "${project.relativePath(valuesFile)}: callback allowlists not using shared befta host value"
+            def callbackAllowlistKeys = [
+                "CCD_CALLBACK_ALLOWED_HOSTS",
+                "CCD_CALLBACK_ALLOWED_HTTP_HOSTS",
+                "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS"
+            ]
+            callbackAllowlistKeys.each { key ->
+                boolean hasKey = content.contains("${key}:")
+                boolean hasExpectedLiteral = content.contains("${key}: localhost,127.0.0.1,${expectedStubHost}")
+                boolean hasTemplatedValue = content.contains("${key}: localhost,127.0.0.1,${templatedStubHost}")
+                if (hasKey && !(hasExpectedLiteral || hasTemplatedValue)) {
+                    issues << "${project.relativePath(valuesFile)}: ${key} missing expected BEFTA stub host"
+                }
             }
+            boolean beftaStubBaseUrlValid =
+                content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL: \"http://${expectedStubHost}/\"")
+                    || content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL: \"http://${templatedStubHost}/\"")
             if (content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL:")
-                && !content.contains("http://{{ .Values.beftaTestStubServiceHost }}/")) {
-                issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL not using shared befta host value"
+                && !beftaStubBaseUrlValid) {
+                issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL not set to expected stub host"
             }
         }
 
