@@ -80,6 +80,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1019-VerifyCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1019_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1019.7 #AC-7
     Scenario: CaseLink field contains blank value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
@@ -90,6 +92,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Then    a positive response is received
       And     the response has all other details as expected
       And     a successful call [to verify that no Case Links have been created in the CASE_LINK table] as in [F-1019-VerifyCaseLinksNotInserted]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1019_7_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1019.8 #AC-8
     Scenario: CaseLink field contains Invalid CaseReference value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
@@ -112,6 +116,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Then    a negative response is received,
       And     the response [has the 422 return code],
       And     the response has all other details as expected.
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1019_9_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1019.10 #AC-10
     Scenario: Collection of CaseLink fields contains CaseReference value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST
@@ -125,6 +131,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Then    a positive response is received
       And     the response has all other details as expected
       And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1019_10_Remove_Case_Assigned_User_role_for_Case].
 
 
    #=======================================
@@ -213,6 +221,8 @@ Feature: F-1019: Submit Case Creation Handle Case Links
       Then    a positive response is received
       And     the response has all other details as expected
       And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1019-VerifyMultipleCaseLinksUsingStandardLinkField]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1019_7_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1019.18
     Scenario: Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST
