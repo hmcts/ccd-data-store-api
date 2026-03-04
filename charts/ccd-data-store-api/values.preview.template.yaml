@@ -43,9 +43,9 @@ java:
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     # callback hardening: destination allowlists used by CallbackService URL validation
-    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
-    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
-    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
+    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
     DEFAULT_CACHE_TTL_SEC: 1
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://{{ .Values.beftaTestStubServiceHost }}/"
     SPRING_APPLICATION_JSON: |
