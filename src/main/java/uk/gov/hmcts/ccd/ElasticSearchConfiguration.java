@@ -59,12 +59,11 @@ public class ElasticSearchConfiguration {
 
     @Bean
     public ElasticsearchClient elasticsearchClient(ObjectMapper objectMapper) {
+        HttpHost[] esHosts = applicationParams.getElasticSearchDataHosts().stream()
+            .map(HttpHost::create)
+            .toArray(HttpHost[]::new);
 
-        RestClientBuilder builder = RestClient.builder(
-                new HttpHost(
-                    getElasticsearchHost(),
-                    applicationParams.getElasticSearchPort(),
-                    HttpHost.DEFAULT_SCHEME_NAME))
+        RestClientBuilder builder = RestClient.builder(esHosts)
             .setFailureListener(new RestClient.FailureListener() {
                 @Override
                 public void onFailure(Node node) {
