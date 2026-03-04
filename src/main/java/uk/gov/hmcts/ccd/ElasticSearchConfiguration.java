@@ -17,7 +17,6 @@ import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -96,17 +95,4 @@ public class ElasticSearchConfiguration {
                     .build()
             );
     }
-
-    private String getElasticsearchHost() {
-        String esHost = stripProtocolAndPort(applicationParams.getElasticSearchHosts().getFirst());
-        log.info("esHost: {}", esHost);
-        return esHost;
-    }
-
-    public String stripProtocolAndPort(String url) {
-        String noProtocol = url.replaceFirst("^https?://", "");
-        // Remove port (e.g., :9200)
-        return noProtocol.replaceFirst(":\\d+$", "");
-    }
-
 }
