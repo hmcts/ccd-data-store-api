@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -264,7 +265,9 @@ class DefaultCaseDefinitionRepositoryCoreTest {
 
     @Test
     void shouldNoOpWhenValidatingNullCaseTypeDefinition() {
-        ReflectionTestUtils.invokeMethod(subject, "validateCaseTypeCallbackUrls", new Object[] {null});
+        assertDoesNotThrow(
+            () -> ReflectionTestUtils.invokeMethod(subject, "validateCaseTypeCallbackUrls", new Object[] {null})
+        );
     }
 
     @Test

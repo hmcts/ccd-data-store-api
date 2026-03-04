@@ -45,7 +45,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public static final String QUALIFIER = "default";
     private static final int RESOURCE_NOT_FOUND = 404;
     private static final Pattern ENV_PLACEHOLDER_PATTERN =
-        Pattern.compile("\\$\\{([A-Za-z_][A-Za-z0-9_]*)(?::([^}]*))?}");
+        Pattern.compile("\\$\\{([A-Za-z_]\\w*)(?::([^}]*))?}");
 
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
@@ -337,8 +337,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     private boolean isNotFound(Exception e) {
-        return e instanceof HttpClientErrorException
-            && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND;
+        return e instanceof HttpClientErrorException httpClientErrorException
+            && httpClientErrorException.getStatusCode().value() == RESOURCE_NOT_FOUND;
     }
 
     private ServiceException toServiceException(String prefixMessage, Exception e) {
