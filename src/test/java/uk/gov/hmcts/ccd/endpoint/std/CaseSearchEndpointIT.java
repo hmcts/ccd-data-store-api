@@ -108,6 +108,47 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    void testSearchCaseDetailsTruncatesMicrosecondPrecision() throws Exception {
+        final long referenceId = 1535450291607660L;
+        String lastModified = "2018-08-28T09:58:11.643123Z";
+        String createdDate = "2018-08-28T09:58:11.627456Z";
+        String dataJson = """
+            {
+            "PersonFirstName": "2018-08-28T09:58:11.643123",
+            "PersonAddress": {"AddressLine1": "2018-08-28T09:58:11.643123Z"},
+            "Aliases": [{"value": "2018-08-28T09:58:11.643123+01:00"}]
+            }
+            """;
+        String caseDetailElastic = create1CaseDetailsElastic(referenceId, lastModified, createdDate, dataJson);
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
+
+        String searchRequest = "{\"query\": {\"match_all\": {}}}";
+        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
+                .contentType(JSON_CONTENT_TYPE)
+                .param("ctid", "TestAddressBookCase")
+                .content(searchRequest))
+                .andExpect(status().is(200))
+                .andReturn();
+
+        JsonNode response = mapper.readTree(result.getResponse().getContentAsString());
+        JsonNode firstCase = response.path("cases").path(0);
+
+        assertThat(firstCase.get("last_modified").asText(), is("2018-08-28T09:58:11.643"));
+        assertThat(firstCase.get("created_date").asText(), is("2018-08-28T09:58:11.627"));
+
+        JsonNode caseData = firstCase.path("case_data");
+        if (caseData.isMissingNode()) {
+            caseData = firstCase.path("data");
+        }
+        assertThat(caseData.isMissingNode(), is(false));
+        assertThat(caseData.path("PersonFirstName").asText(), is("2018-08-28T09:58:11.643"));
+        assertThat(caseData.path("PersonAddress").path("AddressLine1").asText(),
+            is("2018-08-28T09:58:11.643Z"));
+        assertThat(caseData.path("Aliases").path(0).path("value").asText(),
+            is("2018-08-28T09:58:11.643+01:00"));
+    }
+
+    @Test
     void shouldAuditLogSearchCases() throws Exception {
 
         final long reference1 = 1535450291607660L;
@@ -159,6 +200,21 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
+    private String create1CaseDetailsElastic(Long reference, String lastModified, String createdDate, String dataJson) {
+        return "{\n" +
+            "   \"took\":177,\n" +
+            "   \"hits\":{\n" +
+            "      \"total\": 2," +
+            "      \"hits\":[\n" +
+            "         {\n" +
+            "            \"_index\":\"TestAddressBookCase_cases-000001\",\n" +
+            "            \"_source\":" + createCaseDetails(reference, lastModified, createdDate, dataJson) +
+            "         }\n" +
+            "      ]\n" +
+            "   }\n" +
+            "}";
+    }
+
     private String create2CaseDetailsElastic(Long reference1,Long reference2) {
         return "{\n" +
             "   \"took\":177,\n" +
@@ -191,6 +247,24 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
             + "\"data\": {},\n"
             + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
+            + "\"index_id\": \"probate_aat_cases\",\n"
+            + "\"case_type_id\": \"TestAddressBookCase\"\n"
+            + "}";
+    }
+
+    private String createCaseDetails(Long reference, String lastModified, String createdDate, String dataJson) {
+        return "{\n"
+            + "\"reference\": " + reference + ",\n"
+            + "\"last_modified\": \"" + lastModified + "\",\n"
+            + "\"state\": \"TODO\",\n"
+            + "\"@version\": \"1\",\n"
+            + "\"data_classification\": {},\n"
+            + "\"id\": 18,\n"
+            + "\"security_classification\": \"PUBLIC\",\n"
+            + "\"jurisdiction\": \"PROBATE\",\n"
+            + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
+            + "\"data\": " + dataJson + ",\n"
+            + "\"created_date\": \"" + createdDate + "\",\n"
             + "\"index_id\": \"probate_aat_cases\",\n"
             + "\"case_type_id\": \"TestAddressBookCase\"\n"
             + "}";
