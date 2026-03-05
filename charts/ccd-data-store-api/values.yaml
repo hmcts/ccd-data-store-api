@@ -2,7 +2,6 @@ elastic:
   enabled: false
 ccd:
   enabled: false
-beftaTestStubServiceHost: ccd-test-stubs-service-aat.service.core-compute-aat.internal
 
 java:
   image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest'
@@ -50,9 +49,9 @@ java:
 # this variable takes a comma separated list of callback urls for which details needs to be logged, or '*' for all
     LOG_CALLBACK_DETAILS:
     # callback hardening: destination allowlists used by CallbackService URL validation
-    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
-    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
-    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,{{ .Values.beftaTestStubServiceHost }}
+    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
     CCD_DRAFT_TTL_DAYS: 180
     TTL_GUARD: 365
 

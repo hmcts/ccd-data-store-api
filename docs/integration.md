@@ -18,3 +18,13 @@ be rejected as invalid URLs before callback execution.
 For BEFTA/AAT definitions that use environment placeholders (for example
 `${TEST_STUB_SERVICE_BASE_URL:...}/callback_get_case_injectedData`), ensure placeholder resolution happens before
 callback URL validation in the import path.
+
+For local BEFTA/AAT runs, set `TEST_STUB_SERVICE_BASE_URL` before importing definitions; otherwise placeholders can
+fall back to AAT defaults and later fail callback host allowlist checks.
+
+Example:
+
+```bash
+export TEST_STUB_SERVICE_BASE_URL=http://host.docker.internal:5555
+./gradlew functional
+```
