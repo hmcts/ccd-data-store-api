@@ -38,9 +38,9 @@ java:
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     # callback hardening: destination allowlists used by CallbackService URL validation
-    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
-    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
-    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOWED_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal,aac-manage-case-assignment-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOWED_HTTP_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal,aac-manage-case-assignment-aat.service.core-compute-aat.internal
+    CCD_CALLBACK_ALLOW_PRIVATE_HOSTS: localhost,127.0.0.1,ccd-test-stubs-service-aat.service.core-compute-aat.internal,aac-manage-case-assignment-aat.service.core-compute-aat.internal
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
     SPRING_APPLICATION_JSON: |
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}

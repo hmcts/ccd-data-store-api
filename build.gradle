@@ -211,6 +211,7 @@ task verifyBefTaStubHostConfigConsistency {
 
     doLast {
         def expectedStubHost = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+        def expectedAacHost = "aac-manage-case-assignment-aat.service.core-compute-aat.internal"
         def valuesFiles = [
             file("charts/ccd-data-store-api/values.yaml"),
             file("charts/ccd-data-store-api/values.preview.template.yaml"),
@@ -233,10 +234,13 @@ task verifyBefTaStubHostConfigConsistency {
                 "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS"
             ]
             callbackAllowlistKeys.each { key ->
-                boolean hasKey = content.contains("${key}:")
-                boolean hasExpectedLiteral = content.contains("${key}: localhost,127.0.0.1,${expectedStubHost}")
-                if (hasKey && !hasExpectedLiteral) {
-                    issues << "${project.relativePath(valuesFile)}: ${key} missing expected BEFTA stub host"
+                def matcher = content =~ /(?m)^\s*${java.util.regex.Pattern.quote(key)}:\s*(.+)$/
+                boolean hasKey = matcher.find()
+                String lineValue = hasKey ? matcher.group(1) : ""
+                boolean hasStubHost = lineValue.contains(expectedStubHost)
+                boolean hasAacHost = lineValue.contains(expectedAacHost)
+                if (hasKey && (!hasStubHost || !hasAacHost)) {
+                    issues << "${project.relativePath(valuesFile)}: ${key} missing expected callback allowlist hosts"
                 }
             }
             boolean beftaStubBaseUrlValid =
