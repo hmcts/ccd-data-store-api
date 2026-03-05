@@ -54,7 +54,8 @@ The following environment variables are required:
 For Helm-based preview/AAT deployments, ensure callback host allowlists include the callback destinations used by
 your environment in `CCD_CALLBACK_ALLOWED_HOSTS`, `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`, and
 `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`.
-For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` in all three settings.
+For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
+`aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three settings.
 
 ### Building
 

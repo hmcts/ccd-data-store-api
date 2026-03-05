@@ -93,7 +93,8 @@ After enabling callback hardening, service teams should:
    - `CCD_CALLBACK_ALLOWED_HOSTS`
    - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
    - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
-   - For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` in all three allowlists.
+   - For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
+     `aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three allowlists.
 3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
 4. Re-run callback integration tests and verify expected callback hosts are accepted.
 5. Ensure callback endpoints do not return redirects (`3xx`) and instead return final responses directly.
