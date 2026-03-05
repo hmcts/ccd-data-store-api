@@ -66,7 +66,7 @@ public class DocumentController {
         responseCode = "500",
         description = V2.Error.PRINTABLE_DOCUMENTS_ENDPOINT_DOWN
     )
-    public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId) {
+    public ResponseEntity<DocumentsResource> getDocuments(@PathVariable String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
