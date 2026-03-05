@@ -243,7 +243,8 @@ public class CreateCaseEventService {
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
         // add upload timestamp
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase,
+            caseTypeDefinition);
 
         // Fetch updated case details after call and update SupplementaryData
         final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference,
@@ -369,7 +370,8 @@ public class CreateCaseEventService {
 
         final Optional<String> newState = Optional.ofNullable(oldState);
 
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase,
+            caseTypeDefinition);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
