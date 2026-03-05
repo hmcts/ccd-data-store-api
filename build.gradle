@@ -11,7 +11,7 @@ plugins {
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'info.solidsoft.pitest' version '1.15.0'
-    id 'uk.gov.hmcts.java' version '0.12.67'
+    id 'uk.gov.hmcts.java' version '0.12.68'
     id 'au.com.dius.pact' version '4.6.20'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '12.1.3'
@@ -30,8 +30,8 @@ ext {
     set('log4j2.version', '2.24.3')
     set('jackson.version', '2.16.0')
     set('snakeyaml.version', '2.2')
-    junit = '5.14.2'
-    junitPlatform = '1.14.2'
+    junit = '5.14.3'
+    junitPlatform = '1.14.3'
     jjwt = '0.13.0'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.6.19'
@@ -66,7 +66,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.5'
+        force 'net.bytebuddy:byte-buddy:1.18.7'
     }
 }
 
@@ -312,7 +312,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.15'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.16'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
@@ -347,7 +347,7 @@ dependencies {
 
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.9'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
 
     // TEST DEPENDENCIES
     testImplementation libraries.junit5
