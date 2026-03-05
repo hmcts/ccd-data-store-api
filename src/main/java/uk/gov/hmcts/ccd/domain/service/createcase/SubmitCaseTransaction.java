@@ -143,7 +143,7 @@ public class SubmitCaseTransaction implements AccessControl {
             ignoreWarning
         );
 
-        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null);
+        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null, caseTypeDefinition);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
