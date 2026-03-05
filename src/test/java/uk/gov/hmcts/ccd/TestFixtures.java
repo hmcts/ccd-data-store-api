@@ -173,6 +173,18 @@ public abstract class TestFixtures {
         return json.toString();
     }
 
+    public static JsonNode readJsonTestsResource(String filename) {
+        try (InputStream is = getTestsInputStream(filename)) {
+            return mapper.readTree(is);
+        } catch (IOException e) {
+            throw new RuntimeException("Caught exception reading JSON resource tests/" + filename, e);
+        }
+    }
+
+    public static JsonNode copyJsonNode(JsonNode node) {
+        return node.deepCopy();
+    }
+
     private static InputStream getInputStream(final String filename) {
         return TestFixtures.class.getClassLoader()
             .getResourceAsStream(filename);
