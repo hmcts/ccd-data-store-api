@@ -47,6 +47,15 @@ The following environment variables are required:
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
 | DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| CCD_CALLBACK_ALLOWED_HOSTS | localhost,127.0.0.1 | Comma-separated callback destination host allowlist (`*` and `*.domain.tld` supported). Use environment-specific callback hosts (for example local Docker: `host.docker.internal`; AAT/pipeline: internal service DNS). |
+| CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to use `http` for callbacks (all other callback hosts must use `https`). |
+| CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to resolve to private/local addresses for callbacks. |
+
+For Helm-based preview/AAT deployments, ensure callback host allowlists include the callback destinations used by
+your environment in `CCD_CALLBACK_ALLOWED_HOSTS`, `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`, and
+`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`.
+For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
+`aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three settings.
 
 ### Building
 

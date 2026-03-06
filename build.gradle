@@ -182,6 +182,82 @@ tasks.withType(Test) {
     }
 }
 
+task testUnit(type: Test) {
+    description = "Runs unit tests (parallel)"
+    group = "Verification"
+    useJUnitPlatform()
+    include '**/*Test.class'
+    exclude '**/*IT.class', '**/*ITest.class'
+    maxParallelForks = (System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6) as int
+}
+
+task testIt(type: Test) {
+    description = "Runs integration-style tests (*IT, *ITest) serially for WireMock/Spring stability"
+    group = "Verification"
+    useJUnitPlatform()
+    include '**/*IT.class', '**/*ITest.class'
+    maxParallelForks = (System.getenv('MAX_NUM_PARALLEL_THREADS_IT') ?: 1) as int
+}
+
+test {
+    enabled = false
+}
+
+check.dependsOn testUnit, testIt
+
+task verifyBefTaStubHostConfigConsistency {
+    group = "Verification"
+    description = "Ensures Helm values keep BEFTA stub host and callback allowlists aligned."
+
+    doLast {
+        def expectedStubHost = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+        def expectedAacHost = "aac-manage-case-assignment-aat.service.core-compute-aat.internal"
+        def valuesFiles = [
+            file("charts/ccd-data-store-api/values.yaml"),
+            file("charts/ccd-data-store-api/values.preview.template.yaml"),
+            file("charts/ccd-data-store-api/values.aat.template.yaml")
+        ]
+        def issues = []
+
+        valuesFiles.each { valuesFile ->
+            if (!valuesFile.exists()) {
+                return
+            }
+            def content = valuesFile.getText("UTF-8")
+            boolean containsExpectedHostLiteral = content.contains(expectedStubHost)
+            if (!containsExpectedHostLiteral) {
+                issues << "${project.relativePath(valuesFile)}: missing BEFTA stub host definition"
+            }
+            def callbackAllowlistKeys = [
+                "CCD_CALLBACK_ALLOWED_HOSTS",
+                "CCD_CALLBACK_ALLOWED_HTTP_HOSTS",
+                "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS"
+            ]
+            callbackAllowlistKeys.each { key ->
+                def matcher = content =~ /(?m)^\s*${java.util.regex.Pattern.quote(key)}:\s*(.+)$/
+                boolean hasKey = matcher.find()
+                String lineValue = hasKey ? matcher.group(1) : ""
+                boolean hasStubHost = lineValue.contains(expectedStubHost)
+                boolean hasAacHost = lineValue.contains(expectedAacHost)
+                if (hasKey && (!hasStubHost || !hasAacHost)) {
+                    issues << "${project.relativePath(valuesFile)}: ${key} missing expected callback allowlist hosts"
+                }
+            }
+            boolean beftaStubBaseUrlValid =
+                content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL: \"http://${expectedStubHost}/\"")
+            if (content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL:")
+                && !beftaStubBaseUrlValid) {
+                issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL not set to expected stub host"
+            }
+        }
+
+        if (!issues.isEmpty()) {
+            throw new GradleException("BEFTA callback/stub host config drift detected:\n - " + issues.join("\n - "))
+        }
+    }
+}
+check.dependsOn verifyBefTaStubHostConfigConsistency
+
 task integration(type: Test) {
     description = "Runs integration tests"
     group = "Verification"
@@ -582,7 +658,9 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
-    executionData(test, integration)
+    dependsOn generateJsonSchema2Pojo, compileJava, processResources, testUnit, testIt, integration
+    mustRunAfter generateJsonSchema2Pojo, compileJava, processResources
+    executionData(testUnit, testIt, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
     }
@@ -719,9 +797,152 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task preSmokeDiagnostics {
+    group = "Verification"
+    description = "Logs key smoke-test env values and probes TEST_URL health endpoint."
+
+    doLast {
+        def env = System.getenv()
+        def testUrl = env.get("TEST_URL")
+        def beftaStubBaseUrl = env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL")
+        def callbackAllowedHosts = env.get("CCD_CALLBACK_ALLOWED_HOSTS")
+        def callbackAllowedHttpHosts = env.get("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+        def callbackAllowPrivateHosts = env.get("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+        logger.quiet("Smoke diagnostics: TEST_URL=${testUrl ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: IDAM_API_URL_BASE=${env.get('IDAM_API_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: S2S_URL_BASE=${env.get('S2S_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: BEFTA_TEST_STUB_SERVICE_BASE_URL=${beftaStubBaseUrl ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HOSTS=${callbackAllowedHosts ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOWED_HTTP_HOSTS=${callbackAllowedHttpHosts ?: '<unset>'}")
+        logger.quiet("Smoke diagnostics: CCD_CALLBACK_ALLOW_PRIVATE_HOSTS=${callbackAllowPrivateHosts ?: '<unset>'}")
+
+        if (beftaStubBaseUrl) {
+            try {
+                String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
+                boolean callbackAllowlistsProvided = callbackAllowedHosts?.trim()
+                    && callbackAllowedHttpHosts?.trim()
+                    && callbackAllowPrivateHosts?.trim()
+                if (!callbackAllowlistsProvided) {
+                    logger.quiet("Smoke diagnostics: callback allowlist env vars are not fully set; "
+                        + "skipping strict BEFTA stub host membership check.")
+                } else {
+                List<String> missing = []
+                if (!(callbackAllowedHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOWED_HOSTS")
+                }
+                if (!(callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+                }
+                if (!(callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                    missing.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+                }
+                if (!missing.isEmpty()) {
+                    throw new GradleException("Smoke preflight failed: BEFTA stub host '" + beftaStubHost
+                        + "' is missing from " + missing + ".")
+                }
+                logger.quiet("Smoke diagnostics: BEFTA stub host '${beftaStubHost}' present in callback allowlists.")
+                }
+            } catch (MalformedURLException malformedURLException) {
+                throw new GradleException("Smoke preflight failed: invalid BEFTA_TEST_STUB_SERVICE_BASE_URL: "
+                    + beftaStubBaseUrl, malformedURLException)
+            }
+        }
+
+        if (!testUrl) {
+            logger.quiet("Smoke diagnostics: TEST_URL is not set; skipping health probe.")
+            return
+        }
+
+        def healthUrl = testUrl.endsWith("/") ? "${testUrl}actuator/health" : "${testUrl}/actuator/health"
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(healthUrl).openConnection()
+            connection.setRequestMethod("GET")
+            connection.setConnectTimeout(5000)
+            connection.setReadTimeout(5000)
+            connection.connect()
+            int statusCode = connection.getResponseCode()
+            logger.quiet("Smoke diagnostics: health probe ${healthUrl} -> HTTP ${statusCode}")
+        } catch (Exception exception) {
+            logger.quiet("Smoke diagnostics: health probe failed for ${healthUrl}: ${exception.getClass().getSimpleName()} - ${exception.getMessage()}")
+        }
+    }
+}
+
+task preFunctionalDiagnostics {
+    group = "Verification"
+    description = "Logs key functional-test env values and probes TEST_URL health endpoint."
+
+    doLast {
+        def env = System.getenv()
+        def testUrl = env.get("TEST_URL")
+        def beftaStubBaseUrl = env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL")
+        def callbackAllowedHosts = env.get("CCD_CALLBACK_ALLOWED_HOSTS")
+        def callbackAllowedHttpHosts = env.get("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+        def callbackAllowPrivateHosts = env.get("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+        logger.quiet("Functional diagnostics: TEST_URL=${testUrl ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: IDAM_API_URL_BASE=${env.get('IDAM_API_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: S2S_URL_BASE=${env.get('S2S_URL_BASE') ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: BEFTA_TEST_STUB_SERVICE_BASE_URL=${beftaStubBaseUrl ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: CCD_CALLBACK_ALLOWED_HOSTS=${callbackAllowedHosts ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: CCD_CALLBACK_ALLOWED_HTTP_HOSTS=${callbackAllowedHttpHosts ?: '<unset>'}")
+        logger.quiet("Functional diagnostics: CCD_CALLBACK_ALLOW_PRIVATE_HOSTS=${callbackAllowPrivateHosts ?: '<unset>'}")
+
+        if (beftaStubBaseUrl) {
+            try {
+                String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
+                boolean callbackAllowlistsProvided = callbackAllowedHosts?.trim()
+                    && callbackAllowedHttpHosts?.trim()
+                    && callbackAllowPrivateHosts?.trim()
+                if (!callbackAllowlistsProvided) {
+                    logger.quiet("Functional diagnostics: callback allowlist env vars are not fully set; "
+                        + "skipping strict BEFTA stub host membership check.")
+                } else {
+                    List<String> missing = []
+                    if (!(callbackAllowedHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                        missing.add("CCD_CALLBACK_ALLOWED_HOSTS")
+                    }
+                    if (!(callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                        missing.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+                    }
+                    if (!(callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
+                        missing.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+                    }
+                    if (!missing.isEmpty()) {
+                        throw new GradleException("Functional preflight failed: BEFTA stub host '" + beftaStubHost
+                            + "' is missing from " + missing + ".")
+                    }
+                    logger.quiet("Functional diagnostics: BEFTA stub host '${beftaStubHost}' present in callback allowlists.")
+                }
+            } catch (MalformedURLException malformedURLException) {
+                throw new GradleException("Functional preflight failed: invalid BEFTA_TEST_STUB_SERVICE_BASE_URL: "
+                    + beftaStubBaseUrl, malformedURLException)
+            }
+        }
+
+        if (!testUrl) {
+            logger.quiet("Functional diagnostics: TEST_URL is not set; skipping health probe.")
+            return
+        }
+
+        def healthUrl = testUrl.endsWith("/") ? "${testUrl}actuator/health" : "${testUrl}/actuator/health"
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(healthUrl).openConnection()
+            connection.setRequestMethod("GET")
+            connection.setConnectTimeout(5000)
+            connection.setReadTimeout(5000)
+            connection.connect()
+            int statusCode = connection.getResponseCode()
+            logger.quiet("Functional diagnostics: health probe ${healthUrl} -> HTTP ${statusCode}")
+        } catch (Exception exception) {
+            logger.quiet("Functional diagnostics: health probe failed for ${healthUrl}: ${exception.getClass().getSimpleName()} - ${exception.getMessage()}")
+        }
+    }
+}
+
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
+    dependsOn preSmokeDiagnostics
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
@@ -763,6 +984,7 @@ task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
+    dependsOn preFunctionalDiagnostics
 
     group = "Verification"
 

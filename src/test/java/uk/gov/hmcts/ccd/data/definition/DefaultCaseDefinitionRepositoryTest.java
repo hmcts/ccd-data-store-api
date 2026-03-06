@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -47,6 +48,8 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private CallbackUrlValidator callbackUrlValidator;
 
     private CaseDefinitionRepository caseDefinitionRepository;
 
@@ -56,7 +59,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
 
-        caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, definitionStoreClient);
+        caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, definitionStoreClient,
+            callbackUrlValidator);
     }
 
     @Test

@@ -105,6 +105,11 @@ env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.BEFTA_TEST_STUB_SERVICE_HOST = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.AAC_MANAGE_CASE_ASSIGNMENT_HOST = "aac-manage-case-assignment-aat.service.core-compute-aat.internal"
+env.CCD_CALLBACK_ALLOWED_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST},${env.AAC_MANAGE_CASE_ASSIGNMENT_HOST}"
+env.CCD_CALLBACK_ALLOWED_HTTP_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST},${env.AAC_MANAGE_CASE_ASSIGNMENT_HOST}"
+env.CCD_CALLBACK_ALLOW_PRIVATE_HOSTS = "localhost,127.0.0.1,${env.BEFTA_TEST_STUB_SERVICE_HOST},${env.AAC_MANAGE_CASE_ASSIGNMENT_HOST}"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 // BEFTA retry env variables
@@ -139,6 +144,7 @@ withPipeline(type, product, component) {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
     }
+    echo "Effective TEST_URL=${env.TEST_URL}"
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
@@ -160,10 +166,10 @@ withPipeline(type, product, component) {
 
       copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
-     
+
       copyIgnore('./build/reports/tests/test', './Unit Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
-       
+
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
@@ -184,6 +190,9 @@ withPipeline(type, product, component) {
     }
 
     afterAlways('smoketest:preview') {
+        steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-smoke.json; fi")
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-smoke.json'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/smoke/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -196,6 +205,9 @@ withPipeline(type, product, component) {
     }
 
     afterAlways('smoketest:aat') {
+        steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-smoke.json; fi")
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-smoke.json'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/smoke/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -208,6 +220,9 @@ withPipeline(type, product, component) {
     }
 
     afterAlways('functionalTest:preview') {
+        steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-functional.json; fi")
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-functional.json'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/functional/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -220,6 +235,9 @@ withPipeline(type, product, component) {
     }
 
     afterAlways('functionalTest:aat') {
+        steps.sh("if [ -f target/cucumber.json ]; then cp target/cucumber.json target/cucumber-functional.json; fi")
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'target/cucumber-functional.json'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/functional/cucumber.xml'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
         publishHTML target: [
             allowMissing         : true,
