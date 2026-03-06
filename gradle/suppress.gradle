@@ -109,11 +109,11 @@ class Globals {
 }
 
 task suppressCves() {
-    if (tasks.findByName("dependencyCheckAnalyze")) {
-        dependsOn("dependencyCheckAnalyze")
-    } else if (tasks.findByName("dependencyCheckAggregate")) {
-        dependsOn("dependencyCheckAggregate")
-    }
+    //if (tasks.findByName("dependencyCheckAnalyze")) {
+    //    dependsOn("dependencyCheckAnalyze")
+    //} else if (tasks.findByName("dependencyCheckAggregate")) {
+    //    dependsOn("dependencyCheckAggregate")
+    //}
 
     doLast {
         // Optional argument can be added to specify the name of the report file.
