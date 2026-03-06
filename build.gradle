@@ -17,8 +17,6 @@ plugins {
     id 'org.owasp.dependencycheck' version '12.2.0'
 }
 
-apply from: './gradle/suppress.gradle'
-
 def versions = [
         pact_version    : '4.3.4',
 ]
