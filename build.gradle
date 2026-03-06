@@ -562,12 +562,21 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
+        def sonarProjectKey = System.getenv("SONAR_PROJECT_KEY") ?: "ccd-data-store-api"
+        def sonarOrganization = System.getenv("SONAR_ORGANIZATION") ?: "hmcts"
+        def sonarToken = System.getenv("SONAR_TOKEN") ?: System.getenv("SONAR_AUTH_TOKEN")
+
         property "sonar.exclusions", "build/generated-sources/**/*.java," +
             "**/AppInsightsConfiguration.java," +
             "**/TestingSupportController.java"
+        property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.projectName", "ccd-data-store-api"
-        property "sonar.projectKey", "ccd-data-store-api"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
+        property "sonar.projectKey", sonarProjectKey
+        property "sonar.organization", sonarOrganization
+        if (sonarToken) {
+            property "sonar.token", sonarToken
+        }
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 
