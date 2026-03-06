@@ -473,3 +473,24 @@ Feature: F-1017: Validate Event to Update TTL
        Then a negative response is received
         And the response has all other details as expected
         And the response [contains the error message indicating unauthorised change to the TTL values]
+
+    @S-1017.37
+    Scenario: Mid event callback should retain TTL.Suspended presence when normalising null/No/Yes values on v2_external#/case-data-validator-controller/validateUsingPOST
+      Given a user with [a caseworker with an active profile in CCD]
+        And a user with [access to manage TTL properties]
+        And a successful call [to create a case] as in [CreateCase_TTLCaseType_PreRequisiteCaseworker]
+        And a successful call [to grant access to a case] as in [GrantAccess_TTLCaseType_manageTTLUser_PreRequisiteCaseworker]
+        And a successful call [to set TTL properties for a case] as in [UpdateCase_TTLCaseType_manageCaseTTL_SuspenedNull_PreRequisiteCaseworker]
+
+       When a request is prepared with appropriate values
+        And the request [contains a case Id that has just been created as in CreateCase_TTLCaseType_PreRequisiteCaseworker]
+        And the request [contains an event token for the case just created above]
+        And the request [has a TTLIncrement of 20 days configured]
+        And the request [has the mid event callback change the TTL.Suspended value changed]
+        And it is submitted to call the [validation of a set of fields as Case worker (v2_ext)] operation of [CCD Data Store]
+
+       Then a positive response is received
+        And the response has all other details as expected
+        And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
+        And the response [contains the TTL.OverrideTTL from the previous data]
+        And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
