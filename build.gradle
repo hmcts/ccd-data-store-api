@@ -73,6 +73,8 @@ dependencyCheck {
     suppressionFiles = ['dependency-check-suppressions.xml']
 }
 
+apply from: "$rootDir/gradle/suppress.gradle"
+
 tasks.register("printSuppressionFile") {
   doLast {
     def suppressionFile = dependencyCheck.getSuppressionFiles()
