@@ -75,14 +75,21 @@ dependencyCheck {
 
 tasks.register("printSuppressionFile") {
   doLast {
-    println "SUPPRESSION_FILE=${dependencyCheck.getSuppressionFile()}"
     def suppressionFile = dependencyCheck.getSuppressionFiles()
+
     if (suppressionFile instanceof org.gradle.api.provider.Provider) {
       suppressionFile = suppressionFile.getOrNull()
     }
     if (suppressionFile instanceof Collection) {
       suppressionFile = suppressionFile.find { it }?.toString()
+    } else if (suppressionFile != null) {
+      suppressionFile = suppressionFile.toString()
     }
+
+    if (!suppressionFile) {
+      throw new GradleException("No dependency-check suppression file configured")
+    }
+
     println "SUPPRESSION_FILE=${suppressionFile}"
   }
 }
