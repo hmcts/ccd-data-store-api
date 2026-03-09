@@ -85,6 +85,17 @@ Prevent untrusted callback destinations from being invoked and prevent sensitive
 - Callback pass-through headers use strict allowlist semantics (only `Client-Context` is forwarded).
 - Callback detail logging redacts sensitive values (for example auth/token/password/secret fields and bearer tokens).
 
+### Why all three callback allowlists are required
+
+These three settings enforce different controls and are all required for internal callback destinations:
+
+- `CCD_CALLBACK_ALLOWED_HOSTS`: destination host allowlist (where callbacks may go).
+- `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`: explicit exceptions for hosts that may use `http` (all others must use `https`).
+- `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`: explicit exceptions for hosts that resolve to private/local/internal addresses.
+
+For internal service hosts used in AAT/preview, a callback can be blocked if any one of these is missing,
+even when the host appears in the other two lists.
+
 ### Service rollout checklist
 
 After enabling callback hardening, service teams should:
