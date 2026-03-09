@@ -18,8 +18,6 @@ plugins {
     id 'org.owasp.dependencycheck' version '12.2.0'
 }
 
-apply from: './gradle/suppress.gradle'
-
 def versions = [
         pact_version    : '4.3.4',
 ]
@@ -71,15 +69,33 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
-apply from: './gradle/suppress.gradle'
 dependencyCheck {
-    suppressionFile = 'dependency-check-suppressions.xml'
+    // suppress.gradle parses dependency-check-report.xml
+    formats = ['HTML', 'XML']
+    suppressionFiles = ['dependency-check-suppressions.xml']
 }
 
+apply from: "$rootDir/gradle/suppress.gradle"
+
 tasks.register("printSuppressionFile") {
-    doLast {
-        println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile}"
+  doLast {
+    def suppressionFile = dependencyCheck.getSuppressionFiles()
+
+    if (suppressionFile instanceof org.gradle.api.provider.Provider) {
+      suppressionFile = suppressionFile.getOrNull()
     }
+    if (suppressionFile instanceof Collection) {
+      suppressionFile = suppressionFile.find { it }?.toString()
+    } else if (suppressionFile != null) {
+      suppressionFile = suppressionFile.toString()
+    }
+
+    if (!suppressionFile) {
+      throw new GradleException("No dependency-check suppression file configured")
+    }
+
+    println "SUPPRESSION_FILE=${suppressionFile}"
+  }
 }
 
 application {
