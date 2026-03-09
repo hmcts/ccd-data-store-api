@@ -188,7 +188,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start event creation as Citizen", 
+        summary = "Start event creation as Citizen",
         description = "Start the event creation process for an existing case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -215,7 +215,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Case worker", 
+        summary = "Start case creation as Case worker",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -239,7 +239,7 @@ public class CaseDetailsEndpoint {
 
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @Operation(
-        summary = "Start case creation as Citizen", 
+        summary = "Start case creation as Citizen",
         description = "Start the case creation process for a new case. Triggers `AboutToStart` callback."
     )
     @ApiResponses(value = {
@@ -400,8 +400,19 @@ public class CaseDetailsEndpoint {
                                                     content);
     }
 
+    /**
+     * Gets printable documents for a case (deprecated).
+     *
+     * @deprecated This endpoint is deprecated and will be removed in a future release.
+     *     Use {@code /{caseId}/documents} instead.
+     */
+    @Deprecated
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
-    @Operation(summary = "Get a list of printable documents for the given case id ")
+    @Operation(
+        summary = "Get a list of printable documents for the given case id",
+        deprecated = true,
+        description = "Deprecated. Use /{caseId}/documents instead."
+    )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Documents list for the given case id")
     })
@@ -431,7 +442,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @Parameter(name = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
-        @Parameter(name = "Query Parameters", 
+        @Parameter(name = "Query Parameters",
             description = "Query Parameters, valid options: created_date, last_modified_date, "
             + "state, case_reference", required = false)
         @RequestParam(required = false) Map<String, String> queryParameters) {
