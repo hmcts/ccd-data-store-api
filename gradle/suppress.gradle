@@ -109,12 +109,6 @@ class Globals {
 }
 
 task suppressCves() {
-    //if (tasks.findByName("dependencyCheckAnalyze")) {
-    //    dependsOn("dependencyCheckAnalyze")
-    //} else if (tasks.findByName("dependencyCheckAggregate")) {
-    //    dependsOn("dependencyCheckAggregate")
-    //}
-
     doLast {
         // Optional argument can be added to specify the name of the report file.
         // If no argument is specified, the default report file is 'dependency-check-report.xml'
