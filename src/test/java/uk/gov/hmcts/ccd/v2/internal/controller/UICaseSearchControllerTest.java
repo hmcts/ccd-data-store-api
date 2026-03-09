@@ -32,7 +32,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.argThat;
@@ -89,17 +88,17 @@ class UICaseSearchControllerTest {
         final ResponseEntity<CaseSearchResultViewResource> response = controller
             .searchCases(CASE_TYPE_ID, WORKBASKET, false, searchRequest);
 
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
-            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
         }), anyBoolean());
-        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
-            eq(Collections.emptyList()));
+        verify(caseSearchResultViewGenerator).execute(CASE_TYPE_ID, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
         verify(applicationParams, never()).getGlobalSearchIndexName();
         verify(applicationParams, never()).getGlobalSearchIndexType();
         assertAll(
@@ -125,7 +124,7 @@ class UICaseSearchControllerTest {
         final ResponseEntity<CaseSearchResultViewResource> response = controller
             .searchCases(CASE_TYPE_ID, WORKBASKET, true, searchRequest);
 
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(searchRequest);
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
@@ -134,8 +133,8 @@ class UICaseSearchControllerTest {
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
         }), anyBoolean());
-        verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
-            eq(Collections.emptyList()));
+        verify(caseSearchResultViewGenerator).execute(CASE_TYPE_ID, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
         verify(applicationParams, atLeastOnce()).getGlobalSearchIndexName();
         verify(applicationParams, atLeastOnce()).getGlobalSearchIndexType();
         assertAll(
