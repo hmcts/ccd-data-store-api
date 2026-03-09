@@ -210,8 +210,9 @@ task verifyBefTaStubHostConfigConsistency {
     description = "Ensures Helm values keep BEFTA stub host and callback allowlists aligned."
 
     doLast {
-        def expectedStubHost = "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
-        def expectedAacHost = "aac-manage-case-assignment-aat.service.core-compute-aat.internal"
+        def env = System.getenv()
+        def expectedStubHost = env.get("BEFTA_TEST_STUB_SERVICE_HOST") ?: "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+        def expectedAacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
         def valuesFiles = [
             file("charts/ccd-data-store-api/values.yaml"),
             file("charts/ccd-data-store-api/values.preview.template.yaml"),
@@ -238,7 +239,7 @@ task verifyBefTaStubHostConfigConsistency {
                 boolean hasKey = matcher.find()
                 String lineValue = hasKey ? matcher.group(1) : ""
                 boolean hasStubHost = lineValue.contains(expectedStubHost)
-                boolean hasAacHost = lineValue.contains(expectedAacHost)
+                boolean hasAacHost = expectedAacHost ? lineValue.contains(expectedAacHost) : true
                 if (hasKey && (!hasStubHost || !hasAacHost)) {
                     issues << "${project.relativePath(valuesFile)}: ${key} missing expected callback allowlist hosts"
                 }
@@ -819,6 +820,14 @@ task preSmokeDiagnostics {
         if (beftaStubBaseUrl) {
             try {
                 String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
+                String aacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
+                List<String> requiredHosts = [beftaStubHost]
+                if (aacHost?.trim()) {
+                    requiredHosts.add(aacHost.trim())
+                } else {
+                    logger.quiet("Smoke diagnostics: AAC_MANAGE_CASE_ASSIGNMENT_HOST is unset; "
+                        + "enforcing callback allowlist membership only for BEFTA stub host.")
+                }
                 boolean callbackAllowlistsProvided = callbackAllowedHosts?.trim()
                     && callbackAllowedHttpHosts?.trim()
                     && callbackAllowPrivateHosts?.trim()
@@ -826,21 +835,30 @@ task preSmokeDiagnostics {
                     logger.quiet("Smoke diagnostics: callback allowlist env vars are not fully set; "
                         + "skipping strict BEFTA stub host membership check.")
                 } else {
-                List<String> missing = []
-                if (!(callbackAllowedHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                    missing.add("CCD_CALLBACK_ALLOWED_HOSTS")
-                }
-                if (!(callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                    missing.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
-                }
-                if (!(callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                    missing.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
-                }
-                if (!missing.isEmpty()) {
-                    throw new GradleException("Smoke preflight failed: BEFTA stub host '" + beftaStubHost
-                        + "' is missing from " + missing + ".")
-                }
-                logger.quiet("Smoke diagnostics: BEFTA stub host '${beftaStubHost}' present in callback allowlists.")
+                    List<String> allowedHostsList = (callbackAllowedHosts ?: "").split(',').collect { it.trim() }
+                    List<String> allowedHttpHostsList = (callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }
+                    List<String> allowedPrivateHostsList = (callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }
+                    List<String> missingFromAllowed = requiredHosts.findAll { !allowedHostsList.contains(it) }
+                    List<String> missingFromHttpAllowed = requiredHosts.findAll { !allowedHttpHostsList.contains(it) }
+                    List<String> missingFromPrivateAllowed = requiredHosts.findAll { !allowedPrivateHostsList.contains(it) }
+                    List<String> issues = []
+                    if (!missingFromAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOWED_HOSTS missing " + missingFromAllowed)
+                    }
+                    if (!missingFromHttpAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS missing " + missingFromHttpAllowed)
+                    }
+                    if (!missingFromPrivateAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS missing " + missingFromPrivateAllowed)
+                    }
+                    if (!issues.isEmpty()) {
+                        throw new GradleException("Smoke preflight failed: callback allowlist drift detected.\n"
+                            + "Required hosts: " + requiredHosts + "\n"
+                            + "Issues: " + issues + "\n"
+                            + "Set CCD_CALLBACK_ALLOWED_HOSTS, CCD_CALLBACK_ALLOWED_HTTP_HOSTS and "
+                            + "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS to include all required hosts.")
+                    }
+                    logger.quiet("Smoke diagnostics: required callback hosts ${requiredHosts} present in callback allowlists.")
                 }
             } catch (MalformedURLException malformedURLException) {
                 throw new GradleException("Smoke preflight failed: invalid BEFTA_TEST_STUB_SERVICE_BASE_URL: "
@@ -890,6 +908,14 @@ task preFunctionalDiagnostics {
         if (beftaStubBaseUrl) {
             try {
                 String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
+                String aacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
+                List<String> requiredHosts = [beftaStubHost]
+                if (aacHost?.trim()) {
+                    requiredHosts.add(aacHost.trim())
+                } else {
+                    logger.quiet("Functional diagnostics: AAC_MANAGE_CASE_ASSIGNMENT_HOST is unset; "
+                        + "enforcing callback allowlist membership only for BEFTA stub host.")
+                }
                 boolean callbackAllowlistsProvided = callbackAllowedHosts?.trim()
                     && callbackAllowedHttpHosts?.trim()
                     && callbackAllowPrivateHosts?.trim()
@@ -897,21 +923,30 @@ task preFunctionalDiagnostics {
                     logger.quiet("Functional diagnostics: callback allowlist env vars are not fully set; "
                         + "skipping strict BEFTA stub host membership check.")
                 } else {
-                    List<String> missing = []
-                    if (!(callbackAllowedHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                        missing.add("CCD_CALLBACK_ALLOWED_HOSTS")
+                    List<String> allowedHostsList = (callbackAllowedHosts ?: "").split(',').collect { it.trim() }
+                    List<String> allowedHttpHostsList = (callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }
+                    List<String> allowedPrivateHostsList = (callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }
+                    List<String> missingFromAllowed = requiredHosts.findAll { !allowedHostsList.contains(it) }
+                    List<String> missingFromHttpAllowed = requiredHosts.findAll { !allowedHttpHostsList.contains(it) }
+                    List<String> missingFromPrivateAllowed = requiredHosts.findAll { !allowedPrivateHostsList.contains(it) }
+                    List<String> issues = []
+                    if (!missingFromAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOWED_HOSTS missing " + missingFromAllowed)
                     }
-                    if (!(callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                        missing.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS")
+                    if (!missingFromHttpAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS missing " + missingFromHttpAllowed)
                     }
-                    if (!(callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }.contains(beftaStubHost)) {
-                        missing.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS")
+                    if (!missingFromPrivateAllowed.isEmpty()) {
+                        issues.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS missing " + missingFromPrivateAllowed)
                     }
-                    if (!missing.isEmpty()) {
-                        throw new GradleException("Functional preflight failed: BEFTA stub host '" + beftaStubHost
-                            + "' is missing from " + missing + ".")
+                    if (!issues.isEmpty()) {
+                        throw new GradleException("Functional preflight failed: callback allowlist drift detected.\n"
+                            + "Required hosts: " + requiredHosts + "\n"
+                            + "Issues: " + issues + "\n"
+                            + "Set CCD_CALLBACK_ALLOWED_HOSTS, CCD_CALLBACK_ALLOWED_HTTP_HOSTS and "
+                            + "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS to include all required hosts.")
                     }
-                    logger.quiet("Functional diagnostics: BEFTA stub host '${beftaStubHost}' present in callback allowlists.")
+                    logger.quiet("Functional diagnostics: required callback hosts ${requiredHosts} present in callback allowlists.")
                 }
             } catch (MalformedURLException malformedURLException) {
                 throw new GradleException("Functional preflight failed: invalid BEFTA_TEST_STUB_SERVICE_BASE_URL: "

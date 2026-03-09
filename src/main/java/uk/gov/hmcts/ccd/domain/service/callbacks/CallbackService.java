@@ -161,7 +161,7 @@ public class CallbackService {
             httpHeaders.add("Content-Type", "application/json");
             httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, securityUtils.getServiceAuthorization());
             addPassThroughHeaders(httpHeaders);
-            final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
+            final HttpEntity<CallbackRequest> requestEntity = new HttpEntity<>(callbackRequest, httpHeaders);
             final boolean shouldLogCallbackDetails = LOG.isInfoEnabled() && logCallbackDetails(url);
             if (shouldLogCallbackDetails) {
                 String requestDetails = printCallbackDetails(requestEntity);
@@ -259,8 +259,8 @@ public class CallbackService {
         }
     }
 
-    private void storePassThroughHeadersAsRequestAttributes(ResponseEntity responseEntity,
-                                                            HttpEntity requestEntity,
+    private void storePassThroughHeadersAsRequestAttributes(ResponseEntity<?> responseEntity,
+                                                            HttpEntity<?> requestEntity,
                                                             HttpServletRequest request) {
         HttpHeaders httpHeaders = responseEntity.getHeaders();
         if (null != request && null != applicationParams
@@ -281,12 +281,13 @@ public class CallbackService {
         }
     }
 
-    private ResponseEntity replaceResponseEntityWithUpdatedHeaders(final ResponseEntity responseEntity,
-                                                                   final String headerName) {
+    private <T> ResponseEntity<T> replaceResponseEntityWithUpdatedHeaders(final ResponseEntity<T> responseEntity,
+                                                                          final String headerName) {
         HttpHeaders headers = responseEntity.getHeaders();
-        if (headers != null && headers.get(headerName) != null) {
+        Object requestHeaderValue = request.getAttribute(CLIENT_CONTEXT);
+        if (headers != null && headers.get(headerName) != null && requestHeaderValue != null) {
             HttpHeaders newHeaders = ClientContextUtil.replaceHeader(headers, CLIENT_CONTEXT,
-                request.getAttribute(CLIENT_CONTEXT).toString());
+                requestHeaderValue.toString());
             return new ResponseEntity<>(responseEntity.getBody(), newHeaders, responseEntity.getStatusCode());
         } else {
             return responseEntity;

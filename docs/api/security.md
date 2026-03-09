@@ -70,6 +70,7 @@ To get your micro-service authorised, please raise a ticket with CCD.
 ## Callback security hardening
 
 Event callback URLs are validated both at definition ingestion/read-time and again before outbound requests are sent (defense in depth). This is required to reduce SSRF and token leakage risk when callback URLs originate from case definition data.
+Note: Wizard page mid-event callback URLs are validated at runtime before invocation (not eagerly at definition read-time).
 
 ### Objective
 

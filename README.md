@@ -51,11 +51,8 @@ The following environment variables are required:
 | CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to use `http` for callbacks (all other callback hosts must use `https`). |
 | CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated hosts allowed to resolve to private/local addresses for callbacks. |
 
-For Helm-based preview/AAT deployments, ensure callback host allowlists include the callback destinations used by
-your environment in `CCD_CALLBACK_ALLOWED_HOSTS`, `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`, and
-`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`.
-For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
-`aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three settings.
+For callback hardening rollout guidance and environment examples (including preview/AAT allowlist hosts),
+see [`docs/api/security.md`](docs/api/security.md).
 
 ### Building
 
