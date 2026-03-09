@@ -284,7 +284,7 @@ public class CallbackService {
     private <T> ResponseEntity<T> replaceResponseEntityWithUpdatedHeaders(final ResponseEntity<T> responseEntity,
                                                                           final String headerName) {
         HttpHeaders headers = responseEntity.getHeaders();
-        Object requestHeaderValue = request.getAttribute(CLIENT_CONTEXT);
+        Object requestHeaderValue = request != null ? request.getAttribute(CLIENT_CONTEXT) : null;
         if (headers != null && headers.get(headerName) != null && requestHeaderValue != null) {
             HttpHeaders newHeaders = ClientContextUtil.replaceHeader(headers, CLIENT_CONTEXT,
                 requestHeaderValue.toString());
