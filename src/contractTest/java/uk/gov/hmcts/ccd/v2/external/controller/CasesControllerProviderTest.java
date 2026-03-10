@@ -106,7 +106,9 @@ import static org.mockito.Mockito.when;
 @Provider("ccdDataStoreAPI_Cases")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
-    enablePendingPacts = "${pactbroker.enablePending:true}")
+    providerTags = "${pactbroker.providerTags:master}",
+    enablePendingPacts = "${pactbroker.enablePending:true}"
+)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
