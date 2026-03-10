@@ -179,6 +179,7 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     @MockitoBean
     CaseTypeService caseTypeService;
     @MockitoBean
+    @Qualifier("default")
     ValidateCaseFieldsOperation validateCaseFieldsOperation;
     @MockitoBean
     SubmitCaseTransaction submitCaseTransaction;
