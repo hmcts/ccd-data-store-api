@@ -128,7 +128,7 @@ class UICaseSearchControllerTest {
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));
-            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().get(0), is(CASE_TYPE_ID));
+            assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().getFirst(), is(CASE_TYPE_ID));
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
