@@ -1,0 +1,8 @@
+{
+  "_guid_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-befta_jurisdiction_1",
+  "delete": false,
+  "read": "[[ANYTHING_PRESENT]]"
+}

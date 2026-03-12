@@ -371,10 +371,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 },
@@ -390,10 +390,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 },
@@ -409,10 +409,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                      "_extends_": "CaseworkerBeftaJurisdiction1ReadAgnosticAccessControlList"
                     },
                     {
-                      "_extends_": "CaseworkerCaaAccessControlList"
+                      "_extends_": "CaseworkerCaaReadAgnosticAccessControlList"
                     }
                   ]
                 }
