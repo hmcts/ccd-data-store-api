@@ -253,6 +253,9 @@ public class ApplicationParams {
     @Value("${validation.dynamic-list.value-max-length}")
     private Integer validationDynamicListValueMaxLength;
 
+    @Value("${token.claim.validation.enabled}")
+    private boolean validateTokenClaims;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -658,5 +661,9 @@ public class ApplicationParams {
 
     public List<String> getExcludeVerifyAccessCaseTypesForValidate() {
         return excludeVerifyAccessCaseTypesForValidate;
+    }
+
+    public boolean isValidateTokenClaims() {
+        return validateTokenClaims;
     }
 }
