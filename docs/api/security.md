@@ -66,3 +66,49 @@ Once a service has been authenticated, it has to be authorised.
 CCD's APIs can only be called by a list of authorised `microservice_name`. This authorisation is achieved by comparing the service JWT token with the list of authorised services provided as part of the API's configuration.
 
 To get your micro-service authorised, please raise a ticket with CCD.
+
+## Callback security hardening
+
+Event callback URLs are validated both at definition ingestion/read-time and again before outbound requests are sent (defense in depth). This is required to reduce SSRF and token leakage risk when callback URLs originate from case definition data.
+Note: Wizard page mid-event callback URLs are validated at runtime before invocation (not eagerly at definition read-time).
+
+### Objective
+
+Prevent untrusted callback destinations from being invoked and prevent sensitive credential/context headers from being leaked during callback execution.
+
+- Callback hosts must be allowlisted (`CCD_CALLBACK_ALLOWED_HOSTS`).
+- Callback URLs must use `https` unless the host is explicitly approved for `http` (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
+- Callback hosts that resolve to local/private ranges are blocked unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Cloud instance metadata endpoint targets are explicitly blocked (for example `169.254.169.254`).
+- Callback URLs with embedded credentials are rejected (`https://user:pass@host/...`).
+- Callback redirects are rejected (`3xx` callback responses are not followed).
+- Callback pass-through headers use strict allowlist semantics (only `Client-Context` is forwarded).
+- Callback detail logging redacts sensitive values (for example auth/token/password/secret fields and bearer tokens).
+
+### Why all three callback allowlists are required
+
+These three settings enforce different controls and are all required for internal callback destinations:
+
+- `CCD_CALLBACK_ALLOWED_HOSTS`: destination host allowlist (where callbacks may go).
+- `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`: explicit exceptions for hosts that may use `http` (all others must use `https`).
+- `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`: explicit exceptions for hosts that resolve to private/local/internal addresses.
+
+For internal service hosts used in AAT/preview, a callback can be blocked if any one of these is missing,
+even when the host appears in the other two lists.
+
+### Service rollout checklist
+
+After enabling callback hardening, service teams should:
+
+1. Ensure callback URLs do not contain embedded credentials (`user:pass@host`).
+2. Configure trusted callback destinations with:
+   - `CCD_CALLBACK_ALLOWED_HOSTS`
+   - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
+   - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
+   - For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
+     `aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three allowlists.
+3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
+4. Re-run callback integration tests and verify expected callback hosts are accepted.
+5. Ensure callback endpoints do not return redirects (`3xx`) and instead return final responses directly.
+6. Update callback implementations that depended on arbitrary forwarded headers; only `Client-Context` is forwarded.
+7. Update alerting/log triage rules to use redacted callback logs (sensitive URL/auth/token/password values are masked).

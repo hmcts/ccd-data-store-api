@@ -129,7 +129,7 @@ public abstract class AbstractBaseIntegrationTest {
     @Inject
     protected CacheManager cacheManager;
     @Inject
-    @Qualifier("DefaultObjectMapper")
+    @Qualifier("defaultObjectMapper")
     protected ObjectMapper defaultObjectMapper;
 
     @Mock
