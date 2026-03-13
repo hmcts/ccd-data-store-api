@@ -10,7 +10,7 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
-    id 'info.solidsoft.pitest' version '1.15.0'
+    id 'info.solidsoft.pitest' version '1.19.0-rc.3'
     id 'uk.gov.hmcts.java' version '0.12.68'
     id 'au.com.dius.pact' version '4.6.20'
     id 'org.jsonschema2pojo' version '1.2.2'
@@ -244,7 +244,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '5.0.1'
     implementation group: 'org.springframework.hateoas', name: 'spring-hateoas'
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -304,7 +304,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.0'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '5.0.2'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
@@ -623,7 +623,7 @@ jacocoTestReport {
         def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
-        def parser = new XmlParser()
+        def parser = new groovy.xml.XmlParser()
         parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
@@ -719,11 +719,11 @@ task fortifyScan(type: JavaExec)  {
 
 idea {
   module {
-    // config to allow Intelij to mark test source and resource files correctly to help linting tools
-    testSourceDirs += project.sourceSets.aat.java.srcDirs
-    testSourceDirs += project.sourceSets.contractTest.java.srcDirs
-    testResourceDirs += project.sourceSets.aat.resources.srcDirs
-    testResourceDirs += project.sourceSets.contractTest.resources.srcDirs
+      // config to allow InteliJ to mark test source and resource files correctly to help linting tools
+      testSources.from(project.sourceSets.aat.java.srcDirs)
+      testSources.from(project.sourceSets.contractTest.java.srcDirs)
+      testResources.from(project.sourceSets.aat.resources.srcDirs)
+      testResources.from(project.sourceSets.contractTest.resources.srcDirs)
   }
 }
 
