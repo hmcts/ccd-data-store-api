@@ -1,3 +1,4 @@
+import groovy.xml.XmlSlurper
 import groovy.xml.slurpersupport.GPathResult
 import groovy.xml.DOMBuilder
 import groovy.xml.XmlUtil
