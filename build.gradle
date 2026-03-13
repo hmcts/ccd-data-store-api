@@ -244,7 +244,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '5.0.1'
     implementation group: 'org.springframework.hateoas', name: 'spring-hateoas'
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -719,11 +719,11 @@ task fortifyScan(type: JavaExec)  {
 
 idea {
   module {
-    // config to allow Intelij to mark test source and resource files correctly to help linting tools
-    testSourceDirs += project.sourceSets.aat.java.srcDirs
-    testSourceDirs += project.sourceSets.contractTest.java.srcDirs
-    testResourceDirs += project.sourceSets.aat.resources.srcDirs
-    testResourceDirs += project.sourceSets.contractTest.resources.srcDirs
+      // config to allow InteliJ to mark test source and resource files correctly to help linting tools
+      testSources.from(project.sourceSets.aat.java.srcDirs)
+      testSources.from(project.sourceSets.contractTest.java.srcDirs)
+      testResources.from(project.sourceSets.aat.resources.srcDirs)
+      testResources.from(project.sourceSets.contractTest.resources.srcDirs)
   }
 }
 
