@@ -1,4 +1,4 @@
-import groovy.util.slurpersupport.GPathResult
+import groovy.xml.slurpersupport.GPathResult
 import groovy.xml.DOMBuilder
 import groovy.xml.XmlUtil
 import org.w3c.dom.Document
