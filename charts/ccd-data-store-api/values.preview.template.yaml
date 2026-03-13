@@ -29,7 +29,8 @@ java:
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    #DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-1709-java/
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     ELASTIC_SEARCH_ENABLED: true
@@ -92,7 +93,7 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -116,7 +117,7 @@ ccd:
   ccd-user-profile-api:
     java:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
-      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      image: hmctsprod.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
@@ -178,13 +179,13 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
+  image: "hmctsprod.azurecr.io/imported/logstash/logstash"
   imageTag: "7.16.1"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
-      image: hmctspublic.azurecr.io/curl:7.70.0
+      image: hmctsprod.azurecr.io/curl:7.70.0
       command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
