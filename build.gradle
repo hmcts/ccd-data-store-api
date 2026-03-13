@@ -10,7 +10,7 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
-    id 'info.solidsoft.pitest' version '1.15.0'
+    id 'info.solidsoft.pitest' version '1.19.0-rc.3'
     id 'uk.gov.hmcts.java' version '0.12.68'
     id 'au.com.dius.pact' version '4.6.20'
     id 'org.jsonschema2pojo' version '1.2.2'
@@ -623,7 +623,7 @@ jacocoTestReport {
         def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
-        def parser = new XmlParser()
+        def parser = new groovy.xml.XmlParser()
         parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
