@@ -21,19 +21,25 @@ class SecurityConfigurationTest {
     @Test
     void shouldAcceptJwtFromConfiguredIssuer() {
         Instant now = Instant.now();
-        assertFalse(validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors());
+        assertFalse(
+            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+        );
     }
 
     @Test
     void shouldRejectJwtFromUnexpectedIssuer() {
         Instant now = Instant.now();
-        assertTrue(validator().validate(buildJwt(INVALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors());
+        assertTrue(
+            validator().validate(buildJwt(INVALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+        );
     }
 
     @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
         Instant now = Instant.now();
-        assertTrue(validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(120), now.minusSeconds(60))).hasErrors());
+        assertTrue(
+            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(120), now.minusSeconds(60))).hasErrors()
+        );
     }
 
     private OAuth2TokenValidator<Jwt> validator() {
