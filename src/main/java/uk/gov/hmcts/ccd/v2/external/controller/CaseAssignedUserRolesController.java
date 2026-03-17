@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,7 +55,24 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
-@RequestMapping(path = "/")
+/*
+  NOTE: Explicitly set to application/hal+json to bypass a Spring Framework concurrency problem
+  in AbstractJackson2HttpMessageConverter (Issue #36090).
+  * Although the response bodies may suppress _links (via @JsonIgnore), we strictly enforce
+  the HAL media type here for two critical reasons:
+  * 1. CRASH PREVENTION: It forces Spring to select the specific HAL converter (fast path)
+  instead of iterating over all converters to discover supported types. The iteration
+  path triggers an ArrayIndexOutOfBoundsException on a corrupted LinkedHashMap
+  during concurrent startup (Lazy Initialization race condition).
+  * 2. COMPATIBILITY: It preserves the existing Content-Type header (application/hal+json)
+  that clients expect, preventing contract breakage.
+  * WARNING: DO NOT change this to MediaType.APPLICATION_JSON_VALUE or remove it
+  without verifying that the upstream apps fix has been applied.
+ */
+@RequestMapping(
+    path = "/",
+    produces = MediaTypes.HAL_JSON_VALUE
+)
 @ConditionalOnProperty(value = "ccd.conditional-apis.case-assigned-users-and-roles.enabled", havingValue = "true")
 public class CaseAssignedUserRolesController {
 
