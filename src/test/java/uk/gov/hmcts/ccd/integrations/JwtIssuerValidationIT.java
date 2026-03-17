@@ -51,7 +51,7 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
             String.class
         );
 
-        assertThat(response.getStatusCode().value()).isEqualTo(401);
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
         WireMock.verify(0, getRequestedFor(urlEqualTo("/o/userinfo")));
     }

@@ -32,7 +32,7 @@ The test fixtures use valid JWT timelines so failures reflect validator behavior
 
 `src/test/java/uk/gov/hmcts/ccd/integrations/JwtIssuerValidationIT.java` adds full-stack coverage for a signed JWT whose `iss` claim does not match the configured issuer. This test requires the normal integration-test runtime dependencies for the repo.
 
-Coverage is intentionally layered: validator-only in `SecurityConfigurationTest`, request-level Spring Security behavior in `JwtIssuerSecurityWebTest`, and full integration wiring in `JwtIssuerValidationIT`.
+Coverage is layered between validator-only behavior in `SecurityConfigurationTest` and full integration wiring in `JwtIssuerValidationIT`.
 
 ## Configuration and deployment note
 
