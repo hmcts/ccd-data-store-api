@@ -306,7 +306,7 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.4'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
