@@ -33,7 +33,7 @@ java:
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
-    OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+    OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
