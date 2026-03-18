@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.integrations;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -21,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@Ignore
+@Disabled
 // FIXME : RDM-7635 - has to mock opendId jwks responses with proper Key set (RS256 public / private key).
 public class ServiceToServiceIT {
 
@@ -48,8 +48,8 @@ public class ServiceToServiceIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), not(401));
-        assertThat(response.getStatusCodeValue(), not(403));
+        assertThat(response.getStatusCode().value(), not(401));
+        assertThat(response.getStatusCode().value(), not(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
                    .withHeader("Authorization", equalTo("Bearer " + SERVICE_TOKEN)));
 
@@ -74,7 +74,7 @@ public class ServiceToServiceIT {
             String.class
         );
 
-        assertThat(response.getStatusCodeValue(), is(403));
+        assertThat(response.getStatusCode().value(), is(403));
         verify(getRequestedFor(urlEqualTo("/s2s/details"))
                    .withHeader("Authorization", equalTo("Bearer " + INVALID_SERVICE_TOKEN)));
 

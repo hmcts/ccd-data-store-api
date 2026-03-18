@@ -1,13 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -26,6 +19,15 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
@@ -33,7 +35,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -87,12 +88,12 @@ class AuditCaseRemoteOperationTest {
         .build();
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() throws JsonProcessingException {
+        MockitoAnnotations.openMocks(this);
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
-        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, feignClient,
+        auditCaseRemoteOperation = new AuditCaseRemoteOperation(feignClient,
             auditCaseRemoteConfiguration);
     }
 
@@ -111,10 +112,10 @@ class AuditCaseRemoteOperationTest {
         // Verify asyncRequestService interaction
         ArgumentCaptor<CaseActionPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseActionPostRequest.class);
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseAction(any(String.class), requestCaptor.capture())
+            verify(feignClient).postCaseAction(requestCaptor.capture())
         );
         // Verify headers and endpoint
-        verify(feignClient).postCaseAction(eq("Bearer 1234"), any(CaseActionPostRequest.class));
+        verify(feignClient).postCaseAction(any(CaseActionPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseActionAuditUrl(), is(equalTo("http://localhost/caseAction")));
 
         // Assert the captured request
@@ -145,9 +146,9 @@ class AuditCaseRemoteOperationTest {
         // Verify FeignClient interaction
         ArgumentCaptor<CaseSearchPostRequest> requestCaptor = ArgumentCaptor.forClass(CaseSearchPostRequest.class);
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseSearch(any(String.class), requestCaptor.capture())
+            verify(feignClient).postCaseSearch(requestCaptor.capture())
         );
-        verify(feignClient).postCaseSearch(eq("Bearer 1234"), any(CaseSearchPostRequest.class));
+        verify(feignClient).postCaseSearch(any(CaseSearchPostRequest.class));
         assertThat(auditCaseRemoteConfiguration.getCaseSearchAuditUrl(), is(equalTo("http://localhost/caseSearch")));
 
         // Assert the captured request
@@ -184,13 +185,13 @@ class AuditCaseRemoteOperationTest {
 
         // Simulate exception in FeignClient
         doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseAction(any(String.class), any(CaseActionPostRequest.class));
+            .postCaseAction(any(CaseActionPostRequest.class));
 
         auditCaseRemoteOperation.postCaseAction(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseAction(any(String.class), any(CaseActionPostRequest.class))
+            verify(feignClient).postCaseAction(any(CaseActionPostRequest.class))
         );
     }
 
@@ -206,13 +207,13 @@ class AuditCaseRemoteOperationTest {
 
         // Simulate exception in FeignClient
         doThrow(new RuntimeException("FeignClient error")).when(feignClient)
-            .postCaseSearch(any(String.class), any(CaseSearchPostRequest.class));
+            .postCaseSearch(any(CaseSearchPostRequest.class));
 
         auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
 
         // Verify exception is logged and no further interaction occurs
         await().atMost(200, MILLISECONDS).untilAsserted(() ->
-            verify(feignClient).postCaseSearch(any(String.class), any(CaseSearchPostRequest.class))
+            verify(feignClient).postCaseSearch(any(CaseSearchPostRequest.class))
         );
     }
 

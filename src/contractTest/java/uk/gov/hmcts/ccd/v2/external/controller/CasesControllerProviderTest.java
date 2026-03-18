@@ -1,36 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import au.com.dius.pact.provider.junit5.HttpTestTarget;
-import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
-import au.com.dius.pact.provider.junitsupport.Provider;
-import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
-import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.collect.Lists;
-import com.microsoft.applicationinsights.TelemetryClient;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.auditlog.AuditService;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.WireMockBaseContractTest;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
@@ -58,9 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -68,8 +35,6 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAmApiClient;
-import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
@@ -80,8 +45,6 @@ import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdate
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
-import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
-import uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
 import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
@@ -95,6 +58,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import au.com.dius.pact.provider.junit5.HttpTestTarget;
+import au.com.dius.pact.provider.junit5.PactVerificationContext;
+import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
+import au.com.dius.pact.provider.junitsupport.Provider;
+import au.com.dius.pact.provider.junitsupport.State;
+import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
+import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
+import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -129,7 +119,7 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest extends WireMockBaseTest {
+public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -140,135 +130,74 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
     @Autowired
     ContractTestSecurityUtils securityUtils;
-
-    @MockBean
+    @MockitoBean
     UserAuthorisationSecurity userAuthorisationSecurity;
-
     @Autowired
     ContractTestCreateCaseOperation contractTestCreateCaseOperation;
-
     @Autowired
     ContractTestGetCaseOperation getCaseOperation;
-
     @Autowired
     ContractTestStartEventOperation startEventOperation;
-
     @Autowired
     ObjectMapper objectMapper;
-
-    @MockBean
+    @MockitoBean
     @Qualifier(DefaultUserRepository.QUALIFIER)
     UserRepository userRepository;
-
-    @MockBean
+    @MockitoBean
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     CaseDefinitionRepository caseDefinitionRepository;
-
-    @MockBean
-    EventTriggerService eventTriggerService;
-
-    @MockBean
-    CaseDataService caseDataService;
-
-    @MockBean
-    SubmitCaseTransaction submitCaseTransaction;
-
-    @MockBean
-    CaseSanitiser caseSanitiser;
-
-    @MockBean
-    CaseTypeService caseTypeService;
-
-    @MockBean
+    @MockitoBean
     CallbackInvoker callbackInvoker;
-
-    @MockBean
-    ValidateCaseFieldsOperation validateCaseFieldsOperation;
-
-    @MockBean
-    CasePostStateService casePostStateService;
-
-    @MockBean
+    @MockitoBean
+    GlobalSearchProcessorService globalSearchProcessorService;
+    @MockitoBean
     @Qualifier(DefaultDraftGateway.QUALIFIER)
     DraftGateway draftGateway;
-
-    @MockBean
+    @MockitoBean
     CaseDataIssueLogger caseDataIssueLogger;
-
-    @MockBean
-    GlobalSearchProcessorService globalSearchProcessorService;
-
-    @MockBean
+    @MockitoBean
     EventTokenService eventTokenService;
-
-    @MockBean
+    @MockitoBean
     @Qualifier("default")
     SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
-
-    @MockBean
+    @MockitoBean
     SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
-
-    @MockBean
-    CaseLinkService caseLinkService;
-
-    @MockBean
-    TimeToLiveService timeToLiveService;
-
-    @MockBean
+    @MockitoBean
     CaseService caseService;
-
-    @MockBean
-    DocumentSanitiser documentSanitiser;
-
-    @MockBean
+    @MockitoBean
     DefinitionStoreClient definitionStoreClient;
-
     @Autowired
     ContractTestCaseDefinitionRepository contractTestCaseDefinitionRepository;
-
-    @MockBean
+    @MockitoBean
     AuthorisedCaseSearchOperation elasticsearchCaseSearchOperationMock;
-
-    @MockBean
+    @MockitoBean
     AuthorisedSearchOperation authorisedSearchOperation;
-
-    @MockBean
+    @MockitoBean
     UserAuthorisation userAuthorisation;
-
-    @MockBean
-    AuditService auditService;
-
-    @MockBean
-    CaseAccessService caseAccessService;
-    @MockBean
-    AccessControlService accessControlService;
-
-    @MockBean
-    TelemetryClient telemetryClient;
-
     @Autowired
     ContractTestCreateEventOperation createEventOperation;
-
-    @MockBean
-    MessageService messageService;
-
-    @MockBean
-    CaseAuditEventRepository caseAuditEventRepository;
-
-    @MockBean
-    CaseDocumentAmApiClient caseDocumentAmApiClient;
-
-    @MockBean
+    @MockitoBean
+    CaseTypeService caseTypeService;
+    @MockitoBean
+    ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @MockitoBean
+    SubmitCaseTransaction submitCaseTransaction;
+    @MockitoBean
+    TimeToLiveService timeToLiveService;
+    @MockitoBean
+    CasePostStateService casePostStateService;
+    @MockitoBean
+    CaseLinkService caseLinkService;
+    @MockitoBean
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-    CaseDetailsRepository caseDetailsRepository;
-
-    @MockBean
+    DefaultCaseDetailsRepository caseDetailsRepository;
+    @MockitoBean
     UIDService uidService;
-
-    @MockBean
+    @MockitoBean
+    EventTriggerService eventTriggerService;
+    @MockitoBean
     SecurityClassificationServiceImpl securityClassificationService;
-
-    @MockBean
+    @MockitoBean
     @Qualifier("authorised")
     CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
 
@@ -303,7 +232,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
 
         stubFor(WireMock.post(urlMatching("/oauth2/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
-        when(validateCaseFieldsOperation.validateCaseDetails(any(), any())).thenReturn(new HashMap<>());
+        when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 
     @State("adoption-web makes request to get cases")

@@ -1,0 +1,66 @@
+{
+  "_guid_": "F-150_CreateCase",
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+  "specs": [
+    "to create a decentralised case"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true,
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8"
+    },
+    "pathVariables": {
+      "ctid": "FT_Decentralisation"
+    },
+    "body": {
+      "data": {
+        "TextField": "Decentralised case"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-150_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "Decentralised case"
+      },
+      "ignore_warning": false
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/case-types/FT_Decentralisation/cases{?ignore-warning}"
+        }
+      },
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_Decentralisation",
+      "created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "data": {
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
+      },
+      "data_classification": {},
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

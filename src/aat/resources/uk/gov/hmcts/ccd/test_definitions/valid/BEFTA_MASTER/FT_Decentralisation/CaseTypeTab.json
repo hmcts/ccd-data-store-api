@@ -1,0 +1,16 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "Channel": "notApplicable",
+    "TabID": "NameTab",
+    "TabLabel": "Details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "TextField",
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "",
+    "TabShowCondition": "",
+    "DisplayContextParameter": ""
+  }
+]

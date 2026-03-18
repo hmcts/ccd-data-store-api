@@ -13,8 +13,10 @@ Feature: F-107: Organisation Policies on Cases
       And it is submitted to call the [Submit Case Creation as Caseworker] operation of [CCD Data Store]
       Then a positive response is received
       And the response has all other details as expected
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-107_Remove_Case_Assigned_User_role_for_Case].
 
-    @S-930 @Ignore
+  @S-930 @Ignore
     Scenario: must successfully update OrganisationPolicy fields on a case
       Given a user with [an active profile in CCD]
       And a case that has just been created as in [S-930_Create_Case_Data]

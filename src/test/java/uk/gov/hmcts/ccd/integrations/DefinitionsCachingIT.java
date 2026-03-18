@@ -1,18 +1,18 @@
 package uk.gov.hmcts.ccd.integrations;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedUIDefinitionGateway;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
@@ -71,7 +71,7 @@ public class DefinitionsCachingIT {
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
 
-    @SpyBean
+    @MockitoSpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
@@ -80,13 +80,13 @@ public class DefinitionsCachingIT {
     @Autowired
     ApplicationParams applicationParams;
 
-    @SpyBean
+    @MockitoSpyBean
     UIDefinitionRepository uiDefinitionRepository;
 
-    @SpyBean
+    @MockitoSpyBean
     private HttpUIDefinitionGateway httpUIDefinitionGateway;
 
-    @SpyBean
+    @MockitoSpyBean
     private CachedUIDefinitionGateway cachedUIDefinitionGateway;
 
     @Mock
@@ -107,7 +107,7 @@ public class DefinitionsCachingIT {
     List<WizardPage> wizardPageList = new ArrayList<>();
     List<Banner> bannersList = Collections.emptyList();
 
-    @Before
+    @BeforeEach
     public void setup() {
         initiateWizardPageList(wizardPageList);
 
@@ -214,7 +214,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+        assertEquals(3, applicationParams.getJurisdictionTTLSecs());
 
         verify(caseDefinitionRepository, times(0)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
         caseDefinitionRepository.getJurisdiction(JURISDICTION_ID_2);
@@ -244,7 +244,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
-        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
+        assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
@@ -256,7 +256,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
+        assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
 
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);

@@ -1,0 +1,173 @@
+package uk.gov.hmcts.ccd.domain.service.getevents;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedAuditEventLoader;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
+
+@ExtendWith(MockitoExtension.class)
+class DelegatingGetEventsOperationTest {
+
+    private static final Long CASE_ID = 123L;
+    private static final String JURISDICTION_ID = "Probate";
+    private static final String CASE_TYPE_ID = "CaseTypeId";
+    private static final String CASE_REFERENCE = "999999";
+    private static final Long EVENT_ID = 100L;
+    private static final List<AuditEvent> EVENTS = new ArrayList<>();
+    @Mock
+    private CaseAuditEventRepository auditEventRepository;
+    @Mock
+    private CreatorGetCaseOperation getCaseOperation;
+    @Mock
+    private UIDService uidService;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private DecentralisedAuditEventLoader decentralisedAuditEventLoader;
+
+    private DelegatingGetEventsOperation listEventsOperation;
+    private CaseDetails caseDetails;
+    private AuditEvent event;
+
+    @BeforeEach
+    void setUp() {
+        openMocks(this);
+
+        caseDetails = new CaseDetails();
+        caseDetails.setId(String.valueOf(CASE_ID));
+
+        listEventsOperation = new DelegatingGetEventsOperation(resolver, decentralisedAuditEventLoader,
+            new LocalAuditEventLoader(auditEventRepository), getCaseOperation, uidService);
+        event = new AuditEvent();
+    }
+
+    @Test
+    @DisplayName("should retrieve events from repository")
+    void shouldDelegateCallToRepository() {
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
+
+        final List<AuditEvent> events = listEventsOperation.getEvents(caseDetails);
+
+        assertAll(
+            () -> verify(auditEventRepository).findByCase(caseDetails),
+            () -> assertThat(events, sameInstance(EVENTS))
+        );
+    }
+
+    @Test
+    @DisplayName("should find case details and retrieve events from repository")
+    void shouldFindCaseDetailsAndDelegateCallToRepository() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
+
+        final List<AuditEvent> events = listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(auditEventRepository).findByCase(caseDetails),
+            () -> assertThat(events, sameInstance(EVENTS))
+        );
+    }
+
+    @Test
+    @DisplayName("should find case details and retrieve events from repository for case reference")
+    void shouldFindCaseDetailsAndGetEventsForCaseReference() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
+
+        final List<AuditEvent> events = listEventsOperation.getEvents(CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(auditEventRepository).findByCase(caseDetails),
+            () -> assertThat(events, sameInstance(EVENTS))
+        );
+    }
+
+    @Test
+    @DisplayName("should return resource not found exception when case details cannot be found for case reference")
+    void shouldReturnErrorWhenCaseDetailsCannotBeFoundForCaseReference() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+
+        assertThrows(ResourceNotFoundException.class,
+            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+    }
+
+    @Test
+    @DisplayName("should return bad request exception when case reference invalid1 when only case reference is passed")
+    void shouldThrowBadRequestExceptionWhenCaseDetailsCannotBeFoundForCaseReference() {
+        doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
+
+        assertThrows(BadRequestException.class,
+            () -> listEventsOperation.getEvents(CASE_REFERENCE));
+    }
+
+
+    @Test
+    @DisplayName("should return bad request exception when case reference invalid")
+    void shouldThrowBadRequestExceptionWhenCaseDetailsCannotBeFound() {
+        doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
+
+        assertThrows(BadRequestException.class, () ->
+            listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+    }
+
+    @Test
+    @DisplayName("should return resource not found exception when case details cannot be found")
+    void shouldReturnErrorWhenCaseDetailsCannotBeFound() {
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+
+        assertThrows(ResourceNotFoundException.class, () ->
+            listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+    }
+
+    @Test
+    @DisplayName("should find case details and retrieve events from repository")
+    void shouldFindEventAndDelegateCallToRepository() {
+        doReturn(Optional.of(event)).when(auditEventRepository).findByEventId(EVENT_ID);
+
+        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
+
+        assertThat(optionalAuditEvent.isPresent(), is(true));
+        AuditEvent output = optionalAuditEvent.get();
+        assertAll(
+            () -> verify(auditEventRepository).findByEventId(EVENT_ID),
+            () -> assertThat(output, sameInstance(event))
+        );
+    }
+
+    @Test
+    @DisplayName("should throw resource not found exception when event cannot be found")
+    void shouldReturnErrorWhenEventCannotBeFound() {
+        doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
+
+        assertThrows(ResourceNotFoundException.class, () ->
+            listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID));
+    }
+}

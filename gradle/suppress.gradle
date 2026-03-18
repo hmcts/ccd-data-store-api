@@ -21,12 +21,21 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
     // Creates a unique set of non-suppressed vulnerabilities
     GPathResult vulnerabilityReport = new XmlSlurper().parse(new FileReader(reportFile))
     Set<String> unSuppressedCves = vulnerabilityReport.'**'
-                                    .findAll { node -> node.name() == 'vulnerability' }
-                                    .collect { it.name.text() } as Set<String>
+            .findAll { node -> node.name() == 'vulnerability' }
+            .collect { it.name.text() } as Set<String>
 
     if (!unSuppressedCves.isEmpty()) {
-        // Suppression file must be specified as 'suppressionFile=...' in build.gradle.
-        File suppressionFile = project.file(dependencyCheck.getSuppressionFile())
+        // Suppression file must be specified in dependencyCheck.suppressionFiles in build.gradle.
+        def suppressionFileValue = dependencyCheck.getSuppressionFiles()
+        if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, "getOrNull")) {
+            suppressionFileValue = suppressionFileValue.getOrNull()
+        } else if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, "get")) {
+            suppressionFileValue = suppressionFileValue.get()
+        }
+        if (suppressionFileValue instanceof Collection) {
+            suppressionFileValue = suppressionFileValue.find { it }?.toString()
+        }
+        File suppressionFile = project.file(suppressionFileValue)
         validateSection(suppressionFile, new XmlSlurper(false, false).parse(suppressionFile))
 
         String suppressionXml = new String(suppressionFile.readBytes(), "UTF-8")

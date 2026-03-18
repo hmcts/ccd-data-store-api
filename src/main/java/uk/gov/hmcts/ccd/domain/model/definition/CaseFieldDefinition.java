@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
@@ -19,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
-@ApiModel(description = "")
+@Schema
 public class CaseFieldDefinition implements Serializable, CommonField, Copyable<CaseFieldDefinition> {
 
     private static final long serialVersionUID = -4257574164546267919L;
@@ -358,6 +359,36 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
         return caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition() != null
             && caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields() != null
             && !caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields().isEmpty();
+    }
+
+    /**
+     * Retrieves the subfield definition for the specified field name.
+     * If the field name corresponds to a subfield within the current field's
+     * complex fields or collection field type, the subfield definition is returned.
+     * If no match is found, an empty Optional is returned.
+     *
+     * @param fieldName The name of the subfield to retrieve.
+     * @return An Optional containing the matching subfield definition, or empty if no match is found.
+     */
+    public Optional<CaseFieldDefinition> getSubfieldDefinition(String fieldName) {
+        FieldTypeDefinition fieldType = this.getFieldTypeDefinition();
+
+        if (fieldType != null) {
+            Optional<CaseFieldDefinition> complexField = fieldType.getComplexFieldById(fieldName);
+            if (complexField.isPresent()) {
+                return complexField;
+            }
+
+            FieldTypeDefinition collectionFieldType = fieldType.getCollectionFieldTypeDefinition();
+            if (collectionFieldType != null) {
+                Optional<CaseFieldDefinition> collectionField = collectionFieldType.getComplexFieldById(fieldName);
+                if (collectionField.isPresent()) {
+                    return collectionField;
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     @JsonIgnore
