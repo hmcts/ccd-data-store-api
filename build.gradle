@@ -326,6 +326,7 @@ dependencies {
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:4.3.1'
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
