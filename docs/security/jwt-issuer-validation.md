@@ -52,6 +52,10 @@ Before rollout, confirm:
 Do not infer `OIDC_ISSUER` from the public OIDC discovery URL. In preview/AAT for this repo, the correct
 `OIDC_ISSUER` had to be taken from decoded real tokens and did not match the public `IDAM_OIDC_URL` base.
 
+Smoke and functional pipeline runs now perform a pre-check that acquires a real test token and fails fast if its
+`iss` claim does not match `OIDC_ISSUER`.
+This verifier is enabled in CI via `VERIFY_OIDC_ISSUER=true` and remains opt-in for local runs.
+
 If external services still send tokens with a different issuer, this change will reject them with `401` until configuration or token issuance is aligned.
 
 For local running, `IDAM_OIDC_URL` should point to the local OIDC discovery base, usually `http://localhost:5000`, and `OIDC_ISSUER` must exactly match the `iss` claim in the local access tokens being used. Common local values are `OIDC_ISSUER=http://fr-am:8080/openam/oauth2/hmcts` or `OIDC_ISSUER=http://localhost:5000/o`, depending on how the local token source is configured.

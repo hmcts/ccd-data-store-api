@@ -1,0 +1,57 @@
+package uk.gov.hmcts.ccd.datastore.befta;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.datastore.tests.Env;
+import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
+import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+public final class JwtIssuerVerificationApp {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private JwtIssuerVerificationApp() {
+    }
+
+    public static void main(String[] args) throws Exception {
+        String expectedIssuer = Env.require("OIDC_ISSUER");
+        String idamBaseUrl = Env.require("IDAM_API_URL_BASE");
+        String email = Env.require("CCD_CASEWORKER_AUTOTEST_EMAIL");
+        String password = Env.require("CCD_CASEWORKER_AUTOTEST_PASSWORD");
+
+        IdamHelper idamHelper = new IdamHelper(idamBaseUrl, OAuth2.INSTANCE);
+        String accessToken = idamHelper.getIdamOauth2Token(email, password);
+        String actualIssuer = decodeIssuer(accessToken);
+
+        if (!expectedIssuer.equals(actualIssuer)) {
+            throw new IllegalStateException(
+                "OIDC_ISSUER mismatch: expected `" + expectedIssuer + "` but token iss was `" + actualIssuer + "`"
+            );
+        }
+
+        System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
+    }
+
+    private static String decodeIssuer(String accessToken) throws Exception {
+        String[] parts = accessToken.split("\\.");
+        if (parts.length < 2) {
+            throw new IllegalStateException("Access token is not a JWT");
+        }
+
+        byte[] decodedPayload = Base64.getUrlDecoder().decode(padBase64(parts[1]));
+        JsonNode payload = OBJECT_MAPPER.readTree(new String(decodedPayload, StandardCharsets.UTF_8));
+        JsonNode issuer = payload.get("iss");
+        if (issuer == null || issuer.isNull()) {
+            throw new IllegalStateException("Access token does not contain an iss claim");
+        }
+        return issuer.asText();
+    }
+
+    private static String padBase64(String value) {
+        int remainder = value.length() % 4;
+        return remainder == 0 ? value : value + "=".repeat(4 - remainder);
+    }
+}

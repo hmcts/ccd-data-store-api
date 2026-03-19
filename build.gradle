@@ -735,9 +735,22 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task verifyFunctionalTestJwtIssuer(type: JavaExec) {
+    description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+    group = 'Verification'
+    dependsOn aatClasses
+
+    onlyIf {
+        System.getenv('VERIFY_OIDC_ISSUER')?.toBoolean()
+    }
+
+    mainClass = 'uk.gov.hmcts.ccd.datastore.befta.JwtIssuerVerificationApp'
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+}
+
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
-    dependsOn aatClasses
+    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
@@ -778,7 +791,7 @@ def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
-    dependsOn aatClasses
+    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
 
     group = "Verification"
 
