@@ -52,6 +52,8 @@ The following environment variables are required:
 
 `IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
 
+For Codex-based JWT or security work in this repo, explicitly tell Codex to use skill at `docs/skills/security/SKILL.md`.
+
 ### Building
 
 The project uses [Gradle](https://gradle.org/).
