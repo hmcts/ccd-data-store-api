@@ -49,6 +49,9 @@ Before rollout, confirm:
 - no pipeline or release-time override is supplying an older issuer value
 - external callers, smoke tests, and AAT clients obtain tokens whose `iss` claim matches this service's configured `OIDC_ISSUER`
 
+Do not infer `OIDC_ISSUER` from the public OIDC discovery URL. In preview/AAT for this repo, the correct
+`OIDC_ISSUER` had to be taken from decoded real tokens and did not match the public `IDAM_OIDC_URL` base.
+
 If external services still send tokens with a different issuer, this change will reject them with `401` until configuration or token issuance is aligned.
 
 For local running, `IDAM_OIDC_URL` should point to the local OIDC discovery base, usually `http://localhost:5000`, and `OIDC_ISSUER` must exactly match the `iss` claim in the local access tokens being used. Common local values are `OIDC_ISSUER=http://fr-am:8080/openam/oauth2/hmcts` or `OIDC_ISSUER=http://localhost:5000/o`, depending on how the local token source is configured.

@@ -37,8 +37,9 @@ class SecurityConfigurationTest {
     @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
         Instant now = Instant.now();
+        // Keep expiry clearly outside the default clock-skew allowance to avoid boundary flakiness.
         assertTrue(
-            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(120), now.minusSeconds(60))).hasErrors()
+            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(300), now.minusSeconds(121))).hasErrors()
         );
     }
 
