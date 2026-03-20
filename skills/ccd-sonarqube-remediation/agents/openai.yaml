@@ -1,4 +1,0 @@
-interface:
-  display_name: "CCD SonarQube Remediation"
-  short_description: "Fix Sonar findings with safe, test-backed patches"
-  default_prompt: "Use ccd-sonarqube-remediation to triage and fix current SonarQube findings in hmcts/ccd-data-store-api: identify root cause per finding, apply minimal-risk refactors, update Spring bean qualifiers/tests/fixtures as needed, ensure tests cover new/changed code at >=80%, run targeted compile/tests plus checkstyle, and summarize behavior impact plus residual risks."

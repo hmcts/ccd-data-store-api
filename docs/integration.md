@@ -22,6 +22,18 @@ callback URL validation in the import path.
 For local BEFTA/AAT runs, set `TEST_STUB_SERVICE_BASE_URL` before importing definitions; otherwise placeholders can
 fall back to AAT defaults and later fail callback host allowlist checks.
 
+## Callback Allowlist Notes
+
+Callback preflight validation checks the callback allowlist configuration before BEFTA and related setup work runs.
+
+Required AAT callback hosts currently include:
+
+- `ccd-test-stubs-service-aat.service.core-compute-aat.internal`
+- `aac-manage-case-assignment-aat.service.core-compute-aat.internal`
+
+If callback allowlist values drift across Jenkins or Helm config, preflight validation should fail early with the
+missing hosts called out explicitly rather than allowing later callback failures.
+
 Example:
 
 ```bash

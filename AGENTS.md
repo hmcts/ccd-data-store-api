@@ -1,5 +1,7 @@
 # Agents
 
+This file is the index for repo-local workflow skills in this repository. Skill files live under `docs/skills/`.
+
 ## CCD Callback SSRF Hardening
 
 Use the `ccd-callback-ssrf-hardening` agent for any callback security change in this repository, especially around event callbacks, webhook URL ingestion, or auth header handling.
@@ -29,7 +31,7 @@ Tasks:
 ### Quick Scanner
 
 ```bash
-bash skills/ccd-callback-ssrf-hardening/scripts/scan_callback_risks.sh
+bash docs/skills/ccd-callback-ssrf-hardening/scripts/scan_callback_risks.sh
 ```
 
 ## CCD SonarQube Remediation

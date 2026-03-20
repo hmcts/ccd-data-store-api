@@ -13,6 +13,8 @@
 
 Store/search cases and provide workbaskets.
 
+Repo-local workflow docs are indexed in `AGENTS.md`.
+
 ### Prerequisites
 
 - [Open JDK 21](https://openjdk.java.net/)
