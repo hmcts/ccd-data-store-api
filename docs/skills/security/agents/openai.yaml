@@ -1,7 +1,0 @@
-interface:
-  display_name: "Security"
-  short_description: "JWT and Spring security workflow"
-  default_prompt: "Use $security to continue or verify JWT, IDAM, and Spring Security changes in ccd-data-store-api."
-
-policy:
-  allow_implicit_invocation: true

@@ -55,6 +55,8 @@ Do not infer `OIDC_ISSUER` from the public OIDC discovery URL. In preview/AAT fo
 Smoke and functional pipeline runs now perform a pre-check that acquires a real test token and fails fast if its
 `iss` claim does not match `OIDC_ISSUER`.
 This verifier is enabled in CI via `VERIFY_OIDC_ISSUER=true` and remains opt-in for local runs.
+Because the verifier runs in the build JVM before deployed app env is available, issuer changes may need updating in
+both Jenkins test env and Helm app config.
 
 If external services still send tokens with a different issuer, this change will reject them with `401` until configuration or token issuance is aligned.
 

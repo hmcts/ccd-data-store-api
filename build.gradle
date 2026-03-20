@@ -728,7 +728,7 @@ idea {
 }
 
 task highLevelDataSetup(type: JavaExec) {
-    dependsOn aatClasses
+    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
 
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
