@@ -1,5 +1,7 @@
-# Repo-local Codex guidance
+# Agent Instructions
 
-For JWT, IDAM, Spring Security, and related regression-test work in this repo, use the repo-local skill at `docs/skills/security/SKILL.md`.
+## Available skills
 
-When resuming or reviewing security changes, explicitly follow that skill before making code, test, or pipeline changes.
+- `docs/skills/security/SKILL.md`
+  Use for JWT issuer validation, Spring Security, IDAM/OIDC, Helm/Jenkins issuer settings, and related regression testing.
+  Prompt cue: `Use docs/skills/security/SKILL.md`
