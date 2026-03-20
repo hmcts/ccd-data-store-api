@@ -19,11 +19,13 @@ public final class JwtIssuerVerificationApp {
     public static void main(String[] args) throws Exception {
         String expectedIssuer = Env.require("OIDC_ISSUER");
         String idamBaseUrl = Env.require("IDAM_API_URL_BASE");
-        String email = Env.require("CCD_CASEWORKER_AUTOTEST_EMAIL");
-        String password = Env.require("CCD_CASEWORKER_AUTOTEST_PASSWORD");
+        String[] credentials = firstAvailableCredentials(
+            "CCD_CASEWORKER_AUTOTEST_EMAIL", "CCD_CASEWORKER_AUTOTEST_PASSWORD",
+            "DEFINITION_IMPORTER_USERNAME", "DEFINITION_IMPORTER_PASSWORD"
+        );
 
         IdamHelper idamHelper = new IdamHelper(idamBaseUrl, OAuth2.INSTANCE);
-        String accessToken = idamHelper.getIdamOauth2Token(email, password);
+        String accessToken = idamHelper.getIdamOauth2Token(credentials[0], credentials[1]);
         String actualIssuer = decodeIssuer(accessToken);
 
         if (!expectedIssuer.equals(actualIssuer)) {
@@ -33,6 +35,22 @@ public final class JwtIssuerVerificationApp {
         }
 
         System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
+    }
+
+    private static String[] firstAvailableCredentials(String... envNames) {
+        for (int i = 0; i < envNames.length; i += 2) {
+            String username = System.getenv(envNames[i]);
+            String password = System.getenv(envNames[i + 1]);
+            if (username != null && password != null) {
+                return new String[]{username, password};
+            }
+        }
+
+        throw new IllegalStateException(
+            "No credentials available for JWT issuer verification. "
+                + "Expected one of: CCD_CASEWORKER_AUTOTEST_EMAIL/PASSWORD or "
+                + "DEFINITION_IMPORTER_USERNAME/PASSWORD"
+        );
     }
 
     private static String decodeIssuer(String accessToken) throws Exception {
