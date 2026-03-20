@@ -728,7 +728,7 @@ idea {
 }
 
 task highLevelDataSetup(type: JavaExec) {
-    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
@@ -750,7 +750,7 @@ task verifyFunctionalTestJwtIssuer(type: JavaExec) {
 
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
-    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
@@ -791,7 +791,7 @@ def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
-    dependsOn aatClasses, verifyFunctionalTestJwtIssuer
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     group = "Verification"
 
