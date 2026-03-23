@@ -1,5 +1,9 @@
 # JWT issuer validation
 
+## Service
+
+`ccd-data-store-api`
+
 ## Summary
 
 This change re-enables issuer validation in `ccd-data-store-api` so JWTs must match `oidc.issuer` as well as pass timestamp checks.

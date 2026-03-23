@@ -52,7 +52,7 @@ The following environment variables are required:
 
 `IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
 
-### Codex Skill
+### Codex Workflow Docs
 Repo-local workflow docs are indexed in `AGENTS.md`.
 
 ### Building
