@@ -22,8 +22,8 @@ import uk.gov.hmcts.reform.ccd.pactprovider.caseassigneduserroles.controller.Cas
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
@@ -66,7 +66,7 @@ public class CasesProviderTest {
     @State("A User Role exists for a Case")
     public void getOrRemoveCaseUserRoles() {
         when(caseReferenceService.validateUID(anyString())).thenReturn(true);
-        when(caseAssignedUserRolesOperation.findCaseUserRoles(any(List.class), any(List.class)))
+        when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
             .thenReturn(mockCaseAssignedUserRoles());
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("mockClientServiceName");
         when(applicationParams.getAuthorisedServicesForCaseUserRoles())
@@ -75,7 +75,8 @@ public class CasesProviderTest {
 
     private List<CaseAssignedUserRole> mockCaseAssignedUserRoles() {
         List<CaseAssignedUserRole> caseAssignedUserRoles = new ArrayList<>();
-        caseAssignedUserRoles.add(new CaseAssignedUserRole("caseDataId", "userId", "caseRole"));
+        caseAssignedUserRoles.add(new CaseAssignedUserRole("1583841721773828", "0a5874a4-3f38-4bbd-ba4c",
+            "[CREATOR]"));
         return caseAssignedUserRoles;
     }
 

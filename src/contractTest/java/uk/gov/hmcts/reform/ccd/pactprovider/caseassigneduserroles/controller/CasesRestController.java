@@ -9,9 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ccd.v2.external.domain.SearchCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,8 +44,11 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
 public class CasesRestController {
+    private static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
+    private static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
+    private static final String CONNECTION_CLOSE = "close";
 
-    private final Pattern caseRolePattern = Pattern.compile("^.+$");
+    private final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
     private final ApplicationParams applicationParams;
     private final UIDService caseReferenceService;
@@ -83,7 +89,23 @@ public class CasesRestController {
             .stream()
             .map(Long::valueOf)
             .collect(Collectors.toCollection(ArrayList::new)), userIds);
-        return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
+            .body(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
+    }
+
+    @PostMapping(path = "/case-users", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaseAssignedUserRolesResponse> addCaseUserRoles(
+        @Parameter(name = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
+        @Parameter(name = "List of Case-User-Role assignments to add", required = true)
+        @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
+    ) {
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
+            .body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
     }
 
 
@@ -109,7 +131,25 @@ public class CasesRestController {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
         this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
             .getCaseAssignedUserRoles());
-        return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse("REMOVED"));
+        return ResponseEntity.status(HttpStatus.OK)
+            .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
+            .body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
+    }
+
+    @PostMapping(path = "/case-users/search", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaseAssignedUserRolesResource> searchCaseUserRoles(
+        @RequestBody SearchCaseAssignedUserRolesRequest searchRequest
+    ) {
+        List<String> caseIds = searchRequest.getCaseIds();
+        List<String> userIds = searchRequest.getUserIds();
+        validateRequestParams(caseIds, userIds);
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
+            .stream()
+            .map(Long::valueOf)
+            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
+            .body(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
 
 
