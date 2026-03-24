@@ -33,7 +33,7 @@ The following environment variables are required:
 | IDAM_USER_URL | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance. |
 | IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
 | IDAM_OIDC_URL | - | Base URL for IdAM OIDC discovery and JWKS lookup. This is used to resolve the OpenID configuration and signing keys. |
-| OIDC_ISSUER | - | Enforced JWT issuer value. This must match the `iss` claim in real access tokens accepted by this service. |
+| OIDC_ISSUER | - | Enforced JWT issuer value. This must match the `iss` claim in real access tokens accepted by this service. Do not guess it; derive it from a real token for the target environment. |
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DOCUMENT_URL_PATTERN | - |  URL Pattern for documents attachable to cases. |
