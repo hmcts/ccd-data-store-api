@@ -736,7 +736,7 @@ task highLevelDataSetup(type: JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task smoke() {
+task smoke(type: JavaExec) {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -746,19 +746,15 @@ task smoke() {
         into "$buildDir/test-results/test"
     }
 
-    doLast {
-        generateCucumberReports.enabled = true
-        javaexec {
-            mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-                    '--tags', '@Smoke and not @Ignore',
-                    '--glue', 'uk.gov.hmcts.befta.player',
-                    '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
-            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
-        }
-    }
+    generateCucumberReports.enabled = true
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+    args = ['--plugin', "json:${rootDir}/target/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
+            '--tags', '@Smoke and not @Ignore',
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+    jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
     finalizedBy {
         generateCucumberReports {
