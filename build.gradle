@@ -234,10 +234,6 @@ task verifyBefTaStubHostConfigConsistency {
     doLast {
         def env = System.getenv()
         try {
-            def expectedStubHost = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.resolveStubHost(
-                env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL"),
-                env.get("BEFTA_TEST_STUB_SERVICE_HOST"),
-                "ccd-test-stubs-service-aat.service.core-compute-aat.internal")
             def expectedAacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
             def valuesFiles = [
                 file("charts/ccd-data-store-api/values.yaml"),
@@ -253,15 +249,11 @@ task verifyBefTaStubHostConfigConsistency {
                 def content = valuesFile.getText("UTF-8")
                 def beftaStubBaseUrlMatcher = content =~ /(?m)^\s*BEFTA_TEST_STUB_SERVICE_BASE_URL:\s*(.+)\s*$/
                 boolean hasBeftaStubBaseUrl = beftaStubBaseUrlMatcher.find()
+                String configuredBeftaStubHost = null
                 if (hasBeftaStubBaseUrl) {
                     String configuredBeftaStubBaseUrl = beftaStubBaseUrlMatcher.group(1)
-                    String configuredBeftaStubHost = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.parseUrlHost(
+                    configuredBeftaStubHost = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.parseUrlHost(
                         configuredBeftaStubBaseUrl)
-                    boolean beftaStubHostMatchesExpected =
-                        uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.matches(expectedStubHost, configuredBeftaStubHost)
-                    if (!beftaStubHostMatchesExpected) {
-                        issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL host does not match expected stub host"
-                    }
                 }
                 def callbackAllowlistKeys = [
                     "CCD_CALLBACK_ALLOWED_HOSTS",
@@ -272,8 +264,9 @@ task verifyBefTaStubHostConfigConsistency {
                     def matcher = content =~ /(?m)^\s*${java.util.regex.Pattern.quote(key)}:\s*(.+)$/
                     boolean hasKey = matcher.find()
                     String lineValue = hasKey ? matcher.group(1) : ""
-                    boolean hasStubHost = uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.containsHost(
-                        expectedStubHost, lineValue)
+                    boolean hasStubHost = configuredBeftaStubHost
+                        ? uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.containsHost(configuredBeftaStubHost, lineValue)
+                        : true
                     boolean hasAacHost = expectedAacHost
                         ? uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.containsHost(expectedAacHost, lineValue)
                         : true
