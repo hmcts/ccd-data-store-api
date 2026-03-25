@@ -128,9 +128,9 @@ env.BEFTA_HTTP_LOGGING_ENABLED = "true"
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
@@ -141,9 +141,9 @@ withPipeline(type, product, component) {
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
@@ -176,10 +176,10 @@ withPipeline(type, product, component) {
 
       copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
-     
+
       copyIgnore('./build/reports/tests/test', './Unit Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
-       
+
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
