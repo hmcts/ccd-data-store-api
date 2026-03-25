@@ -102,6 +102,12 @@ application {
 }
 
 sourceSets {
+    main {
+        java {
+            srcDir('buildSrc/src/main/java')
+        }
+    }
+
     aat {
         java {
             srcDir('src/aat/java')
@@ -227,49 +233,63 @@ task verifyBefTaStubHostConfigConsistency {
 
     doLast {
         def env = System.getenv()
-        def expectedStubHost = env.get("BEFTA_TEST_STUB_SERVICE_HOST") ?: "ccd-test-stubs-service-aat.service.core-compute-aat.internal"
-        def expectedAacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
-        def valuesFiles = [
-            file("charts/ccd-data-store-api/values.yaml"),
-            file("charts/ccd-data-store-api/values.preview.template.yaml"),
-            file("charts/ccd-data-store-api/values.aat.template.yaml")
-        ]
-        def issues = []
-
-        valuesFiles.each { valuesFile ->
-            if (!valuesFile.exists()) {
-                return
-            }
-            def content = valuesFile.getText("UTF-8")
-            boolean containsExpectedHostLiteral = content.contains(expectedStubHost)
-            if (!containsExpectedHostLiteral) {
-                issues << "${project.relativePath(valuesFile)}: missing BEFTA stub host definition"
-            }
-            def callbackAllowlistKeys = [
-                "CCD_CALLBACK_ALLOWED_HOSTS",
-                "CCD_CALLBACK_ALLOWED_HTTP_HOSTS",
-                "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS"
+        try {
+            def expectedStubHost = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.resolveStubHost(
+                env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL"),
+                env.get("BEFTA_TEST_STUB_SERVICE_HOST"),
+                "ccd-test-stubs-service-aat.service.core-compute-aat.internal")
+            def expectedAacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
+            def valuesFiles = [
+                file("charts/ccd-data-store-api/values.yaml"),
+                file("charts/ccd-data-store-api/values.preview.template.yaml"),
+                file("charts/ccd-data-store-api/values.aat.template.yaml")
             ]
-            callbackAllowlistKeys.each { key ->
-                def matcher = content =~ /(?m)^\s*${java.util.regex.Pattern.quote(key)}:\s*(.+)$/
-                boolean hasKey = matcher.find()
-                String lineValue = hasKey ? matcher.group(1) : ""
-                boolean hasStubHost = lineValue.contains(expectedStubHost)
-                boolean hasAacHost = expectedAacHost ? lineValue.contains(expectedAacHost) : true
-                if (hasKey && (!hasStubHost || !hasAacHost)) {
-                    issues << "${project.relativePath(valuesFile)}: ${key} missing expected callback allowlist hosts"
+            def issues = []
+
+            valuesFiles.each { valuesFile ->
+                if (!valuesFile.exists()) {
+                    return
+                }
+                def content = valuesFile.getText("UTF-8")
+                def beftaStubBaseUrlMatcher = content =~ /(?m)^\s*BEFTA_TEST_STUB_SERVICE_BASE_URL:\s*(.+)\s*$/
+                boolean hasBeftaStubBaseUrl = beftaStubBaseUrlMatcher.find()
+                if (hasBeftaStubBaseUrl) {
+                    String configuredBeftaStubBaseUrl = beftaStubBaseUrlMatcher.group(1)
+                    String configuredBeftaStubHost = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.parseUrlHost(
+                        configuredBeftaStubBaseUrl)
+                    boolean beftaStubHostMatchesExpected =
+                        uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.matches(expectedStubHost, configuredBeftaStubHost)
+                    if (!beftaStubHostMatchesExpected) {
+                        issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL host does not match expected stub host"
+                    }
+                }
+                def callbackAllowlistKeys = [
+                    "CCD_CALLBACK_ALLOWED_HOSTS",
+                    "CCD_CALLBACK_ALLOWED_HTTP_HOSTS",
+                    "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS"
+                ]
+                callbackAllowlistKeys.each { key ->
+                    def matcher = content =~ /(?m)^\s*${java.util.regex.Pattern.quote(key)}:\s*(.+)$/
+                    boolean hasKey = matcher.find()
+                    String lineValue = hasKey ? matcher.group(1) : ""
+                    boolean hasStubHost = uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.containsHost(
+                        expectedStubHost, lineValue)
+                    boolean hasAacHost = expectedAacHost
+                        ? uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher.containsHost(expectedAacHost, lineValue)
+                        : true
+                    if (hasKey && (!hasStubHost || !hasAacHost)) {
+                        issues << "${project.relativePath(valuesFile)}: ${key} missing expected callback allowlist hosts"
+                    }
                 }
             }
-            boolean beftaStubBaseUrlValid =
-                content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL: \"http://${expectedStubHost}/\"")
-            if (content.contains("BEFTA_TEST_STUB_SERVICE_BASE_URL:")
-                && !beftaStubBaseUrlValid) {
-                issues << "${project.relativePath(valuesFile)}: BEFTA_TEST_STUB_SERVICE_BASE_URL not set to expected stub host"
-            }
-        }
 
-        if (!issues.isEmpty()) {
-            throw new GradleException("BEFTA callback/stub host config drift detected:\n - " + issues.join("\n - "))
+            if (!issues.isEmpty()) {
+                throw new GradleException("BEFTA callback/stub host config drift detected:\n - " + issues.join("\n - "))
+            }
+        } catch (MalformedURLException malformedURLException) {
+            throw new GradleException("BEFTA callback/stub host config drift detected: invalid "
+                + "BEFTA_TEST_STUB_SERVICE_BASE_URL: " + env.get("BEFTA_TEST_STUB_SERVICE_BASE_URL"),
+                malformedURLException)
         }
     }
 }
@@ -835,12 +855,10 @@ task preSmokeDiagnostics {
 
         if (beftaStubBaseUrl) {
             try {
-                String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
                 String aacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
-                List<String> requiredHosts = [beftaStubHost]
-                if (aacHost?.trim()) {
-                    requiredHosts.add(aacHost.trim())
-                } else {
+                List<String> requiredHosts = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.requiredHosts(
+                    beftaStubBaseUrl, aacHost)
+                if (!aacHost?.trim()) {
                     logger.quiet("Smoke diagnostics: AAC_MANAGE_CASE_ASSIGNMENT_HOST is unset; "
                         + "enforcing callback allowlist membership only for BEFTA stub host.")
                 }
@@ -851,22 +869,11 @@ task preSmokeDiagnostics {
                     logger.quiet("Smoke diagnostics: callback allowlist env vars are not fully set; "
                         + "skipping strict BEFTA stub host membership check.")
                 } else {
-                    List<String> allowedHostsList = (callbackAllowedHosts ?: "").split(',').collect { it.trim() }
-                    List<String> allowedHttpHostsList = (callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }
-                    List<String> allowedPrivateHostsList = (callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }
-                    List<String> missingFromAllowed = requiredHosts.findAll { !allowedHostsList.contains(it) }
-                    List<String> missingFromHttpAllowed = requiredHosts.findAll { !allowedHttpHostsList.contains(it) }
-                    List<String> missingFromPrivateAllowed = requiredHosts.findAll { !allowedPrivateHostsList.contains(it) }
-                    List<String> issues = []
-                    if (!missingFromAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOWED_HOSTS missing " + missingFromAllowed)
-                    }
-                    if (!missingFromHttpAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS missing " + missingFromHttpAllowed)
-                    }
-                    if (!missingFromPrivateAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS missing " + missingFromPrivateAllowed)
-                    }
+                    List<String> issues = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.findAllowlistIssues(
+                        requiredHosts,
+                        callbackAllowedHosts ?: "",
+                        callbackAllowedHttpHosts ?: "",
+                        callbackAllowPrivateHosts ?: "")
                     if (!issues.isEmpty()) {
                         throw new GradleException("Smoke preflight failed: callback allowlist drift detected.\n"
                             + "Required hosts: " + requiredHosts + "\n"
@@ -923,12 +930,10 @@ task preFunctionalDiagnostics {
 
         if (beftaStubBaseUrl) {
             try {
-                String beftaStubHost = new URL(beftaStubBaseUrl).getHost()
                 String aacHost = env.get("AAC_MANAGE_CASE_ASSIGNMENT_HOST")
-                List<String> requiredHosts = [beftaStubHost]
-                if (aacHost?.trim()) {
-                    requiredHosts.add(aacHost.trim())
-                } else {
+                List<String> requiredHosts = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.requiredHosts(
+                    beftaStubBaseUrl, aacHost)
+                if (!aacHost?.trim()) {
                     logger.quiet("Functional diagnostics: AAC_MANAGE_CASE_ASSIGNMENT_HOST is unset; "
                         + "enforcing callback allowlist membership only for BEFTA stub host.")
                 }
@@ -939,22 +944,11 @@ task preFunctionalDiagnostics {
                     logger.quiet("Functional diagnostics: callback allowlist env vars are not fully set; "
                         + "skipping strict BEFTA stub host membership check.")
                 } else {
-                    List<String> allowedHostsList = (callbackAllowedHosts ?: "").split(',').collect { it.trim() }
-                    List<String> allowedHttpHostsList = (callbackAllowedHttpHosts ?: "").split(',').collect { it.trim() }
-                    List<String> allowedPrivateHostsList = (callbackAllowPrivateHosts ?: "").split(',').collect { it.trim() }
-                    List<String> missingFromAllowed = requiredHosts.findAll { !allowedHostsList.contains(it) }
-                    List<String> missingFromHttpAllowed = requiredHosts.findAll { !allowedHttpHostsList.contains(it) }
-                    List<String> missingFromPrivateAllowed = requiredHosts.findAll { !allowedPrivateHostsList.contains(it) }
-                    List<String> issues = []
-                    if (!missingFromAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOWED_HOSTS missing " + missingFromAllowed)
-                    }
-                    if (!missingFromHttpAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOWED_HTTP_HOSTS missing " + missingFromHttpAllowed)
-                    }
-                    if (!missingFromPrivateAllowed.isEmpty()) {
-                        issues.add("CCD_CALLBACK_ALLOW_PRIVATE_HOSTS missing " + missingFromPrivateAllowed)
-                    }
+                    List<String> issues = uk.gov.hmcts.ccd.util.CallbackAllowlistPreflight.findAllowlistIssues(
+                        requiredHosts,
+                        callbackAllowedHosts ?: "",
+                        callbackAllowedHttpHosts ?: "",
+                        callbackAllowPrivateHosts ?: "")
                     if (!issues.isEmpty()) {
                         throw new GradleException("Functional preflight failed: callback allowlist drift detected.\n"
                             + "Required hosts: " + requiredHosts + "\n"

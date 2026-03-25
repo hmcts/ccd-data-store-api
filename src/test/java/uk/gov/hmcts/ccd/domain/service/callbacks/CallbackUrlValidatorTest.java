@@ -28,7 +28,7 @@ class CallbackUrlValidatorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         subject = new CallbackUrlValidator(applicationParams);
-        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("localhost", "*.allowed.example"));
+        when(applicationParams.getCallbackAllowedHosts()).thenReturn(List.of("localhost", ".*\\.allowed\\.example"));
         when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(List.of("localhost"));
         when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(List.of("localhost"));
     }
@@ -74,6 +74,14 @@ class CallbackUrlValidatorTest {
             "sub.allowed.example", "*.allowed.example"));
         assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
             "allowed.example", "*.allowed.example"));
+    }
+
+    @Test
+    void shouldMatchRegexPattern() {
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
+            "pr-123.demo.platform.hmcts.net", ".*\\.demo\\.platform\\.hmcts\\.net"));
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
+            "demo.platform.hmcts.net", ".*\\.demo\\.platform\\.hmcts\\.net"));
     }
 
     @Test
@@ -149,6 +157,12 @@ class CallbackUrlValidatorTest {
     @Test
     void shouldMatchAllowlistWildcardDirectly() {
         assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "any.host", "*"));
+    }
+
+    @Test
+    void shouldFallbackToLiteralComparisonForInvalidRegex() {
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "literal.host", "literal.host"));
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "other.host", "literal.host"));
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -15,7 +16,6 @@ import java.util.Optional;
 
 @Component
 public class CallbackUrlValidator {
-    private static final String ALLOWLIST_WILDCARD = "*";
     private static final String HTTPS_SCHEME = "https";
     private static final String HTTP_SCHEME = "http";
     // Cloud instance metadata endpoint; explicitly blocked to prevent SSRF credential exfiltration.
@@ -74,27 +74,16 @@ public class CallbackUrlValidator {
     }
 
     private boolean isAllowedHost(String host, List<String> allowedHosts) {
-        if (!StringUtils.hasLength(host) || allowedHosts == null) {
-            return false;
+        try {
+            CallbackHostPatternMatcher.validateEntries(allowedHosts);
+            return CallbackHostPatternMatcher.containsHost(host, allowedHosts);
+        } catch (IllegalArgumentException ex) {
+            throw new CallbackException(ex.getMessage());
         }
-        return allowedHosts.stream()
-            .filter(StringUtils::hasLength)
-            .map(String::trim)
-            .anyMatch(allowed -> hostMatches(host, allowed));
     }
 
     private boolean hostMatches(String host, String allowedHost) {
-        if (ALLOWLIST_WILDCARD.equals(allowedHost)) {
-            return true;
-        }
-        final String normalisedHost = host.toLowerCase(Locale.UK);
-        final String normalisedAllowedHost = allowedHost.toLowerCase(Locale.UK);
-        if (normalisedAllowedHost.startsWith("*.")) {
-            // Wildcard matches only subdomains (e.g. *.example.com -> a.example.com), not the apex domain.
-            String suffix = normalisedAllowedHost.substring(1);
-            return normalisedHost.endsWith(suffix);
-        }
-        return normalisedHost.equals(normalisedAllowedHost);
+        return CallbackHostPatternMatcher.matches(host, allowedHost);
     }
 
     private boolean resolvesToPrivateAddress(String host) {

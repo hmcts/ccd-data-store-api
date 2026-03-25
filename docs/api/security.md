@@ -76,9 +76,9 @@ Note: Wizard page mid-event callback URLs are validated at runtime before invoca
 
 Prevent untrusted callback destinations from being invoked and prevent sensitive credential/context headers from being leaked during callback execution.
 
-- Callback hosts must be allowlisted (`CCD_CALLBACK_ALLOWED_HOSTS`).
-- Callback URLs must use `https` unless the host is explicitly approved for `http` (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
-- Callback hosts that resolve to local/private ranges are blocked unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Callback hosts must match the configured allowlist patterns (`CCD_CALLBACK_ALLOWED_HOSTS`).
+- Callback URLs must use `https` unless the host matches an explicitly approved `http` allowlist pattern (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
+- Callback hosts that resolve to local/private ranges are blocked unless they match an explicitly approved private-host allowlist pattern (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
 - Cloud instance metadata endpoint targets are explicitly blocked (for example `169.254.169.254`).
 - Callback URLs with embedded credentials are rejected (`https://user:pass@host/...`).
 - Callback redirects are rejected (`3xx` callback responses are not followed).
@@ -89,9 +89,23 @@ Prevent untrusted callback destinations from being invoked and prevent sensitive
 
 These three settings enforce different controls and are all required for internal callback destinations:
 
-- `CCD_CALLBACK_ALLOWED_HOSTS`: destination host allowlist (where callbacks may go).
-- `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`: explicit exceptions for hosts that may use `http` (all others must use `https`).
-- `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`: explicit exceptions for hosts that resolve to private/local/internal addresses.
+- `CCD_CALLBACK_ALLOWED_HOSTS`: destination host allowlist patterns (where callbacks may go).
+- `CCD_CALLBACK_ALLOWED_HTTP_HOSTS`: explicit exceptions for host patterns that may use `http` (all others must use `https`).
+- `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`: explicit exceptions for host patterns that resolve to private/local/internal addresses.
+
+Allowlist values are comma-separated match patterns. Supported forms are:
+
+- exact hosts such as `aac-manage-case-assignment-aat.service.core-compute-aat.internal`
+- legacy subdomain wildcard entries such as `*.example.com`
+- `*` to match any host
+- regex patterns such as `.*\.demo\.platform\.hmcts\.net`
+
+Example comma-separated value:
+
+`.*\.demo\.platform\.hmcts\.net,.*\.preview\.platform\.hmcts\.net`
+
+Do not use shell-style globs such as `*demo.platform.hmcts.net`; invalid regex-like entries now fail validation
+explicitly rather than being treated as literal hostnames.
 
 For internal service hosts used in AAT/preview, a callback can be blocked if any one of these is missing,
 even when the host appears in the other two lists.
@@ -106,7 +120,8 @@ After enabling callback hardening, service teams should:
    - `CCD_CALLBACK_ALLOWED_HTTP_HOSTS` (only for explicitly approved `http` hosts)
    - `CCD_CALLBACK_ALLOW_PRIVATE_HOSTS` (only for explicitly approved private/local hosts)
    - For preview/AAT, include `ccd-test-stubs-service-aat.service.core-compute-aat.internal` and
-     `aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three allowlists.
+     `aac-manage-case-assignment-aat.service.core-compute-aat.internal` in all three allowlists, or use a regex
+     pattern where that is the intended operational model.
 3. Validate callback URLs during definition onboarding/import so invalid URLs are rejected before runtime.
 4. Re-run callback integration tests and verify expected callback hosts are accepted.
 5. Ensure callback endpoints do not return redirects (`3xx`) and instead return final responses directly.

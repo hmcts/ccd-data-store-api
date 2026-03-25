@@ -36,7 +36,7 @@
 ## Suggested Validation Rules
 
 - Scheme: `https` by default; `http` only for explicitly approved hosts (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
-- Host allowlist: exact domains and/or controlled subdomain rules (`CCD_CALLBACK_ALLOWED_HOSTS`).
+- Host allowlist: exact domains, controlled subdomain rules, and/or regex patterns (`CCD_CALLBACK_ALLOWED_HOSTS`).
 - DNS/IP checks: reject loopback, private, link-local, multicast, and metadata service ranges unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
 
 ## Recommended Next Controls (Not Yet Enforced Here)

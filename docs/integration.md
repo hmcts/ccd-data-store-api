@@ -25,6 +25,8 @@ fall back to AAT defaults and later fail callback host allowlist checks.
 ## Callback Allowlist Notes
 
 Callback preflight validation checks the callback allowlist configuration before BEFTA and related setup work runs.
+Allowlist env values are interpreted as comma-separated host match patterns, so exact hosts, legacy `*.domain.tld`,
+`*`, and regex patterns are supported. Invalid regex-like entries fail preflight validation explicitly.
 
 Required AAT callback hosts currently include:
 
@@ -33,6 +35,10 @@ Required AAT callback hosts currently include:
 
 If callback allowlist values drift across Jenkins or Helm config, preflight validation should fail early with the
 missing hosts called out explicitly rather than allowing later callback failures.
+
+Example comma-separated pattern value:
+
+`.*\.demo\.platform\.hmcts\.net,.*\.preview\.platform\.hmcts\.net`
 
 Example:
 
