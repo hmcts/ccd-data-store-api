@@ -48,7 +48,9 @@ public class CasesRestController {
     private static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
     private static final String CONNECTION_CLOSE = "close";
 
-    private final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
+    // Some Pact consumers send `case_role` without surrounding brackets (e.g. "caseRoleTest"),
+    // while other callers may include them (e.g. "[CREATOR]"). Accept both formats.
+    private final Pattern caseRolePattern = Pattern.compile("^\\[?.+]?$");
 
     private final ApplicationParams applicationParams;
     private final UIDService caseReferenceService;
@@ -133,7 +135,8 @@ public class CasesRestController {
             .getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
-            .body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
+            .header(HttpHeaders.CONTENT_TYPE, "application/json")
+            .body(new CaseAssignedUserRolesResponse("REMOVED"));
     }
 
     @PostMapping(path = "/case-users/search", produces = APPLICATION_JSON_VALUE)

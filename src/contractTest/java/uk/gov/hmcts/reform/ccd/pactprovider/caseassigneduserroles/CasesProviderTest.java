@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
@@ -65,7 +66,9 @@ public class CasesProviderTest {
 
     @State("A User Role exists for a Case")
     public void getOrRemoveCaseUserRoles() {
-        when(caseReferenceService.validateUID(anyString())).thenReturn(true);
+        // Pact consumer JSON is unmarshalled into request DTOs; if any field is missing, validation may see null.
+        // Stub broadly so controller-level validation can proceed to the mocked operation.
+        when(caseReferenceService.validateUID(any())).thenReturn(true);
         when(caseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
             .thenReturn(mockCaseAssignedUserRoles());
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("mockClientServiceName");
