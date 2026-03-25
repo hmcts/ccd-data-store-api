@@ -1,0 +1,22 @@
+{
+  "_guid_": "F-150_CreateCase_Conflict_Token_Creation",
+
+  "_extends_": "F-150_CreateCase_Token_Creation",
+
+  "request": {
+    "pathVariables": {
+      "etid": "simulateDecentralisedConflict"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/case-types/FT_Decentralisation/event-triggers/simulateDecentralisedConflict{?ignore-warning}"
+        }
+      },
+      "event_id": "simulateDecentralisedConflict"
+    }
+  }
+}

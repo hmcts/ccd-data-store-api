@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.function.Predicate.not;
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.rest.RestRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

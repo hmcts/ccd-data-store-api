@@ -19,9 +19,9 @@ public interface CaseDetailsRepository {
      *
      * @param id Internal case ID
      * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated since 2018-04-04. Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     CaseDetails findById(Long id);
 
     List<Long> findCaseReferencesByIds(List<Long> ids);
@@ -34,14 +34,16 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> findByReference(String reference);
 
+    Optional<CaseDetails> findByReference(String reference, boolean refresh);
+
     /**
      * Find by reference.
      *
      * @param caseReference Public case reference
      * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated since 2018-04-04. Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     CaseDetails findByReference(Long caseReference);
 
     /**
@@ -51,9 +53,9 @@ public interface CaseDetailsRepository {
      * @param caseTypeId Case's type ID
      * @param caseReference Public case reference
      * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
+     * @deprecated since 2018-04-04. Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "2018-04-04")
     CaseDetails findUniqueCase(String jurisdictionId,
                                String caseTypeId,
                                String caseReference);

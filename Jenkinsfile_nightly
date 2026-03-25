@@ -3,7 +3,7 @@
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
     //CCD-3539 (Stop running Nightly builds on weekends) - At 07:00 on every day-of-week from Monday through Friday.  Original schedule was 'H 07 * * *'
-    pipelineTriggers([cron('H 07 * * 1-5')])
+    pipelineTriggers([cron('H 17 * * 1-5')])
 ])
 
 @Library("Infrastructure")
@@ -104,6 +104,14 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
+
+    stage('Wait for ccd-definition-store-api job') {
+        script {
+            echo "Waiting for upstream ccd-definition-store-api job to complete..."
+            build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
+        }
+    }
+
     overrideVaultEnvironments(vaultOverrides)
     disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)

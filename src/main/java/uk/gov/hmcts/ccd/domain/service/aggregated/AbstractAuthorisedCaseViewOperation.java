@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.AbstractCaseView;

@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ApiModel(description = "")
+@Schema
 public class WizardPage implements Serializable, Copyable<WizardPage> {
 
     private String id = null;
@@ -23,7 +23,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
     private String callBackURLMidEvent;
     private List<Integer> retriesTimeoutMidEvent;
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -42,7 +42,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         this.order = order;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -52,7 +52,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         this.label = label;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("wizard_page_fields")
     public List<WizardPageField> getWizardPageFields() {
         return wizardPageFields;
@@ -62,7 +62,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         this.wizardPageFields = wizardPageFields;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("callback_url_mid_event")
     public String getCallBackURLMidEvent() {
         return callBackURLMidEvent;
@@ -72,7 +72,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         this.callBackURLMidEvent = callBackURLMidEvent;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("retries_timeout_mid_event")
     public List<Integer> getRetriesTimeoutMidEvent() {
         return retriesTimeoutMidEvent == null ? Collections.emptyList() : retriesTimeoutMidEvent;
@@ -82,7 +82,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         this.retriesTimeoutMidEvent = retriesTimeoutMidEvent;
     }
 
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;

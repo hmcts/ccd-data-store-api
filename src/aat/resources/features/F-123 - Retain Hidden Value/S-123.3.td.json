@@ -989,6 +989,9 @@
             "order": 1,
             "wizard_page_fields": [
               {
+                "__ordering__": "UNORDERED"
+              },
+              {
                 "case_field_id": "FamilyDetails",
                 "order": 1,
                 "page_column_no": null,

@@ -204,7 +204,7 @@ class ElasticsearchRequestTest {
     }
 
     @Nested
-    class ToFinalRequestTest {
+    public class ToFinalRequestTest {
 
         @Test
         void shouldSetSourceFieldsWhenSourceIsProvidedInRequest() throws Exception {

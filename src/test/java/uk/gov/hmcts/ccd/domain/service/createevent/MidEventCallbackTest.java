@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -31,8 +32,9 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -74,7 +76,7 @@ class MidEventCallbackTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = new Event();
         event.setEventId("createCase");
@@ -131,10 +133,11 @@ class MidEventCallbackTest {
     void shouldUpdateCaseDetailsFromMidEventCallback() throws Exception {
 
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}"));
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name"
+                }"""));
         CaseDetails updatedCaseDetails = caseDetails(data);
         CaseDataContent content = newCaseDataContent().withEvent(event).withData(data)
             .withIgnoreWarning(IGNORE_WARNINGS)
@@ -150,27 +153,27 @@ class MidEventCallbackTest {
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
 
-        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
             "createCase1");
 
-        final JsonNode expectedResponse = MAPPER.readTree(
-            "{"
-                + "\"data\": {\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}}");
+        Map<String, JsonNode> expectedResponse = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name"
+                }""")));
         assertThat(result, is(expectedResponse));
     }
 
     @Test
     @DisplayName("test no interaction when pageId not present")
     void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
-        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
             "");
 
-        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
+        final Map<String, JsonNode> expectedResponse = JacksonUtils.convertValue((MAPPER.readTree("{}")));
         assertThat("Data should stay unchanged", result, is(expectedResponse));
         verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
             uiDefinitionRepository, caseService);
@@ -181,10 +184,11 @@ class MidEventCallbackTest {
     void shouldPassEventDataToMidEventCallback() throws Exception {
 
         Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}")));
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name"
+                }""")));
         CaseDetails updatedCaseDetails = caseDetails(eventData);
 
         CaseDataContent content = newCaseDataContent()
@@ -200,19 +204,19 @@ class MidEventCallbackTest {
             null,
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
-        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, updatedCaseDetails)).willReturn(null);
+        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).thenReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails)).willReturn(caseDetails);
 
-        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
             "createCase1");
 
-        JsonNode expectedResponse = MAPPER.readTree(
-            "{"
-                + "\"data\": {\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}}");
+        Map<String, JsonNode> expectedResponse = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name"
+                }""")));
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
@@ -222,8 +226,66 @@ class MidEventCallbackTest {
                 null,
                 caseDetails,
                 IGNORE_WARNINGS),
-            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
-            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
+            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data));
+    }
+
+    @Test
+    @DisplayName("should keep both organisation policies when event data only contains current page fields")
+    void shouldMergeFullCaseDataWithEventDataDuringMidEvent() throws Exception {
+
+        Map<String, JsonNode> fullCaseData = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "ApplicantOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "APP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Applicant]"
+                  },
+                  "RespondentOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "RESP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Respondent]"
+                  }
+                }""")));
+
+        // Simulate UI sending only the current page data (losing the second organisation policy)
+        Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "ApplicantOrganisationPolicy": {
+                    "Organisation": { "OrganisationID": "APP-ORG" },
+                    "OrgPolicyCaseAssignedRole": "[Applicant]"
+                  }
+                }""")));
+
+        CaseDataContent content = newCaseDataContent()
+            .withEvent(event)
+            .withData(fullCaseData)
+            .withEventData(eventData)
+            .withIgnoreWarning(IGNORE_WARNINGS)
+            .build();
+
+        CaseDetails eventDataOnlyCaseDetails = caseDetails(fullCaseData);
+        when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, fullCaseData))
+            .thenReturn(eventDataOnlyCaseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, eventDataOnlyCaseDetails))
+            .willReturn(eventDataOnlyCaseDetails);
+
+        when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            null,
+            eventDataOnlyCaseDetails,
+            IGNORE_WARNINGS)).thenAnswer(invocation -> {
+                CaseDetails detailsPassedToCallback = invocation.getArgument(4);
+                Map<String, JsonNode> callbackData = detailsPassedToCallback.getData();
+                assertNotNull(callbackData.get("RespondentOrganisationPolicy"));
+                return detailsPassedToCallback;
+            });
+
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
+            content,
+            "createCase1");
+
+        assertThat(result, is(fullCaseData));
     }
 
     @Test
@@ -231,22 +293,25 @@ class MidEventCallbackTest {
     void shouldContainAllDataFromExistingCaseReferenceDuringAMidEventCallback() throws Exception {
 
         Map<String, JsonNode> eventData = JacksonUtils.convertValue((MAPPER.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}")));
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name"
+                }""")));
 
         Map<String, JsonNode> existingData = JacksonUtils.convertValue((MAPPER.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}")));
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonMiddleName": "Middle Name"
+                }""")));
         Map<String, JsonNode> combineData = JacksonUtils.convertValue((MAPPER.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\",\n"
-                + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}")));
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name",
+                  "PersonMiddleName": "Middle Name"
+                }""")));
         CaseDetails existingCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
         CaseDataContent content = newCaseDataContent()
@@ -271,17 +336,17 @@ class MidEventCallbackTest {
             .willReturn(combineCaseDetails);
 
 
-        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
             "createCase1");
 
-        JsonNode expectedResponse = MAPPER.readTree(
-            "{"
-                + "\"data\": {\n"
-                + "  \"PersonFirstName\": \"First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\",\n"
-                + "  \"PersonMiddleName\": \"Middle Name\"\n"
-                + "}}");
+        Map<String, JsonNode> expectedResponse = JacksonUtils.convertValue((MAPPER.readTree(
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name",
+                  "PersonMiddleName": "Middle Name"
+                }""")));
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
@@ -296,7 +361,7 @@ class MidEventCallbackTest {
     @DisplayName("should call filter case data content when wizard page order exists")
     void shouldCallFilterCaseDataContentWhenWizardPageOrderExists() {
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
-            .willReturn(asList(wizardPageWithCallback));
+            .willReturn(Collections.singletonList(wizardPageWithCallback));
         CaseDetails existingCaseDetails = caseDetails(data);
         when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE))
             .thenReturn(existingCaseDetails);
