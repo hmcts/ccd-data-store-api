@@ -13,6 +13,11 @@ VALUES (2, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
             "Country": "Wales",
             "Postcode": "W11 5DF"
           },
+          "D8Document": {
+            "document_url": "http://localhost:[port]/documents/fa99ac30-d6e4-4cd8-99ac-30d6e4dcd849",
+            "document_binary_url": "http://localhost:[port]/documents/fa99ac30-d6e4-4cd8-99ac-30d6e4dcd849/binary",
+            "document_filename": "ExistingDocument.pdf"
+          },
           "D8Documents": [
             {
               "id": "existing-item-id-001",
@@ -40,6 +45,7 @@ VALUES (2, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
               "Postcode": "PUBLIC"
             }
           },
+          "D8Document": "PUBLIC",
           "D8Documents": {
             "classification": "PUBLIC",
             "value": {

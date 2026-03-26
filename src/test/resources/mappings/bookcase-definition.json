@@ -22,6 +22,13 @@
         "description": "Test Jurisdiction"
       },
       "security_classification": "PUBLIC",
+      "categories": [
+        {
+          "category_id": "caseDocuments",
+          "category_label": "Case Documents",
+          "parent_category_id": null
+        }
+      ],
       "acls": [
         {
           "role": "caseworker-probate-public",
@@ -341,6 +348,44 @@
             }],
           "show_event_notes": true,
           "can_save_draft": true
+        },
+        {
+          "id": "CREATE_DOCUMENT_EVENT",
+          "name": "CREATE DOCUMENT EVENT",
+          "description": "Test event for document collection on case creation",
+          "order": 5,
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL"
+            },
+            {
+              "case_field_id": "PersonLastName",
+              "display_context": "OPTIONAL"
+            },
+            {
+              "case_field_id": "D8Documents",
+              "display_context": "OPTIONAL"
+            }
+          ],
+          "pre_states": [],
+          "post_states": [{
+            "enabling_condition": null,
+            "priority": 99,
+            "post_state_reference": "state3"
+          }],
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "callback_url_about_to_submit_event": "http://localhost:{{request.requestLine.port}}/callback/aboutToSubmit",
+          "show_event_notes": false,
+          "can_save_draft": false
         }
       ],
       "states": [

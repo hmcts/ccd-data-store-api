@@ -305,7 +305,8 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(emptySet()).when(documentUtils).findDocumentIds(anyMap());
 
         // When
-        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes, emptyMap());
+        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes,
+            emptyMap());
 
         // Then
         assertThat(result).isEmpty();
@@ -321,7 +322,8 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(savedDocumentIds).when(documentUtils).findDocumentIds(anyMap());
 
         // When
-        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes, emptyMap());
+        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes,
+            emptyMap());
 
         // Then
         assertThat(result)
@@ -339,7 +341,8 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(savedDocumentIds).when(documentUtils).findDocumentIds(anyMap());
 
         // When
-        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes, emptyMap());
+        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes,
+            emptyMap());
 
         // Then
         assertThat(result)
@@ -357,7 +360,8 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(savedDocumentIds).when(documentUtils).findDocumentIds(anyMap());
 
         // When
-        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes, emptyMap());
+        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes,
+            emptyMap());
 
         // Then
         assertThat(result).isEmpty();
@@ -373,7 +377,8 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(savedDocumentIds).when(documentUtils).findDocumentIds(anyMap());
 
         // When
-        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes, emptyMap());
+        final List<DocumentHashToken> result = underTest.filterDocumentHashesAgainstSavedData(documentHashes,
+            emptyMap());
 
         // Then
         assertThat(result).isEmpty();
