@@ -236,17 +236,23 @@ class CaseServiceTest {
 
 
             Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"PersonFirstName\": \"First Name\",\n"
-                    + "  \"PersonLastName\": \"Last Name\"\n"
-                    + "}"));
+                """
+                    {
+                        "PersonFirstName": "First Name",
+                        "PersonLastName": "Last Name"
+                    }
+                 """
+            ));
 
             Map<String, JsonNode> resultData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"PersonFirstName\": \"First Name\",\n"
-                    + "  \"PersonLastName\": \"Last Name\",\n"
-                    + "  \"Person\":{\"Names\":{\"FirstName\":\"Jack\"}}\n"
-                    + "}"));
+                """
+                    {
+                        "PersonFirstName": "First Name",
+                        "PersonLastName": "Last Name",
+                        "Person":{"Names":{"FirstName":"Jack"}}
+                    }
+                """
+            ));
 
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withCaseReference(CASE_REFERENCE)
@@ -271,16 +277,22 @@ class CaseServiceTest {
             caseDetails.getData().put("OtherField", MAPPER.getNodeFactory().textNode("old2"));
 
             Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"TextField\": \"value\",\n"
-                    + "  \"OtherField\": \"event\"\n"
-                    + "}"));
+                """
+                    {
+                        "TextField": "value",
+                        "OtherField": "event"
+                    }
+                """
+            ));
 
             Map<String, JsonNode> pageData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"TextField\": null,\n"
-                    + "  \"NewField\": \"new\"\n"
-                    + "}"));
+                """
+                    {
+                        "TextField": null,
+                        "NewField": "new"
+                    }
+                """
+            ));
 
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withCaseReference(CASE_REFERENCE)
