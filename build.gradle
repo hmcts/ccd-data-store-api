@@ -748,6 +748,36 @@ task verifyFunctionalTestJwtIssuer(type: JavaExec) {
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
 }
 
+task verifyOidcIssuerPolicy {
+    description = 'Fails if oidc.issuer is derived from discovery configuration'
+    group = 'Verification'
+
+    doLast {
+        def policyFiles = [
+            'src/main/resources/application.properties',
+            'src/test/resources/test.properties',
+            'src/contractTest/resources/application.properties'
+        ]
+
+        def violations = policyFiles.findAll { path ->
+            def file = file(path)
+            file.exists() && file.readLines().any { line ->
+                def normalized = line.replaceAll(/\s+/, '')
+                normalized.startsWith('oidc.issuer=') && normalized.contains('IDAM_OIDC_URL')
+                    || normalized.startsWith('oidc.issuer=') && normalized.contains('idam.api.url')
+            }
+        }
+
+        if (!violations.isEmpty()) {
+            throw new GradleException(
+                "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+            )
+        }
+    }
+}
+
+check.dependsOn verifyOidcIssuerPolicy
+
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'

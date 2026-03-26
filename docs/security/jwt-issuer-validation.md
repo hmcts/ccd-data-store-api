@@ -92,3 +92,42 @@ PY
 ## Optional future variant
 
 Only switch to multi-issuer validation if production tokens genuinely need both values during migration. In that case, use an explicit allow-list for issuer values rather than dropping issuer validation.
+
+## Acceptance Checklist
+
+Before merging JWT issuer-validation changes, confirm all of the following:
+
+- The active `JwtDecoder` is built from `spring.security.oauth2.client.provider.oidc.issuer-uri`.
+- The active validator chain includes both `JwtTimestampValidator` and `JwtIssuerValidator(oidc.issuer)`.
+- There is no disabled, commented-out, or alternate runtime path that leaves issuer validation off.
+- `issuer-uri` is used for discovery and JWKS lookup only.
+- `oidc.issuer` / `OIDC_ISSUER` is used as the enforced token `iss` value only.
+- `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL.
+- App config, Helm values, preview values, and CI/Jenkins values are aligned for the target environment.
+- If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
+- There is a test that accepts a token with the expected issuer.
+- There is a test that rejects a token with an unexpected issuer.
+- There is a test that rejects an expired token.
+- There is decoder-level coverage using a signed token, not only validator-only coverage.
+- At least one failure assertion clearly proves issuer rejection, for example by checking for `iss`.
+- CI or build verification checks that a real token issuer matches `OIDC_ISSUER`, or the repo documents why that does not apply.
+- Comments and docs do not describe the old insecure behavior.
+- Any repo-specific difference from peer services is intentional and documented.
+
+Do not merge if any of the following are true:
+
+- issuer validation is constructed but not applied
+- only timestamp validation is active
+- `OIDC_ISSUER` was inferred rather than verified
+- Helm and CI/Jenkins issuer values disagree without explanation
+- only happy-path tests exist
+
+## Configuration Policy
+
+- `spring.security.oauth2.client.provider.oidc.issuer-uri` is used for OIDC discovery and JWKS lookup only.
+- `oidc.issuer` / `OIDC_ISSUER` is the enforced JWT issuer and must match the token `iss` claim exactly.
+- Do not derive `OIDC_ISSUER` from `IDAM_OIDC_URL` or the discovery URL.
+- Production-like environments must provide `OIDC_ISSUER` explicitly.
+- Requiring explicit `OIDC_ISSUER` with no static fallback in main runtime config is the preferred pattern. This repo already follows that stricter pattern.
+- Local or test-only fallbacks are acceptable only when they are static, intentional, and clearly scoped to non-production use.
+- The build enforces this policy with `verifyOidcIssuerPolicy`, which fails if `oidc.issuer` is derived from discovery config.

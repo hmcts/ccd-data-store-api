@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ccd.util.KeyGenerator.getRsaJWK;
 // Validator-level coverage for issuer and timestamp enforcement.
 class SecurityConfigurationTest {
 
-    private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
+    private static final String VALID_ISSUER = "http://localhost:5000/o";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
 
     @Test
