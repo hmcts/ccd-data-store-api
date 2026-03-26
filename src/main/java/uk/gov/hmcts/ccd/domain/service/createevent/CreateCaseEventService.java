@@ -275,12 +275,16 @@ public class CreateCaseEventService {
         if (isDecentralisedCase) {
             // Documents must be attached before the event is committed.
             // When decentralised we must do the attach before the event is submitted to the decentralised service.
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, caseDetailsAfterCallbackWithoutHashes.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
+
             var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(
                 content.getEvent(), caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
@@ -297,6 +301,10 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
                 caseEventDefinition, newState, timeNow);
+
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, finalCaseDetails.getData());
+
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -306,8 +314,7 @@ public class CreateCaseEventService {
                 timeNow,
                 oldState,
                 onBehalfOfUser,
-                securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                    caseEventDefinition)
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition)
             );
 
             caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
@@ -318,9 +325,8 @@ public class CreateCaseEventService {
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
-
         }
 
         return CreateCaseEventResult.caseEventWith()
