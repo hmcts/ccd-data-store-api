@@ -263,6 +263,41 @@ class CaseServiceTest {
         }
 
         @Test
+        @DisplayName("should remove deleted fields from event data when latest data contains nulls")
+        void shouldRemoveFieldsDeletedOnPage() throws Exception {
+            CaseDetails caseDetails = buildCaseDetails();
+            caseDetails.setId("299");
+            caseDetails.getData().put("TextField", MAPPER.getNodeFactory().textNode("old"));
+            caseDetails.getData().put("OtherField", MAPPER.getNodeFactory().textNode("old2"));
+
+            Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
+                "{\n"
+                    + "  \"TextField\": \"value\",\n"
+                    + "  \"OtherField\": \"event\"\n"
+                    + "}"));
+
+            Map<String, JsonNode> pageData = JacksonUtils.convertValue(MAPPER.readTree(
+                "{\n"
+                    + "  \"TextField\": null,\n"
+                    + "  \"NewField\": \"new\"\n"
+                    + "}"));
+
+            CaseDataContent caseDataContent = newCaseDataContent()
+                .withCaseReference(CASE_REFERENCE)
+                .withEventData(eventData)
+                .withData(pageData)
+                .build();
+
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
+
+            assertAll(
+                () -> assertThat(result.getData().containsKey("TextField"), is(false)),
+                () -> assertThat(result.getData().get("OtherField").asText(), is("event")),
+                () -> assertThat(result.getData().get("NewField").asText(), is("new"))
+            );
+        }
+
+        @Test
         @DisplayName("should fail for bad CASE_REFERENCE")
         void shouldThrowBadRequestException() {
             doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);

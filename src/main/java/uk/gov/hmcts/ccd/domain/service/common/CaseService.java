@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 // TODO CaseService and CaseDataService could probably be merged together.
@@ -76,10 +75,22 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        if (content.getEventData() != null) {
-            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
-        }
+        applyEventData(caseDetails, content.getEventData());
+        applyEventData(caseDetails, content.getData());
         return caseDetails;
+    }
+
+    private void applyEventData(CaseDetails caseDetails, Map<String, JsonNode> updates) {
+        if (updates == null || updates.isEmpty()) {
+            return;
+        }
+        updates.forEach((key, value) -> {
+            if (value == null || value.isNull()) {
+                caseDetails.getData().remove(key);
+            } else {
+                caseDetails.getData().put(key, value);
+            }
+        });
     }
 
     public CaseDetails clone(CaseDetails source) {
@@ -135,7 +146,7 @@ public class CaseService {
                     .filter(e -> !e.getReference().isBlank())
                     .map(caseEventFieldComplex -> JacksonUtils
                         .buildFromDottedPath(caseEventFieldComplex.getReference(),
-                                             caseEventFieldComplex.getDefaultValue())).collect(toList());
+                                             caseEventFieldComplex.getDefaultValue())).toList();
 
                 if (!collect.isEmpty()) { // to prevent construct like "FieldA": {}
                     ObjectNode objectNode = MAPPER.getNodeFactory().objectNode();
