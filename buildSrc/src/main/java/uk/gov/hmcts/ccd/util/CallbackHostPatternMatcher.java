@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.util;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -16,7 +16,7 @@ public final class CallbackHostPatternMatcher {
         if (!hasText(host) || !hasText(rawAllowlist)) {
             return false;
         }
-        return Arrays.stream(rawAllowlist.split(","))
+        return splitRawAllowlist(rawAllowlist).stream()
             .map(String::trim)
             .anyMatch(entry -> matches(host, entry));
     }
@@ -47,7 +47,7 @@ public final class CallbackHostPatternMatcher {
             return normalisedHost.endsWith(normalisedEntry.substring(1));
         }
         if (!isPlainHostname(trimmedEntry)) {
-            return matchesRegex(normalisedHost, normalisedEntry);
+            return matchesRegex(host, trimmedEntry);
         }
 
         return normalisedHost.equals(normalisedEntry);
@@ -66,7 +66,7 @@ public final class CallbackHostPatternMatcher {
         }
 
         try {
-            Pattern.compile(normalisedEntry);
+            Pattern.compile(trimmedEntry, Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             throw new IllegalArgumentException("Invalid callback allowlist pattern: " + trimmedEntry, ex);
         }
@@ -85,17 +85,45 @@ public final class CallbackHostPatternMatcher {
         if (!hasText(rawAllowlist)) {
             return;
         }
-        Arrays.stream(rawAllowlist.split(","))
+        splitRawAllowlist(rawAllowlist).stream()
             .map(String::trim)
             .filter(CallbackHostPatternMatcher::hasText)
             .forEach(CallbackHostPatternMatcher::validateEntry);
     }
 
-    private static boolean matchesRegex(String normalisedHost, String normalisedEntry) {
+    public static List<String> splitRawAllowlist(String rawAllowlist) {
+        List<String> entries = new ArrayList<>();
+        StringBuilder currentEntry = new StringBuilder();
+
+        for (int i = 0; i < rawAllowlist.length(); i++) {
+            char currentChar = rawAllowlist.charAt(i);
+            if (currentChar == '\\' && i + 1 < rawAllowlist.length()) {
+                char nextChar = rawAllowlist.charAt(i + 1);
+                if (nextChar == ',') {
+                    currentEntry.append(',');
+                    i++;
+                    continue;
+                }
+                currentEntry.append(currentChar);
+                continue;
+            }
+            if (currentChar == ',') {
+                entries.add(currentEntry.toString());
+                currentEntry.setLength(0);
+                continue;
+            }
+            currentEntry.append(currentChar);
+        }
+
+        entries.add(currentEntry.toString());
+        return entries;
+    }
+
+    private static boolean matchesRegex(String host, String entry) {
         try {
-            return Pattern.compile(normalisedEntry).matcher(normalisedHost).matches();
+            return Pattern.compile(entry, Pattern.CASE_INSENSITIVE).matcher(host).matches();
         } catch (PatternSyntaxException ex) {
-            throw new IllegalArgumentException("Invalid callback allowlist pattern: " + normalisedEntry, ex);
+            throw new IllegalArgumentException("Invalid callback allowlist pattern: " + entry, ex);
         }
     }
 

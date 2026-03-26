@@ -30,6 +30,14 @@ class CallbackHostPatternMatcherTest {
     }
 
     @Test
+    void shouldTreatRegexPatternsAsCaseInsensitiveWithoutRewritingThem() {
+        assertTrue(CallbackHostPatternMatcher.matches("PR-123.PREVIEW.PLATFORM.HMCTS.NET",
+            "pr-[0-9]+\\.preview\\.platform\\.hmcts\\.net"));
+        assertTrue(CallbackHostPatternMatcher.matches("api.callback.example",
+            "[A-Z]+\\.callback\\.example"));
+    }
+
+    @Test
     void shouldFallbackToLiteralEqualityForNonMatchingHost() {
         assertTrue(CallbackHostPatternMatcher.matches("literal.host", "literal.host"));
         assertFalse(CallbackHostPatternMatcher.matches("other.host", "literal.host"));
@@ -56,5 +64,21 @@ class CallbackHostPatternMatcherTest {
             "localhost,.*\\.demo\\.platform\\.hmcts\\.net"));
         assertFalse(CallbackHostPatternMatcher.containsHost("service.other.platform.hmcts.net",
             "localhost,.*\\.demo\\.platform\\.hmcts\\.net"));
+    }
+
+    @Test
+    void shouldSupportRegexQuantifierWithEscapedCommaInRawAllowlist() {
+        assertTrue(CallbackHostPatternMatcher.containsHost("node123.example.internal",
+            "localhost,node[0-9]{1\\,3}\\.example\\.internal"));
+        assertFalse(CallbackHostPatternMatcher.containsHost("node1234.example.internal",
+            "localhost,node[0-9]{1\\,3}\\.example\\.internal"));
+    }
+
+    @Test
+    void shouldValidateRegexQuantifierWithEscapedCommaInRawAllowlist() {
+        assertThrows(IllegalArgumentException.class, () ->
+            CallbackHostPatternMatcher.validateEntries("localhost,node[0-9]{1,3}\\.example\\.internal"));
+
+        CallbackHostPatternMatcher.validateEntries("localhost,node[0-9]{1\\,3}\\.example\\.internal");
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -242,14 +243,14 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.passthru-header-contexts}'.split(',')}")
     private List<String> callbackPassthruHeaderContexts;
 
-    @Value("#{'${ccd.callback.allowed-hosts}'.split(',')}")
-    private List<String> callbackAllowedHosts;
+    @Value("${ccd.callback.allowed-hosts}")
+    private String callbackAllowedHosts;
 
-    @Value("#{'${ccd.callback.allowed-http-hosts}'.split(',')}")
-    private List<String> callbackAllowedHttpHosts;
+    @Value("${ccd.callback.allowed-http-hosts}")
+    private String callbackAllowedHttpHosts;
 
-    @Value("#{'${ccd.callback.allow-private-hosts}'.split(',')}")
-    private List<String> callbackAllowPrivateHosts;
+    @Value("${ccd.callback.allow-private-hosts}")
+    private String callbackAllowPrivateHosts;
 
     @Value("#{'${case.data.exclude.verifyaccess.casetype.validate}'.split(',')}")
     private List<String> excludeVerifyAccessCaseTypesForValidate;
@@ -662,15 +663,15 @@ public class ApplicationParams {
     }
 
     public List<String> getCallbackAllowedHosts() {
-        return callbackAllowedHosts;
+        return CallbackHostPatternMatcher.splitRawAllowlist(callbackAllowedHosts);
     }
 
     public List<String> getCallbackAllowedHttpHosts() {
-        return callbackAllowedHttpHosts;
+        return CallbackHostPatternMatcher.splitRawAllowlist(callbackAllowedHttpHosts);
     }
 
     public List<String> getCallbackAllowPrivateHosts() {
-        return callbackAllowPrivateHosts;
+        return CallbackHostPatternMatcher.splitRawAllowlist(callbackAllowPrivateHosts);
     }
 
     public List<String> getUploadTimestampFeaturedCaseTypes() {

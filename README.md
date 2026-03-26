@@ -53,7 +53,7 @@ The following environment variables are required:
 | CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to use `http` for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly; all other callback hosts must use `https`. |
 | CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to resolve to private/local addresses for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly. |
 
-For callback hardening rollout guidance and environment examples (including preview/AAT allowlist hosts),
+For callback hardening rollout guidance, allowlist pattern syntax, and environment examples (including preview/AAT allowlist hosts),
 see [`docs/api/security.md`](docs/api/security.md).
 
 ### Building

@@ -104,6 +104,11 @@ Example comma-separated value:
 
 `.*\.demo\.platform\.hmcts\.net,.*\.preview\.platform\.hmcts\.net`
 
+If a single regex entry needs a comma, escape it as `\,` so it stays within the same allowlist item rather than
+being split into two entries. For example:
+
+`localhost,node[0-9]{1\,3}\.example\.internal`
+
 Do not use shell-style globs such as `*demo.platform.hmcts.net`; invalid regex-like entries now fail validation
 explicitly rather than being treated as literal hostnames.
 
