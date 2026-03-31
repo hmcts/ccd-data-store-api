@@ -4,24 +4,25 @@
 
 `ccd-data-store-api`
 
-## Reference
-
-HMCTS guidance: [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
-
 ## Summary
 
-This change re-enables issuer validation in `ccd-data-store-api` so JWTs must match `oidc.issuer` as well as pass timestamp checks.
-For this repo, the current implementation follows the single configured issuer approach rather than an allow-list model.
-Service-level issuer decisions should be checked against the reference above and the externally agreed service issuer policy before changing this repo's JWT issuer configuration.
+- re-enables issuer validation in `ccd-data-store-api`, so JWTs must match `oidc.issuer` as well as pass timestamp checks
+- follows the single configured issuer approach rather than an allow-list model
+- any change to this repo's JWT issuer configuration should remain consistent with the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and the externally agreed service issuer policy
 
-## At a glance
+## HMCTS Guidance
+
+- [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
+- Use that guidance as the reference point for service-level issuer decisions and configuration recommendations.
+
+## Current approach
 
 | Area | Current approach in this repo |
 |---|---|
 | JWT validation | Signature, timestamp, and issuer are all enforced |
 | Discovery / JWKS source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
 | Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
-| Issuer model | Single configured issuer, not allow-list |
+| Issuer model | Single configured issuer, not allow-list; this is permitted by the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and matches the one externally agreed issuer for this repo |
 | Main runtime config | `OIDC_ISSUER` must be supplied explicitly |
 
 ## Context
@@ -74,7 +75,7 @@ Before rollout, confirm:
 | Item | Current repo state |
 |---|---|
 | Service issuer model | Single configured issuer |
-| Issuer pattern used for this service | Canonical FORGEROCK issuer pattern, consistent with the HMCTS guidance in the Reference section and the external service issuer policy for `ccd-data-store-api` |
+| Issuer pattern used for this service | Canonical FORGEROCK issuer pattern, consistent with the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and the external service issuer policy for `ccd-data-store-api` |
 | Repo wiring status | Helm values, preview values, and Jenkins wiring are already aligned to that FORGEROCK issuer pattern |
 
 Do not infer `OIDC_ISSUER` from the public OIDC discovery URL. In preview/AAT for this repo, the correct
@@ -117,7 +118,7 @@ PY
 
 Only switch to multi-issuer validation if production tokens genuinely need both values during migration. In that case, use an explicit allow-list for issuer values rather than dropping issuer validation.
 
-## Current repo status
+## Current implementation status
 
 | Area | Current status |
 |---|---|
@@ -162,3 +163,7 @@ Do not merge if:
 | Main runtime config | Explicit `OIDC_ISSUER` with no static fallback is the preferred pattern; this repo follows that pattern |
 | Local / test-only fallbacks | Acceptable only when static, intentional, and clearly scoped to non-production use |
 | Build guard | `verifyOidcIssuerPolicy` fails if `oidc.issuer` is derived from discovery config |
+
+## References
+
+See [HMCTS Guidance](#hmcts-guidance).
