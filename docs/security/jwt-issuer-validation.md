@@ -23,7 +23,6 @@
 | Discovery / JWKS source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
 | Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
 | Issuer model | Single configured issuer, not allow-list; this is permitted by the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and matches the one externally agreed issuer for this repo |
-| Main runtime config | `OIDC_ISSUER` must be supplied explicitly |
 
 ## Context
 
@@ -49,6 +48,8 @@ OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withT
 | `oidc.issuer` | Enforced token `iss` value | Supplied from `OIDC_ISSUER` |
 | `IDAM_OIDC_URL` | Discovery base URL | Not the source of truth for token `iss` |
 | `OIDC_ISSUER` | Expected JWT issuer | Must match real caller token `iss` exactly |
+
+For this repo, the FORGEROCK issuer used in deployed environments is an explicit `OIDC_ISSUER` value supplied by Helm/Jenkins configuration. It is not a runtime fallback that appears automatically when issuer settings are absent.
 
 ## Tests
 
@@ -160,7 +161,6 @@ Do not merge if:
 | Enforcement | `oidc.issuer` / `OIDC_ISSUER` is the enforced JWT issuer and must match the token `iss` claim exactly |
 | Derivation | Do not derive `OIDC_ISSUER` from `IDAM_OIDC_URL` or the discovery URL |
 | Production-like environments | Must provide `OIDC_ISSUER` explicitly |
-| Main runtime config | Explicit `OIDC_ISSUER` with no static fallback is the preferred pattern; this repo follows that pattern |
 | Local / test-only fallbacks | Acceptable only when static, intentional, and clearly scoped to non-production use |
 | Build guard | `verifyOidcIssuerPolicy` fails if `oidc.issuer` is derived from discovery config |
 
