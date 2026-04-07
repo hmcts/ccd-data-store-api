@@ -40,6 +40,12 @@ import static org.hamcrest.Matchers.notNullValue;
  *   <li>{@code -Dtarget.fields}: comma-separated list of case field IDs to check.</li>
  * </ul>
  *
+ * Example of env variables to run  from IntelliJ:
+ * -ea
+ * -Dtarget.fields=isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress
+ * -Ddefinition.file=/Users/markdathorne/Downloads/ccd-appeal-config-preview-pr3017.xlsx
+ * -Droles=caseworker-ia-admofficer,hmcts-admin
+ *
  * <p>Process:</p>
  * <ol>
  *   <li>Load the {@code CaseEventToFields}, {@code AuthorisationCaseField}, and
