@@ -1,5 +1,5 @@
 {
-  "title": "No organisation ID is provided by the user so Assigned User Count remains unchanged",
+  "title": "No organisation ID is provided by the user so caller organisation from PRD is used",
 
   "_guid_": "S-105.16",
   "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
