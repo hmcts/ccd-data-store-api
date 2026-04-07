@@ -31,7 +31,10 @@ import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Harness-style test that inspects a definition spreadsheet and reports whether
- * specific fields are readable for the supplied roles on a fixed event.
+ * specific fields are readable for the supplied roles on a fixed event
+ * and are therefore returned if so, or not returned.
+ *
+ * Example: field sponsorEmailAdminJ, event editAppealAfterSubmit, case type Appeal, role caseworker-ia-admofficer.
  *
  * <p>Required system properties (parameters):</p>
  * <ul>
@@ -55,6 +58,9 @@ import static org.hamcrest.Matchers.notNullValue;
  *   <li>For each matching case type, derive CaseViewField visibility from {@code AuthorisationCaseField} CRUD.</li>
  *   <li>Report decisions and fail the test if any field is not returned.</li>
  * </ol>
+ *
+ * Success: field -> Returned
+ * Failure: field -> Not returned: No read access
  */
 class DefinitionSpreadsheetHarnessTest {
 
