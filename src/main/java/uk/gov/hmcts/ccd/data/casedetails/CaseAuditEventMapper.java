@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
@@ -19,7 +19,7 @@ public class CaseAuditEventMapper {
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();
         final SignificantItem significantItem = new SignificantItem();
-        auditEvent.setId(caseAuditEventEntity.getId());
+        auditEvent.setId(caseAuditEventEntity.getId() == null ? null : String.valueOf(caseAuditEventEntity.getId()));
         auditEvent.setCaseDataId(String.valueOf(caseAuditEventEntity.getCaseDataId()));
         auditEvent.setCaseTypeId(caseAuditEventEntity.getCaseTypeId());
         auditEvent.setCaseTypeVersion(caseAuditEventEntity.getCaseTypeVersion());
@@ -60,7 +60,7 @@ public class CaseAuditEventMapper {
         final CaseAuditEventEntity newCaseAuditEventEntity = new CaseAuditEventEntity();
         final SignificantItemEntity significantItemEntity = new SignificantItemEntity();
 
-        newCaseAuditEventEntity.setId(auditEvent.getId());
+        newCaseAuditEventEntity.setId(auditEvent.getId() == null ? null : Long.parseLong(auditEvent.getId()));
         newCaseAuditEventEntity.setCaseDataId(auditEvent.getCaseDataId());
         newCaseAuditEventEntity.setCaseTypeId(auditEvent.getCaseTypeId());
         newCaseAuditEventEntity.setCaseTypeVersion(auditEvent.getCaseTypeVersion());

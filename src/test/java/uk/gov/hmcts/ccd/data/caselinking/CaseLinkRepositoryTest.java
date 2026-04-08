@@ -6,7 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,8 +167,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         // GIVEN
         CaseLinkEntity.CaseLinkPrimaryKey pk = new CaseLinkEntity.CaseLinkPrimaryKey();
-        pk.setCaseId(CASE_19_ID);
-        pk.setLinkedCaseId(CASE_21_ID);
+        pk.setCaseId(Long.parseLong(CASE_19_ID));
+        pk.setLinkedCaseId(Long.parseLong(CASE_21_ID));
 
         assertFalse(caseLinkRepository.findById(pk).isPresent());
 
@@ -180,8 +180,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
         // THEN
         Optional<CaseLinkEntity>  savedCaseLinkEntity = caseLinkRepository.findById(pk);
         assertTrue(savedCaseLinkEntity.isPresent());
-        assertEquals(CASE_19_ID, savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getCaseId());
-        assertEquals(CASE_21_ID, savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getLinkedCaseId());
+        assertEquals(Long.parseLong(CASE_19_ID), savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getCaseId());
+        assertEquals(Long.parseLong(CASE_21_ID), savedCaseLinkEntity.get().getCaseLinkPrimaryKey().getLinkedCaseId());
         assertNotNull(savedCaseLinkEntity.get().getCaseTypeId());
         assertEquals(NON_STANDARD_LINK, savedCaseLinkEntity.get().getStandardLink());
     }
@@ -211,8 +211,8 @@ class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         final List<String> foundLinkedCaseIds = allByCaseReference.stream()
             .filter(caseLinkEntity -> caseLinkEntity.getCaseTypeId().equals(TEST_ADDRESS_BOOK_CASE)
-                && caseLinkEntity.getCaseLinkPrimaryKey().getCaseId().equals(CASE_01_ID))
-            .map(cle -> cle.getCaseLinkPrimaryKey().getLinkedCaseId())
+                && caseLinkEntity.getCaseLinkPrimaryKey().getCaseId().equals(Long.parseLong(CASE_01_ID)))
+            .map(cle -> String.valueOf(cle.getCaseLinkPrimaryKey().getLinkedCaseId()))
             .collect(Collectors.toList());
 
         assertTrue(foundLinkedCaseIds.containsAll(linkedCaseIds));

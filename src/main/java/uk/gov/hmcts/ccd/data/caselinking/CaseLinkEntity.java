@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd.data.caselinking;
 
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 
 @Entity
@@ -19,23 +19,23 @@ public class CaseLinkEntity {
     @EqualsAndHashCode
     public static class CaseLinkPrimaryKey implements Serializable {
         @Column(name = "case_id", nullable = false)
-        private String caseId;
+        private Long caseId;
         @Column(name = "linked_case_id", nullable = false)
-        private String linkedCaseId;
+        private Long linkedCaseId;
 
-        public String getCaseId() {
+        public Long getCaseId() {
             return caseId;
         }
 
-        public void setCaseId(String caseId) {
+        public void setCaseId(Long caseId) {
             this.caseId = caseId;
         }
 
-        public String getLinkedCaseId() {
+        public Long getLinkedCaseId() {
             return linkedCaseId;
         }
 
-        public void setLinkedCaseId(String linkedCaseId) {
+        public void setLinkedCaseId(Long linkedCaseId) {
             this.linkedCaseId = linkedCaseId;
         }
     }
@@ -55,8 +55,8 @@ public class CaseLinkEntity {
 
     public CaseLinkEntity(String caseId, String linkedCaseId, String caseTypeId, Boolean standardLink) {
         caseLinkPrimaryKey = new CaseLinkPrimaryKey();
-        caseLinkPrimaryKey.setCaseId(caseId);
-        caseLinkPrimaryKey.setLinkedCaseId(linkedCaseId);
+        caseLinkPrimaryKey.setCaseId(Long.parseLong(caseId));
+        caseLinkPrimaryKey.setLinkedCaseId(Long.parseLong(linkedCaseId));
 
         this.caseTypeId = caseTypeId;
         this.standardLink = standardLink;

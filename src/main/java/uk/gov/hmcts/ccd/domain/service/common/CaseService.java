@@ -76,7 +76,9 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        if (content.getEventData() != null) {
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        }
         return caseDetails;
     }
 

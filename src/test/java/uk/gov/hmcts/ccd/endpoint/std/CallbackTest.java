@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -48,12 +48,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
+import static org.junit.Assert.fail;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -190,7 +192,7 @@ public class CallbackTest extends WireMockBaseTest {
     public CallbackTest() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
 
         DATA = mapper.readTree(DATA_JSON_STRING);
@@ -209,7 +211,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
@@ -222,7 +224,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -239,7 +241,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -255,13 +257,13 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -483,6 +485,13 @@ public class CallbackTest extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String body = mvcResult.getResponse().getContentAsString();
+
+        if (status != 201) {
+            fail("Expected 201 but got " + status + "\nResponse body:\n" + body);
+        }
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);

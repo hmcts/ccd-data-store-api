@@ -45,7 +45,7 @@ class CaseDocumentControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
             .caseId(CASE_REFERENCE)

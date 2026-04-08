@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.types;
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +13,8 @@ import java.util.List;
 @Singleton
 public class TextValidator implements BaseTypeValidator {
     public static final String TYPE_ID = "Text";
+
+    private static final int FIELD_VALUE_SUMMARY_MAX_LENGTH = 50;
 
     @Override
     public BaseType getType() {
@@ -38,15 +40,17 @@ public class TextValidator implements BaseTypeValidator {
         final String value = dataValue.textValue();
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
+            String fieldValueSummary = getFieldValueSummary(value);
             return Collections.singletonList(
-                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition
+                new ValidationResult(fieldValueSummary + " exceeds the maximum length of " + caseFieldDefinition
                     .getFieldTypeDefinition().getMax(), dataFieldId)
             );
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
+            String fieldValueSummary = getFieldValueSummary(value);
             return Collections.singletonList(
-                new ValidationResult(value + " require minimum length " + caseFieldDefinition
+                new ValidationResult(fieldValueSummary + " requires a minimum length of " + caseFieldDefinition
                     .getFieldTypeDefinition().getMin(), dataFieldId)
             );
         }
@@ -56,6 +60,20 @@ public class TextValidator implements BaseTypeValidator {
         }
 
         return Collections.emptyList();
+    }
+
+    private static String getFieldValueSummary(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        int valueLength = value.length();
+
+        String truncatedValue = valueLength > FIELD_VALUE_SUMMARY_MAX_LENGTH
+            ? value.substring(0, FIELD_VALUE_SUMMARY_MAX_LENGTH) + "..." : value;
+
+        return "\"%s\" (%d %s)"
+            .formatted(truncatedValue, valueLength, valueLength == 1 ? "character" : "characters");
     }
 
     static Boolean checkMax(final BigDecimal max, final String value) {

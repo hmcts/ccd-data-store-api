@@ -42,7 +42,7 @@ class SecurityValidationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         securityValidationService = new SecurityValidationService(authorisedGetCaseOperation);
     }

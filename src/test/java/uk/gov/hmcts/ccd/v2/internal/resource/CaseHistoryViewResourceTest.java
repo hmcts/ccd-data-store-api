@@ -40,7 +40,7 @@ class CaseHistoryViewResourceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         tabs = new CaseViewTab[]{};
         event = newCaseViewEvent();

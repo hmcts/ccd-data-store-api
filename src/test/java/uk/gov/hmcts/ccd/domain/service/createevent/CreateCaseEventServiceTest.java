@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -18,28 +19,32 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -55,9 +60,10 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -65,6 +71,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,12 +82,16 @@ import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -149,8 +160,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
     @Mock
-    private HttpServletRequest request;
-    @Mock
     private SecurityClassificationServiceImpl securityClassificationService;
     @Mock
     private TimeToLiveService timeToLiveService;
@@ -159,11 +168,21 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private ApplicationParams applicationParams;
     @Mock
+    private CaseAccessGroupUtils caseAccessGroupUtils;
+    @Mock
     private UserRepository userRepository;
     @Mock
     private UIDService uidService;
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedCreateCaseEventService;
+    @Mock
+    private PersistenceStrategyResolver resolver;
+    @Mock
+    private CasePointerRepository pointerRepository;
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
     @Mock
     private ConditionalFieldRestorer conditionalFieldRestorer;
     @Mock
@@ -189,10 +208,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseDetails caseDetailsFromDB;
     private CaseDetails caseDetailsBefore;
     private CaseDataContent caseDataContent;
+    private AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse;
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();
@@ -208,7 +228,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
         significantItem.setType(SignificantItemType.DOCUMENT.name());
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
@@ -232,7 +252,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, true);
 
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, caseEventDefinition);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
@@ -255,6 +276,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
 
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
+        when(resolver.isDecentralised(any(CaseDetails.class))).thenReturn(false);
+        when(resolver.isDecentralised(anyString())).thenReturn(false);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(emptySet());
     }
 
@@ -357,6 +380,52 @@ class CreateCaseEventServiceTest extends TestFixtures {
             caseTypeDefinition,
             IGNORE_WARNING);
         verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
+    }
+
+    @Test
+    @DisplayName("should set supplementary data when present in about to submit callback response")
+    void shouldSetSupplementaryDataWhenPresentInAboutToSubmitCallback() {
+        // GIVEN - Create supplementary_data map
+        final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
+        supplementaryDataMap.put("key1", TextNode.valueOf("value1"));
+        supplementaryDataMap.put("key2", IntNode.valueOf(42));
+
+        // Mock callbackInvoker to set supplementary_data on the CaseDetails
+        doAnswer(invocation -> {
+            CaseDetails caseDetailsArg = invocation.getArgument(2);
+            caseDetailsArg.setSupplementaryData(supplementaryDataMap);
+            return aboutToSubmitCallbackResponse;
+        }).when(callbackInvoker).invokeAboutToSubmitCallback(any(),
+            any(),
+            any(),
+            any(),
+            any());
+
+        // WHEN
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        assertAll(
+            () -> verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean()),
+            () -> assertNotNull(caseEventResult.getSavedCaseDetails().getSupplementaryData()),
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
+                .isEqualTo("value1"),
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key2").asInt())
+                .isEqualTo(42)
+        );
+    }
+
+    @Test
+    @DisplayName("should not set supplementary data when not present in about to submit callback response")
+    void shouldNotSetSupplementaryDataWhenNotPresentInAboutToSubmitCallback() {
+        // GIVEN - callbackInvoker doesn't set supplementary_data (default behavior)
+
+        // WHEN
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean());
+        assertNull(caseEventResult.getSavedCaseDetails().getSupplementaryData());
     }
 
     @Test
@@ -497,6 +566,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         caseDetails.setState(POST_STATE);
         doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseSystemEvent(CASE_REFERENCE,
             ATTRIBUTE_PATH,
@@ -562,7 +632,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @DisplayName("should throw Resource Not Found Exception when no case reference found")
     void shouldThrowResourceNotFoundExceptionWhenNoCaseReferenceFound() throws Exception {
         CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
-        doReturn(Optional.empty()).when(defaultCaseDetailsRepository).findByReference(NON_EXISTENT_CASE_REFERENCE);
+        doReturn(Optional.empty()).when(defaultCaseDetailsRepository)
+            .findByReference(NON_EXISTENT_CASE_REFERENCE, false);
         assertThrows(ResourceNotFoundException.class, () -> {
             underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
                 ATTRIBUTE_PATH,
@@ -586,10 +657,12 @@ class CreateCaseEventServiceTest extends TestFixtures {
         ObjectNode objectNode = createBasicDoc();
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(buildDocumentCaseField("dataKey1")));
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(true);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
@@ -606,20 +679,31 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertEquals(1, countChanges.get());
     }
 
+    private CaseFieldDefinition buildDocumentCaseField(String id) {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(FieldTypeDefinition.DOCUMENT);
+        fieldTypeDefinition.setRegularExpression(".pdf,.docx,.html,.htm");
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(id);
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+        return caseFieldDefinition;
+    }
+
     @Test
     @DisplayName("should not replace upload timestamp in a document")
     void shouldNotReplaceUploadTimestampInDocument() throws Exception {
         Map<String, JsonNode> data = Maps.newHashMap();
         ObjectNode objectNode = createBasicDoc();
         final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
-        objectNode.put(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
+        objectNode.set(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
         caseDetailsFromDB = caseDetails.shallowClone();
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
-        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository).findByReference(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(caseDetailsFromDB)).when(defaultCaseDetailsRepository)
+            .findByReference(CASE_REFERENCE, true);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE, false);
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
@@ -654,9 +738,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     private ObjectNode createBasicDoc() {
         ObjectNode node = MAPPER.createObjectNode();
-        node.put(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
-        node.put(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
-        node.put("document_filename", new TextNode("test-a5.pdf"));
+        node.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
+        node.set(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
+        node.set("document_filename", new TextNode("test-a5.pdf"));
 
         return node;
     }

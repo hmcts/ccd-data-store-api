@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
-import org.hamcrest.core.IsCollectionContaining;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,7 +12,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -37,7 +37,7 @@ class DefaultGetCaseTypesOperationTestDefinition {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         testCaseTypeDefinition1 = newCaseType().build();
         testCaseTypeDefinition2 = newCaseType().build();
         testCaseTypeDefinition3 = newCaseType().build();
@@ -64,7 +64,7 @@ class DefaultGetCaseTypesOperationTestDefinition {
             () -> assertThat(updateCaseTypeDefinitions, is(equalTo(createCaseTypeDefinitions))),
             () -> assertThat(readCaseTypeDefinitions, is(equalTo(updateCaseTypeDefinitions))),
             () -> assertThat(updateCaseTypeDefinitions, is(equalTo(readCaseTypeDefinitions))),
-            () -> assertThat(createCaseTypeDefinitions, IsCollectionContaining.hasItems(testCaseTypeDefinition1,
+            () -> assertThat(createCaseTypeDefinitions, hasItems(testCaseTypeDefinition1,
                                                         testCaseTypeDefinition2, testCaseTypeDefinition3))
         );
     }

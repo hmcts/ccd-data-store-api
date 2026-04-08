@@ -1,0 +1,10 @@
+[ {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_Decentralisation",
+  "ID" : "CaseCreated",
+  "Name" : "Create case",
+  "Description" : "",
+  "DisplayOrder" : 1,
+  "TitleDisplay" : ""
+} ]

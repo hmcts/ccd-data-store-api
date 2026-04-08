@@ -41,8 +41,9 @@ class CaseLinkMapperTest {
     void testModelToEntity() {
         CaseLinkEntity mappedCaseLinkEntity = caseLinkMapper.modelToEntity(caseLinkModel);
         assertAll(() -> {
-            assertEquals(CASE_ID, mappedCaseLinkEntity.getCaseLinkPrimaryKey().getCaseId());
-            assertEquals(LINKED_CASE_ID, mappedCaseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
+            assertEquals(Long.parseLong(CASE_ID), mappedCaseLinkEntity.getCaseLinkPrimaryKey().getCaseId());
+            assertEquals(Long.parseLong(LINKED_CASE_ID),
+                mappedCaseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
             assertEquals(CASE_TYPE_ID, mappedCaseLinkEntity.getCaseTypeId());
             assertEquals(NON_STANDARD_LINK, mappedCaseLinkEntity.getStandardLink());
         });
