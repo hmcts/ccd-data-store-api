@@ -32,6 +32,7 @@ java:
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    RD_PROFESSIONAL_API_BASE_URL: http://rd-professional-api-aat.service.core-compute-aat.internal
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
