@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -68,7 +70,7 @@ public class DataBlockGenerator {
                 ? buildComplexNode(originalNode, fieldType)
                 : buildComplexNode(originalNode, allSubFields, directChildrenFields);
         } else if (fieldType.isCollectionFieldType()) {
-            return buildCollectionNode(originalNode, (originalValueNode) ->
+            return buildCollectionNode(originalNode, originalValueNode ->
                 fieldType.getCollectionFieldTypeDefinition().getChildren().isEmpty()
                     ? buildSimpleNode(originalValueNode, fieldType.getCollectionFieldTypeDefinition().getType())
                     : buildComplexNode(originalValueNode, allSubFields, directChildrenFields));
@@ -126,7 +128,7 @@ public class DataBlockGenerator {
             return originalNode;
         }
 
-        return buildCollectionNode(originalNode, (originalValueNode) -> {
+        return buildCollectionNode(originalNode, originalValueNode -> {
             ObjectNode newValueNode = MAPPER.createObjectNode();
             children.forEach(caseFieldDefinition -> {
                 String fieldId = caseFieldDefinition.getId();
@@ -157,8 +159,7 @@ public class DataBlockGenerator {
         switch (fieldType) {
             case YES_OR_NO:
                 return booleanNodeOf(node);
-            case NUMBER:
-            case MONEY_GBP:
+            case NUMBER, MONEY_GBP:
                 return numberNodeOf(node);
             default:
                 return node;
@@ -173,7 +174,16 @@ public class DataBlockGenerator {
         return node.textValue().equalsIgnoreCase("Yes") ? BooleanNode.TRUE : BooleanNode.FALSE;
     }
 
-    private JsonNode numberNodeOf(JsonNode node) {
+    private JsonNode processBigDecimalNodeOf(JsonNode node) {
+        return node.isDouble() ? DecimalNode.valueOf(node.decimalValue())
+            : DecimalNode.valueOf(BigDecimal.valueOf(Double.parseDouble(node.textValue())));
+    }
+
+    private JsonNode processNumberNodeOf(JsonNode node) {
         return node.isNumber() ? LongNode.valueOf(node.asLong()) : LongNode.valueOf(Long.parseLong(node.textValue()));
+    }
+
+    private JsonNode numberNodeOf(JsonNode node) {
+        return node.isDouble() ? processBigDecimalNodeOf(node) : processNumberNodeOf(node);
     }
 }
