@@ -27,7 +27,7 @@ ext {
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
-    set('jacksonVersion', '2.19.2')
+    set('jackson.version', '2.19.2')
     set('snakeyaml.version', '2.2')
     junit = '5.14.3'
     junitPlatform = '1.14.3'
@@ -290,9 +290,9 @@ dependencies {
     implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
 
-//    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+//    implementation "com.fasterxml.jackson.core:jackson-core:${property('jackson.version')}"
+//    implementation "com.fasterxml.jackson.core:jackson-databind:${property('jackson.version')}"
+//    implementation "com.fasterxml.jackson.core:jackson-annotations:${property('jackson.version')}"
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
