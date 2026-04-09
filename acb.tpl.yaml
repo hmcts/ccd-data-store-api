@@ -8,7 +8,7 @@ steps:
 
   - id: runtime-amd64
     build: >
-      -t {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64
+      -t hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-amd64
       --build-arg PLATFORM=/linux/amd64
       --platform linux/amd64
       .
@@ -26,7 +26,7 @@ steps:
 
   - id: runtime-arm64
     build: >
-      -t {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
+      -t hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-arm64
       --build-arg PLATFORM=/linux/arm64
       --platform linux/arm64/v8
       .
@@ -37,8 +37,8 @@ steps:
 
   - id: push-images
     push:
-      - "{{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64"
-      - "{{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64"
+      - "hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-amd64"
+      - "hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-arm64"
     when:
       - runtime-amd64
       - runtime-arm64
@@ -46,14 +46,14 @@ steps:
     retryDelay: 5
 
   - id: manifest-create
-    cmd: docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
+    cmd: docker manifest create hmctsprod.azurecr.io/{{CI_IMAGE_TAG}} hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-amd64 hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}-arm64
     when:
       - push-images
     retries: 3
     retryDelay: 5
 
   - id: manifest-push
-    cmd: docker manifest push --purge {{.Run.Registry}}/{{CI_IMAGE_TAG}}
+    cmd: docker manifest push --purge hmctsprod.azurecr.io/{{CI_IMAGE_TAG}}
     when:
       - manifest-create
     retries: 3
