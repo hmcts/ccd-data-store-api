@@ -115,11 +115,6 @@ env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctsprod ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 
-//enable BEFTA logging
-env.LOGGING_LEVEL_UK_GOV_HMCTS_CCD = "DEBUG"
-env.BEFTA_HTTP_LOGGING_ENABLED = "true"
-
-
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
