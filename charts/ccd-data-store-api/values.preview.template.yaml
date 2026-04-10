@@ -34,10 +34,10 @@ java:
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
-    # ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
-    ELASTIC_SEARCH_HOSTS: "ccd-data-store-api-pr-2844-es-master:9200"
-    # ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://ccd-data-store-api-pr-2844-es-master:9200"
+    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
+    #ELASTIC_SEARCH_HOSTS: "ccd-data-store-api-pr-2844-es-master:9200"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+    #ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://ccd-data-store-api-pr-2844-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
@@ -95,7 +95,7 @@ ccd:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       #image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1756
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1756-62e46ac-20260410122535
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
