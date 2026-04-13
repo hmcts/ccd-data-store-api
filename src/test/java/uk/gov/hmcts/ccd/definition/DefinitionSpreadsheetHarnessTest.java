@@ -314,8 +314,7 @@ class DefinitionSpreadsheetHarnessTest {
 
         Map<Integer, String> headersByIndex = readHeaders(headerRow, formatter);
         log.info("Initial header row index for {}: {}", sheetName, headerRow.getRowNum());
-        if (ROLES_TO_ACCESS_PROFILE_SHEET.equals(sheetName)
-            && !isRoleToAccessProfilesHeader(headersByIndex)) {
+        if (ROLES_TO_ACCESS_PROFILE_SHEET.equals(sheetName)) {
             headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
                 isRoleToAccessProfilesHeader(thisRowHeaders));
             if (headerRow != null) {
@@ -323,8 +322,7 @@ class DefinitionSpreadsheetHarnessTest {
                 log.info("Adjusted RoleToAccessProfiles header row to index {}", headerRow.getRowNum());
             }
         }
-        if ("CaseEventToFields".equals(sheetName)
-            && !isCaseEventToFieldsHeader(headersByIndex)) {
+        if ("CaseEventToFields".equals(sheetName)) {
             headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
                 isCaseEventToFieldsHeader(thisRowHeaders));
             if (headerRow != null) {
@@ -332,8 +330,7 @@ class DefinitionSpreadsheetHarnessTest {
                 log.info("Adjusted CaseEventToFields header row to index {}", headerRow.getRowNum());
             }
         }
-        if ("AuthorisationCaseField".equals(sheetName)
-            && !isAuthorisationCaseFieldHeader(headersByIndex)) {
+        if ("AuthorisationCaseField".equals(sheetName)) {
             headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
                 isAuthorisationCaseFieldHeader(thisRowHeaders));
             if (headerRow != null) {
