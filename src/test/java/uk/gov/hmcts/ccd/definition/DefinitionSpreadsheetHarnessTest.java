@@ -74,6 +74,7 @@ class DefinitionSpreadsheetHarnessTest {
     private static final String CASE_EVENT_ID_COLUMN = "caseeventid";
     private static final String CASE_FIELD_ID_COLUMN = "casefieldid";
     private static final String CASE_TYPE_ID_COLUMN = "casetypeid";
+    private static final String ACCESS_PROFILE_COLUMN = "accessprofile";
 
     @Test
     void shouldReportIfFieldsReturnedForRoles() throws Exception {
@@ -286,7 +287,7 @@ class DefinitionSpreadsheetHarnessTest {
 
     private static AccessControlList toAccessControlList(Map<String, String> row) {
         AccessControlList accessControlList = new AccessControlList();
-        accessControlList.setAccessProfile(nullSafeTrim(rowValue(row, "accessprofile", "access profile")));
+        accessControlList.setAccessProfile(nullSafeTrim(rowValue(row, ACCESS_PROFILE_COLUMN)));
         String crud = rowValue(row, "crud");
         if (crud != null) {
             String upper = crud.toUpperCase(Locale.ROOT);
@@ -405,7 +406,7 @@ class DefinitionSpreadsheetHarnessTest {
         boolean hasCaseField = headersByIndex.containsValue(CASE_FIELD_ID_COLUMN)
             || headersByIndex.containsValue("case field id")
             || headersByIndex.containsValue("case field");
-        boolean hasAccessProfile = headersByIndex.containsValue("accessprofile")
+        boolean hasAccessProfile = headersByIndex.containsValue(ACCESS_PROFILE_COLUMN)
             || headersByIndex.containsValue("access profile");
         boolean hasCrud = headersByIndex.containsValue("crud");
         return hasCaseType && hasCaseField && hasAccessProfile && hasCrud;
@@ -444,7 +445,7 @@ class DefinitionSpreadsheetHarnessTest {
             String roleName = normalizeRole(rawRoleName);
             if (!roleName.isEmpty() && roles.contains(roleName)) {
                 log.info("Matched role: raw='{}', normalized='{}'", rawRoleName, roleName);
-                String profilesValue = nullSafeTrim(rowValue(row, "accessprofiles", "accessprofile"));
+                String profilesValue = nullSafeTrim(rowValue(row, "accessprofiles", ACCESS_PROFILE_COLUMN));
                 if (!profilesValue.isEmpty()) {
                     for (String profile : profilesValue.split("[,;]")) {
                         String trimmed = profile.trim();
