@@ -402,14 +402,9 @@ class DefinitionSpreadsheetHarnessTest {
     }
 
     private static boolean isAuthorisationCaseFieldHeader(Map<Integer, String> headersByIndex) {
-        boolean hasCaseType = headersByIndex.containsValue(CASE_TYPE_ID_COLUMN)
-            || headersByIndex.containsValue("case type id")
-            || headersByIndex.containsValue("case type");
-        boolean hasCaseField = headersByIndex.containsValue(CASE_FIELD_ID_COLUMN)
-            || headersByIndex.containsValue("case field id")
-            || headersByIndex.containsValue("case field");
-        boolean hasAccessProfile = headersByIndex.containsValue(ACCESS_PROFILE_COLUMN)
-            || headersByIndex.containsValue("access profile");
+        boolean hasCaseType = headersByIndex.containsValue(CASE_TYPE_ID_COLUMN);
+        boolean hasCaseField = headersByIndex.containsValue(CASE_FIELD_ID_COLUMN);
+        boolean hasAccessProfile = headersByIndex.containsValue(ACCESS_PROFILE_COLUMN);
         boolean hasCrud = headersByIndex.containsValue("crud");
         return hasCaseType && hasCaseField && hasAccessProfile && hasCrud;
     }
