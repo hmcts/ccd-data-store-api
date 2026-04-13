@@ -238,8 +238,8 @@ class DefinitionSpreadsheetHarnessTest {
         for (String caseTypeId : caseTypesForEventField) {
             log.info("Checking case type: {}", caseTypeId);
             List<Map<String, String>> caseTypeFieldRows = authCaseFields.stream()
-                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_TYPE_ID_COLUMN, "case type id", "case type"), caseTypeId))
-                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_FIELD_ID_COLUMN, "case field id", "case field"), fieldId))
+                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_TYPE_ID_COLUMN), caseTypeId))
+                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_FIELD_ID_COLUMN), fieldId))
                 .collect(Collectors.toList());
             log.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
             if (caseTypeFieldRows.isEmpty()) {
