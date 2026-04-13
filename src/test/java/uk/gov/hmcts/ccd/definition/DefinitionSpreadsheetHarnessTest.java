@@ -341,6 +341,11 @@ class DefinitionSpreadsheetHarnessTest {
         log.info("Using header row index for {}: {}", sheetName, headerRow.getRowNum());
 
         List<Map<String, String>> rows = new ArrayList<>();
+        if (null == headerRow) {
+            log.info("Loaded 0 data rows from sheet {}", sheetName);
+            return null;
+        }
+
         for (int i = headerRow.getRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) {
