@@ -5,8 +5,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -62,20 +61,23 @@ import static org.hamcrest.Matchers.notNullValue;
  * Success: field -> Returned
  * Failure: field -> Not returned: No read access
  */
+@Slf4j
 class DefinitionSpreadsheetHarnessTest {
 
-    private static final Logger LOG = LogManager.getLogger(DefinitionSpreadsheetHarnessTest.class);
     private static final String SPREADSHEET_PATH_PROPERTY = "definition.file";
     private static final String ROLES_PROPERTY = "roles";
     private static final String TARGET_FIELDS_PROPERTY = "target.fields";
-    private static final String EVENT_ID = "editAppealAfterSubmit";
+    private static final String EVENT_ID_PROPERTY = "event.id";
     private static final String ROLES_TO_ACCESS_PROFILE_SHEET = "RoleToAccessProfiles";
+    private static final String AUTHORISATION_CASE_FIELD_SHEET = "AuthorisationCaseField";
+    private static final String CASE_EVENT_TO_FIELDS_SHEET = "CaseEventToFields";
 
     @Test
     void shouldReportIfFieldsReturnedForRoles() throws Exception {
         String spreadsheetPath = System.getProperty(SPREADSHEET_PATH_PROPERTY);
         String rolesCsv = System.getProperty(ROLES_PROPERTY);
         String fieldsCsv = System.getProperty(TARGET_FIELDS_PROPERTY);
+        String eventId = System.getProperty(EVENT_ID_PROPERTY);
 
         assertThat("Missing -D" + SPREADSHEET_PATH_PROPERTY + "=<path-to-xlsx>",
             spreadsheetPath, is(notNullValue()));
@@ -83,12 +85,16 @@ class DefinitionSpreadsheetHarnessTest {
             rolesCsv, is(notNullValue()));
         assertThat("Missing -D" + TARGET_FIELDS_PROPERTY + "=field1,field2",
             fieldsCsv, is(notNullValue()));
+        assertThat("Missing -D" + EVENT_ID_PROPERTY + "=eventId",
+            eventId, is(notNullValue()));
         assertThat("Blank -D" + SPREADSHEET_PATH_PROPERTY + " value",
             spreadsheetPath.isBlank(), is(false));
         assertThat("Blank -D" + ROLES_PROPERTY + " value",
             rolesCsv.isBlank(), is(false));
         assertThat("Blank -D" + TARGET_FIELDS_PROPERTY + " value",
             fieldsCsv.isBlank(), is(false));
+        assertThat("Blank -D" + EVENT_ID_PROPERTY + " value",
+            eventId.isBlank(), is(false));
 
         Set<String> roles = parseRoles(rolesCsv);
         List<String> targetFields = parseFields(fieldsCsv);
@@ -96,11 +102,11 @@ class DefinitionSpreadsheetHarnessTest {
         List<FieldDecision> decisions = evaluateSpreadsheet(
             Path.of(spreadsheetPath),
             roles,
-            EVENT_ID,
+            eventId,
             targetFields
         );
 
-        decisions.forEach(decision -> LOG.info(decision.format()));
+        decisions.forEach(decision -> log.info(decision.format()));
 
         List<FieldDecision> failures = decisions.stream()
             .filter(decision -> !decision.isReturned())
@@ -145,29 +151,29 @@ class DefinitionSpreadsheetHarnessTest {
                                                            Set<String> roles,
                                                            String eventId,
                                                            List<String> fieldIds) throws Exception {
-        LOG.info("Evaluating spreadsheet: {}", spreadsheetPath);
-        LOG.info("Event ID: {}", eventId);
-        LOG.info("Roles: {}", String.join(", ", roles));
-        LOG.info("Target fields: {}", String.join(", ", fieldIds));
+        log.info("Evaluating spreadsheet: {}", spreadsheetPath);
+        log.info("Event ID: {}", eventId);
+        log.info("Roles: {}", String.join(", ", roles));
+        log.info("Target fields: {}", String.join(", ", fieldIds));
         try (InputStream inputStream = Files.newInputStream(spreadsheetPath);
              Workbook workbook = WorkbookFactory.create(inputStream)) {
 
-            List<Map<String, String>> eventToFields = readSheet(workbook, "CaseEventToFields");
-            List<Map<String, String>> authCaseFields = readSheet(workbook, "AuthorisationCaseField");
+            List<Map<String, String>> eventToFields = readSheet(workbook, CASE_EVENT_TO_FIELDS_SHEET);
+            List<Map<String, String>> authCaseFields = readSheet(workbook, AUTHORISATION_CASE_FIELD_SHEET);
             List<Map<String, String>> rolesToAccessProfiles = readSheet(workbook, ROLES_TO_ACCESS_PROFILE_SHEET);
             Set<String> accessProfiles = translateRolesToAccessProfiles(roles, rolesToAccessProfiles);
-            LOG.info("Rows loaded: CaseEventToFields={}, AuthorisationCaseField={}",
+            log.info("Rows loaded: CaseEventToFields={}, AuthorisationCaseField={}",
                 eventToFields.size(), authCaseFields.size());
-            LOG.info("Rows loaded: RolesToAccessProfile={}, accessProfiles={}",
+            log.info("Rows loaded: RolesToAccessProfile={}, accessProfiles={}",
                 rolesToAccessProfiles.size(), String.join(", ", accessProfiles));
             if (!rolesToAccessProfiles.isEmpty()) {
-                LOG.info("RoleToAccessProfiles headers: {}",
+                log.info("RoleToAccessProfiles headers: {}",
                     String.join(", ", rolesToAccessProfiles.get(0).keySet()));
             }
             if (!eventToFields.isEmpty()) {
-                LOG.info("CaseEventToFields headers: {}",
+                log.info("CaseEventToFields headers: {}",
                     String.join(", ", eventToFields.get(0).keySet()));
-                LOG.info("CaseEventToFields sample caseeventid values: {}",
+                log.info("CaseEventToFields sample caseeventid values: {}",
                     eventToFields.stream()
                         .map(row -> row.get("caseeventid"))
                         .filter(value -> value != null && !value.isBlank())
@@ -176,7 +182,7 @@ class DefinitionSpreadsheetHarnessTest {
                         .collect(Collectors.joining(", ")));
             }
             if (!authCaseFields.isEmpty()) {
-                LOG.info("AuthorisationCaseField headers: {}",
+                log.info("AuthorisationCaseField headers: {}",
                     String.join(", ", authCaseFields.get(0).keySet()));
             }
 
@@ -184,7 +190,7 @@ class DefinitionSpreadsheetHarnessTest {
             for (String fieldId : fieldIds) {
                 decisions.add(evaluateField(fieldId, accessProfiles, eventId, eventToFields, authCaseFields));
             }
-            LOG.info("Decisions evaluated: {}", decisions.size());
+            log.info("Decisions evaluated: {}", decisions.size());
             return decisions;
         }
     }
@@ -203,7 +209,7 @@ class DefinitionSpreadsheetHarnessTest {
                                                String eventId,
                                                List<Map<String, String>> eventToFields,
                                                List<Map<String, String>> authCaseFields) {
-        LOG.info("Evaluating field: {} (eventId={})", fieldId, eventId);
+        log.info("Evaluating field: {} (eventId={})", fieldId, eventId);
         long totalEventToFields = eventToFields.size();
         List<Map<String, String>> eventIdMatches = eventToFields.stream()
             .filter(row -> equalsIgnoreCase(row.get("caseeventid"), eventId))
@@ -216,38 +222,37 @@ class DefinitionSpreadsheetHarnessTest {
             .filter(value -> !value.isEmpty())
             .distinct()
             .collect(Collectors.toList());
-        LOG.info("CaseEventToFields rows: total={}, eventIdMatch={}, eventId+fieldMatch={}, caseTypes={}",
+        log.info("CaseEventToFields rows: total={}, eventIdMatch={}, eventId+fieldMatch={}, caseTypes={}",
             totalEventToFields, eventIdMatches.size(), eventAndFieldMatches.size(),
             String.join(", ", caseTypesForEventField));
 
         if (caseTypesForEventField.isEmpty()) {
-            LOG.info("No CaseEventToFields row found for event/field");
+            log.info("No CaseEventToFields row found for event/field");
             return FieldDecision.notReturned(fieldId, "No CaseEventToFields row found for event/field");
         }
 
         for (String caseTypeId : caseTypesForEventField) {
-            LOG.info("Checking case type: {}", caseTypeId);
+            log.info("Checking case type: {}", caseTypeId);
             List<Map<String, String>> caseTypeFieldRows = authCaseFields.stream()
                 .filter(row -> equalsIgnoreCase(rowValue(row, "casetypeid", "case type id", "case type"), caseTypeId))
                 .filter(row -> equalsIgnoreCase(rowValue(row, "casefieldid", "case field id", "case field"), fieldId))
                 .collect(Collectors.toList());
-            LOG.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
+            log.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
             if (caseTypeFieldRows.isEmpty()) {
-                LOG.info("No matching AuthorisationCaseField rows for caseType={} field={}", caseTypeId, fieldId);
+                log.info("No matching AuthorisationCaseField rows for caseType={} field={}", caseTypeId, fieldId);
             }
 
             boolean viewable = canAccessCaseViewFieldWithCriteria(caseTypeFieldRows, accessProfiles);
 
-            LOG.info("Derived CaseViewField visibility from CRUD: {}", viewable);
+            log.info("Derived CaseViewField visibility from CRUD: {}", viewable);
             if (viewable) {
-                LOG.info("Viewable for accessProfiles {} in case type {}",
+                log.info("Viewable for accessProfiles {} in case type {}",
                     String.join(", ", accessProfiles), caseTypeId);
                 return FieldDecision.returned(fieldId, caseTypeId);
             }
         }
 
-
-        LOG.info("No read access for accessProfiles {} in case types {}", String.join(", ", accessProfiles),
+        log.info("No read access for accessProfiles {} in case types {}", String.join(", ", accessProfiles),
             String.join(", ", caseTypesForEventField));
         return FieldDecision.notReturned(fieldId,
             "No read access in AuthorisationCaseField for supplied roles and matching case types: "
@@ -259,19 +264,19 @@ class DefinitionSpreadsheetHarnessTest {
         Set<AccessProfile> profileSet = accessProfiles.stream()
             .map(AccessProfile::new)
             .collect(Collectors.toSet());
-        LOG.info("Evaluating ACLs for accessProfiles: {}", String.join(", ", accessProfiles));
-        LOG.info("AccessControl rows count: {}", accessControlRows.size());
+        log.info("Evaluating ACLs for accessProfiles: {}", String.join(", ", accessProfiles));
+        log.info("AccessControl rows count: {}", accessControlRows.size());
         List<AccessControlList> accessControlLists = accessControlRows.stream()
             .map(DefinitionSpreadsheetHarnessTest::toAccessControlList)
             .collect(Collectors.toList());
         for (AccessControlList acl : accessControlLists) {
-            LOG.info("ACL: accessProfile={}, create={}, read={}, update={}, delete={}",
+            log.info("ACL: accessProfile={}, create={}, read={}, update={}, delete={}",
                 acl.getAccessProfile(), acl.isCreate(), acl.isRead(), acl.isUpdate(), acl.isDelete());
         }
         boolean hasAccess = AccessControlService.hasAccessControlList(profileSet,
             accessControlLists,
             AccessControlService.CAN_READ);
-        LOG.info("ACL read access result: {}", hasAccess);
+        log.info("ACL read access result: {}", hasAccess);
         return hasAccess;
     }
 
@@ -290,7 +295,7 @@ class DefinitionSpreadsheetHarnessTest {
     }
 
     private static List<Map<String, String>> readSheet(Workbook workbook, String sheetName) {
-        LOG.info("Reading sheet: {}", sheetName);
+        log.info("Reading sheet: {}", sheetName);
         Sheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
             throw new IllegalArgumentException("Missing sheet: " + sheetName);
@@ -303,14 +308,14 @@ class DefinitionSpreadsheetHarnessTest {
         }
 
         Map<Integer, String> headersByIndex = readHeaders(headerRow, formatter);
-        LOG.info("Initial header row index for {}: {}", sheetName, headerRow.getRowNum());
+        log.info("Initial header row index for {}: {}", sheetName, headerRow.getRowNum());
         if (ROLES_TO_ACCESS_PROFILE_SHEET.equals(sheetName)
             && !isRoleToAccessProfilesHeader(headersByIndex)) {
             headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
                 isRoleToAccessProfilesHeader(thisRowHeaders));
             if (headerRow != null) {
                 headersByIndex = readHeaders(headerRow, formatter);
-                LOG.info("Adjusted RoleToAccessProfiles header row to index {}", headerRow.getRowNum());
+                log.info("Adjusted RoleToAccessProfiles header row to index {}", headerRow.getRowNum());
             }
         }
         if ("CaseEventToFields".equals(sheetName)
@@ -319,7 +324,7 @@ class DefinitionSpreadsheetHarnessTest {
                 isCaseEventToFieldsHeader(thisRowHeaders));
             if (headerRow != null) {
                 headersByIndex = readHeaders(headerRow, formatter);
-                LOG.info("Adjusted CaseEventToFields header row to index {}", headerRow.getRowNum());
+                log.info("Adjusted CaseEventToFields header row to index {}", headerRow.getRowNum());
             }
         }
         if ("AuthorisationCaseField".equals(sheetName)
@@ -328,10 +333,10 @@ class DefinitionSpreadsheetHarnessTest {
                 isAuthorisationCaseFieldHeader(thisRowHeaders));
             if (headerRow != null) {
                 headersByIndex = readHeaders(headerRow, formatter);
-                LOG.info("Adjusted AuthorisationCaseField header row to index {}", headerRow.getRowNum());
+                log.info("Adjusted AuthorisationCaseField header row to index {}", headerRow.getRowNum());
             }
         }
-        LOG.info("Using header row index for {}: {}", sheetName, headerRow.getRowNum());
+        log.info("Using header row index for {}: {}", sheetName, headerRow.getRowNum());
 
         List<Map<String, String>> rows = new ArrayList<>();
         for (int i = headerRow.getRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
@@ -352,7 +357,7 @@ class DefinitionSpreadsheetHarnessTest {
                 rows.add(rowData);
             }
         }
-        LOG.info("Loaded {} data rows from sheet {}", rows.size(), sheetName);
+        log.info("Loaded {} data rows from sheet {}", rows.size(), sheetName);
         return rows;
     }
 
@@ -428,29 +433,29 @@ class DefinitionSpreadsheetHarnessTest {
     private static Set<String> translateRolesToAccessProfiles(Set<String> roles,
                                                               List<Map<String, String>> rolesToAccessProfiles) {
         Set<String> accessProfiles = new HashSet<>();
-        LOG.info("Translating roles to access profiles from sheet: {}",
+        log.info("Translating roles to access profiles from sheet: {}",
             ROLES_TO_ACCESS_PROFILE_SHEET);
         for (Map<String, String> row : rolesToAccessProfiles) {
             String rawRoleName = rowValue(row, "rolename", "role name", "role");
             String roleName = normalizeRole(rawRoleName);
             if (!roleName.isEmpty() && roles.contains(roleName)) {
-                LOG.info("Matched role: raw='{}', normalized='{}'", rawRoleName, roleName);
+                log.info("Matched role: raw='{}', normalized='{}'", rawRoleName, roleName);
                 String profilesValue = nullSafeTrim(rowValue(row, "accessprofiles", "accessprofile"));
                 if (!profilesValue.isEmpty()) {
                     for (String profile : profilesValue.split("[,;]")) {
                         String trimmed = profile.trim();
                         if (!trimmed.isEmpty()) {
                             accessProfiles.add(trimmed);
-                            LOG.info("Added access profile: {}", trimmed);
+                            log.info("Added access profile: {}", trimmed);
                         }
                     }
                 } else {
-                    LOG.info("Matched role '{}' but accessProfiles is empty", roleName);
+                    log.info("Matched role '{}' but accessProfiles is empty", roleName);
                 }
             }
         }
         if (accessProfiles.isEmpty()) {
-            LOG.info("No access profiles found for roles {}", String.join(", ", roles));
+            log.info("No access profiles found for roles {}", String.join(", ", roles));
         }
         return accessProfiles;
     }
