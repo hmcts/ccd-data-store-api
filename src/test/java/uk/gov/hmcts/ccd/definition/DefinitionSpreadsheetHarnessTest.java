@@ -71,6 +71,9 @@ class DefinitionSpreadsheetHarnessTest {
     private static final String ROLES_TO_ACCESS_PROFILE_SHEET = "RoleToAccessProfiles";
     private static final String AUTHORISATION_CASE_FIELD_SHEET = "AuthorisationCaseField";
     private static final String CASE_EVENT_TO_FIELDS_SHEET = "CaseEventToFields";
+    private static final String CASE_EVENT_ID_COLUMN = "caseeventid";
+    private static final String CASE_FIELD_ID_COLUMN = "casefieldid";
+    private static final String CASE_TYPE_ID_COLUMN = "casetypeid";
 
     @Test
     void shouldReportIfFieldsReturnedForRoles() throws Exception {
@@ -173,9 +176,10 @@ class DefinitionSpreadsheetHarnessTest {
             if (!eventToFields.isEmpty()) {
                 log.info("CaseEventToFields headers: {}",
                     String.join(", ", eventToFields.get(0).keySet()));
-                log.info("CaseEventToFields sample caseeventid values: {}",
+                log.info("CaseEventToFields sample {} values: {}",
+                    CASE_EVENT_ID_COLUMN,
                     eventToFields.stream()
-                        .map(row -> row.get("caseeventid"))
+                        .map(row -> row.get(CASE_EVENT_ID_COLUMN))
                         .filter(value -> value != null && !value.isBlank())
                         .distinct()
                         .limit(5)
@@ -212,13 +216,13 @@ class DefinitionSpreadsheetHarnessTest {
         log.info("Evaluating field: {} (eventId={})", fieldId, eventId);
         long totalEventToFields = eventToFields.size();
         List<Map<String, String>> eventIdMatches = eventToFields.stream()
-            .filter(row -> equalsIgnoreCase(row.get("caseeventid"), eventId))
+            .filter(row -> equalsIgnoreCase(row.get(CASE_EVENT_ID_COLUMN), eventId))
             .collect(Collectors.toList());
         List<Map<String, String>> eventAndFieldMatches = eventIdMatches.stream()
-            .filter(row -> equalsIgnoreCase(row.get("casefieldid"), fieldId))
+            .filter(row -> equalsIgnoreCase(row.get(CASE_FIELD_ID_COLUMN), fieldId))
             .collect(Collectors.toList());
         List<String> caseTypesForEventField = eventAndFieldMatches.stream()
-            .map(row -> nullSafeTrim(row.get("casetypeid")))
+            .map(row -> nullSafeTrim(row.get(CASE_TYPE_ID_COLUMN)))
             .filter(value -> !value.isEmpty())
             .distinct()
             .collect(Collectors.toList());
@@ -234,8 +238,8 @@ class DefinitionSpreadsheetHarnessTest {
         for (String caseTypeId : caseTypesForEventField) {
             log.info("Checking case type: {}", caseTypeId);
             List<Map<String, String>> caseTypeFieldRows = authCaseFields.stream()
-                .filter(row -> equalsIgnoreCase(rowValue(row, "casetypeid", "case type id", "case type"), caseTypeId))
-                .filter(row -> equalsIgnoreCase(rowValue(row, "casefieldid", "case field id", "case field"), fieldId))
+                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_TYPE_ID_COLUMN, "case type id", "case type"), caseTypeId))
+                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_FIELD_ID_COLUMN, "case field id", "case field"), fieldId))
                 .collect(Collectors.toList());
             log.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
             if (caseTypeFieldRows.isEmpty()) {
@@ -389,16 +393,16 @@ class DefinitionSpreadsheetHarnessTest {
     }
 
     private static boolean isCaseEventToFieldsHeader(Map<Integer, String> headersByIndex) {
-        return headersByIndex.containsValue("caseeventid")
-            && headersByIndex.containsValue("casefieldid")
-            && headersByIndex.containsValue("casetypeid");
+        return headersByIndex.containsValue(CASE_EVENT_ID_COLUMN)
+            && headersByIndex.containsValue(CASE_FIELD_ID_COLUMN)
+            && headersByIndex.containsValue(CASE_TYPE_ID_COLUMN);
     }
 
     private static boolean isAuthorisationCaseFieldHeader(Map<Integer, String> headersByIndex) {
-        boolean hasCaseType = headersByIndex.containsValue("casetypeid")
+        boolean hasCaseType = headersByIndex.containsValue(CASE_TYPE_ID_COLUMN)
             || headersByIndex.containsValue("case type id")
             || headersByIndex.containsValue("case type");
-        boolean hasCaseField = headersByIndex.containsValue("casefieldid")
+        boolean hasCaseField = headersByIndex.containsValue(CASE_FIELD_ID_COLUMN)
             || headersByIndex.containsValue("case field id")
             || headersByIndex.containsValue("case field");
         boolean hasAccessProfile = headersByIndex.containsValue("accessprofile")
