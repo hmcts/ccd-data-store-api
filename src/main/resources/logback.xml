@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration statusListenerClass="ch.qos.logback.core.status.NopStatusListener">
-    <include resource="reform-base.xml"/>
-
-    <root level="${ROOT_LOGGING_LEVEL:-INFO}">
-        <appender-ref ref="${ROOT_APPENDER:-ASYNC_CONSOLE}"/>
-    </root>
-</configuration>
