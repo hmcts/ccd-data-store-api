@@ -718,6 +718,13 @@ task fortifyScan(type: JavaExec)  {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+task definitionSpreadsheetHarness(type: JavaExec) {
+    group = "verification"
+    description = "Runs the definition spreadsheet harness via main()."
+    mainClass = "uk.gov.hmcts.ccd.definition.DefinitionSpreadsheetHarnessTest"
+    classpath = sourceSets.test.runtimeClasspath
+}
+
 idea {
   module {
     // config to allow Intelij to mark test source and resource files correctly to help linting tools

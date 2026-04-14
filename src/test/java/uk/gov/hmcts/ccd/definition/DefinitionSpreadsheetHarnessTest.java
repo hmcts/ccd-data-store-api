@@ -26,7 +26,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Harness-style test that inspects a definition spreadsheet and reports whether
@@ -76,29 +75,40 @@ class DefinitionSpreadsheetHarnessTest {
     private static final String CASE_TYPE_ID_COLUMN = "casetypeid";
     private static final String ACCESS_PROFILE_COLUMN = "accessprofile";
 
+    public static void main(String[] args) throws Exception {
+        try {
+            List<FieldDecision> failures = runFromSystemProperties();
+            if (failures.isEmpty()) {
+                log.info("All target fields are returned for the supplied roles.");
+            } else {
+                log.error("Some fields are not returned for the supplied roles: {}",
+                    failures.stream().map(FieldDecision::fieldId).collect(Collectors.joining(", ")));
+                failures.forEach(failure -> log.error(failure.format()));
+                System.exit(2);
+            }
+        } catch (IllegalArgumentException error) {
+            log.error(error.getMessage());
+            System.exit(1);
+        }
+    }
+
     @Test
     void shouldReportIfFieldsReturnedForRoles() throws Exception {
-        String spreadsheetPath = System.getProperty(SPREADSHEET_PATH_PROPERTY);
-        String rolesCsv = System.getProperty(ROLES_PROPERTY);
-        String fieldsCsv = System.getProperty(TARGET_FIELDS_PROPERTY);
-        String eventId = System.getProperty(EVENT_ID_PROPERTY);
+        List<FieldDecision> failures = runFromSystemProperties();
+        assertThat("Some fields are not returned for the supplied roles: "
+                + failures.stream().map(FieldDecision::fieldId).collect(Collectors.joining(", ")),
+            failures.isEmpty(), is(true));
+    }
 
-        assertThat("Missing -D" + SPREADSHEET_PATH_PROPERTY + "=<path-to-xlsx>",
-            spreadsheetPath, is(notNullValue()));
-        assertThat("Missing -D" + ROLES_PROPERTY + "=role1,role2",
-            rolesCsv, is(notNullValue()));
-        assertThat("Missing -D" + TARGET_FIELDS_PROPERTY + "=field1,field2",
-            fieldsCsv, is(notNullValue()));
-        assertThat("Missing -D" + EVENT_ID_PROPERTY + "=eventId",
-            eventId, is(notNullValue()));
-        assertThat("Blank -D" + SPREADSHEET_PATH_PROPERTY + " value",
-            spreadsheetPath.isBlank(), is(false));
-        assertThat("Blank -D" + ROLES_PROPERTY + " value",
-            rolesCsv.isBlank(), is(false));
-        assertThat("Blank -D" + TARGET_FIELDS_PROPERTY + " value",
-            fieldsCsv.isBlank(), is(false));
-        assertThat("Blank -D" + EVENT_ID_PROPERTY + " value",
-            eventId.isBlank(), is(false));
+    private static List<FieldDecision> runFromSystemProperties() throws Exception {
+        String spreadsheetPath = requireProperty(SPREADSHEET_PATH_PROPERTY,
+            "Missing -D" + SPREADSHEET_PATH_PROPERTY + "=<path-to-xlsx>");
+        String rolesCsv = requireProperty(ROLES_PROPERTY,
+            "Missing -D" + ROLES_PROPERTY + "=role1,role2");
+        String fieldsCsv = requireProperty(TARGET_FIELDS_PROPERTY,
+            "Missing -D" + TARGET_FIELDS_PROPERTY + "=field1,field2");
+        String eventId = requireProperty(EVENT_ID_PROPERTY,
+            "Missing -D" + EVENT_ID_PROPERTY + "=eventId");
 
         Set<String> roles = parseRoles(rolesCsv);
         List<String> targetFields = parseFields(fieldsCsv);
@@ -112,13 +122,20 @@ class DefinitionSpreadsheetHarnessTest {
 
         decisions.forEach(decision -> log.info(decision.format()));
 
-        List<FieldDecision> failures = decisions.stream()
+        return decisions.stream()
             .filter(decision -> !decision.isReturned())
             .collect(Collectors.toList());
+    }
 
-        assertThat("Some fields are not returned for the supplied roles: "
-                + failures.stream().map(FieldDecision::fieldId).collect(Collectors.joining(", ")),
-            failures.isEmpty(), is(true));
+    private static String requireProperty(String key, String missingMessage) {
+        String value = System.getProperty(key);
+        if (value == null) {
+            throw new IllegalArgumentException(missingMessage);
+        }
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("Blank -D" + key + " value");
+        }
+        return value;
     }
 
     private static Set<String> parseRoles(String rolesCsv) {
