@@ -82,10 +82,6 @@
 				"description": ""
       },
 			"event_token": "${[scenarioContext][childContexts][F-1027_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
-      "event_data": {
-        "TextField": "value1",
-        "TextField2": "value2"
-      },
       "ignore_warning": true,
 			"draft_id": null
 		}
