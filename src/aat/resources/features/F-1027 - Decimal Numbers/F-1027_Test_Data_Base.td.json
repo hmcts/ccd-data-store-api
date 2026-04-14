@@ -1,5 +1,5 @@
 {
-  "title": "should create a case with CaseLink",
+  "title": "should create a case",
 	"_guid_": "F-1027_Test_Data_Base",
 	"productName": "CCD Data Store",
 	"operationName": "Submit Case Creation as Caseworker",

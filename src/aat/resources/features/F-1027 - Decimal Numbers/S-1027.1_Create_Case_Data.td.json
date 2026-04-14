@@ -1,33 +1,14 @@
 {
-	"title": "must successfully create case with number field displaying as expected",
-	"_guid_": "S-1027.3",
-	"_extends_": "F-1027_Test_Data_Base",
-
-	"specs": [
-    "an active profile in CCD",
-    "contains a case with number field showing correctly",
-    "has 201 return code"
-	],
-
+	"_guid_": "S-1027.1_Create_Case_Data",
+  "_extends_": "F-1027_Test_Data_Base",
   "request": {
     "body": {
-      "data": {
-        "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][S-1027.3_Create_Case_Data][testData][actualResponse][body][id]}"
-        }
-      }
+      "event_token": "${[scenarioContext][siblingContexts][S-1027.1_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip",
-      "Vary": "accept-encoding",
-      "Keep-Alive": "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
-    },
     "body" : {
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
@@ -82,7 +63,7 @@
           }
         },
         "CaseLinkField" : {
-          "CaseReference" : "[[ANY_STRING_NOT_NULLABLE]]"
+          "CaseReference" : null
         },
         "CollectionField" : [ ]
       },

@@ -2,7 +2,8 @@
   "_guid_": "F-1027_Case_Data_Create_Token_Creation",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
-    "to create a token for case creation"
+    "to create a token for case creation",
+    "As a prerequisite"
   ],
   "users": {
     "invokingUser": {
