@@ -82,6 +82,8 @@ public class CaseSearchEndpoint {
         ElasticsearchRequest elasticsearchRequest =
             elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
+        log.info("ElasticsearchRequest {}", elasticsearchRequest);
+
         if (!elasticsearchRequest.hasRequestedSupplementaryData()) {
             elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
         }
@@ -92,6 +94,7 @@ public class CaseSearchEndpoint {
             .build();
 
         CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
+        log.info("CaseSearchResult {}", result);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
