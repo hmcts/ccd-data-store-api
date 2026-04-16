@@ -76,7 +76,7 @@ public class CaseSearchEndpoint {
         @RequestBody String jsonSearchRequest,
         @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification) {
 
-        Instant start = Instant.now();
+
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =
@@ -96,6 +96,7 @@ public class CaseSearchEndpoint {
         CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
         log.info("CaseSearchResult {}", result);
 
+        Instant start = Instant.now();
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
         return result;
