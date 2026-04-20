@@ -1,17 +1,16 @@
 {
-  "_guid_": "S-1026.3",
-  "_extends_": "F-1026_Test_Data_Base",
-  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST when OrganisationID is empty",
+  "_guid_": "S-1027.4",
+  "_extends_": "F-1027_Test_Data_Base",
+  "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST where case_data has organisationProfile with newCase set to YES",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1026_GetCreateToken"
+      "Token_Creation": "S-1027_GetCreateToken"
     }
   ],
   "specs": [
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values",
-    "is of caseType where case_data has organisationProfile with newCase set to Yes",
-    "caseData Organisation.OrganisationID value is empty value",
+    "is of caseType where case_data case data has Organisation.OrganisationID and organisationProfile with newCase set to Yes",
     "Submit case creation as Case worker",
     "contains correctly configured values",
     "contains updated values for case_data and data_classification"
@@ -21,9 +20,9 @@
     "body": {
       "data": {
         "OrganisationPolicyField": {
-          "newCase": "Yes",
+          "newCase": "yes",
           "Organisation": {
-            "OrganisationID": "",
+            "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
         }
@@ -31,7 +30,9 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "event_data": {
+      }
     }
   },
   "expectedResponse": {
@@ -52,18 +53,23 @@
       "case_data": {
         "OrganisationPolicyField": {
           "Organisation": {
-            "OrganisationID": "",
+            "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
         }
       },
-      "data_classification" : {}
-    },
-    "supplementary_data" : null,
-    "after_submit_callback_response": null,
-    "callback_response_status_code": null,
-    "callback_response_status": null,
-    "delete_draft_response_status_code": null,
-    "delete_draft_response_status": null
+      "data_classification": {},
+      "supplementary_data": {
+        "new_case":
+          {
+            "orgID1": true
+          }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
   }
 }
