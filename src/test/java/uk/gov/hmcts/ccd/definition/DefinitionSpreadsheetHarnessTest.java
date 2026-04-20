@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,29 +23,26 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 /**
  * Harness-style test that inspects a definition spreadsheet and reports whether
  * specific fields are readable for the supplied roles on a fixed event
  * and are therefore returned if so, or not returned.
- *
+ * <p/>
  * Example: field sponsorEmailAdminJ, event editAppealAfterSubmit, case type Appeal, role caseworker-ia-admofficer.
- *
+ * <p/>
  * <p>Required system properties (parameters):</p>
  * <ul>
  *   <li>{@code -Ddefinition.file}: absolute or relative path to the definition XLSX.</li>
  *   <li>{@code -Droles}: comma-separated list of roles (idam: prefix allowed).</li>
  *   <li>{@code -Dtarget.fields}: comma-separated list of case field IDs to check.</li>
  * </ul>
- *
+ * <p/>
  * Example of env variables to run  from IntelliJ:
  * -ea
  * -Dtarget.fields=isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress
  * -Ddefinition.file=/Users/markdathorne/Downloads/ccd-appeal-config-preview-pr3017.xlsx
  * -Droles=caseworker-ia-admofficer,hmcts-admin
- *
+ * <p/>
  * <p>Process:</p>
  * <ol>
  *   <li>Load the {@code CaseEventToFields}, {@code AuthorisationCaseField}, and
@@ -56,7 +52,7 @@ import static org.hamcrest.Matchers.is;
  *   <li>For each matching case type, derive CaseViewField visibility from {@code AuthorisationCaseField} CRUD.</li>
  *   <li>Report decisions and fail the test if any field is not returned.</li>
  * </ol>
- *
+ * <p/>
  * Success: field -> Returned
  * Failure: field -> Not returned: No read access
  */
@@ -90,14 +86,6 @@ class DefinitionSpreadsheetHarnessTest {
             log.error(error.getMessage());
             System.exit(1);
         }
-    }
-
-    @Test
-    void shouldReportIfFieldsReturnedForRoles() throws Exception {
-        List<FieldDecision> failures = runFromSystemProperties();
-        assertThat("Some fields are not returned for the supplied roles: "
-                + failures.stream().map(FieldDecision::fieldId).collect(Collectors.joining(", ")),
-            failures.isEmpty(), is(true));
     }
 
     private static List<FieldDecision> runFromSystemProperties() throws Exception {
@@ -283,9 +271,6 @@ class DefinitionSpreadsheetHarnessTest {
 
     private static boolean canAccessCaseViewFieldWithCriteria(List<Map<String, String>> accessControlRows,
                                                               Set<String> accessProfiles) {
-        Set<AccessProfile> profileSet = accessProfiles.stream()
-            .map(AccessProfile::new)
-            .collect(Collectors.toSet());
         log.info("Evaluating ACLs for accessProfiles: {}", String.join(", ", accessProfiles));
         log.info("AccessControl rows count: {}", accessControlRows.size());
         List<AccessControlList> accessControlLists = accessControlRows.stream()
@@ -295,6 +280,9 @@ class DefinitionSpreadsheetHarnessTest {
             log.info("ACL: accessProfile={}, create={}, read={}, update={}, delete={}",
                 acl.getAccessProfile(), acl.isCreate(), acl.isRead(), acl.isUpdate(), acl.isDelete());
         }
+        Set<AccessProfile> profileSet = accessProfiles.stream()
+            .map(AccessProfile::new)
+            .collect(Collectors.toSet());
         boolean hasAccess = AccessControlService.hasAccessControlList(profileSet,
             accessControlLists,
             AccessControlService.CAN_READ);
@@ -451,9 +439,10 @@ class DefinitionSpreadsheetHarnessTest {
      */
     private static Set<String> translateRolesToAccessProfiles(Set<String> roles,
                                                               List<Map<String, String>> rolesToAccessProfiles) {
-        Set<String> accessProfiles = new HashSet<>();
+        Set<String> accessProfiles = new HashSet<>(roles);
         log.info("Translating roles to access profiles from sheet: {}",
             ROLES_TO_ACCESS_PROFILE_SHEET);
+        log.info("Seeded direct access profiles from supplied roles: {}", String.join(", ", accessProfiles));
         for (Map<String, String> row : rolesToAccessProfiles) {
             String rawRoleName = rowValue(row, "rolename", "role name", "role");
             String roleName = normalizeRole(rawRoleName);
@@ -473,9 +462,8 @@ class DefinitionSpreadsheetHarnessTest {
                 }
             }
         }
-        if (accessProfiles.isEmpty()) {
-            log.info("No access profiles found for roles {}", String.join(", ", roles));
-        }
+        log.info("Resolved access profiles for roles {} -> {}", String.join(", ", roles),
+            String.join(", ", accessProfiles));
         return accessProfiles;
     }
 
