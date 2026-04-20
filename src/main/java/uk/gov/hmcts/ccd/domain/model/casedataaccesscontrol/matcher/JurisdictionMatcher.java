@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,8 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
     }
 
     private boolean matchJurisdiction(RoleAssignment roleAssignment, String jurisdictionId) {
-        Optional<String> roleJurisdiction = roleAssignment.getAttributes().getJurisdiction();
+        Optional<String> roleJurisdiction = Objects.requireNonNullElse(
+            roleAssignment.getAttributes().getJurisdiction(), Optional.empty());
         log.debug("Matching role assignment jurisdiction {} with case definition jurisdiction {}"
                 + " for role assignment {}",
             roleJurisdiction,
@@ -47,7 +49,7 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
         // Defense-in-depth: fail-closed for null/absent jurisdiction attributes.
         // A role assignment with no jurisdiction must be an explicitly designated
         // cross-jurisdictional role; all other roles are denied cross-jurisdiction access.
-        if (roleJurisdiction == null || roleJurisdiction.isEmpty()) {
+        if (roleJurisdiction.isEmpty()) {
             boolean isCrossJurisdiction = crossJurisdictionalRoles.contains(roleAssignment.getRoleName());
             log.debug("Role assignment jurisdiction is null/absent for role {}. "
                     + "Cross-jurisdictional access granted: {}",
