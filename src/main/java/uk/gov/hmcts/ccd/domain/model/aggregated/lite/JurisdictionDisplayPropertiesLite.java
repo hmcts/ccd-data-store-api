@@ -1,19 +1,19 @@
-package uk.gov.hmcts.ccd.domain.model.aggregated;
+package uk.gov.hmcts.ccd.domain.model.aggregated.lite;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Setter
 @Getter
-public class JurisdictionDisplayProperties {
+public class JurisdictionDisplayPropertiesLite {
+
     private String id;
     private String name;
     private String description;
     @JsonProperty("caseTypes")
-    private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
+    private List<CaseTypeLite> caseTypeLiteDefinitions = new ArrayList<>();
 }
