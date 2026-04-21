@@ -46,9 +46,6 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
             jurisdictionId,
             roleAssignment.getId());
 
-        // Defense-in-depth: fail-closed for null/absent jurisdiction attributes.
-        // A role assignment with no jurisdiction must be an explicitly designated
-        // cross-jurisdictional role; all other roles are denied cross-jurisdiction access.
         if (roleJurisdiction.isEmpty()) {
             boolean isCrossJurisdiction = crossJurisdictionalRoles.contains(roleAssignment.getRoleName());
             log.debug("Role assignment jurisdiction is null/absent for role {}. "
