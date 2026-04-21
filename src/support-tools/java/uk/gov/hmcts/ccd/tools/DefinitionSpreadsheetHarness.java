@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.definition;
+package uk.gov.hmcts.ccd.tools;
 
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -57,7 +57,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
  * Failure: field -> Not returned: No read access
  */
 @Slf4j
-class DefinitionSpreadsheetHarnessTest {
+public class DefinitionSpreadsheetHarness {
 
     private static final String SPREADSHEET_PATH_PROPERTY = "definition.file";
     private static final String ROLES_PROPERTY = "roles";
@@ -274,7 +274,7 @@ class DefinitionSpreadsheetHarnessTest {
         log.info("Evaluating ACLs for accessProfiles: {}", String.join(", ", accessProfiles));
         log.info("AccessControl rows count: {}", accessControlRows.size());
         List<AccessControlList> accessControlLists = accessControlRows.stream()
-            .map(DefinitionSpreadsheetHarnessTest::toAccessControlList)
+            .map(DefinitionSpreadsheetHarness::toAccessControlList)
             .collect(Collectors.toList());
         for (AccessControlList acl : accessControlLists) {
             log.info("ACL: accessProfile={}, create={}, read={}, update={}, delete={}",
