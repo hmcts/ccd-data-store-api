@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.Optional;
 
@@ -46,10 +44,8 @@ public class ProfessionalReferenceDataOrganisationRepository {
 
             String organisationIdentifier = response.get(ORGANISATION_IDENTIFIER_FIELD).asText();
             return Optional.ofNullable(organisationIdentifier).filter(value -> !value.isBlank());
-        } catch (HttpClientErrorException.NotFound exception) {
-            return Optional.empty();
         } catch (RestClientException exception) {
-            throw new ServiceException("Problem getting current user organisation from PRD", exception);
+            return Optional.empty();
         }
     }
 }

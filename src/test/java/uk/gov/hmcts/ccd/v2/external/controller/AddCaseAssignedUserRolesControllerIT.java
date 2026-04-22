@@ -24,6 +24,7 @@ import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -850,6 +851,33 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, ORGANISATION_ID_1)
         );
         stubCurrentUserOrganisation(ORGANISATION_ID_2);
+
+        Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResolvedException();
+
+        assertNotNull(exception);
+        assertThat(exception.getMessage(), containsString(V2.Error.ORGANISATION_ID_MISMATCH));
+        assertEquals(0, caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId).size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName("addCaseUserRoles: should reject restricted caller when PRD organisation lookup fails")
+    void addCaseUserRoles_shouldRejectRestrictedCallerWhenPrdLookupFails() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
+        String userId = "8442-006";
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1)
+        );
+        stubFor(WireMock.get(urlMatching("/refdata/external/v1/organisations/users"))
+            .willReturn(aResponse().withStatus(500)));
 
         Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
