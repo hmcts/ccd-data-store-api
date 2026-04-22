@@ -92,8 +92,8 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      #image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1611
+      #image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1611
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -179,13 +179,13 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctspublic.azurecr.io/imported/elastic/logstash"
+  image: "hmctsprod.azurecr.io/imported/elastic/logstash"
   imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
-      image: hmctspublic.azurecr.io/curl:7.70.0
+      image: hmctsprod.azurecr.io/curl:7.70.0
       command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
