@@ -27,32 +27,37 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
  * Harness-style test that inspects a definition spreadsheet and reports whether
  * specific fields are readable for the supplied roles on a fixed event
  * and are therefore returned if so, or not returned.
- * <p/>
- * Example: field sponsorEmailAdminJ, event editAppealAfterSubmit, case type Appeal, role caseworker-ia-admofficer.
- * <p/>
  * <p>Required system properties (parameters):</p>
  * <ul>
  *   <li>{@code -Ddefinition.file}: absolute or relative path to the definition XLSX.</li>
  *   <li>{@code -Droles}: comma-separated list of roles (idam: prefix allowed).</li>
  *   <li>{@code -Dtarget.fields}: comma-separated list of case field IDs to check.</li>
+ *   <li>{@code -Devent.id}: page event id.</li>
  * </ul>
  * <p/>
  * Example of env variables to run  from IntelliJ:
  * -ea
  * -Dtarget.fields=isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress
- * -Ddefinition.file=/Users/markdathorne/Downloads/ccd-appeal-config-preview-pr3017.xlsx
+ * -Ddefinition.file=/ccd-appeal-config-preview-pr3017.xlsx
  * -Droles=caseworker-ia-admofficer,hmcts-admin
+ * -Devent.id=editAppealAfterSubmit
  * <p/>
  * <p>Process:</p>
  * <ol>
  *   <li>Load the {@code CaseEventToFields}, {@code AuthorisationCaseField}, and
- *       {@code RoleToAccessProfiles} sheets.</li>
+ *       {@code RoleToAccessProfiles} sheets and detect header rows.</li>
  *   <li>Translate input roles into access profiles via {@code RoleToAccessProfiles}.</li>
- *   <li>For each target field, find matching event/field rows for the fixed event ID.</li>
- *   <li>For each matching case type, derive CaseViewField visibility from {@code AuthorisationCaseField} CRUD.</li>
- *   <li>Report decisions and fail the test if any field is not returned.</li>
+ *   <li>For each target field, find matching case types for the supplied event.</li>
+ *   <li>Evaluate read access for each {@code (fieldId, caseTypeId)} pair from
+ *       {@code AuthorisationCaseField} CRUD.</li>
+ *   <li>Emit one decision per evaluated pair and fail if any decision is not returned.</li>
  * </ol>
- * <p/>
+ * <p>Exit codes:</p>
+ * <ul>
+ *   <li>{@code 0}: all decisions returned.</li>
+ *   <li>{@code 1}: invalid/missing input or spreadsheet structure.</li>
+ *   <li>{@code 2}: at least one field decision is not returned.</li>
+ * </ul>
  * Success: field -> Returned
  * Failure: field -> Not returned: No read access
  */
@@ -77,15 +82,32 @@ public class DefinitionSpreadsheetHarness {
             if (failures.isEmpty()) {
                 log.info("All target fields are returned for the supplied roles.");
             } else {
-                log.error("Some fields are not returned for the supplied roles: {}",
-                    failures.stream().map(FieldDecision::fieldId).collect(Collectors.joining(", ")));
+                log.error("Some fields are not returned for the supplied roles (count={}): {}",
+                    failures.size(),
+                    failures.stream().map(FieldDecision::fieldId).distinct().collect(Collectors.joining(", ")));
                 failures.forEach(failure -> log.error(failure.format()));
                 System.exit(2);
             }
         } catch (IllegalArgumentException error) {
             log.error(error.getMessage());
             System.exit(1);
+        } catch (Exception error) {
+            log.error("Unexpected failure running definition spreadsheet harness", error);
+            System.exit(1);
         }
+    }
+
+    static List<FieldDecision> run(Path spreadsheetPath,
+                                   Set<String> roles,
+                                   String eventId,
+                                   List<String> fieldIds) throws Exception {
+        if (roles == null || roles.isEmpty()) {
+            throw new IllegalArgumentException("No valid roles provided in -D" + ROLES_PROPERTY);
+        }
+        if (fieldIds == null || fieldIds.isEmpty()) {
+            throw new IllegalArgumentException("No valid target fields provided in -D" + TARGET_FIELDS_PROPERTY);
+        }
+        return evaluateSpreadsheet(spreadsheetPath, roles, eventId, fieldIds);
     }
 
     private static List<FieldDecision> runFromSystemProperties() throws Exception {
@@ -100,13 +122,14 @@ public class DefinitionSpreadsheetHarness {
 
         Set<String> roles = parseRoles(rolesCsv);
         List<String> targetFields = parseFields(fieldsCsv);
+        if (roles.isEmpty()) {
+            throw new IllegalArgumentException("No valid roles provided in -D" + ROLES_PROPERTY);
+        }
+        if (targetFields.isEmpty()) {
+            throw new IllegalArgumentException("No valid target fields provided in -D" + TARGET_FIELDS_PROPERTY);
+        }
 
-        List<FieldDecision> decisions = evaluateSpreadsheet(
-            Path.of(spreadsheetPath),
-            roles,
-            eventId,
-            targetFields
-        );
+        List<FieldDecision> decisions = run(Path.of(spreadsheetPath), roles, eventId, targetFields);
 
         decisions.forEach(decision -> log.info(decision.format()));
 
@@ -198,7 +221,16 @@ public class DefinitionSpreadsheetHarness {
 
             List<FieldDecision> decisions = new ArrayList<>();
             for (String fieldId : fieldIds) {
-                decisions.add(evaluateField(fieldId, accessProfiles, eventId, eventToFields, authCaseFields));
+                List<String> caseTypesForEventField = findCaseTypesForEventField(fieldId, eventId, eventToFields);
+                log.info("field {} - caseTypesForEventField: {}", fieldId, caseTypesForEventField);
+                if (caseTypesForEventField.isEmpty()) {
+                    decisions.add(FieldDecision.notReturned(fieldId,
+                        "No CaseEventToFields row found for event/field"));
+                    continue;
+                }
+                for (String caseTypeId : caseTypesForEventField) {
+                    decisions.add(evaluateField(fieldId, caseTypeId, accessProfiles, authCaseFields));
+                }
             }
             log.info("Decisions evaluated: {}", decisions.size());
             return decisions;
@@ -206,27 +238,60 @@ public class DefinitionSpreadsheetHarness {
     }
 
     /**
-     * Determines whether a field is viewable for any case type linked to the event.
+     * Determines whether a field is viewable for one specific case type.
      *
      * @param fieldId case field ID to check
+     * @param caseTypeId case type ID
      * @param accessProfiles translated access profiles for the input roles
-     * @param eventId event ID to match in {@code CaseEventToFields}
-     * @param eventToFields rows from {@code CaseEventToFields}
      * @param authCaseFields rows from {@code AuthorisationCaseField}
      */
     private static FieldDecision evaluateField(String fieldId,
+                                               String caseTypeId,
                                                Set<String> accessProfiles,
-                                               String eventId,
-                                               List<Map<String, String>> eventToFields,
                                                List<Map<String, String>> authCaseFields) {
+        log.info("Checking case type: {}", caseTypeId);
+        List<Map<String, String>> caseTypeFieldRows = authCaseFields.stream()
+            .filter(row -> equalsIgnoreCase(rowValue(row, CASE_TYPE_ID_COLUMN), caseTypeId))
+            .filter(row -> equalsIgnoreCase(rowValue(row, CASE_FIELD_ID_COLUMN), fieldId))
+            .collect(Collectors.toList());
+        log.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
+        if (caseTypeFieldRows.isEmpty()) {
+            log.info("No matching AuthorisationCaseField rows for caseType={} field={}", caseTypeId, fieldId);
+            return FieldDecision.notReturned(fieldId,
+                "No matching AuthorisationCaseField rows for case type: " + caseTypeId);
+        }
+
+        boolean viewable = canAccessCaseViewFieldWithCriteria(caseTypeFieldRows, accessProfiles);
+        log.info("Derived CaseViewField visibility from CRUD: {}", viewable);
+        if (viewable) {
+            log.info("Viewable for accessProfiles {} in case type {}",
+                String.join(", ", accessProfiles), caseTypeId);
+            return FieldDecision.returned(fieldId, caseTypeId);
+        }
+        log.info("No read access for accessProfiles {} in case type {}", String.join(", ", accessProfiles),
+            caseTypeId);
+        return FieldDecision.notReturned(fieldId,
+            "No read access in AuthorisationCaseField for supplied roles in case type: " + caseTypeId);
+    }
+
+    /**
+     * Finds case types linked to the supplied field and event.
+     *
+     * @param fieldId case field ID to check
+     * @param eventId event ID to match in {@code CaseEventToFields}
+     * @param eventToFields rows from {@code CaseEventToFields}
+     */
+    private static List<String> findCaseTypesForEventField(String fieldId,
+                                                           String eventId,
+                                                           List<Map<String, String>> eventToFields) {
         log.info("Evaluating field: {} (eventId={})", fieldId, eventId);
         long totalEventToFields = eventToFields.size();
         List<Map<String, String>> eventIdMatches = eventToFields.stream()
             .filter(row -> equalsIgnoreCase(row.get(CASE_EVENT_ID_COLUMN), eventId))
-            .collect(Collectors.toList());
+            .toList();
         List<Map<String, String>> eventAndFieldMatches = eventIdMatches.stream()
             .filter(row -> equalsIgnoreCase(row.get(CASE_FIELD_ID_COLUMN), fieldId))
-            .collect(Collectors.toList());
+            .toList();
         List<String> caseTypesForEventField = eventAndFieldMatches.stream()
             .map(row -> nullSafeTrim(row.get(CASE_TYPE_ID_COLUMN)))
             .filter(value -> !value.isEmpty())
@@ -235,38 +300,7 @@ public class DefinitionSpreadsheetHarness {
         log.info("CaseEventToFields rows: total={}, eventIdMatch={}, eventId+fieldMatch={}, caseTypes={}",
             totalEventToFields, eventIdMatches.size(), eventAndFieldMatches.size(),
             String.join(", ", caseTypesForEventField));
-
-        if (caseTypesForEventField.isEmpty()) {
-            log.info("No CaseEventToFields row found for event/field");
-            return FieldDecision.notReturned(fieldId, "No CaseEventToFields row found for event/field");
-        }
-
-        for (String caseTypeId : caseTypesForEventField) {
-            log.info("Checking case type: {}", caseTypeId);
-            List<Map<String, String>> caseTypeFieldRows = authCaseFields.stream()
-                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_TYPE_ID_COLUMN), caseTypeId))
-                .filter(row -> equalsIgnoreCase(rowValue(row, CASE_FIELD_ID_COLUMN), fieldId))
-                .collect(Collectors.toList());
-            log.info("AuthorisationCaseField rows for caseType/field: {}", caseTypeFieldRows.size());
-            if (caseTypeFieldRows.isEmpty()) {
-                log.info("No matching AuthorisationCaseField rows for caseType={} field={}", caseTypeId, fieldId);
-            }
-
-            boolean viewable = canAccessCaseViewFieldWithCriteria(caseTypeFieldRows, accessProfiles);
-
-            log.info("Derived CaseViewField visibility from CRUD: {}", viewable);
-            if (viewable) {
-                log.info("Viewable for accessProfiles {} in case type {}",
-                    String.join(", ", accessProfiles), caseTypeId);
-                return FieldDecision.returned(fieldId, caseTypeId);
-            }
-        }
-
-        log.info("No read access for accessProfiles {} in case types {}", String.join(", ", accessProfiles),
-            String.join(", ", caseTypesForEventField));
-        return FieldDecision.notReturned(fieldId,
-            "No read access in AuthorisationCaseField for supplied roles and matching case types: "
-                + String.join(", ", caseTypesForEventField));
+        return caseTypesForEventField;
     }
 
     private static boolean canAccessCaseViewFieldWithCriteria(List<Map<String, String>> accessControlRows,
@@ -320,37 +354,56 @@ public class DefinitionSpreadsheetHarness {
         Map<Integer, String> headersByIndex = readHeaders(headerRow, formatter);
         log.info("Initial header row index for {}: {}", sheetName, headerRow.getRowNum());
         if (ROLES_TO_ACCESS_PROFILE_SHEET.equals(sheetName)) {
-            headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
-                isRoleToAccessProfilesHeader(thisRowHeaders));
-            if (headerRow != null) {
-                headersByIndex = readHeaders(headerRow, formatter);
-                log.info("Adjusted RoleToAccessProfiles header row to index {}", headerRow.getRowNum());
+            if (isRoleToAccessProfilesHeader(headersByIndex)) {
+                log.info("Using initial RoleToAccessProfiles header row at index {}", headerRow.getRowNum());
+            } else {
+                Row foundHeaderRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter,
+                    DefinitionSpreadsheetHarness::isRoleToAccessProfilesHeader);
+                if (foundHeaderRow != null) {
+                    headerRow = foundHeaderRow;
+                    headersByIndex = readHeaders(headerRow, formatter);
+                    log.info("Adjusted RoleToAccessProfiles header row to index {}", headerRow.getRowNum());
+                }
             }
         }
         if ("CaseEventToFields".equals(sheetName)) {
-            headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
-                isCaseEventToFieldsHeader(thisRowHeaders));
-            if (headerRow != null) {
-                headersByIndex = readHeaders(headerRow, formatter);
-                log.info("Adjusted CaseEventToFields header row to index {}", headerRow.getRowNum());
+            if (isCaseEventToFieldsHeader(headersByIndex)) {
+                log.info("Using initial CaseEventToFields header row at index {}", headerRow.getRowNum());
+            } else {
+                Row foundHeaderRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter,
+                    DefinitionSpreadsheetHarness::isCaseEventToFieldsHeader);
+                if (foundHeaderRow != null) {
+                    headerRow = foundHeaderRow;
+                    headersByIndex = readHeaders(headerRow, formatter);
+                    log.info("Adjusted CaseEventToFields header row to index {}", headerRow.getRowNum());
+                }
             }
         }
         if ("AuthorisationCaseField".equals(sheetName)) {
-            headerRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter, thisRowHeaders ->
-                isAuthorisationCaseFieldHeader(thisRowHeaders));
-            if (headerRow != null) {
-                headersByIndex = readHeaders(headerRow, formatter);
-                log.info("Adjusted AuthorisationCaseField header row to index {}", headerRow.getRowNum());
+            if (isAuthorisationCaseFieldHeader(headersByIndex)) {
+                log.info("Using initial AuthorisationCaseField header row at index {}", headerRow.getRowNum());
+            } else {
+                Row foundHeaderRow = findHeaderRow(sheet, headerRow.getRowNum() + 1, formatter,
+                    DefinitionSpreadsheetHarness::isAuthorisationCaseFieldHeader);
+                if (foundHeaderRow != null) {
+                    headerRow = foundHeaderRow;
+                    headersByIndex = readHeaders(headerRow, formatter);
+                    log.info("Adjusted AuthorisationCaseField header row to index {}", headerRow.getRowNum());
+                }
             }
+        }
+        if (ROLES_TO_ACCESS_PROFILE_SHEET.equals(sheetName) && !isRoleToAccessProfilesHeader(headersByIndex)) {
+            throw new IllegalArgumentException("Header row not found for sheet: " + sheetName);
+        }
+        if (CASE_EVENT_TO_FIELDS_SHEET.equals(sheetName) && !isCaseEventToFieldsHeader(headersByIndex)) {
+            throw new IllegalArgumentException("Header row not found for sheet: " + sheetName);
+        }
+        if (AUTHORISATION_CASE_FIELD_SHEET.equals(sheetName) && !isAuthorisationCaseFieldHeader(headersByIndex)) {
+            throw new IllegalArgumentException("Header row not found for sheet: " + sheetName);
         }
         log.info("Using header row index for {}: {}", sheetName, headerRow.getRowNum());
 
         List<Map<String, String>> rows = new ArrayList<>();
-        if (null == headerRow) {
-            log.info("Loaded 0 data rows from sheet {}", sheetName);
-            return null;
-        }
-
         for (int i = headerRow.getRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) {
@@ -488,7 +541,7 @@ public class DefinitionSpreadsheetHarness {
         return null;
     }
 
-    private record FieldDecision(String fieldId, boolean returned, String details) {
+    record FieldDecision(String fieldId, boolean returned, String details) {
         static FieldDecision returned(String fieldId, String caseTypeId) {
             return new FieldDecision(fieldId, true, "Returned (case type: " + caseTypeId + ")");
         }

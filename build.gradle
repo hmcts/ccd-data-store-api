@@ -110,6 +110,11 @@ sourceSets {
         }
     }
 
+    test {
+        compileClasspath += sourceSets.supportTools.output
+        runtimeClasspath += sourceSets.supportTools.output
+    }
+
     aat {
         java {
             srcDir('src/aat/java')

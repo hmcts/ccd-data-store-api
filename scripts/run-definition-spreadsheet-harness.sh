@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
-# This script runs the definition spreadsheet harness with the provided arguments.
+# Runs the definition spreadsheet harness with the provided arguments.
 #
 # ./scripts/run-definition-spreadsheet-harness.sh   /Users/<user>/Downloads/ccd-appeal-config-preview-pr3017.xlsx   caseworker-ia-admofficer   isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress   editAppealAfterSubmit;
 #
+# Process summary:
+# 1) Reads CaseEventToFields, AuthorisationCaseField, RoleToAccessProfiles from the XLSX.
+# 2) Resolves roles to access profiles.
+# 3) Evaluates read access for each field and matching case type for the event.
+#
+# Exit code:
+# Non-zero on Gradle task failure (invalid input/configuration or non-returned decisions).
+#
 set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd "${script_dir}/.." && pwd)"
 
 if [ "$#" -ne 4 ]; then
   echo "Usage: $0 <definition-xlsx> <roles> <target-fields> <event-id>" >&2
@@ -14,6 +25,8 @@ definition_file="$1"
 roles="$2"
 target_fields="$3"
 event_id="$4"
+
+cd "${repo_root}"
 
 ./gradlew definitionSpreadsheetHarness \
   -Pdefinition.file="$definition_file" \
