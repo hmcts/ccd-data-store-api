@@ -112,8 +112,8 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
-// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
-env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctsprod ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 
 withPipeline(type, product, component) {
     onMaster {
@@ -122,6 +122,7 @@ withPipeline(type, product, component) {
             AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
+
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
@@ -133,7 +134,8 @@ withPipeline(type, product, component) {
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+    if  (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
