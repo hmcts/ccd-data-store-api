@@ -140,6 +140,14 @@ class CaseAccessServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("should treat BEFTA solicitor suffix role as unrestricted for organisation boundary checks")
+    void shouldNotTreatBeftaSolicitorSuffixRoleAsOrganisationBoundaryRestricted() {
+        withRoles("caseworker-befta_jurisdiction_2-solicitor_2");
+
+        assertFalse(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary());
+    }
+
     @Nested
     @DisplayName("when user is from local authority")
     class WhenLocalAuthority {

@@ -11,9 +11,13 @@
   ],
 
   "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
     "body": {
       "supplementary_data_updates": {
-        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_childContexts.F-105_Get_Organisation_Identifier_Dil]}"
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-105\\.16_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Dil]}"
       }
     }
   },

@@ -806,6 +806,56 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("should use caller organisation and increment count when organisation is omitted")
+        void shouldUseCallerOrganisationAndIncrementCountWhenOrganisationOmitted() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
+        @DisplayName("RA set to true, should use caller organisation and increment count when organisation is omitted")
+        void shouldUseCallerOrganisationAndIncrementCountWhenOrganisationOmittedForRA() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
+            );
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
         @DisplayName("should reject restricted caller when PRD organisation is unavailable")
         void shouldRejectRestrictedCallerWhenPrdOrganisationUnavailable() {
             when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);

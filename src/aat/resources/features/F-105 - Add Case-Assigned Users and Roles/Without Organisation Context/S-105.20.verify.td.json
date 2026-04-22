@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-105.20_Get_Case_Roles_for_Case_C1",
+  "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Empty_Response_Base",
+
+  "users": {
+    "userHemanth": {
+      "_extends_": "F-105_User_Hemanth"
+    }
+  },
+
+  "request": {
+    "queryParams": {
+      "case_ids": "${}${[scenarioContext][siblingContexts][S-105.20_Create_Case_Data][testData][actualResponse][body][id]}",
+      "user_ids": "${[scenarioContext][testData][users][userHemanth][id]}"
+    }
+  },
+
+  "specs": [
+    "to verify that Hemanth hasn't received the role CR-1 over the BEFTA master case after restricted caller omitted organisation ID"
+  ]
+}
