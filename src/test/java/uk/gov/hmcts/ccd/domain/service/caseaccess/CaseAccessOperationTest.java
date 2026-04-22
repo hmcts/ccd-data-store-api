@@ -846,6 +846,24 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("should reject omitted organisation when PRD organisation is unavailable")
+        void shouldRejectOmittedOrganisationWhenPrdOrganisationUnavailable() {
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(false);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.empty());
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+
+            assertEquals(V2.Error.ORGANISATION_ID_MISMATCH, exception.getMessage());
+            verifyNoInteractions(caseUserRepository, roleAssignmentService);
+        }
+
+        @Test
         @DisplayName("should add single case user role")
         void shouldAddSingleCaseUserRole() {
 

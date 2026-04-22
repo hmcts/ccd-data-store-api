@@ -242,7 +242,7 @@ public class CaseAccessOperation {
             );
         }
 
-        if (orgBoundaryRestrictedCaller) {
+        if (requestedOrganisation == null || orgBoundaryRestrictedCaller) {
             throw new BadRequestException(V2.Error.ORGANISATION_ID_MISMATCH);
         }
 
