@@ -252,20 +252,20 @@ Feature: F-105: Add Case-Assigned Users and Roles
 
    # RDM-8842 AC-3
    @S-105.16
-   Scenario: No organisation ID is provided by the user so caller organisation from PRD is used
+   Scenario: Must successfully assign a user and case role without organisation ID when caller organisation is available from PRD
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
      And a user [Dil - who is to add some case role assignment for a case],
      And a user [Olawale - with an active solicitor profile and valid User ID],
      And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
-     And a successful call [to check the number of users having access to C1 in its supplementary data] as in [F-105_Prerequisite_Counter_Check_Call],
+     And a successful call [to check the number of users having access to C1 in its supplementary data for Dil's organisation] as in [S-105.16_Prerequisite_Counter_Check_Call],
      When a request is prepared with appropriate values,
-     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID],
+     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID, relying on caller organisation from PRD],
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case has changed] will get the expected response as in [F-105_Verify_Counter_Changed],
+     And a call [to verify the count of users assigned to a case has changed for Dil's organisation] will get the expected response as in [S-105.16_Verify_Counter_Changed],
       # Clean up role assignment made above
      And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_16_Remove_Case_Assigned_User_role_Orgs_for_Case_C1].
 
@@ -307,3 +307,4 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has changed] will get the expected response as in [F-105_Verify_Counter_Changed],
       # Clean up role assignment made above
      And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_18_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
+
