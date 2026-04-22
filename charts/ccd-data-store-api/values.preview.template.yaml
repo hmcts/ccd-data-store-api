@@ -111,14 +111,12 @@ ccd:
         ELASTIC_SEARCH_SCHEME: https
         ELASTIC_SEARCH_USERNAME: elastic
         ELASTIC_SEARCH_INSECURE_SKIP_TLS_VERIFY: true
+        ELASTIC_SEARCH_PASSWORD: ""
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
-        ELASTIC_SEARCH_PASSWORD:
-          secretRef: "{{ .Release.Name }}-es-master-credentials"
-          key: PASSWORD
 
   ccd-user-profile-api:
     java:
