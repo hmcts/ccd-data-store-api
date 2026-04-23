@@ -63,11 +63,22 @@ Primary code areas:
 - `POST /case-users` no longer trusts request `organisation_id`.
 - If request `organisation_id` is present and differs from the caller's PRD organisation, the request is rejected.
 - If request `organisation_id` is omitted, the server-side PRD organisation is used when available.
+- If request `organisation_id` is omitted and the caller has an org-boundary-restricted role but no caller
+  organisation can be resolved from PRD, the request is rejected with the same mismatch error.
+- If request `organisation_id` is omitted and the caller is not org-boundary restricted, the request can still
+  proceed when PRD organisation is unavailable.
 - Existing blank-when-present validation for `organisation_id` remains in place.
 - Restricted direct case reads now use the existing org-boundary-aware restricted access-profile path.
 - The org-boundary intersection is applied only to org-boundary restricted roles, not to all explicit-grant-only
   users such as citizens or letter-holders.
 - No search-path change was made as part of this fix.
+
+## Role Classification Note
+- Org-boundary restriction is determined by the application role-pattern logic, not by scenario naming.
+- In current code, BEFTA Jurisdiction 2 roles such as `caseworker-befta_jurisdiction_2-solicitor_2` are treated as
+  unrestricted because they do not match the restricted-role pattern.
+- For that reason, the restricted omitted-organisation AAT branch is implemented using a `BEFTA_MASTER` solicitor
+  user whose role does match the restricted-role pattern.
 
 ## Tests
 Add:
@@ -77,6 +88,23 @@ Add:
 - Unit tests for restricted user allowed direct case access within their organisation
 - Extend AAT/functional org-context coverage
 - Add search regression coverage if search path is in scope
+
+Implemented coverage:
+- Service tests cover:
+  - explicit request org mismatch rejection
+  - omitted `organisation_id` with PRD-present caller organisation
+  - omitted `organisation_id` with PRD-unavailable restricted caller rejection
+  - omitted `organisation_id` with PRD-unavailable unrestricted caller success
+- `CaseAccessServiceTest` documents the current role-classification behaviour for BEFTA Jurisdiction 2 solicitor
+  suffix roles, proving they are treated as unrestricted by the current code.
+- `F-105` AAT coverage now maps to the implemented behaviour as follows:
+  - `S-105.16`: omitted `organisation_id`, PRD available, success using caller organisation from PRD
+  - `S-105.17`: blank/invalid `organisation_id`, rejected
+  - `S-105.18`: explicit valid `organisation_id`, existing explicit-org success path
+  - `S-105.19`: omitted `organisation_id`, unrestricted caller, PRD unavailable, success
+  - `S-105.20`: omitted `organisation_id`, restricted caller, PRD unavailable, rejection
+- `S-105.20` uses a `BEFTA_MASTER` restricted solicitor fixture rather than the earlier BEFTA Jurisdiction 2
+  solicitor fixture, because the latter is not classified as restricted by the current application logic.
 
 ## Non-goals
 - Do not redesign all case access rules.
