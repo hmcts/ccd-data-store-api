@@ -239,7 +239,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a user [Olawale - with an active solicitor profile and valid User ID],
      And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
      And a successful call [to grant access for Olawale with a case role CR-1 over the case C1] as in [S-105.15_Grant_Access],
-     And a successful call [to check the number of users having access to C1 in its supplementary data for Dil's organisation] as in [S-105.16_Prerequisite_Counter_Check_Call],
+     And a successful call [to check the number of users having access to C1 in its supplementary data] as in [F-105_Prerequisite_Counter_Check_Call],
      When a request is prepared with appropriate values,
      And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-2 and the Organisation ID of Olawale],
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
