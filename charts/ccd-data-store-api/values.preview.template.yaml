@@ -43,7 +43,7 @@ java:
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
     # BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
-    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-pr-428.preview.platform.hmcts.net"
+    BEFTA_TEST_STUB_SERVICE_BASE_URL: "https://ccd-test-stubs-service-pr-428.preview.platform.hmcts.net"
     SPRING_APPLICATION_JSON: |
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
