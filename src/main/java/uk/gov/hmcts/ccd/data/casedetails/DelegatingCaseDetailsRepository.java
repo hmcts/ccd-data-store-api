@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.decentralised.client.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -118,7 +117,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     @Deprecated(since = "2018-04-04")
     @SuppressWarnings("java:S1133") // keep legacy API for backward compatibility
     public CaseDetails findByReference(Long caseReference) {
-        return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
+        return findByReference(null, caseReference).orElse(null);
     }
 
     /**
