@@ -70,26 +70,27 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
-                                                                  + ".testData.actualResponse.body.id");
+                Object idValue = ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
+                    + ".testData.actualResponse.body.id");
+                return Long.parseLong(idValue.toString());
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
         } else if (key.toString().startsWith("caseIdAsStringFrom")) {
             String childContext = key.toString().replace("caseIdAsStringFrom_","");
             try {
-                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
+                Object idValue = ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
-                return Long.toString(longRef);
+                return idValue.toString();
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
         } else if (key.toString().startsWith("HyphenisedCaseIdFromCaseCreation")) {
             String childContext = key.toString().replace("HyphenisedCaseIdFromCaseCreation_","");
             try {
-                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
+                Object idValue = ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
-                String result = hypheniseACaseId(Long.toString(longRef));
+                String result = hypheniseACaseId(idValue.toString());
                 return result;
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
