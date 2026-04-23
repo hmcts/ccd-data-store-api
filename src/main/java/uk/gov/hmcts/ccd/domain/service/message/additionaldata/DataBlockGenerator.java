@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -174,16 +173,11 @@ public class DataBlockGenerator {
         return node.textValue().equalsIgnoreCase("Yes") ? BooleanNode.TRUE : BooleanNode.FALSE;
     }
 
-    private JsonNode processBigDecimalNodeOf(JsonNode node) {
-        return node.isDouble() ? DecimalNode.valueOf(node.decimalValue())
-            : DecimalNode.valueOf(BigDecimal.valueOf(Double.parseDouble(node.textValue())));
-    }
-
     private JsonNode processNumberNodeOf(JsonNode node) {
         return node.isNumber() ? LongNode.valueOf(node.asLong()) : LongNode.valueOf(Long.parseLong(node.textValue()));
     }
 
     private JsonNode numberNodeOf(JsonNode node) {
-        return node.isDouble() ? processBigDecimalNodeOf(node) : processNumberNodeOf(node);
+        return node.isDouble() ? DecimalNode.valueOf(node.decimalValue()) : processNumberNodeOf(node);
     }
 }
