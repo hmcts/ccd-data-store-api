@@ -70,8 +70,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                String idValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
-                    + ".testData.actualResponse.body.id");
+                String idValue = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts."
+                    + childContext + ".testData.actualResponse.body.id");
                 return Long.parseLong(idValue);
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
