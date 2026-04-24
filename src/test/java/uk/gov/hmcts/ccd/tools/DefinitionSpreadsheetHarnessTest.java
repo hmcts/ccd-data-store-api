@@ -1,11 +1,7 @@
 package uk.gov.hmcts.ccd.tools;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -27,11 +23,23 @@ class DefinitionSpreadsheetHarnessTest {
         "sponsorMobileNumberAdminJ",
         "sponsorAddress"
     );
+    private static final String FIRST_ROW_HEADERS_DEFINITION_SPREADSHEET = "first-row-headers.xlsx";
+    private static final String INVALID_DEFINITION_SPREADSHEET = "invalid-definition.xlsx";
+    private static final String VALID_DEFINITION_SPREADSHEET = "ccd-appeal-config-preview-pr3017.xlsx";
 
-    private static final Path KNOWN_SPREADSHEET =
-        Path.of(System.getProperty("user.dir"))
-            .resolve("ccd-appeal-config-preview-pr3017.xlsx")
-            .toAbsolutePath();
+    private static final Path KNOWN_SPREADSHEET = testResourcePath(VALID_DEFINITION_SPREADSHEET);
+
+    private static Path testResourcePath(String name) {
+        try {
+            var resource = DefinitionSpreadsheetHarnessTest.class.getResource("/" + name);
+            if (resource == null) {
+                throw new IllegalStateException("Missing test resource: " + name);
+            }
+            return Path.of(resource.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to resolve test resource: " + name, e);
+        }
+    }
 
     @Test
     void shouldReturnNoFailuresForKnownAppealSpreadsheetInputs() throws Exception {
@@ -74,15 +82,8 @@ class DefinitionSpreadsheetHarnessTest {
     }
 
     @Test
-    void shouldFailWhenCaseEventToFieldsHeaderRowCannotBeFound(@TempDir Path tempDir) throws Exception {
-        Path invalidSpreadsheet = tempDir.resolve("invalid-definition.xlsx");
-        try (Workbook workbook = new XSSFWorkbook();
-             OutputStream outputStream = Files.newOutputStream(invalidSpreadsheet)) {
-            workbook.createSheet("CaseEventToFields").createRow(0).createCell(0).setCellValue("not-a-header");
-            workbook.createSheet("AuthorisationCaseField").createRow(0).createCell(0).setCellValue("not-a-header");
-            workbook.createSheet("RoleToAccessProfiles").createRow(0).createCell(0).setCellValue("not-a-header");
-            workbook.write(outputStream);
-        }
+    void shouldFailWhenCaseEventToFieldsHeaderRowCannotBeFound() throws Exception {
+        Path invalidSpreadsheet = testResourcePath(INVALID_DEFINITION_SPREADSHEET);
 
         assertThatThrownBy(() -> DefinitionSpreadsheetHarness.run(
             invalidSpreadsheet,
@@ -95,43 +96,8 @@ class DefinitionSpreadsheetHarnessTest {
     }
 
     @Test
-    void shouldReadHeadersWhenTheyAreOnFirstRow(@TempDir Path tempDir) throws Exception {
-        Path spreadsheet = tempDir.resolve("first-row-headers.xlsx");
-        try (Workbook workbook = new XSSFWorkbook();
-             OutputStream outputStream = Files.newOutputStream(spreadsheet)) {
-            var caseEventSheet = workbook.createSheet("CaseEventToFields");
-            var caseEventHeader = caseEventSheet.createRow(0);
-            caseEventHeader.createCell(0).setCellValue("caseeventid");
-            caseEventHeader.createCell(1).setCellValue("casefieldid");
-            caseEventHeader.createCell(2).setCellValue("casetypeid");
-            var caseEventData = caseEventSheet.createRow(1);
-            caseEventData.createCell(0).setCellValue("editAppealAfterSubmit");
-            caseEventData.createCell(1).setCellValue("isFeePaymentEnabled");
-            caseEventData.createCell(2).setCellValue("Asylum");
-
-            var authSheet = workbook.createSheet("AuthorisationCaseField");
-            var authHeader = authSheet.createRow(0);
-            authHeader.createCell(0).setCellValue("casetypeid");
-            authHeader.createCell(1).setCellValue("casefieldid");
-            authHeader.createCell(2).setCellValue("accessprofile");
-            authHeader.createCell(3).setCellValue("crud");
-            var authData = authSheet.createRow(1);
-            authData.createCell(0).setCellValue("Asylum");
-            authData.createCell(1).setCellValue("isFeePaymentEnabled");
-            authData.createCell(2).setCellValue("caseworker-ia-admofficer");
-            authData.createCell(3).setCellValue("R");
-
-            var roleSheet = workbook.createSheet("RoleToAccessProfiles");
-            var roleHeader = roleSheet.createRow(0);
-            roleHeader.createCell(0).setCellValue("rolename");
-            roleHeader.createCell(1).setCellValue("accessprofiles");
-            var roleData = roleSheet.createRow(1);
-            roleData.createCell(0).setCellValue("caseworker-ia-admofficer");
-            roleData.createCell(1).setCellValue("caseworker-ia-admofficer");
-
-            workbook.write(outputStream);
-        }
-
+    void shouldReadHeadersWhenTheyAreOnFirstRow() throws Exception {
+        Path spreadsheet = testResourcePath(FIRST_ROW_HEADERS_DEFINITION_SPREADSHEET);
         List<DefinitionSpreadsheetHarness.FieldDecision> decisions =
             DefinitionSpreadsheetHarness.run(
                 spreadsheet,

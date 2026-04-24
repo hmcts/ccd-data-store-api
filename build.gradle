@@ -108,6 +108,9 @@ sourceSets {
             compileClasspath += main.output + main.compileClasspath
             runtimeClasspath += main.output + main.runtimeClasspath
         }
+        resources {
+            srcDir('src/support-tools/resources')
+        }
     }
 
     test {

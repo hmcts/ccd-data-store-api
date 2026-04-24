@@ -26,7 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 /**
  * Harness that inspects a definition spreadsheet and reports whether
  * specific fields are readable for the supplied roles on a supplied event.
- * If readable, the fields are returned.
+ * If readable, the field will be returned.
  * <p>Required system properties (parameters):</p>
  * <ul>
  *   <li>{@code -Ddefinition.file}: absolute or relative path to the definition XLSX.</li>
@@ -64,19 +64,22 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 @Slf4j
 public class DefinitionSpreadsheetHarness {
 
-    private static final String SPREADSHEET_PATH_PROPERTY = "definition.file";
-    private static final String ROLES_PROPERTY = "roles";
-    private static final String TARGET_FIELDS_PROPERTY = "target.fields";
-    private static final String EVENT_ID_PROPERTY = "event.id";
-    private static final String ROLES_TO_ACCESS_PROFILE_SHEET = "RoleToAccessProfiles";
+    private static final String ACCESS_PROFILE_COLUMN = "accessprofile";
+    private static final String ACCESS_PROFILES_COLUMN = "accessprofiles";
     private static final String AUTHORISATION_CASE_FIELD_SHEET = "AuthorisationCaseField";
-    private static final String CASE_EVENT_TO_FIELDS_SHEET = "CaseEventToFields";
     private static final String CASE_EVENT_ID_COLUMN = "caseeventid";
+    private static final String CASE_EVENT_TO_FIELDS_SHEET = "CaseEventToFields";
     private static final String CASE_FIELD_ID_COLUMN = "casefieldid";
     private static final String CASE_TYPE_ID_COLUMN = "casetypeid";
-    private static final String ACCESS_PROFILE_COLUMN = "accessprofile";
+    private static final String EVENT_ID_PROPERTY = "event.id";
+    private static final String IDAM_PREFIX = "idam:";
+    private static final String ROLE_NAME_COLUMN = "rolename";
+    private static final String ROLES_PROPERTY = "roles";
+    private static final String ROLES_TO_ACCESS_PROFILE_SHEET = "RoleToAccessProfiles";
+    private static final String SPREADSHEET_PATH_PROPERTY = "definition.file";
+    private static final String TARGET_FIELDS_PROPERTY = "target.fields";
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             List<FieldDecision> failures = runFromSystemProperties();
             if (failures.isEmpty()) {
@@ -200,11 +203,11 @@ public class DefinitionSpreadsheetHarness {
                 rolesToAccessProfiles.size(), String.join(", ", accessProfiles));
             if (!rolesToAccessProfiles.isEmpty()) {
                 log.info("RoleToAccessProfiles headers: {}",
-                    String.join(", ", rolesToAccessProfiles.get(0).keySet()));
+                    String.join(", ", rolesToAccessProfiles.getFirst().keySet()));
             }
             if (!eventToFields.isEmpty()) {
                 log.info("CaseEventToFields headers: {}",
-                    String.join(", ", eventToFields.get(0).keySet()));
+                    String.join(", ", eventToFields.getFirst().keySet()));
                 log.info("CaseEventToFields sample {} values: {}",
                     CASE_EVENT_ID_COLUMN,
                     eventToFields.stream()
@@ -216,7 +219,7 @@ public class DefinitionSpreadsheetHarness {
             }
             if (!authCaseFields.isEmpty()) {
                 log.info("AuthorisationCaseField headers: {}",
-                    String.join(", ", authCaseFields.get(0).keySet()));
+                    String.join(", ", authCaseFields.getFirst().keySet()));
             }
 
             List<FieldDecision> decisions = new ArrayList<>();
@@ -372,7 +375,7 @@ public class DefinitionSpreadsheetHarness {
                 }
             }
         }
-        if ("CaseEventToFields".equals(sheetName)) {
+        if (CASE_EVENT_TO_FIELDS_SHEET.equals(sheetName)) {
             if (isCaseEventToFieldsHeader(headersByIndex)) {
                 log.info("Using initial CaseEventToFields header row at index {}", headerRow.getRowNum());
             } else {
@@ -385,7 +388,7 @@ public class DefinitionSpreadsheetHarness {
                 }
             }
         }
-        if ("AuthorisationCaseField".equals(sheetName)) {
+        if (AUTHORISATION_CASE_FIELD_SHEET.equals(sheetName)) {
             if (isAuthorisationCaseFieldHeader(headersByIndex)) {
                 log.info("Using initial AuthorisationCaseField header row at index {}", headerRow.getRowNum());
             } else {
@@ -455,8 +458,8 @@ public class DefinitionSpreadsheetHarness {
     }
 
     private static boolean isRoleToAccessProfilesHeader(Map<Integer, String> headersByIndex) {
-        return headersByIndex.containsValue("rolename")
-            && headersByIndex.containsValue("accessprofiles");
+        return headersByIndex.containsValue(ROLE_NAME_COLUMN)
+            && headersByIndex.containsValue(ACCESS_PROFILES_COLUMN);
     }
 
     private static boolean isCaseEventToFieldsHeader(Map<Integer, String> headersByIndex) {
@@ -503,11 +506,11 @@ public class DefinitionSpreadsheetHarness {
             ROLES_TO_ACCESS_PROFILE_SHEET);
         log.info("Seeded direct access profiles from supplied roles: {}", String.join(", ", accessProfiles));
         for (Map<String, String> row : rolesToAccessProfiles) {
-            String rawRoleName = rowValue(row, "rolename", "role name", "role");
+            String rawRoleName = rowValue(row, ROLE_NAME_COLUMN);
             String roleName = normalizeRole(rawRoleName);
-            if (!roleName.isEmpty() && roles.contains(roleName)) {
+            if (roles.contains(roleName)) {
                 log.info("Matched role: raw='{}', normalized='{}'", rawRoleName, roleName);
-                String profilesValue = nullSafeTrim(rowValue(row, "accessprofiles", ACCESS_PROFILE_COLUMN));
+                String profilesValue = nullSafeTrim(rowValue(row, ACCESS_PROFILES_COLUMN));
                 if (!profilesValue.isEmpty()) {
                     for (String profile : profilesValue.split("[,;]")) {
                         String trimmed = profile.trim();
@@ -531,8 +534,8 @@ public class DefinitionSpreadsheetHarness {
             return "";
         }
         String trimmed = role.trim();
-        if (trimmed.toLowerCase(Locale.ROOT).startsWith("idam:")) {
-            return trimmed.substring("idam:".length()).trim();
+        if (trimmed.toLowerCase(Locale.ROOT).startsWith(IDAM_PREFIX)) {
+            return trimmed.substring(IDAM_PREFIX.length()).trim();
         }
         return trimmed;
     }
