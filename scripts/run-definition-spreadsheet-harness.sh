@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # Runs the definition spreadsheet harness with the provided arguments.
 #
-# ./scripts/run-definition-spreadsheet-harness.sh   /Users/<user>/Downloads/ccd-appeal-config-preview-pr3017.xlsx   caseworker-ia-admofficer   isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress   editAppealAfterSubmit;
+# Usage:
+# run-definition-spreadsheet-harness.sh <definition-xlsx> <roles> <target-fields> <event-id>
+#
+# <roles> and <target-fields> can be comma separated lists.
+#
+# Example:
+# ./scripts/run-definition-spreadsheet-harness.sh /ccd-appeal-config-preview-pr3017.xlsx caseworker-ia-admofficer isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress editAppealAfterSubmit;
 #
 # Process summary:
 # 1) Reads CaseEventToFields, AuthorisationCaseField, RoleToAccessProfiles from the XLSX.
@@ -17,7 +23,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/.." && pwd)"
 
 if [ "$#" -ne 4 ]; then
-  echo "Usage: $0 <definition-xlsx> <roles> <target-fields> <event-id>" >&2
   exit 1
 fi
 
