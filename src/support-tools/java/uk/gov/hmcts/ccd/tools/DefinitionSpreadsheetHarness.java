@@ -7,8 +7,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,7 +185,7 @@ public class DefinitionSpreadsheetHarness {
         log.info("Event ID: {}", eventId);
         log.info("Roles: {}", String.join(", ", roles));
         log.info("Target fields: {}", String.join(", ", fieldIds));
-        try (InputStream inputStream = Files.newInputStream(spreadsheetPath);
+        try (InputStream inputStream = openSpreadsheetInputStream(spreadsheetPath);
              Workbook workbook = WorkbookFactory.create(inputStream)) {
 
             List<Map<String, String>> eventToFields = tryReadSheet(workbook, CASE_EVENT_TO_FIELDS_SHEET);
@@ -231,6 +233,16 @@ public class DefinitionSpreadsheetHarness {
             log.info("Decisions evaluated: {}", decisions.size());
             return decisions;
         }
+    }
+
+    private static InputStream openSpreadsheetInputStream(Path spreadsheetPath) throws IOException {
+        if (spreadsheetPath == null) {
+            throw new IllegalArgumentException("Spreadsheet path must not be null");
+        }
+        if (!Files.isRegularFile(spreadsheetPath)) {
+            throw new NoSuchFileException(spreadsheetPath.toString());
+        }
+        return Files.newInputStream(spreadsheetPath);
     }
 
     /**
