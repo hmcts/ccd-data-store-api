@@ -31,7 +31,9 @@
     },
     "body": {
       "organisationIdentifier": "[[ANYTHING_PRESENT]]",
-      "users": "[[ANYTHING_PRESENT]]"
+      "users": "[[ANYTHING_PRESENT]]",
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]"
     }
   }
 }
