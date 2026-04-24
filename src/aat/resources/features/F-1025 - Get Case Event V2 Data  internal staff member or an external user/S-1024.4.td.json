@@ -13,11 +13,10 @@
   ],
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_403_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-      "message": "No case found for reference: ${[scenarioContext][childContexts][Private_Autotest_Case_Data_Extension_External][testData][actualResponse][body][id]}",
-      "path": "/internal/cases/${[scenarioContext][childContexts][Private_Autotest_Case_Data_Extension_External][testData][actualResponse][body][id]}",
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseHistoryRoleAccessException",
+      "message": "Case History not accessible to the user",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

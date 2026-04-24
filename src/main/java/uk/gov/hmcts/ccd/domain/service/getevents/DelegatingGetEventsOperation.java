@@ -4,32 +4,44 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedAuditEventLoader;
 
 @Service
 @Qualifier("default")
-@RequiredArgsConstructor
 public class DelegatingGetEventsOperation implements GetEventsOperation {
     private final PersistenceStrategyResolver resolver;
     private final DecentralisedAuditEventLoader decentralisedAuditEventLoader;
     private final LocalAuditEventLoader localGetEventsOperation;
-    private final CreatorGetCaseOperation getCaseOperation;
+    private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_RESOURCE_NOT_FOUND //
         = "No case found ( case reference = '%s' )";
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
+
+    public DelegatingGetEventsOperation(PersistenceStrategyResolver resolver,
+                                        DecentralisedAuditEventLoader decentralisedAuditEventLoader,
+                                        LocalAuditEventLoader localGetEventsOperation,
+                                        // Event loading must not use creator/restricted lookup or history
+                                        // endpoints can return case-not-found before their own auth rules run.
+                                        @Qualifier("default") GetCaseOperation getCaseOperation,
+                                        UIDService uidService) {
+        this.resolver = resolver;
+        this.decentralisedAuditEventLoader = decentralisedAuditEventLoader;
+        this.localGetEventsOperation = localGetEventsOperation;
+        this.getCaseOperation = getCaseOperation;
+        this.uidService = uidService;
+    }
 
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {

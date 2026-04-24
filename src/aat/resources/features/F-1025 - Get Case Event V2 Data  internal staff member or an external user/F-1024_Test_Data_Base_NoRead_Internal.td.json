@@ -20,8 +20,7 @@
 			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
 		},
 		"pathVariables": {
-			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_NoRead_Internal][testData][actualResponse][body][id]}",
-			"eventId": "1"
+			"cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension_NoRead_Internal][testData][actualResponse][body][id]}"
 		},
     "body": {
       "data": {
