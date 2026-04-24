@@ -1,20 +1,21 @@
 {
   "_guid_": "S-1025_Get_Private_Autotest_Case_Data_External",
-  "title": "to get the details about case event for the case just created",
+  "title": "to get the details about case event for the case just created using an internal private-capable helper",
 
   "productName": "CCD Data Store",
-  "operationName": "Retrieve a CaseView Event by case for access to External Parties",
+  "operationName": "Retrieve a CaseView Event by case for setup of External Parties event-history test",
 
   "method": "GET",
   "uri": "/internal/cases/{cid}",
 
   "specs": [
-    "to get the details about case event for the case just created"
+    "to get the details about case event for the case just created",
+    "to get the details about case event for the case just created using an internal private-capable helper"
   ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "ExternalCaseworkerSolicitor"
+      "_extends_": "PrivateCaseworker"
     }
   },
 

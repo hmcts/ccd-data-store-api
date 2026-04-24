@@ -1,13 +1,15 @@
 {
-  "_guid_": "S-1025.1",
-  "_extends_": "S-1025_Get_Private_Autotest_Case_Data_External_Negative",
-  "title": "must return negative response for direct internal case view access by External Parties",
+  "_guid_": "S-1025.4",
+  "_extends_": "F-1025_Private_Autotest_Test_Data_Base_External",
+  "title": "must return negative response for Specific Case Event Data accessible by External Parties",
 
   "specs": [
     "an active profile in CCD",
-    "contains the reference of the case just created",
-    "contains a HTTP 404 Not Found",
-    "contains HTTP 404 Not Found"
+    "contains the reference of the case just created and the event id valid for that case",
+    "contains a case that has just been created as in S-1025_Get_Private_Autotest_Case_Data_External",
+    "contains details of the case just created, along with an HTTP-200 OK",
+    "contains the case view history, along with an HTTP-403 Forbidden",
+    "contains HTTP 403 Forbidden"
   ],
 
   "expectedResponse": {
