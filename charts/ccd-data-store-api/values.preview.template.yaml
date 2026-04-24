@@ -93,7 +93,7 @@ ccd:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       #image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1611
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1754
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -101,13 +101,17 @@ ccd:
       devcpuLimits: 4000m
       environment:
         DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-        ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
         DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
+        ELASTIC_SEARCH_SCHEME: https
+        ELASTIC_SEARCH_USERNAME: elastic
+        ELASTIC_SEARCH_INSECURE_SKIP_TLS_VERIFY: true
+        ELASTIC_SEARCH_PASSWORD: ""
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -152,23 +156,25 @@ elastic:
   enabled: true
 
 elasticsearch:
+  image: hmctsprod.azurecr.io/imported/elastic/elasticsearch
+  imageTag: 9.2.3
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
   replicas: 1
+  roles: []
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  secret:
+    password: ${ELASTIC_SEARCH_PASSWORD}
   # Their tests delete the pod after succeeding, we pass --logs to the test command which fail if the pod has already been deleted
   # The tests do pass, at least as of 2023-01-19
   tests:
     enabled: false
-  extraEnvs:
-    - name: discovery.type
-      value: single-node
-    - name: cluster.initial_master_nodes
-      value: ""
-    - name: action.auto_create_index
-      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
+  esConfig:
+    elasticsearch.yml: |
+      discovery.type: single-node
+      action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
   ingress:
