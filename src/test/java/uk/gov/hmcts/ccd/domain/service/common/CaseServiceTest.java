@@ -236,17 +236,23 @@ class CaseServiceTest {
 
 
             Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"PersonFirstName\": \"First Name\",\n"
-                    + "  \"PersonLastName\": \"Last Name\"\n"
-                    + "}"));
+                """
+                    {
+                        "PersonFirstName": "First Name",
+                        "PersonLastName": "Last Name"
+                    }
+                 """
+            ));
 
             Map<String, JsonNode> resultData = JacksonUtils.convertValue(MAPPER.readTree(
-                "{\n"
-                    + "  \"PersonFirstName\": \"First Name\",\n"
-                    + "  \"PersonLastName\": \"Last Name\",\n"
-                    + "  \"Person\":{\"Names\":{\"FirstName\":\"Jack\"}}\n"
-                    + "}"));
+                """
+                    {
+                        "PersonFirstName": "First Name",
+                        "PersonLastName": "Last Name",
+                        "Person":{"Names":{"FirstName":"Jack"}}
+                    }
+                """
+            ));
 
             CaseDataContent caseDataContent = newCaseDataContent()
                 .withCaseReference(CASE_REFERENCE)
@@ -259,6 +265,47 @@ class CaseServiceTest {
             assertAll(
                 () -> assertThat(result.getId(), is(CaseServiceTest.this.caseDetails.getId())),
                 () -> assertThat(result.getData(), is(resultData))
+            );
+        }
+
+        @Test
+        @DisplayName("should remove deleted fields from event data when latest data contains nulls")
+        void shouldRemoveFieldsDeletedOnPage() throws Exception {
+            CaseDetails caseDetails = buildCaseDetails();
+            caseDetails.setId("299");
+            caseDetails.getData().put("TextField", MAPPER.getNodeFactory().textNode("old"));
+            caseDetails.getData().put("OtherField", MAPPER.getNodeFactory().textNode("old2"));
+
+            Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
+                """
+                    {
+                        "TextField": "value",
+                        "OtherField": "event"
+                    }
+                """
+            ));
+
+            Map<String, JsonNode> pageData = JacksonUtils.convertValue(MAPPER.readTree(
+                """
+                    {
+                        "TextField": null,
+                        "NewField": "new"
+                    }
+                """
+            ));
+
+            CaseDataContent caseDataContent = newCaseDataContent()
+                .withCaseReference(CASE_REFERENCE)
+                .withEventData(eventData)
+                .withData(pageData)
+                .build();
+
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
+
+            assertAll(
+                () -> assertThat(result.getData().containsKey("TextField"), is(false)),
+                () -> assertThat(result.getData().get("OtherField").asText(), is("event")),
+                () -> assertThat(result.getData().get("NewField").asText(), is("new"))
             );
         }
 
