@@ -114,14 +114,10 @@ public class DefinitionSpreadsheetHarness {
     }
 
     private static List<FieldDecision> runFromSystemProperties() throws Exception {
-        String spreadsheetPath = requireProperty(SPREADSHEET_PATH_PROPERTY,
-            "Missing -D" + SPREADSHEET_PATH_PROPERTY + "=path-to-xlsx");
-        String rolesCsv = requireProperty(ROLES_PROPERTY,
-            "Missing -D" + ROLES_PROPERTY + "=role1,role2");
-        String fieldsCsv = requireProperty(TARGET_FIELDS_PROPERTY,
-            "Missing -D" + TARGET_FIELDS_PROPERTY + "=field1,field2");
-        String eventId = requireProperty(EVENT_ID_PROPERTY,
-            "Missing -D" + EVENT_ID_PROPERTY + "=eventId");
+        String spreadsheetPath = requireProperty(SPREADSHEET_PATH_PROPERTY,"path-to-xlsx");
+        String rolesCsv = requireProperty(ROLES_PROPERTY,"role1,role2");
+        String fieldsCsv = requireProperty(TARGET_FIELDS_PROPERTY,"field1,field2");
+        String eventId = requireProperty(EVENT_ID_PROPERTY,"eventId");
 
         Set<String> roles = parseRoles(rolesCsv);
         List<String> targetFields = parseFields(fieldsCsv);
@@ -141,13 +137,10 @@ public class DefinitionSpreadsheetHarness {
             .collect(Collectors.toList());
     }
 
-    private static String requireProperty(String key, String missingMessage) {
+    private static String requireProperty(String key, String missingPropertyValue) {
         String value = System.getProperty(key);
-        if (value == null) {
-            throw new IllegalArgumentException(missingMessage);
-        }
-        if (value.isBlank()) {
-            throw new IllegalArgumentException("Blank -D" + key + " value");
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing -D" + key + "=" + missingPropertyValue);
         }
         return value;
     }
