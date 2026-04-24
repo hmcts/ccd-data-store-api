@@ -71,6 +71,10 @@ Primary code areas:
 - Restricted direct case reads now use the existing org-boundary-aware restricted access-profile path.
 - The org-boundary intersection is applied only to org-boundary restricted roles, not to all explicit-grant-only
   users such as citizens or letter-holders.
+- Event-history endpoints keep their existing explicit authorization contract.
+- For that reason, history view and audit-event loading must not reuse the creator/restricted case lookup chain used
+  by direct case reads, or restricted external users can be hidden too early as generic case-not-found before the
+  history-specific authorization path returns the intended forbidden response.
 - No search-path change was made as part of this fix.
 
 ## Role Classification Note
