@@ -10,7 +10,7 @@
     "body": {
       "matchesJsonPath": {
         "expression": "$.testId",
-        "contains": "S-1041"
+        "contains": "S-1041-${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
       }
     }
   },
