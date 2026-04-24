@@ -190,9 +190,9 @@ public class DefinitionSpreadsheetHarness {
         try (InputStream inputStream = Files.newInputStream(spreadsheetPath);
              Workbook workbook = WorkbookFactory.create(inputStream)) {
 
-            List<Map<String, String>> eventToFields = readSheet(workbook, CASE_EVENT_TO_FIELDS_SHEET);
-            List<Map<String, String>> authCaseFields = readSheet(workbook, AUTHORISATION_CASE_FIELD_SHEET);
-            List<Map<String, String>> rolesToAccessProfiles = readSheet(workbook, ROLES_TO_ACCESS_PROFILE_SHEET);
+            List<Map<String, String>> eventToFields = tryReadSheet(workbook, CASE_EVENT_TO_FIELDS_SHEET);
+            List<Map<String, String>> authCaseFields = tryReadSheet(workbook, AUTHORISATION_CASE_FIELD_SHEET);
+            List<Map<String, String>> rolesToAccessProfiles = tryReadSheet(workbook, ROLES_TO_ACCESS_PROFILE_SHEET);
             Set<String> accessProfiles = translateRolesToAccessProfiles(roles, rolesToAccessProfiles);
             log.info("Rows loaded: CaseEventToFields={}, AuthorisationCaseField={}",
                 eventToFields.size(), authCaseFields.size());
@@ -338,7 +338,7 @@ public class DefinitionSpreadsheetHarness {
         return accessControlList;
     }
 
-    private static List<Map<String, String>> readSheet(Workbook workbook, String sheetName) {
+    private static List<Map<String, String>> tryReadSheet(Workbook workbook, String sheetName) {
         log.info("Reading sheet: {}", sheetName);
         Sheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
@@ -349,7 +349,13 @@ public class DefinitionSpreadsheetHarness {
         Row headerRow = sheet.getRow(sheet.getFirstRowNum());
         if (headerRow == null) {
             throw new IllegalArgumentException("Missing header row in sheet: " + sheetName);
+        } else {
+            return readSheet(sheet, sheetName, headerRow, formatter);
         }
+    }
+
+    private static List<Map<String, String>> readSheet(Sheet sheet, String sheetName, Row headerRow,
+                                                       DataFormatter formatter) {
 
         Map<Integer, String> headersByIndex = readHeaders(headerRow, formatter);
         log.info("Initial header row index for {}: {}", sheetName, headerRow.getRowNum());
