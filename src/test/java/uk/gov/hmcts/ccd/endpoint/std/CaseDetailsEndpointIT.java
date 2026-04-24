@@ -64,7 +64,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
@@ -74,6 +77,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
@@ -91,6 +95,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
@@ -163,6 +168,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final Long CASE_LINKS_CASE_999_ID = 999L;
     private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
     private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
+
+    private static final String DOCUMENT_COLLECTION_EVENT_ID = "DOCUMENT_COLLECTION_EVENT";
+    private static final String CREATE_DOCUMENT_EVENT_ID = "CREATE_DOCUMENT_EVENT";
 
     @Inject
     private WebApplicationContext wac;
@@ -447,7 +455,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
 
-        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -949,7 +957,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));  
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -3622,10 +3630,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
         Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
-        assertAll(() -> 
+        assertAll(() ->
             assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
                 .containsAll(actualData.entrySet())),
-            () -> assertThat("Response contains filtered out data", 
+            () -> assertThat("Response contains filtered out data",
                 caseData.has("PersonFirstName"), is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
@@ -6094,6 +6102,786 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
                 JSONCompareMode.LENIENT)
         );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        // Event payload: existing item + new item with documentFile and hash token
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        // Callback ignore D8Documents field with both documentIds
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\""
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback.*aboutToSubmit.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - both collection items including the new document are saved
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean newItemSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.get("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                newItemSaved = true;
+                break;
+            }
+        }
+        assertThat(newItemSaved, is(true));
+
+        // CDAM was called with the new document hash
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
+        throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(DOCUMENT_COLLECTION_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE,
+                caseReference, DOCUMENT_COLLECTION_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - new item is saved but without documentFile because callback stripped it
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should not exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
+        throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newEventDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newEventDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newEventDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newEventDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newEventDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-003\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "         \"document_hash\": \"" + newCallbackDocumentHash + "\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(DOCUMENT_COLLECTION_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE,
+                caseReference, DOCUMENT_COLLECTION_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - new item is saved but without documentFile because callback stripped it
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+        assertThat("Item should not exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newEventDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/documentData/caseref/" + caseReference;
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final String requestBody = "{"
+            + "\"attribute_path\": \"D8Document\","
+            + "\"case_version\": 1,"
+            + "\"category_id\": \"caseDocuments\""
+            + "}";
+
+        // WHEN
+        mockMvc.perform(put(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(requestBody)
+        ).andExpect(status().is(200));
+
+        // THEN - categoryId updated on D8Document in saved case data
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        assertThat(savedCase.getData(), hasKey("D8Document"));
+        final JsonNode savedDocument = mapper.convertValue(
+            savedCase.getData().get("D8Document"), JsonNode.class);
+        assertThat(savedDocument.path("category_id").asText(), is("caseDocuments"));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*")));
+    }
+
+    @Test
+    public void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        // Callback retains documentFile — nothing dropped
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDataContent))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        // CDAM was called with the new document hash
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    public void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+        // Callback strips documentFile from the collection item
+        // This is the bug scenario on case creation — callback rebuilds the collection
+        // item without carrying forward documentFile
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newCallbackDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should not exist in savedDocuments", documentSaved, is(false));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should exist in savedDocuments", newItemFound, is(true));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
+    }
+
+    @Test
+    public void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newCaseDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newEventDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCaseDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCaseDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newEventDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-003\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "         \"document_hash\": \"" + newCallbackDocumentHash + "\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("existing-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-003".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newCallbackDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCaseDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
     }
 
     private String createExampleEventDataWithMissingItems() {
