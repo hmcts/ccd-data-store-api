@@ -36,7 +36,7 @@
     "body": {
       "total": 1,
       "cases": [{
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+        "id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": null,

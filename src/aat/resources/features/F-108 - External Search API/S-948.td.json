@@ -35,7 +35,7 @@
       "total": 1,
       "cases": [{
         "_extends_" : "F-108_Base_Case_Fields_expected",
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_GroupAccess_Full_Case_Creation_Data]}",
+        "id": "${[scenarioContext][customValues][caseIdAsStringFrom_GroupAccess_Full_Case_Creation_Data]}",
         "case_data": {
           "FixedListField": "VALUE1",
           "MoneyGBPField": "1000",
