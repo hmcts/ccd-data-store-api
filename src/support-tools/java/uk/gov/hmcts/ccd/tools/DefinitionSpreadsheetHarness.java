@@ -24,18 +24,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 /**
- * Harness-style test that inspects a definition spreadsheet and reports whether
- * specific fields are readable for the supplied roles on a fixed event
- * and are therefore returned if so, or not returned.
+ * Harness that inspects a definition spreadsheet and reports whether
+ * specific fields are readable for the supplied roles on a supplied event.
+ * If readable, the fields are returned.
  * <p>Required system properties (parameters):</p>
  * <ul>
  *   <li>{@code -Ddefinition.file}: absolute or relative path to the definition XLSX.</li>
- *   <li>{@code -Droles}: comma-separated list of roles (idam: prefix allowed).</li>
+ *   <li>{@code -Droles}: comma-separated list of roles ("idam:" prefix for a role is allowed).</li>
  *   <li>{@code -Dtarget.fields}: comma-separated list of case field IDs to check.</li>
  *   <li>{@code -Devent.id}: page event id.</li>
  * </ul>
  * <p/>
- * Example of env variables to run  from IntelliJ:
+ * Example of command line arguments to run  from IntelliJ:
  * -ea
  * -Dtarget.fields=isFeePaymentEnabled,sponsorEmailAdminJ,sponsorMobileNumberAdminJ,sponsorAddress
  * -Ddefinition.file=/ccd-appeal-config-preview-pr3017.xlsx
@@ -112,7 +112,7 @@ public class DefinitionSpreadsheetHarness {
 
     private static List<FieldDecision> runFromSystemProperties() throws Exception {
         String spreadsheetPath = requireProperty(SPREADSHEET_PATH_PROPERTY,
-            "Missing -D" + SPREADSHEET_PATH_PROPERTY + "=<path-to-xlsx>");
+            "Missing -D" + SPREADSHEET_PATH_PROPERTY + "=path-to-xlsx");
         String rolesCsv = requireProperty(ROLES_PROPERTY,
             "Missing -D" + ROLES_PROPERTY + "=role1,role2");
         String fieldsCsv = requireProperty(TARGET_FIELDS_PROPERTY,
