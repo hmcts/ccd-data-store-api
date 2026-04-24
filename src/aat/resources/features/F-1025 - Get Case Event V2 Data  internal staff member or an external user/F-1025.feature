@@ -59,4 +59,3 @@ Scenario: must return negative response for unauthorised access by Internal Part
 
       When a request is prepared with appropriate values,
       And the request [contains the reference of the case just created and the response will not contain event history case data]
-
