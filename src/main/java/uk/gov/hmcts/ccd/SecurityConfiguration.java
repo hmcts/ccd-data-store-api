@@ -102,7 +102,7 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
             .formLogin(fl -> fl.disable())
             .logout(logout -> logout.disable())
-            .authorizeHttpRequests(auth -> 
+            .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/error")
                 .permitAll()
                 .anyRequest()
@@ -116,12 +116,10 @@ public class SecurityConfiguration {
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
-        // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
+        // See docs/security/jwt-issuer-validation.md for issuer-uri discovery and oidc.issuer enforcement.
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
-        // FIXME : enable `withIssuer` once idam migration done RDM-8094
-        // OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
+        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
 
         jwtDecoder.setJwtValidator(validator);
         return jwtDecoder;

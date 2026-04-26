@@ -306,7 +306,7 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
@@ -729,16 +729,59 @@ idea {
 }
 
 task highLevelDataSetup(type: JavaExec) {
-    dependsOn aatClasses
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task smoke(type: JavaExec) {
-    description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
+task verifyFunctionalTestJwtIssuer(type: JavaExec) {
+    description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+    group = 'Verification'
     dependsOn aatClasses
+
+    onlyIf {
+        System.getenv('VERIFY_OIDC_ISSUER')?.toBoolean()
+    }
+
+    mainClass = 'uk.gov.hmcts.ccd.datastore.befta.JwtIssuerVerificationApp'
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+}
+
+task verifyOidcIssuerPolicy {
+    description = 'Fails if oidc.issuer is derived from discovery configuration'
+    group = 'Verification'
+
+    doLast {
+        def policyFiles = [
+            'src/main/resources/application.properties',
+            'src/test/resources/test.properties',
+            'src/contractTest/resources/application.properties'
+        ]
+
+        def violations = policyFiles.findAll { path ->
+            def file = file(path)
+            file.exists() && file.readLines().any { line ->
+                def normalized = line.replaceAll(/\s+/, '')
+                normalized.startsWith('oidc.issuer=') && normalized.contains('IDAM_OIDC_URL')
+                    || normalized.startsWith('oidc.issuer=') && normalized.contains('idam.api.url')
+            }
+        }
+
+        if (!violations.isEmpty()) {
+            throw new GradleException(
+                "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+            )
+        }
+    }
+}
+
+check.dependsOn verifyOidcIssuerPolicy
+
+task smoke() {
+    description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
@@ -775,7 +818,7 @@ def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
-    dependsOn aatClasses
+    dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
     group = "Verification"
 

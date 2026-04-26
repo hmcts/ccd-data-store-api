@@ -50,6 +50,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(locations = "classpath:test.properties")
 public class DefinitionsCachingIT {
 
