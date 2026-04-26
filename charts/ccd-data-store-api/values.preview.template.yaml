@@ -151,6 +151,7 @@ elastic:
   enabled: true
 
 elasticsearch:
+  image: hmctsprod.azurecr.io/imported/elastic/elasticsearch
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
   replicas: 1
