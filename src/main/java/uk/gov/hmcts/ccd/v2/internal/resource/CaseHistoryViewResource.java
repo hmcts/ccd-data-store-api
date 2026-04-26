@@ -35,7 +35,7 @@ public class CaseHistoryViewResource extends RepresentationModel {
     public CaseHistoryViewResource(@NonNull CaseHistoryView caseHistoryView, String caseId) {
         copyProperties(caseHistoryView);
 
-        add(linkTo(methodOn(UICaseController.class).getCaseHistoryView(caseId, caseHistoryView.getEventId().toString()))
+        add(linkTo(methodOn(UICaseController.class).getCaseHistoryView(caseId, caseHistoryView.getEventId()))
             .withSelfRel());
     }
 

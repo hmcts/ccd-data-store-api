@@ -29,7 +29,7 @@
       "total": 1,
       "cases": [{
         "_extends_" : "F-108_Base_Case_Fields_expected",
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-925_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsStringFrom_S-925_Create_Case_Private_Autotest1]}",
         "case_data": {
           "FixedListField": "VALUE1",
           "MoneyGBPField": "1000",

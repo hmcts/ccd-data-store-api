@@ -101,13 +101,13 @@ public class CaseDetailsEntity {
 
     @Id
     @Column(name = ID_FIELD_COL)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
         generator = "case_data_id_seq_generator")
-    @SequenceGenerator(name = "case_data_id_seq_generator", 
+    @SequenceGenerator(name = "case_data_id_seq_generator",
         sequenceName = "case_data_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
-    private Long reference;
+    private String reference;
     @Column(name = JURISDICTION_FIELD_COL, nullable = false)
     private String jurisdiction;
     @Column(name = CASE_TYPE_ID_FIELD_COL, nullable = false)
@@ -147,11 +147,11 @@ public class CaseDetailsEntity {
         this.id = uuid;
     }
 
-    public Long getReference() {
+    public String getReference() {
         return reference;
     }
 
-    public void setReference(Long reference) {
+    public void setReference(String reference) {
         this.reference = reference;
     }
 

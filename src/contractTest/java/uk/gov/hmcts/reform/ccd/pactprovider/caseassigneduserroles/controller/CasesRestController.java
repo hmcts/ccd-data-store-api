@@ -87,10 +87,8 @@ public class CasesRestController {
                                                                                Optional<List<String>> optionalUserIds) {
         List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
         validateRequestParams(caseIds, userIds);
-        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
-            .stream()
-            .map(Long::valueOf)
-            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(
+            new ArrayList<>(caseIds), userIds);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
             .body(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
@@ -146,10 +144,8 @@ public class CasesRestController {
         List<String> caseIds = searchRequest.getCaseIds();
         List<String> userIds = searchRequest.getUserIds();
         validateRequestParams(caseIds, userIds);
-        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
-            .stream()
-            .map(Long::valueOf)
-            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(
+            new ArrayList<>(caseIds), userIds);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONNECTION, CONNECTION_CLOSE)
             .body(new CaseAssignedUserRolesResource(caseAssignedUserRoles));

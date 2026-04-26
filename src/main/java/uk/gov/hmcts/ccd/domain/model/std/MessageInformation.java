@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
 public class MessageInformation {
     @JsonIgnore
-    private Long id;
+    private String id;
     @JsonProperty("UserId")
     private String userId;
     @JsonProperty("JurisdictionId")
@@ -22,7 +22,7 @@ public class MessageInformation {
     @JsonProperty("EventTimeStamp")
     private LocalDateTime eventTimestamp;
     @JsonProperty("EventInstanceId")
-    private Long eventInstanceId;
+    private String eventInstanceId;
     @JsonProperty("EventId")
     private String eventId;
     @JsonProperty("PreviousStateId")
@@ -36,11 +36,11 @@ public class MessageInformation {
     )
     private AdditionalMessageInformation data;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -76,11 +76,11 @@ public class MessageInformation {
         this.caseId = caseId;
     }
 
-    public Long getEventInstanceId() {
+    public String getEventInstanceId() {
         return eventInstanceId;
     }
 
-    public void setEventInstanceId(Long eventInstanceId) {
+    public void setEventInstanceId(String eventInstanceId) {
         this.eventInstanceId = eventInstanceId;
     }
 

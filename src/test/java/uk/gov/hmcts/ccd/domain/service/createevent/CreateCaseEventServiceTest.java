@@ -87,7 +87,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -234,7 +233,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         aboutToSubmitCallbackResponse.setState(Optional.empty());
 
         caseDetails = new CaseDetails();
-        caseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
@@ -278,7 +277,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         when(caseDocumentTimestampService.isCaseTypeUploadTimestampFeatureEnabled(any())).thenReturn(false);
         when(resolver.isDecentralised(any(CaseDetails.class))).thenReturn(false);
-        when(resolver.isDecentralised(anyLong())).thenReturn(false);
+        when(resolver.isDecentralised(anyString())).thenReturn(false);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(emptySet());
     }
 

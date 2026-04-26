@@ -27,7 +27,7 @@ public class CaseLinkEntity {
             return caseId;
         }
 
-        public void setCaseId(long caseId) {
+        public void setCaseId(Long caseId) {
             this.caseId = caseId;
         }
 
@@ -35,7 +35,7 @@ public class CaseLinkEntity {
             return linkedCaseId;
         }
 
-        public void setLinkedCaseId(long linkedCaseId) {
+        public void setLinkedCaseId(Long linkedCaseId) {
             this.linkedCaseId = linkedCaseId;
         }
     }
@@ -53,10 +53,10 @@ public class CaseLinkEntity {
 
     }
 
-    public CaseLinkEntity(Long caseId, Long linkedCaseId, String caseTypeId, Boolean standardLink) {
+    public CaseLinkEntity(String caseId, String linkedCaseId, String caseTypeId, Boolean standardLink) {
         caseLinkPrimaryKey = new CaseLinkPrimaryKey();
-        caseLinkPrimaryKey.setCaseId(caseId);
-        caseLinkPrimaryKey.setLinkedCaseId(linkedCaseId);
+        caseLinkPrimaryKey.setCaseId(Long.parseLong(caseId));
+        caseLinkPrimaryKey.setLinkedCaseId(Long.parseLong(linkedCaseId));
 
         this.caseTypeId = caseTypeId;
         this.standardLink = standardLink;

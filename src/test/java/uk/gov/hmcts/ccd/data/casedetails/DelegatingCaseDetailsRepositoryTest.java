@@ -34,8 +34,8 @@ public class DelegatingCaseDetailsRepositoryTest {
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_CENTRALIZED = "CentralizedType";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedType";
-    private static final Long CASE_ID = 12345L;
-    private static final Long CASE_REFERENCE = 1234567890L;
+    private static final String CASE_ID = "12345";
+    private static final String CASE_REFERENCE = "1234567890";
     private static final String CASE_REFERENCE_STRING = "1234567890";
 
     @Mock
@@ -242,7 +242,8 @@ public class DelegatingCaseDetailsRepositoryTest {
             .thenReturn(Optional.of(centralizedCaseDetails));
         when(resolver.isDecentralised(centralizedCaseDetails)).thenReturn(false);
 
-        CaseDetails result = repository.findByReference(CASE_REFERENCE);
+        CaseDetails result = repository.findByReference(CASE_REFERENCE)
+            .orElseThrow(() -> new ResourceNotFoundException("No case found with id=" + CASE_REFERENCE));
 
         assertThat(result, is(sameInstance(centralizedCaseDetails)));
     }
@@ -271,11 +272,11 @@ public class DelegatingCaseDetailsRepositoryTest {
 
     @Test
     public void findCaseReferencesByIds_shouldAlwaysDelegateToLocalRepository() {
-        List<Long> ids = Arrays.asList(1L, 2L, 3L);
-        List<Long> expectedReferences = Arrays.asList(100L, 200L, 300L);
+        List<String> ids = Arrays.asList("1", "2", "3");
+        List<String> expectedReferences = Arrays.asList("100", "200", "300");
         when(localRepository.findCaseReferencesByIds(ids)).thenReturn(expectedReferences);
 
-        List<Long> result = repository.findCaseReferencesByIds(ids);
+        List<String> result = repository.findCaseReferencesByIds(ids);
 
         assertThat(result, is(equalTo(expectedReferences)));
         verify(localRepository).findCaseReferencesByIds(ids);

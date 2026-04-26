@@ -32,7 +32,7 @@ public class DelegatingGetEventsOperation implements GetEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case audit events not found";
 
     @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, String eventId) {
         return getEventLoader(caseDetails).getEvent(caseDetails, eventId).map(Optional::of)
             .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }

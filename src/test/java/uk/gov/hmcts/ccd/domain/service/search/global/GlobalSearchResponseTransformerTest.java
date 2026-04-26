@@ -90,7 +90,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withReference(1629297445116784L)
+            .withReference("1629297445116784")
             .withData(emptyMap())
             .withSupplementaryData(emptyMap())
             .build();
@@ -315,7 +315,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // THEN
         assertThat(actualResult)
             .isNotNull()
-            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE));
     }
 
     @Test
@@ -335,7 +335,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // THEN
         assertThat(actualResult)
             .isNotNull()
-            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE));
     }
 
     @ParameterizedTest

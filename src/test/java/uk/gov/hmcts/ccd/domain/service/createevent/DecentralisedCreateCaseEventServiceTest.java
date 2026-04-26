@@ -70,7 +70,7 @@ class DecentralisedCreateCaseEventServiceTest {
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId("1001");
-        caseDetails.setReference(1234567890123456L);
+        caseDetails.setReference("1234567890123456");
         caseDetails.setCaseTypeId("CASE-TYPE");
         caseDetails.setState("Open");
 
@@ -109,7 +109,7 @@ class DecentralisedCreateCaseEventServiceTest {
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId("1002");
-        caseDetails.setReference(1234567890123457L);
+        caseDetails.setReference("1234567890123457");
         caseDetails.setCaseTypeId("CASE-TYPE");
         caseDetails.setState("Open");
 

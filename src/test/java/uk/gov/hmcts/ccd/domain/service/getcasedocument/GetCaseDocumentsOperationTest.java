@@ -186,7 +186,7 @@ public class GetCaseDocumentsOperationTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
-        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setData(caseDetailsData);
         return caseDetails;
     }

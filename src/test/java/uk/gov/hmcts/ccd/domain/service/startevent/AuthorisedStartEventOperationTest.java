@@ -130,7 +130,7 @@ class AuthorisedStartEventOperationTest {
 
         classifiedCaseDetails = new CaseDetails();
         classifiedCaseDetails.setId(CASE_REFERENCE);
-        classifiedCaseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        classifiedCaseDetails.setReference(CASE_REFERENCE);
         classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
         classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(
             classifiedCaseDetailsClassificationNode));
