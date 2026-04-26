@@ -25,6 +25,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     public static final String QUALIFIER = "authorised-case-history";
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final CaseAccessService caseAccessService;
+    private final CaseDetailsRepository caseDetailsRepository;
 
     public AuthorisedGetCaseHistoryViewOperation(
         @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
@@ -38,6 +39,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         super(caseDefinitionRepository, accessControlService, caseDetailsRepository, caseDataAccessControl);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
         this.caseAccessService = caseAccessService;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
@@ -55,5 +57,14 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
             throw new CaseHistoryRoleAccessException("Case History not accessible to the user");
         }
         return caseHistoryView;
+    }
+
+    @Override
+    protected CaseDetails getCase(String caseReference) {
+        // Case history has its own access contract. Load the case without secured lookup here so
+        // external users reach the explicit CaseHistoryRoleAccessException branch instead of being
+        // hidden earlier as a generic case-not-found.
+        return caseDetailsRepository.findByReferenceWithNoAccessControl(caseReference)
+            .orElseThrow(() -> new uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException(caseReference));
     }
 }

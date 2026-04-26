@@ -32,6 +32,7 @@ java:
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    RD_PROFESSIONAL_API_BASE_URL: http://rd-professional-api-aat.service.core-compute-aat.internal
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
@@ -41,7 +42,8 @@ java:
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
-    BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
+    # BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
+    BEFTA_TEST_STUB_SERVICE_BASE_URL: "https://ccd-test-stubs-service-pr-428.preview.platform.hmcts.net"
     SPRING_APPLICATION_JSON: |
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:

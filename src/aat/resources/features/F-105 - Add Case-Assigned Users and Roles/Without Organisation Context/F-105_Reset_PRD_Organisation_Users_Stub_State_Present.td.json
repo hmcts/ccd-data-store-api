@@ -1,0 +1,27 @@
+{
+  "_guid_": "F-105_Reset_PRD_Organisation_Users_Stub_State_Present",
+  "productName": "CCD Test Stub Service",
+  "operationName": "Set PRD organisation users stub state",
+  "specs": [
+    "to reset PRD organisation users stub state to present"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+  "method": "POST",
+  "uri": "{{BEFTA_TEST_STUB_SERVICE_BASE_URL}}/stub-state/prd-organisations-users",
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "stubMode": "present"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "stubMode": "present"
+    }
+  }
+}
