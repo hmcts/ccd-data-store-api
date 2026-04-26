@@ -10,10 +10,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -25,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
@@ -39,14 +44,19 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public static final String QUALIFIER = "default";
     private static final int RESOURCE_NOT_FOUND = 404;
+    private static final Pattern ENV_PLACEHOLDER_PATTERN =
+        Pattern.compile("\\$\\{([A-Za-z_]\\w*)(?::([^}]*))?}");
 
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
+    private final CallbackUrlValidator callbackUrlValidator;
 
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams,
-                                           final DefinitionStoreClient definitionStoreClient) {
+                                           final DefinitionStoreClient definitionStoreClient,
+                                           final CallbackUrlValidator callbackUrlValidator) {
         this.applicationParams = applicationParams;
         this.definitionStoreClient = definitionStoreClient;
+        this.callbackUrlValidator = callbackUrlValidator;
     }
 
     /**
@@ -57,13 +67,15 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
-            return Arrays.asList(Objects.requireNonNull(definitionStoreClient.invokeGetRequest(
+            List<CaseTypeDefinition> caseTypeDefinitions = Arrays.asList(Objects.requireNonNull(definitionStoreClient
+                .invokeGetRequest(
                 applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
                 CaseTypeDefinition[].class).getBody()));
+            caseTypeDefinitions.forEach(this::validateCaseTypeCallbackUrls);
+            return caseTypeDefinitions;
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
-            if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
                         + jurisdictionId + " because of " + e.getMessage());
             } else {
@@ -89,13 +101,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (caseTypeDefinition != null) {
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+                validateCaseTypeCallbackUrls(caseTypeDefinition);
             }
             return caseTypeDefinition;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
-            if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
                         + caseTypeId + " because of " + e.getMessage());
             } else {
@@ -118,8 +130,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 FieldTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 throw new ResourceNotFoundException(
                     "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
@@ -138,14 +149,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             return definitionStoreClient.invokeGetRequest(applicationParams.userRoleClassification(),
                 UserRole.class, queryParams).getBody();
         } catch (Exception e) {
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
-                throw new ServiceException("Error while retrieving classification for user role " + userRole
-                    + " because of " + e.getMessage(), e);
+                throw toServiceException("Error while retrieving classification for user role " + userRole, e);
             }
         }
     }
@@ -163,8 +172,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + " because of " + e.getMessage(), e);
+            throw toServiceException("Error while retrieving classification for user roles " + userRoles, e);
         }
     }
 
@@ -185,8 +193,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
-            if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 throw new ResourceNotFoundException(
                         "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
             } else {
@@ -239,6 +246,68 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
+    private void validateCaseTypeCallbackUrls(CaseTypeDefinition caseTypeDefinition) {
+        if (caseTypeDefinition == null) {
+            return;
+        }
+        // Ingestion/read-time validation scope: case-level and event-level callback URLs from case definitions.
+        // WizardPage mid-event callback URLs are still validated at runtime by CallbackService before invocation.
+        caseTypeDefinition.setCallbackGetCaseUrl(
+            validateAndResolveCallbackUrlIfPresent(caseTypeDefinition.getCallbackGetCaseUrl())
+        );
+        if (caseTypeDefinition.getEvents() != null) {
+            for (CaseEventDefinition eventDefinition : caseTypeDefinition.getEvents()) {
+                validateEventCallbackUrls(eventDefinition);
+            }
+        }
+    }
+
+    private void validateEventCallbackUrls(CaseEventDefinition eventDefinition) {
+        if (eventDefinition == null) {
+            return;
+        }
+        eventDefinition.setCallBackURLAboutToStartEvent(
+            validateAndResolveCallbackUrlIfPresent(eventDefinition.getCallBackURLAboutToStartEvent())
+        );
+        eventDefinition.setCallBackURLAboutToSubmitEvent(
+            validateAndResolveCallbackUrlIfPresent(eventDefinition.getCallBackURLAboutToSubmitEvent())
+        );
+        eventDefinition.setCallBackURLSubmittedEvent(
+            validateAndResolveCallbackUrlIfPresent(eventDefinition.getCallBackURLSubmittedEvent())
+        );
+    }
+
+    private String validateAndResolveCallbackUrlIfPresent(String callbackUrl) {
+        if (StringUtils.isBlank(callbackUrl)) {
+            return callbackUrl;
+        }
+        String resolvedUrl = resolveCallbackUrlPlaceholders(callbackUrl);
+        callbackUrlValidator.validateCallbackUrl(resolvedUrl);
+        return resolvedUrl;
+    }
+
+    private String resolveCallbackUrlPlaceholders(String callbackUrl) {
+        Matcher matcher = ENV_PLACEHOLDER_PATTERN.matcher(callbackUrl);
+        StringBuffer resolvedValue = new StringBuffer();
+
+        while (matcher.find()) {
+            String variableName = matcher.group(1);
+            String defaultValue = matcher.group(2);
+            String envValue = System.getenv(variableName);
+            String systemPropertyValue = System.getProperty(variableName);
+            String replacement = StringUtils.defaultIfBlank(envValue,
+                StringUtils.defaultIfBlank(systemPropertyValue, defaultValue));
+
+            if (replacement == null) {
+                throw new CallbackException("Callback URL contains unresolved placeholder: ${" + variableName + "}");
+            }
+            matcher.appendReplacement(resolvedValue, Matcher.quoteReplacement(replacement));
+        }
+
+        matcher.appendTail(resolvedValue);
+        return resolvedValue.toString();
+    }
+
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
@@ -256,8 +325,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             return jurisdictionDefinitionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getStatusCode().value() == RESOURCE_NOT_FOUND) {
+            if (isNotFound(e)) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
                     jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
@@ -266,5 +334,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                     e);
             }
         }
+    }
+
+    private boolean isNotFound(Exception e) {
+        return e instanceof HttpClientErrorException httpClientErrorException
+            && httpClientErrorException.getStatusCode().value() == RESOURCE_NOT_FOUND;
+    }
+
+    private ServiceException toServiceException(String prefixMessage, Exception e) {
+        return new ServiceException(prefixMessage + " because of " + e.getMessage(), e);
     }
 }

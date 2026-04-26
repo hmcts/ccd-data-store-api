@@ -13,6 +13,8 @@
 
 Store/search cases and provide workbaskets.
 
+Repo-local workflow docs are indexed in `AGENTS.md`.
+
 ### Prerequisites
 
 - [Open JDK 21](https://openjdk.java.net/)
@@ -47,6 +49,12 @@ The following environment variables are required:
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
 | DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| CCD_CALLBACK_ALLOWED_HOSTS | localhost,127.0.0.1 | Comma-separated callback destination match patterns. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported. Invalid regex-like entries fail validation explicitly. Use environment-specific callback hosts or patterns (for example local Docker: `host.docker.internal`; preview/demo PR domains: `.*\\.demo\\.platform\\.hmcts\\.net,.*\\.preview\\.platform\\.hmcts\\.net`; AAT/pipeline: internal service DNS). |
+| CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to use `http` for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly; all other callback hosts must use `https`. |
+| CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to resolve to private/local addresses for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly. |
+
+For callback hardening rollout guidance, allowlist pattern syntax, and environment examples (including preview/AAT allowlist hosts),
+see [`docs/api/security.md`](docs/api/security.md).
 
 ### Building
 
