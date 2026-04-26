@@ -35,7 +35,9 @@ java:
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
+    #ELASTIC_SEARCH_HOSTS: "ccd-data-store-api-pr-2844-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+    #ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://ccd-data-store-api-pr-2844-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
@@ -92,7 +94,8 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1756-62e46ac-20260410122535
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -178,14 +181,15 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctsprod.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  image: "hmctsprod.azurecr.io/imported/elastic/logstash"
+  imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctsprod.azurecr.io/curl:7.70.0
-      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
+
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
@@ -197,11 +201,12 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
-      http.host: 0.0.0.0
+      api.http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
       queue.type: persisted
       dead_letter_queue.enable: true
+      pipeline.ecs_compatibility: disabled
     pipelines.yml: |
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"

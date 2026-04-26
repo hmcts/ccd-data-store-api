@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.MsearchRequest;
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.MultiSearch;
-import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
-import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,11 +23,13 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchR
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -38,22 +40,20 @@ import static java.util.stream.Collectors.toList;
 public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
-    static final String MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE = "root_cause";
-    private static final String HITS = "hits";
 
-    private final JestClient jestClient;
     private final ObjectMapper objectMapper;
+    private final ElasticsearchClient elasticsearchClient;
     private final CaseDetailsMapper caseDetailsMapper;
     private final ApplicationParams applicationParams;
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
 
     @Autowired
-    public ElasticsearchCaseSearchOperation(JestClient jestClient,
+    public ElasticsearchCaseSearchOperation(ElasticsearchClient elasticsearchClient,
                                             @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
                                             CaseDetailsMapper caseDetailsMapper,
                                             ApplicationParams applicationParams,
                                             CaseSearchRequestSecurity caseSearchRequestSecurity) {
-        this.jestClient = jestClient;
+        this.elasticsearchClient = elasticsearchClient;
         this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
         this.applicationParams = applicationParams;
@@ -62,29 +62,28 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest request, boolean dataClassification) {
-        MultiSearchResult result = search(request);
-        if (result.isSucceeded()) {
-            return toCaseDetailsSearchResult(result, request);
-        } else {
-            throw new BadSearchRequest(result.getErrorMessage());
-        }
+        MsearchResponse<ElasticSearchCaseDetailsDTO> result = search(request);
+        return toCaseDetailsSearchResult(result, request);
     }
 
-    private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
-        MultiSearch multiSearch = secureAndTransformSearchRequest(request);
+    private MsearchResponse<ElasticSearchCaseDetailsDTO> search(CrossCaseTypeSearchRequest request) {
+        MsearchRequest msearchRequest = secureAndTransformSearchRequest(request);
+        log.debug("MsearchRequest: {}", msearchRequest);
         try {
-            return jestClient.execute(multiSearch);
-        } catch (IOException e) {
-            throw new ServiceException("Exception executing search : " + e.getMessage(), e);
+            MsearchResponse<ElasticSearchCaseDetailsDTO> response = elasticsearchClient.msearch(msearchRequest,
+                ElasticSearchCaseDetailsDTO.class);
+            log.debug("MsearchResponse: {}", response);
+            return response;
+        } catch (Exception e) {
+            throw new ServiceException("Exception executing Elasticsearch search: " + e.getMessage(), e);
         }
     }
 
-    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
+    private MsearchRequest secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
         final List<Search> securedSearches = request.getSearchIndex()
             .map(searchIndex -> List.of(createSecuredSearch(searchIndex, request)))
             .orElseGet(() -> buildSearchesByCaseType(request));
-
-        return new MultiSearch.Builder(securedSearches).build();
+        return JestToESConverter.fromJest(securedSearches);
     }
 
     private List<Search> buildSearchesByCaseType(final CrossCaseTypeSearchRequest request) {
@@ -115,58 +114,52 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             .build();
     }
 
-    private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult,
-                                                       CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
-        final List<CaseDetails> caseDetails = new ArrayList<>();
-        final List<CaseTypeResults> caseTypeResults = new ArrayList<>();
-        long totalHits = 0L;
+    private CaseSearchResult toCaseDetailsSearchResult(MsearchResponse<ElasticSearchCaseDetailsDTO> multiSearchResult,
+                                                       CrossCaseTypeSearchRequest request) {
+        List<CaseDetails> allCaseDetails = new ArrayList<>();
+        List<CaseTypeResults> caseTypeResults = new ArrayList<>();
+        long total = 0;
 
-        for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
-            if (response.isError) {
-                JsonObject errorObject = response.error.getAsJsonObject();
-                String errMsg = errorObject.toString();
-                log.error("Elasticsearch query execution error: {}", errMsg);
-                if (errorObject.has(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE)) {
-                    errMsg = errorObject.get(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE).toString();
-                }
-                throw new BadSearchRequest(errMsg);
+        for (MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> response : multiSearchResult.responses()) {
+            if (response.isFailure()) {
+                String errorMsg = Optional.ofNullable(response.failure())
+                    .map(e -> e.error() + " [" + e.status() + "]")
+                    .orElse("Unknown search failure");
+                log.error("Elasticsearch search error: {}", errorMsg);
+                throw new BadSearchRequest(errorMsg);
             }
-            if (response.searchResult != null) {
-                buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
-                caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits += new JestSearchResult(response.searchResult).getTotal();
+
+            var result = response.result();
+            if (result == null || result.hits() == null || result.hits().hits() == null) {
+                log.warn("No hits found for index: {}", "");
+                continue;
+            }
+            assert result.hits().total() != null;
+            total += result.hits().total().value();
+            List<Hit<ElasticSearchCaseDetailsDTO>> hits = result.hits().hits();
+            if (!hits.isEmpty()) {
+                String indexName = hits.getFirst().index();
+                String caseTypeId = request.getSearchIndex().isEmpty()
+                    ? getCaseTypeIDFromIndex(indexName, request.getCaseTypeIds())
+                    : null;
+
+                List<ElasticSearchCaseDetailsDTO> dtos = hits.stream()
+                    .map(Hit::source)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+                List<CaseDetails> mapped = caseDetailsMapper.dtosToCaseDetailsList(dtos);
+                allCaseDetails.addAll(mapped);
+
+                long count = Optional.ofNullable(result.hits().total())
+                    .map(TotalHits::value)
+                    .orElse((long) mapped.size());
+
+                caseTypeResults.add(new CaseTypeResults(caseTypeId, count));
             }
         }
 
-        return new CaseSearchResult(totalHits, caseDetails, caseTypeResults);
-    }
-
-    private void buildCaseTypesResults(
-        MultiSearchResult.MultiSearchResponse response,
-        List<CaseTypeResults> caseTypeResults,
-        CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
-        if (hitsIsNotEmpty(response)) {
-            String caseTypeId = null;
-
-            // NB: bypass case type lookup if using a single search index (required for GlobalSearch)
-            if (crossCaseTypeSearchRequest.getSearchIndex().isEmpty()) {
-                String indexName = getIndexName(response);
-                caseTypeId = getCaseTypeIDFromIndex(indexName, crossCaseTypeSearchRequest.getCaseTypeIds());
-            }
-
-            caseTypeResults.add(new CaseTypeResults(caseTypeId,
-                new JestSearchResult(response.searchResult).getTotal()));
-        }
-    }
-
-    private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
-        String quotedIndexName =  response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
-            .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
-        return quotedIndexName.replaceAll("\"", "");
-    }
-
-    private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
-        return response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS).getAsJsonArray().size() != 0;
+        return new CaseSearchResult(total, allCaseDetails, caseTypeResults);
     }
 
     private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
@@ -190,20 +183,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             throw new ServiceException("Cannot determine case type id from ES index name - cannot extract"
                 + " case type id");
         }
-    }
-
-    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
-        List<String> casesAsString = searchResult.getSourceAsStringList();
-        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
-    }
-
-    private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {
-        return cases
-            .stream()
-            .map(Unchecked.function(caseDetail
-                -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
-            .collect(toList());
     }
 
     private String getCaseIndexName(String caseTypeId) {
