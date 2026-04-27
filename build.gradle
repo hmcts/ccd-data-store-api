@@ -3,18 +3,18 @@ plugins {
     id 'jacoco'
     id 'idea'
     id 'eclipse'
-    id 'org.springframework.boot' version '3.5.13'
-    id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'org.springframework.boot' version '3.5.14'
+    id 'com.github.ben-manes.versions' version '0.54.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '6.3.1.5724'
     id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
-    id 'info.solidsoft.pitest' version '1.15.0'
+    id 'info.solidsoft.pitest' version '1.19.0'
     id 'uk.gov.hmcts.java' version '0.12.68'
-    id 'au.com.dius.pact' version '4.6.20'
+    id 'au.com.dius.pact' version '4.7.0'
     id 'org.jsonschema2pojo' version '1.2.2'
-    id 'org.owasp.dependencycheck' version '12.2.0'
+    id 'org.owasp.dependencycheck' version '12.2.1'
 }
 
 def versions = [
@@ -22,7 +22,7 @@ def versions = [
 ]
 
 ext {
-    set('springCloudVersion', '2025.0.1')
+    set('springCloudVersion', '2025.1.1')
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
@@ -32,15 +32,15 @@ ext {
     junitPlatform = '1.14.3'
     jjwt = '0.13.0'
     appInsightsVersion = '2.6.4'
-    pactProviderVersion = '4.6.20'
-    lombokVersion = '1.18.44'
+    pactProviderVersion = '4.7.0'
+    lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
     elasticVersion = '8.16.2'
     testContainersVersion = '1.21.4'
     cucumber = '7.34.3'
     beftaFwVersion = '9.2.4'
-    ccdTestDefinitionVersion = '7.25.4'
+    ccdTestDefinitionVersion = '7.26.2'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -64,7 +64,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.7'
+        force 'net.bytebuddy:byte-buddy:1.18.8'
     }
 }
 
@@ -202,11 +202,11 @@ configurations {
 }
 
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
-tasks.withType(Checkstyle).configureEach {
+tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
-tasks.withType(Test).configureEach {
+tasks.withType(Test) {
     maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6 as int
 
     useJUnitPlatform()
@@ -216,7 +216,7 @@ tasks.withType(Test).configureEach {
     }
 }
 
-tasks.register('integration', Test) {
+task integration(type: Test) {
     description = "Runs integration tests"
     group = "Verification"
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -262,7 +262,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '4.3.2'
     implementation group: 'org.springframework.hateoas', name: 'spring-hateoas'
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -274,16 +274,16 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.16'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.1'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
@@ -298,9 +298,9 @@ dependencies {
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.2'
-    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.1'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.2'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
@@ -323,7 +323,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.0'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
@@ -332,6 +332,7 @@ dependencies {
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:4.3.3'
 
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
@@ -425,7 +426,7 @@ pitest {
 
 project.tasks['pitest'].group = "Verification"
 
-tasks.register('projectVersion') {
+task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
@@ -642,7 +643,7 @@ jacocoTestReport {
         def report = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         logger.lifecycle("Checking coverage results: ${report}")
 
-        def parser = new XmlParser()
+        def parser = new groovy.xml.XmlParser()
         parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
@@ -730,7 +731,7 @@ test {
 
 check.dependsOn jacocoTestReport
 
-tasks.register('fortifyScan', JavaExec) {
+task fortifyScan(type: JavaExec)  {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -746,15 +747,17 @@ tasks.register('definitionSpreadsheetHarness', JavaExec) {
 
 idea {
   module {
-    // config to allow Intelij to mark test source and resource files correctly to help linting tools
-    testSourceDirs += project.sourceSets.aat.java.srcDirs
-    testSourceDirs += project.sourceSets.contractTest.java.srcDirs
-    testResourceDirs += project.sourceSets.aat.resources.srcDirs
-    testResourceDirs += project.sourceSets.contractTest.resources.srcDirs
+      // config to allow IntelliJ to mark test source and resource files correctly to help linting tools
+      testSources.from(project.sourceSets.aat.java.srcDirs)
+      testSources.from(project.sourceSets.contractTest.java.srcDirs)
+      testSources.from(project.sourceSets.supportTools.java.srcDirs)
+      testResources.from(project.sourceSets.aat.resources.srcDirs)
+      testResources.from(project.sourceSets.contractTest.resources.srcDirs)
+      testResources.from(project.sourceSets.supportTools.resources.srcDirs)
   }
 }
 
-tasks.register('highLevelDataSetup', JavaExec) {
+task highLevelDataSetup(type: JavaExec) {
     dependsOn aatClasses
 
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
@@ -762,7 +765,7 @@ tasks.register('highLevelDataSetup', JavaExec) {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-tasks.register('smoke') {
+task smoke(type: JavaExec) {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
 
@@ -772,19 +775,15 @@ tasks.register('smoke') {
         into "$buildDir/test-results/test"
     }
 
-    doLast {
-        generateCucumberReports.enabled = true
-        javaexec {
-            mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-                    '--tags', '@Smoke and not @Ignore',
-                    '--glue', 'uk.gov.hmcts.befta.player',
-                    '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
-            jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-        }
-    }
+    generateCucumberReports.enabled = true
+    mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+    args = ['--plugin', "json:${rootDir}/target/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
+            '--tags', '@Smoke and not @Ignore',
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+    jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
     finalizedBy {
         generateCucumberReports {
@@ -802,7 +801,7 @@ tasks.register('smoke') {
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
 
-tasks.register('functional', JavaExec) {
+task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
@@ -848,7 +847,7 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-tasks.register('runProviderPactVerification', Test) {
+task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
@@ -874,13 +873,13 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
-tasks.register('reloadEnvSecretsDemo') {
+task reloadEnvSecretsDemo {
     doFirst {
         reloadEnvSecrets("demo")
     }
 }
 
-tasks.register('reloadEnvSecretsAAT') {
+task reloadEnvSecretsAAT {
     doFirst {
         reloadEnvSecrets("aat")
     }
@@ -892,7 +891,7 @@ void reloadEnvSecrets(String env) {
     }
 }
 
-tasks.register('runRemoteDemo', JavaExec) {
+task runRemoteDemo(type: JavaExec) {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {
@@ -900,7 +899,7 @@ tasks.register('runRemoteDemo', JavaExec) {
     }
 }
 
-tasks.register('runRemoteAAT', JavaExec) {
+task runRemoteAAT(type: JavaExec) {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
     classpath = sourceSets.main.runtimeClasspath
     doFirst() {

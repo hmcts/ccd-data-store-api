@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
  * Harness that inspects a definition spreadsheet and reports whether
  * specific fields are readable for the supplied roles on a supplied event.
  * If readable, the field will be returned.
+ *
  * <p>Required system properties (parameters):</p>
  * <ul>
  *   <li>{@code -Ddefinition.file}: absolute or relative path to the definition XLSX.</li>
@@ -43,7 +44,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
  * -Ddefinition.file=/ccd-appeal-config-preview-pr3017.xlsx
  * -Droles=caseworker-ia-admofficer,hmcts-admin
  * -Devent.id=editAppealAfterSubmit
- * <p/>
+ *
  * <p>Process:</p>
  * <ol>
  *   <li>Load the {@code CaseEventToFields}, {@code AuthorisationCaseField}, and
@@ -54,6 +55,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
  *       {@code AuthorisationCaseField} CRUD.</li>
  *   <li>Emit one decision per evaluated pair and fail if any decision is not returned.</li>
  * </ol>
+ *
  * <p>Exit codes:</p>
  * <ul>
  *   <li>{@code 0}: all decisions returned.</li>
