@@ -102,6 +102,22 @@ application {
 }
 
 sourceSets {
+    supportTools {
+        java {
+            srcDir('src/support-tools/java')
+            compileClasspath += main.output + main.compileClasspath
+            runtimeClasspath += main.output + main.runtimeClasspath
+        }
+        resources {
+            srcDir('src/support-tools/resources')
+        }
+    }
+
+    test {
+        compileClasspath += sourceSets.supportTools.output
+        runtimeClasspath += sourceSets.supportTools.output
+    }
+
     aat {
         java {
             srcDir('src/aat/java')
@@ -176,6 +192,8 @@ configurations {
     integrationTestImplementation.extendsFrom(testImplementation)
     integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
+    supportToolsCompileOnly.extendsFrom(compileOnly)
+    supportToolsAnnotationProcessor.extendsFrom(annotationProcessor)
 
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
@@ -288,6 +306,7 @@ dependencies {
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
     implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.0'
 
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
@@ -297,7 +316,7 @@ dependencies {
     testImplementation libraries.junit5
     testImplementation libs.mockito
     mockitoAgent(libs.mockito) {
-        transitive = false;
+        transitive = false
     }
     testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
@@ -625,7 +644,7 @@ jacocoTestReport {
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new groovy.xml.XmlParser()
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
         def results = parser.parse(report)
 
@@ -718,13 +737,23 @@ task fortifyScan(type: JavaExec)  {
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
+tasks.register('definitionSpreadsheetHarness', JavaExec) {
+    group = "verification"
+    description = "Runs the definition spreadsheet harness via main()."
+    dependsOn supportToolsClasses
+    mainClass = "uk.gov.hmcts.ccd.tools.DefinitionSpreadsheetHarness"
+    classpath = sourceSets.supportTools.runtimeClasspath
+}
+
 idea {
   module {
-      // config to allow InteliJ to mark test source and resource files correctly to help linting tools
+      // config to allow IntelliJ to mark test source and resource files correctly to help linting tools
       testSources.from(project.sourceSets.aat.java.srcDirs)
       testSources.from(project.sourceSets.contractTest.java.srcDirs)
+      testSources.from(project.sourceSets.supportTools.java.srcDirs)
       testResources.from(project.sourceSets.aat.resources.srcDirs)
       testResources.from(project.sourceSets.contractTest.resources.srcDirs)
+      testResources.from(project.sourceSets.supportTools.resources.srcDirs)
   }
 }
 
@@ -758,7 +787,7 @@ task smoke(type: JavaExec) {
 
     finalizedBy {
         generateCucumberReports {
-            doLast{
+            doLast {
                 delete "${rootDir}/BEFTA Report for Smoke Tests/"
                 new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
@@ -798,7 +827,7 @@ task functional(type: JavaExec) {
     finalizedBy {
         generateCucumberReports.enabled = true
         generateCucumberReports {
-            doLast{
+            doLast {
                 delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
@@ -894,6 +923,13 @@ void configRemoteRunTask(Task execTask, String env) {
         def value = it.substring(index + 1)
         execTask.environment(key, value)
     }
+}
+
+tasks.named('definitionSpreadsheetHarness', JavaExec) {
+    systemProperty 'definition.file', project.findProperty('definition.file')
+    systemProperty 'roles', project.findProperty('roles')
+    systemProperty 'target.fields', project.findProperty('target.fields')
+    systemProperty 'event.id', project.findProperty('event.id')
 }
 
 void loadEnvSecrets(String env) {
