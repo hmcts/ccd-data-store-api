@@ -12,7 +12,7 @@
   "request": {
     "body": {
       "request": {
-        "method": "POST",
+        "method": "GET",
         "urlPath": "/document_hash_callback",
         "headers": {
           "request-id": {
@@ -51,7 +51,7 @@
       "id": "[[ANY_STRING_NOT_NULLABLE]]",
       "request": {
         "urlPath": "/document_hash_callback",
-        "method": "POST",
+        "method": "GET",
         "headers": {
           "request-id": {
             "equalTo": "S-1041-${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
