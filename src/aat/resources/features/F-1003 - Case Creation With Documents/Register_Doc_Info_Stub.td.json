@@ -13,7 +13,12 @@
     "body": {
       "request": {
         "method": "POST",
-        "urlPath": "/document_hash_callback"
+        "urlPath": "/document_hash_callback",
+        "headers": {
+          "request-id": {
+            "equalTo": "S-1041-${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
+          }
+        }
       },
       "response": {
         "status": 200,
@@ -46,7 +51,12 @@
       "id": "[[ANY_STRING_NOT_NULLABLE]]",
       "request": {
         "urlPath": "/document_hash_callback",
-        "method": "POST"
+        "method": "POST",
+        "headers": {
+          "request-id": {
+            "equalTo": "S-1041-${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
+          }
+        }
       },
       "response": {
         "status": 200,
