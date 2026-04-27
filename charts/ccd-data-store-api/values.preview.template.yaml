@@ -157,6 +157,8 @@ elasticsearch:
   imageTag: 9.2.3
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
+  createCert: false
+  protocol: http
   replicas: 1
   roles: []
   minimumMasterNodes: 1
