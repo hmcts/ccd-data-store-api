@@ -181,6 +181,21 @@ public class AppInsightsTest {
     }
 
     @Test
+    public void trackTrace_shouldCallTrackTrace() {
+
+        // ARRANGE
+        String message = "Test trace";
+        Map<String, String> customProperties = new HashMap<>();
+        customProperties.put("test1", "Test property 1");
+
+        // ACT
+        classUnderTest.trackTrace(message, customProperties, SeverityLevel.Warning);
+
+        // ASSERT
+        verify(telemetryClient, times(1)).trackTrace(message, SeverityLevel.Warning, customProperties);
+    }
+
+    @Test
     public void trackDependency_simple_shouldCallTrackDependency_successfulDependency() {
 
         // ARRANGE
