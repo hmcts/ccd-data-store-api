@@ -17,10 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static java.util.Collections.emptyMap;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_HASH;
 
 @Named
+@Slf4j
 public class CaseDocumentService {
     private final CaseService caseService;
     private final CaseDocumentUtils caseDocumentUtils;
@@ -74,6 +77,10 @@ public class CaseDocumentService {
             postCallbackDocs
         );
 
+        log.info("Extracted document hashes for attach-to-case: databaseDocs={} eventDocs={} postCallbackDocs={} "
+                + "documentHashTokens={}",
+            dbDocs, eventDocs, postCallbackDocs, documentHashTokens);
+
         validate(documentHashTokens);
 
         return documentHashTokens;
@@ -100,6 +107,8 @@ public class CaseDocumentService {
                 .jurisdictionId(jurisdictionId)
                 .documentHashTokens(documentHashes)
                 .build();
+
+            log.info("Sending attach-to-case metadata: {}", documentMetadata);
 
             caseDocumentAmApiClient.applyPatch(documentMetadata);
         }

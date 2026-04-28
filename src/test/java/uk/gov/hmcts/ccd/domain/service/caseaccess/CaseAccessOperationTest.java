@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.ProfessionalReferenceDataOrganisationRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -29,9 +30,12 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import java.util.ArrayList;
@@ -53,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -107,10 +110,16 @@ class CaseAccessOperationTest {
     private ApplicationParams applicationParams;
 
     @Mock
+    private CaseAccessService caseAccessService;
+
+    @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Mock
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
+    @Mock
+    private ProfessionalReferenceDataOrganisationRepository professionalReferenceDataOrganisationRepository;
 
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
@@ -129,6 +138,9 @@ class CaseAccessOperationTest {
             );
             return null;
         }).when(supplementaryDataUpdateOperation).updateSupplementaryData(anyString(), any());
+        when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+            .thenReturn(Optional.empty());
+        when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(false);
     }
 
 
@@ -732,6 +744,8 @@ class CaseAccessOperationTest {
         @BeforeEach
         void setUp() {
             configureCaseRepository(null);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
         }
 
         @Test
@@ -748,6 +762,155 @@ class CaseAccessOperationTest {
 
             verifyNoInteractions(caseUserRepository);
             verifyNoInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("should reject request organisation when it does not match caller organisation")
+        void shouldRejectRequestOrganisationMismatch() {
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE,
+                    ORGANISATION_OTHER)
+            );
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+
+            assertEquals(V2.Error.ORGANISATION_ID_MISMATCH, exception.getMessage());
+            verifyNoInteractions(caseUserRepository, roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("should accept same organisation request and use caller organisation")
+        void shouldAcceptSameOrganisationRequest() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
+        @DisplayName("should use caller organisation and increment count when organisation is omitted")
+        void shouldUseCallerOrganisationAndIncrementCountWhenOrganisationOmitted() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
+        @DisplayName("RA set to true, should use caller organisation and increment count when organisation is omitted")
+        void shouldUseCallerOrganisationAndIncrementCountWhenOrganisationOmittedForRA() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.of(ORGANISATION));
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
+            );
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
+        @DisplayName("should reject restricted caller when PRD organisation is unavailable")
+        void shouldRejectRestrictedCallerWhenPrdOrganisationUnavailable() {
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.empty());
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+
+            assertEquals(V2.Error.ORGANISATION_ID_MISMATCH, exception.getMessage());
+            verifyNoInteractions(caseUserRepository, roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("should keep explicit organisation for unrestricted caller when PRD organisation is unavailable")
+        void shouldKeepExplicitOrganisationForUnrestrictedCallerWhenPrdOrganisationUnavailable() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(false);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.empty());
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(supplementaryDataUpdateOperation)
+                .updateSupplementaryData(eq(CASE_REFERENCE.toString()),
+                    argThat(request -> request.getOperationProperties(SupplementaryDataOperation.INC)
+                        .containsKey(getOrgUserCountSupDataKey(ORGANISATION))));
+        }
+
+        @Test
+        @DisplayName("should keep omitted organisation for unrestricted caller when PRD organisation is unavailable")
+        void shouldKeepOmittedOrganisationForUnrestrictedCallerWhenPrdOrganisationUnavailable() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(false);
+            when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                .thenReturn(Optional.empty());
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
         }
 
         @Test
@@ -1424,11 +1587,12 @@ class CaseAccessOperationTest {
         }
 
         @Test
-        @DisplayName("should increment organisation user count for multiple new case-user relationship")
-        void shouldIncrementOrganisationUserCountForMultipleNewRelationships() {
+        @DisplayName("should reject multiple organisation request when caller organisation is fixed")
+        void shouldRejectMultipleOrganisationRequestWhenCallerOrganisationIsFixed() {
 
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // CASE_REFERENCE/CASE_ID
@@ -1461,37 +1625,20 @@ class CaseAccessOperationTest {
                 createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
             ));
 
-            // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
 
-            // ASSERT
-            // verify CASE_REFERENCE/CASE_ID
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 2L);
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
-                    2L);
-
-            // verify CASE_REFERENCE_OTHER/CASE_ID_OTHER (NB: only 1 user per org: 2nd org has no new relationships)
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE_OTHER.toString(), getOrgUserCountSupDataKey(ORGANISATION),
-                    1L);
-            verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
-                .incrementSupplementaryData(
-                    eq(CASE_REFERENCE_OTHER.toString()),
-                    eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
-                    anyLong()
-                );
-
-            verifyNoInteractions(roleAssignmentService);
+            assertEquals(V2.Error.ORGANISATION_ID_MISMATCH, exception.getMessage());
+            verifyNoInteractions(caseUserRepository, roleAssignmentService);
         }
 
         @Test
-        @DisplayName("RA set to true, should increment organisation user count for multiple new case-user relationship")
-        void shouldIncrementOrganisationUserCountForMultipleNewRelationshipsForRA() {
+        @DisplayName("RA set to true, should reject multiple organisation request when caller organisation is fixed")
+        void shouldRejectMultipleOrganisationRequestWhenCallerOrganisationIsFixedForRA() {
 
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // CASE_REFERENCE/CASE_ID
@@ -1524,27 +1671,11 @@ class CaseAccessOperationTest {
                 new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE_OTHER)
             ));
 
-            // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
 
-            // ASSERT
-            // verify CASE_REFERENCE/CASE_ID
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 2L);
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
-                    2L);
-
-            // verify CASE_REFERENCE_OTHER/CASE_ID_OTHER (NB: only 1 user per org: 2nd org has no new relationships)
-            verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE_OTHER.toString(), getOrgUserCountSupDataKey(ORGANISATION),
-                    1L);
-            verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
-                .incrementSupplementaryData(
-                    eq(CASE_REFERENCE_OTHER.toString()),
-                    eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
-                    anyLong()
-                );
+            assertEquals(V2.Error.ORGANISATION_ID_MISMATCH, exception.getMessage());
+            verifyNoInteractions(caseUserRepository, roleAssignmentService);
         }
 
     }

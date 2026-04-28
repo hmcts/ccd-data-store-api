@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseHistoryRoleAccessException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -146,7 +147,9 @@ class AuthorisedGetCaseHistoryViewOperationTest {
             .generateAccessProfilesByCaseReference(anyString());
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
-        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(
+            CASE_REFERENCE
+        );
 
         authorisedGetCaseHistoryViewOperation =
                 new uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation(
@@ -185,7 +188,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         assertThat(caseHistoryView, CoreMatchers.is(TEST_CASE_HISTORY_VIEW));
         verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
+        verify(caseDetailsRepository).findByReferenceWithNoAccessControl(CASE_REFERENCE);
         verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE);
         verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
     }
@@ -247,6 +250,19 @@ class AuthorisedGetCaseHistoryViewOperationTest {
             () -> assertThat(actualCaseView.getTabs().length, is(1)),
             () -> assertEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
         );
+    }
+
+    @Test
+    @DisplayName("should throw forbidden for external user case history access")
+    void shouldThrowForbiddenForExternalUserCaseHistoryAccess() {
+        doReturn(true).when(accessControlService)
+            .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
+        doReturn(true).when(caseAccessService).isExternalUser();
+
+        assertThrows(CaseHistoryRoleAccessException.class,
+            () -> authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
+
+        verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
     }
 
     @Test
