@@ -51,7 +51,7 @@ class CaseServiceTest {
     private static final String JURISDICTION = "SSCS";
     private static final String STATE = "CreatedState";
     private static final String CASE_REFERENCE = "1234123412341236";
-    private static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
+    private static final String REFERENCE = CASE_REFERENCE;
     private static final String DATA_PERSON = "Person";
     private static final String DATA_NAMES = "Names";
     private static final String DATA_FNAME = "FirstName";

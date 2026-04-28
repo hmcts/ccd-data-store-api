@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,7 +51,7 @@ class DelegatingSupplementaryDataUpdateOperationTest {
         SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
         SupplementaryData expected = new SupplementaryData();
 
-        when(persistenceResolver.isDecentralised(Long.valueOf(CASE_REFERENCE))).thenReturn(false);
+        when(persistenceResolver.isDecentralised(CASE_REFERENCE)).thenReturn(false);
         when(defaultSupplementaryDataUpdateOperation.updateSupplementaryData(CASE_REFERENCE, request))
             .thenReturn(expected);
 
@@ -61,7 +60,7 @@ class DelegatingSupplementaryDataUpdateOperationTest {
         assertSame(expected, result);
         verify(defaultSupplementaryDataUpdateOperation).updateSupplementaryData(CASE_REFERENCE, request);
         verify(servicePersistenceClient, never())
-            .updateSupplementaryData(anyLong(), any(SupplementaryDataUpdateRequest.class));
+            .updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class));
     }
 
     @Test
@@ -71,8 +70,8 @@ class DelegatingSupplementaryDataUpdateOperationTest {
         );
         ObjectNode responseNode = JsonNodeFactory.instance.objectNode().put("fieldA", 10);
 
-        when(persistenceResolver.isDecentralised(Long.valueOf(CASE_REFERENCE))).thenReturn(true);
-        when(servicePersistenceClient.updateSupplementaryData(Long.valueOf(CASE_REFERENCE), request))
+        when(persistenceResolver.isDecentralised(CASE_REFERENCE)).thenReturn(true);
+        when(servicePersistenceClient.updateSupplementaryData(CASE_REFERENCE, request))
             .thenReturn(responseNode);
 
         SupplementaryData result = delegatingOperation.updateSupplementaryData(CASE_REFERENCE, request);
@@ -80,7 +79,7 @@ class DelegatingSupplementaryDataUpdateOperationTest {
 
         // Responses should contain just the keys and values that were updated
         assertEquals(Map.of("fieldA", 10), result.getResponse());
-        verify(servicePersistenceClient).updateSupplementaryData(Long.valueOf(CASE_REFERENCE), request);
+        verify(servicePersistenceClient).updateSupplementaryData(CASE_REFERENCE, request);
         verify(defaultSupplementaryDataUpdateOperation, never())
             .updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class));
     }

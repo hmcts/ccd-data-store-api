@@ -41,7 +41,7 @@ class CaseDetailsQueryBuilderFactoryTest {
     private CriteriaQuery<CaseDetailsEntity> query;
 
     @Mock
-    private CriteriaQuery<Long> countQuery;
+    private CriteriaQuery<String> countQuery;
 
     @Mock
     private Root<CaseDetailsEntity> root;
@@ -58,7 +58,7 @@ class CaseDetailsQueryBuilderFactoryTest {
 
         when(em.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         when(criteriaBuilder.createQuery(CaseDetailsEntity.class)).thenReturn(query);
-        when(criteriaBuilder.createQuery(Long.class)).thenReturn(countQuery);
+        when(criteriaBuilder.createQuery(String.class)).thenReturn(countQuery);
         when(query.from(CaseDetailsEntity.class)).thenReturn(root);
         when(countQuery.from(CaseDetailsEntity.class)).thenReturn(root);
     }
@@ -127,7 +127,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @DisplayName("should secure count query")
         void shouldSecureCountQuery() {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
-            CaseDetailsQueryBuilder<Long> queryBuilder = factory.count(em, metaData);
+            CaseDetailsQueryBuilder<String> queryBuilder = factory.count(em, metaData);
 
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
@@ -191,7 +191,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @Test
         @DisplayName("should selectByReferenceSecured query")
         void shouldSecureSelectByReferenceQuery() {
-            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            CaseDetailsQueryBuilder<String> queryBuilder = factory.selectByReferenceSecured(em);
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
                 () -> verify(userAuthorisationSecurity).secure(queryBuilder, null),
@@ -206,7 +206,7 @@ class CaseDetailsQueryBuilderFactoryTest {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
             metaData.setSortDirection(Optional.of(sortDirection));
 
-            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            CaseDetailsQueryBuilder<String> queryBuilder = factory.selectByReferenceSecured(em);
             queryBuilder.orderBy(metaData);
 
             assertAll(

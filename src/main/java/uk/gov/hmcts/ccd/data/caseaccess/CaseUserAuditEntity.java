@@ -29,7 +29,7 @@ public class CaseUserAuditEntity {
         sequenceName = "case_users_audit_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = "case_data_id")
-    private long caseDataId;
+    private String caseDataId;
     @Column(name = "user_id")
     private String userId;
     @Column(name = "case_role")
@@ -50,11 +50,11 @@ public class CaseUserAuditEntity {
         this.id = id;
     }
 
-    public long getCaseDataId() {
+    public String getCaseDataId() {
         return caseDataId;
     }
 
-    public void setCaseDataId(long caseDataId) {
+    public void setCaseDataId(String caseDataId) {
         this.caseDataId = caseDataId;
     }
 

@@ -21,7 +21,7 @@ public class LocalAuditEventLoader implements AuditEventLoader {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, Long eventId) {
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String eventId) {
         return auditEventRepository.findByEventId(eventId);
     }
 }

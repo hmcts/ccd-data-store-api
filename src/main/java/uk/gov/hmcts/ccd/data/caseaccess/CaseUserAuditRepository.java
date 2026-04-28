@@ -22,15 +22,15 @@ public class CaseUserAuditRepository {
     @Inject
     private SecurityUtils securityUtils;
 
-    public void auditGrant(Long caseId, String userId, String caseRole) {
+    public void auditGrant(String caseId, String userId, String caseRole) {
         em.persist(getEntity(caseId, userId, caseRole, GRANT));
     }
 
-    public void auditRevoke(Long caseId, String userId, String caseRole) {
+    public void auditRevoke(String caseId, String userId, String caseRole) {
         em.persist(getEntity(caseId, userId, caseRole, REVOKE));
     }
 
-    private CaseUserAuditEntity getEntity(Long caseId, String userId, String caseRole, Action action) {
+    private CaseUserAuditEntity getEntity(String caseId, String userId, String caseRole, Action action) {
         CaseUserAuditEntity entity = new CaseUserAuditEntity();
         entity.setCaseDataId(caseId);
         entity.setUserId(userId);
