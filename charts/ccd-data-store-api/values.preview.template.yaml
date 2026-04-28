@@ -160,7 +160,6 @@ elasticsearch:
   createCert: false
   protocol: http
   replicas: 1
-  roles: []
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
@@ -170,11 +169,8 @@ elasticsearch:
     enabled: false
   esConfig:
     elasticsearch.yml: |
-      discovery.type: single-node
       action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,ccd-logstash-dead-letter
       xpack.security.enabled: false
-      xpack.security.http.ssl.enabled: false
-      xpack.security.transport.ssl.enabled: false
   persistence:
     enabled: false
   ingress:
