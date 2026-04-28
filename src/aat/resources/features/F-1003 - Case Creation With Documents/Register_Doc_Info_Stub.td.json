@@ -12,7 +12,7 @@
   "request": {
     "body": {
       "request": {
-        "method": "GET",
+        "method": "POST",
         "urlPath": "/document_hash_callback"
       },
       "response": {
@@ -46,7 +46,7 @@
       "id": "[[ANY_STRING_NOT_NULLABLE]]",
       "request": {
         "urlPath": "/document_hash_callback",
-        "method": "GET"
+        "method": "POST"
       },
       "response": {
         "status": 200,
