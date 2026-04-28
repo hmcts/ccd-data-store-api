@@ -28,7 +28,7 @@ ext {
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
-    set('jacksonVersion', '2.16.0')
+    set('jacksonVersion', '2.19.2')
     set('snakeyaml.version', '2.2')
     junit = '5.14.3'
     junitPlatform = '1.14.3'
@@ -43,7 +43,6 @@ ext {
     cucumber = '7.34.3'
     beftaFwVersion = '9.2.4'
     ccdTestDefinitionVersion = '7.26.2'
-    smokeTestJacksonVersion = '2.19.4'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -189,7 +188,7 @@ configurations {
 configurations.matching { it.name in ['aatCompileClasspath', 'aatRuntimeClasspath', 'cucumberRuntime'] }.configureEach {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group?.startsWith('com.fasterxml.jackson')) {
-            details.useVersion smokeTestJacksonVersion
+            details.useVersion jacksonVersion
             details.because 'BEFTA 9.2.x still references PropertyNamingStrategy$SnakeCaseStrategy, removed in Jackson 2.20'
         }
     }
