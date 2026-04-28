@@ -63,6 +63,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -114,7 +115,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final String EVENT_ID = "UpdateCase";
     private static final String PRE_STATE_ID = "Created";
     private static final LocalDateTime LAST_MODIFIED = LocalDateTime.of(2015, 12, 21, 15, 30);
-    private static final int CASE_VERSION = 0;
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -236,6 +236,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails = new CaseDetails();
         caseDetails.setReference(Long.parseLong(CASE_REFERENCE));
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
@@ -635,12 +636,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
         CaseDetailsRepository defaultCaseDetailsRepository = mock(DefaultCaseDetailsRepository.class);
         doReturn(Optional.empty()).when(defaultCaseDetailsRepository)
             .findByReference(NON_EXISTENT_CASE_REFERENCE, false);
-        assertThrows(ResourceNotFoundException.class, () -> {
-            underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
-                ATTRIBUTE_PATH,
-                CATEGORY_ID,
-                new Event());
-        });
+        assertThrows(ResourceNotFoundException.class, () -> underTest.createCaseSystemEvent(NON_EXISTENT_CASE_REFERENCE,
+            ATTRIBUTE_PATH,
+            CATEGORY_ID,
+            new Event()));
 
         assertAll(
             () -> verify(caseTypeService, times(0)).findState(any(), any()),
@@ -678,6 +677,181 @@ class CreateCaseEventServiceTest extends TestFixtures {
             assertTrue(node.has(UPLOAD_TIMESTAMP));
         });
         assertEquals(1, countChanges.get());
+    }
+
+    @Test
+    @DisplayName("should only attach documents that are present in saved case data")
+    void shouldOnlyAttachDocumentsPresentInSavedCaseData() {
+        // GIVEN
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
+        final List<DocumentHashToken> verifiedDocumentHashes = List.of(HASH_TOKEN_A1);
+
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(verifiedDocumentHashes).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(allDocumentHashes, caseDetails.getData());
+        doReturn(true).when(applicationParams).isAttachDocumentEnabled();
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDocumentService).filterDocumentHashesAgainstSavedData(
+            allDocumentHashes, caseDetails.getData());
+        verify(caseDocumentService).attachCaseDocuments(
+            CASE_REFERENCE,
+            CASE_TYPE_ID,
+            JURISDICTION_ID,
+            verifiedDocumentHashes
+        );
+    }
+
+    @Test
+    @DisplayName("should not attach any documents when callback drops all document fields")
+    void shouldNotAttachDocumentsWhenCallbackDropsAllDocumentFields() {
+        // GIVEN - callback drops the document, so all document hashes are filtered out
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
+
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(List.of()).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(allDocumentHashes, caseDetails.getData());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDocumentService).filterDocumentHashesAgainstSavedData(
+            allDocumentHashes, caseDetails.getData());
+        verify(caseDocumentService).attachCaseDocuments(
+            CASE_REFERENCE,
+            CASE_TYPE_ID,
+            JURISDICTION_ID,
+            List.of()
+        );
+    }
+
+    @Test
+    @DisplayName("should attach all documents when all are present in saved case data")
+    void shouldAttachAllDocumentsWhenAllPresentInSavedCaseData() {
+        // GIVEN - all documents survive through callback and are saved
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
+
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(allDocumentHashes).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(allDocumentHashes, caseDetails.getData());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDocumentService).filterDocumentHashesAgainstSavedData(
+            allDocumentHashes, caseDetails.getData());
+        verify(caseDocumentService).attachCaseDocuments(
+            CASE_REFERENCE,
+            CASE_TYPE_ID,
+            JURISDICTION_ID,
+            allDocumentHashes
+        );
+    }
+
+    @Test
+    @DisplayName("should filter document hashes using saved case data not pre-save data")
+    void shouldFilterDocumentHashesUsingFinalSavedCaseDataNotPreSaveData() {
+        // GIVEN
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
+        final List<DocumentHashToken> verifiedDocumentHashes = List.of(HASH_TOKEN_A1);
+
+        // savedCaseDetails returned from repository after save
+        final CaseDetails savedCaseDetails = new CaseDetails();
+        savedCaseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+        savedCaseDetails.setCaseTypeId(CASE_TYPE_ID);
+        savedCaseDetails.setState(POST_STATE);
+        final Map<String, JsonNode> savedData = Map.of("savedKey", JSON_NODE_FACTORY.textNode("savedValue"));
+        savedCaseDetails.setData(savedData);
+
+        doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(verifiedDocumentHashes).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(allDocumentHashes, savedData);
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN - verify filter was called with the data from the repository response
+        // not from caseDetailsAfterCallbackWithoutHashes
+        verify(caseDocumentService).filterDocumentHashesAgainstSavedData(allDocumentHashes, savedData);
+        verify(caseDocumentService).attachCaseDocuments(
+            CASE_REFERENCE,
+            CASE_TYPE_ID,
+            JURISDICTION_ID,
+            verifiedDocumentHashes
+        );
+    }
+
+    @Test
+    @DisplayName("should call filterDocumentHashesAgainstSavedData before attachCaseDocuments")
+    void shouldCallFilterBeforeAttachCaseDocuments() {
+        // GIVEN
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1);
+        final List<DocumentHashToken> verifiedDocumentHashes = List.of(HASH_TOKEN_A1);
+
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(verifiedDocumentHashes).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(any(), any());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN - verify ordering: filter must be called before attach
+        final var inOrder = org.mockito.Mockito.inOrder(caseDocumentService);
+        inOrder.verify(caseDocumentService).filterDocumentHashesAgainstSavedData(any(), any());
+        inOrder.verify(caseDocumentService).attachCaseDocuments(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should call filterDocumentHashesAgainstSavedData after saveCaseDetails")
+    void shouldCallFilterAfterSaveCaseDetails() {
+        // GIVEN
+        final List<DocumentHashToken> allDocumentHashes = List.of(HASH_TOKEN_A1);
+
+        doReturn(allDocumentHashes).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(allDocumentHashes).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(any(), any());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN - verify ordering: save must happen before filter
+        final var inOrder = org.mockito.Mockito.inOrder(caseDetailsRepository, caseDocumentService);
+        inOrder.verify(caseDetailsRepository).set(any(CaseDetails.class));
+        inOrder.verify(caseDocumentService).filterDocumentHashesAgainstSavedData(any(), any());
+    }
+
+    @Test
+    @DisplayName("should not call filterDocumentHashesAgainstSavedData when no document hashes extracted")
+    void shouldNotCallFilterWhenNoDocumentHashesExtracted() {
+        // GIVEN
+        doReturn(List.of()).when(caseDocumentService).extractDocumentHashToken(
+            anyMap(), anyMap(), anyMap());
+        doReturn(List.of()).when(caseDocumentService)
+            .filterDocumentHashesAgainstSavedData(List.of(), caseDetails.getData());
+
+        // WHEN
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        // THEN
+        verify(caseDocumentService).filterDocumentHashesAgainstSavedData(List.of(), caseDetails.getData());
+        verify(caseDocumentService).attachCaseDocuments(
+            CASE_REFERENCE,
+            CASE_TYPE_ID,
+            JURISDICTION_ID,
+            List.of()
+        );
     }
 
     private CaseFieldDefinition buildDocumentCaseField(String id) {
