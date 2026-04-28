@@ -43,6 +43,10 @@ Primary code areas:
 1. Caller organisation source of truth:
 - Professional Reference Data external organisations-users endpoint
 - Implemented in Data Store directly, not via AAC
+- Response contract relied on by Data Store is intentionally narrow:
+  - `GET /refdata/external/v1/organisations/users`
+  - success-for-our-purpose requires a non-blank top-level `organisationIdentifier`
+  - `null` body, missing field, blank field, or request failure are all treated as caller organisation unavailable
 
 2. Case organisation source of truth:
 - `CaseAccessGroups` on the case
@@ -94,11 +98,20 @@ Add:
 - Add search regression coverage if search path is in scope
 
 Implemented coverage:
+- Repository tests cover:
+  - `organisationIdentifier` present
+  - PRD lookup failure
+  - `null` response body
+  - missing `organisationIdentifier`
+  - blank `organisationIdentifier`
 - Service tests cover:
   - explicit request org mismatch rejection
   - omitted `organisation_id` with PRD-present caller organisation
   - omitted `organisation_id` with PRD-unavailable restricted caller rejection
   - omitted `organisation_id` with PRD-unavailable unrestricted caller success
+- Controller/integration tests cover:
+  - restricted caller rejected when PRD returns `200` without `organisationIdentifier`
+  - unrestricted caller allowed when PRD returns `200` without `organisationIdentifier`
 - `CaseAccessServiceTest` documents the current role-classification behaviour for BEFTA Jurisdiction 2 solicitor
   suffix roles, proving they are treated as unrestricted by the current code.
 - `F-105` AAT coverage now maps to the implemented behaviour as follows:

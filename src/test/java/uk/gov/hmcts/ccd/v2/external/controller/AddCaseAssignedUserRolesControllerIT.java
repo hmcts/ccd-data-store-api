@@ -903,6 +903,32 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
         "classpath:sql/insert_cases_with_valid_case_ids.sql"
     })
+    @DisplayName("addCaseUserRoles: should reject restricted caller when PRD response has no organisation identifier")
+    void addCaseUserRoles_shouldRejectRestrictedCallerWhenPrdResponseHasNoOrganisationIdentifier() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
+        String userId = "8442-006a";
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1)
+        );
+        stubCurrentUserOrganisationResponse("{\"users\":[]}");
+
+        Exception exception = mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResolvedException();
+
+        assertNotNull(exception);
+        assertThat(exception.getMessage(), containsString(V2.Error.ORGANISATION_ID_MISMATCH));
+        assertEquals(0, caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId).size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
     @DisplayName("addCaseUserRoles: should allow unrestricted caller when PRD organisation lookup fails")
     void addCaseUserRoles_shouldAllowUnrestrictedCallerWhenPrdLookupFails() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
@@ -930,6 +956,63 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         );
         stubFor(WireMock.get(urlMatching("/refdata/external/v1/organisations/users"))
             .willReturn(aResponse().withStatus(500)));
+
+        final var supplementaryDataBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null);
+        final Object orgUserCountersBefore = supplementaryDataBefore.getResponse() == null
+            ? null
+            : supplementaryDataBefore.getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        final var supplementaryDataAfter = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null);
+        final Object orgUserCountersAfter = supplementaryDataAfter.getResponse() == null
+            ? null
+            : supplementaryDataAfter.getResponse().getOrDefault(ORGANISATION_ASSIGNED_USER_COUNTER_KEY, null);
+
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_EXTRA), userId);
+            assertEquals(1, caseRoles.size());
+            assertThat(caseRoles, hasItems(CASE_ROLE_1));
+        }
+
+        assertEquals(orgUserCountersBefore, orgUserCountersAfter);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName("addCaseUserRoles: should allow unrestricted caller when PRD response has no organisation identifier")
+    void addCaseUserRoles_shouldAllowUnrestrictedCallerWhenPrdResponseHasNoOrganisationIdentifier() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
+        String userId = "8442-007a";
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+
+            RoleAssignmentResource roleAssignment1 =
+                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_EXTRA, CASE_ROLE_1, userId);
+            RoleAssignmentRequestResponse roleAssignmentRequestResponse =
+                createRoleAssignmentRequestResponse(singletonList(roleAssignment1));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentRequestResponse))
+                    .withStatus(200)));
+
+            stubIdamRolesForUser(userId);
+            stubUserInfo(userId);
+        }
+
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1)
+        );
+        stubCurrentUserOrganisationResponse("{\"users\":[]}");
 
         final var supplementaryDataBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null);
         final Object orgUserCountersBefore = supplementaryDataBefore.getResponse() == null

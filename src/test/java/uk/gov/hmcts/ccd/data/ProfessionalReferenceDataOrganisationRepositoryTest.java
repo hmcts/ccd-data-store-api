@@ -72,4 +72,52 @@ class ProfessionalReferenceDataOrganisationRepositoryTest {
 
         assertTrue(organisationIdentifier.isEmpty());
     }
+
+    @Test
+    @DisplayName("should return empty when PRD response body is null")
+    void shouldReturnEmptyWhenPrdResponseBodyIsNull() {
+        when(applicationParams.getPrdApiUrl()).thenReturn(PRD_API_URL);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        when(restTemplate.exchange(eq(PRD_API_URL + "/refdata/external/v1/organisations/users"),
+            eq(HttpMethod.GET), any(HttpEntity.class), eq(com.fasterxml.jackson.databind.JsonNode.class)))
+            .thenReturn(ResponseEntity.ok(null));
+
+        Optional<String> organisationIdentifier = repository.getCurrentUserOrganisationIdentifier();
+
+        assertTrue(organisationIdentifier.isEmpty());
+    }
+
+    @Test
+    @DisplayName("should return empty when organisation identifier is missing")
+    void shouldReturnEmptyWhenOrganisationIdentifierMissing() {
+        ObjectNode response = new ObjectMapper().createObjectNode()
+            .put("users", "ignored");
+
+        when(applicationParams.getPrdApiUrl()).thenReturn(PRD_API_URL);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        when(restTemplate.exchange(eq(PRD_API_URL + "/refdata/external/v1/organisations/users"),
+            eq(HttpMethod.GET), any(HttpEntity.class), eq(com.fasterxml.jackson.databind.JsonNode.class)))
+            .thenReturn(ResponseEntity.ok(response));
+
+        Optional<String> organisationIdentifier = repository.getCurrentUserOrganisationIdentifier();
+
+        assertTrue(organisationIdentifier.isEmpty());
+    }
+
+    @Test
+    @DisplayName("should return empty when organisation identifier is blank")
+    void shouldReturnEmptyWhenOrganisationIdentifierBlank() {
+        ObjectNode response = new ObjectMapper().createObjectNode()
+            .put("organisationIdentifier", "   ");
+
+        when(applicationParams.getPrdApiUrl()).thenReturn(PRD_API_URL);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        when(restTemplate.exchange(eq(PRD_API_URL + "/refdata/external/v1/organisations/users"),
+            eq(HttpMethod.GET), any(HttpEntity.class), eq(com.fasterxml.jackson.databind.JsonNode.class)))
+            .thenReturn(ResponseEntity.ok(response));
+
+        Optional<String> organisationIdentifier = repository.getCurrentUserOrganisationIdentifier();
+
+        assertTrue(organisationIdentifier.isEmpty());
+    }
 }

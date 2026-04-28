@@ -185,6 +185,11 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
                 + "}").withStatus(200)));
     }
 
+    protected void stubCurrentUserOrganisationResponse(String responseBody) {
+        stubFor(WireMock.get(urlMatching(PRD_ORGANISATIONS_USERS_PATH))
+            .willReturn(okJson(responseBody).withStatus(200)));
+    }
+
     protected void verifyAuditForAddCaseUserRoles(HttpStatus status,
                                                   List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
