@@ -49,7 +49,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
-                                            @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+                                            @Qualifier("defaultObjectMapper") ObjectMapper objectMapper,
                                             CaseDetailsMapper caseDetailsMapper,
                                             ApplicationParams applicationParams,
                                             CaseSearchRequestSecurity caseSearchRequestSecurity) {
