@@ -779,7 +779,7 @@ task verifyOidcIssuerPolicy {
 
 check.dependsOn verifyOidcIssuerPolicy
 
-task smoke() {
+task smoke(type: JavaExec) {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn 'aatClasses', 'verifyFunctionalTestJwtIssuer'
 
