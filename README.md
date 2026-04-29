@@ -32,6 +32,8 @@ The following environment variables are required:
 | DATA_STORE_S2S_AUTHORISED_SERVICES | ccd_gw | Authorised micro-service names for S2S calls |
 | IDAM_USER_URL | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance. |
 | IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
+| IDAM_OIDC_URL | - | Base URL for IdAM OIDC discovery and JWKS lookup. This is used to resolve the OpenID configuration and signing keys. |
+| OIDC_ISSUER | - | Enforced JWT issuer value. This must match the `iss` claim in real access tokens accepted by this service. Do not guess it; derive it from a real token for the target environment. |
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DOCUMENT_URL_PATTERN | - |  URL Pattern for documents attachable to cases. |
@@ -47,6 +49,11 @@ The following environment variables are required:
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
 | DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+
+`IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
+
+### Codex Workflow Docs
+Repo-local workflow docs are indexed in `AGENTS.md`.
 
 ### Building
 
