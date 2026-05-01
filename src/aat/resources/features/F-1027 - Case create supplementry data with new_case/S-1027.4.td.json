@@ -1,10 +1,10 @@
 {
-  "_guid_": "S-1026.4",
-  "_extends_": "F-1026_Test_Data_Base",
+  "_guid_": "S-1027.4",
+  "_extends_": "F-1027_Test_Data_Base",
   "title": "Invoke saveCaseDetailsForCaseWorkerUsingPOST where case_data has organisationProfile with newCase set to YES",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1026_GetCreateToken"
+      "Token_Creation": "S-1027_GetCreateToken"
     }
   ],
   "specs": [
