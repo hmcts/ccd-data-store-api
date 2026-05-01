@@ -33,7 +33,7 @@ java:
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     ELASTIC_SEARCH_ENABLED: true
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
@@ -92,7 +92,8 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1754
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -100,13 +101,14 @@ ccd:
       devcpuLimits: 4000m
       environment:
         DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-        ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
         DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
+        ELASTIC_SEARCH_SCHEME: http
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -151,8 +153,12 @@ elastic:
   enabled: true
 
 elasticsearch:
+  image: hmctsprod.azurecr.io/imported/elastic/elasticsearch
+  imageTag: 9.2.3
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
+  createCert: false
+  protocol: http
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
@@ -161,13 +167,10 @@ elasticsearch:
   # The tests do pass, at least as of 2023-01-19
   tests:
     enabled: false
-  extraEnvs:
-    - name: discovery.type
-      value: single-node
-    - name: cluster.initial_master_nodes
-      value: ""
-    - name: action.auto_create_index
-      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
+  esConfig:
+    elasticsearch.yml: |
+      action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,ccd-logstash-dead-letter
+      xpack.security.enabled: false
   persistence:
     enabled: false
   ingress:
@@ -178,14 +181,14 @@ elasticsearch:
     #     paths:
     #       - path: /
 logstash:
-  image: "hmctsprod.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  image: "hmctsprod.azurecr.io/imported/elastic/logstash"
+  imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctsprod.azurecr.io/curl:7.70.0
-      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
@@ -197,11 +200,12 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
-      http.host: 0.0.0.0
+      api.http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
       queue.type: persisted
       dead_letter_queue.enable: true
+      pipeline.ecs_compatibility: disabled
     pipelines.yml: |
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"

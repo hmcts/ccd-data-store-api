@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -33,6 +35,16 @@ public class ElasticsearchQueryHelper {
     private final ObjectMapperService objectMapperService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
+
+    private static final String FROM = "from";
+    private static final String GT = "gt";
+    private static final String GTE = "gte";
+    private static final String LT = "lt";
+    private static final String LTE = "lte";
+    private static final String INCLUDE_LOWER = "include_lower";
+    private static final String INCLUDE_UPPER = "include_upper";
+    private static final String RANGE = "range";
+    private static final String TO = "to";
 
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
@@ -67,8 +79,99 @@ public class ElasticsearchQueryHelper {
         } catch (ServiceException ex) {
             throw new BadRequestException("Request requires correctly formatted JSON, " + ex.getMessage());
         }
+        normaliseRangeQueries(searchRequestNode);
         validateSupplementaryData(searchRequestNode);
         return new ElasticsearchRequest(searchRequestNode);
+    }
+
+    private void normaliseRangeQueries(JsonNode node) {
+        if (node == null) {
+            return;
+        }
+
+        if (node.isObject()) {
+            ObjectNode objectNode = (ObjectNode) node;
+            JsonNode rangeNode = objectNode.get(RANGE);
+            if (rangeNode != null && rangeNode.isObject()) {
+                normaliseRangeObject((ObjectNode) rangeNode);
+            }
+
+            Iterator<JsonNode> elements = objectNode.elements();
+            while (elements.hasNext()) {
+                normaliseRangeQueries(elements.next());
+            }
+            return;
+        }
+
+        if (node.isArray()) {
+            for (JsonNode element : node) {
+                normaliseRangeQueries(element);
+            }
+        }
+    }
+
+    private void normaliseRangeObject(ObjectNode rangeNode) {
+        rangeNode.fieldNames().forEachRemaining(fieldName -> {
+            ObjectNode fieldObject = asObject(rangeNode.get(fieldName));
+            if (fieldObject == null) {
+                return;
+            }
+            applyRangeFieldUpdates(fieldObject);
+        });
+    }
+
+    private ObjectNode asObject(JsonNode node) {
+        if (node == null || !node.isObject()) {
+            return null;
+        }
+        return (ObjectNode) node;
+    }
+
+    private void applyRangeFieldUpdates(ObjectNode fieldObject) {
+        boolean hasFrom = fieldObject.has(FROM);
+        boolean hasTo = fieldObject.has(TO);
+        if (!hasFrom && !hasTo) {
+            return;
+        }
+
+        boolean includeLower = !fieldObject.has(INCLUDE_LOWER)
+            || fieldObject.get(INCLUDE_LOWER).asBoolean(true);
+        boolean includeUpper = !fieldObject.has(INCLUDE_UPPER)
+            || fieldObject.get(INCLUDE_UPPER).asBoolean(true);
+
+        if (hasFrom) {
+            setRangeValue(fieldObject, FROM, includeLower ? GTE : GT, GTE, GT);
+        }
+        if (hasTo) {
+            setRangeValue(fieldObject, TO, includeUpper ? LTE : LT, LTE, LT);
+        }
+
+        removeRangeMarkers(fieldObject, hasFrom, hasTo);
+    }
+
+    private void setRangeValue(ObjectNode fieldObject,
+                               String legacyKey,
+                               String targetKey,
+                               String inclusiveKey,
+                               String exclusiveKey) {
+        if (fieldObject.has(inclusiveKey) || fieldObject.has(exclusiveKey)) {
+            return;
+        }
+        JsonNode value = fieldObject.get(legacyKey);
+        if (value != null && !value.isNull()) {
+            fieldObject.set(targetKey, value);
+        }
+    }
+
+    private void removeRangeMarkers(ObjectNode fieldObject, boolean hasFrom, boolean hasTo) {
+        if (hasFrom) {
+            fieldObject.remove(FROM);
+        }
+        if (hasTo) {
+            fieldObject.remove(TO);
+        }
+        fieldObject.remove(INCLUDE_LOWER);
+        fieldObject.remove(INCLUDE_UPPER);
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {
