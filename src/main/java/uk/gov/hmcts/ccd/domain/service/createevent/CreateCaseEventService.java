@@ -349,7 +349,7 @@ public class CreateCaseEventService {
                                                        Event event) {
         final CaseDetails caseDetails = delegatingCaseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() ->
-            new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+                new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");

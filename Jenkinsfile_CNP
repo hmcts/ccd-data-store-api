@@ -132,10 +132,6 @@ withPipeline(type, product, component) {
             AppPipelineDsl.PactRoles.PROVIDER
         ])
     }
-    if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
-        enableSlackNotifications('#ccd-develop-builds')
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-    }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
@@ -147,7 +143,8 @@ withPipeline(type, product, component) {
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+    if  (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
