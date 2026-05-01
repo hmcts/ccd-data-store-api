@@ -1,10 +1,11 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  devmemoryRequests: 2048Mi
-  devcpuRequests: 2000m
-  devmemoryLimits: 4096Mi
-  devcpuLimits: 4000m
+  # PlatOps recommended preview resources
+  devmemoryRequests: 1536Mi
+  devcpuRequests: 50m
+  devmemoryLimits: 2048Mi
+  devcpuLimits: 200m
   keyVaults:
     ccd:
       resourceGroup: ccd-shared
