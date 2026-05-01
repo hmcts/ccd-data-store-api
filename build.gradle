@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -26,7 +27,7 @@ ext {
     set('spring-framework.version', '6.2.14')
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
-    set('jackson.version', '2.16.0')
+    set('jackson.version', '2.19.2')
     set('snakeyaml.version', '2.2')
     junit = '5.14.4'
     junitPlatform = '1.14.4'
@@ -36,11 +37,11 @@ ext {
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
-    elasticVersion = '8.16.2'
-    testContainersVersion = '1.21.4'
+    elasticVersion = '9.2.4'
+    testContainersVersion = '2.0.2'
     cucumber = '7.34.3'
     beftaFwVersion = '9.2.4'
-    ccdTestDefinitionVersion = '7.26.2'
+    ccdTestDefinitionVersion = '7.26.2_CCD-7641-0'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -283,7 +284,16 @@ dependencies {
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.1'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
+
+    // Elasticsearch
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: elasticVersion
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
+
+//    implementation "com.fasterxml.jackson.core:jackson-core:${property('jackson.version')}"
+//    implementation "com.fasterxml.jackson.core:jackson-databind:${property('jackson.version')}"
+//    implementation "com.fasterxml.jackson.core:jackson-annotations:${property('jackson.version')}"
+
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
@@ -306,9 +316,8 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: testContainersVersion
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
@@ -330,6 +339,19 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
     }
 }
 
@@ -771,6 +793,8 @@ task smoke(type: JavaExec) {
 }
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+//temporary to check feature working on its own in pipeline or not
+//tags = tags + " and (@S-164 or @S-1025.3)"
 
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
@@ -908,7 +932,7 @@ void loadEnvSecrets(String env) {
                 }
                 standardOutput = os
             }
-            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
         }
     }
 }
