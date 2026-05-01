@@ -23,11 +23,7 @@
       "channels": null,
       "jurisdictions": "[[ANYTHING_PRESENT]]",
       "default": {
-        "workbasket": {
-          "jurisdiction_id": "[[ANYTHING_PRESENT]]",
-          "case_type_id": "[[ANYTHING_PRESENT]]",
-          "state_id": "[[ANYTHING_PRESENT]]"
-        }
+        "workbasket": null
       }
     }
   }
