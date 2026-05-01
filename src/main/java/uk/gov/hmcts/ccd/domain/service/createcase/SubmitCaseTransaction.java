@@ -136,7 +136,7 @@ public class SubmitCaseTransaction implements AccessControl {
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from
             collisions.
          */
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             null,
             caseDetailsWithoutHashes,
