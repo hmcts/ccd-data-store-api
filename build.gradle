@@ -185,6 +185,15 @@ configurations {
     }
 }
 
+configurations.matching { it.name in ['aatCompileClasspath', 'aatRuntimeClasspath', 'cucumberRuntime'] }.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group?.startsWith('com.fasterxml.jackson')) {
+            details.useVersion jacksonVersion
+            details.because 'BEFTA 9.2.x still references PropertyNamingStrategy$SnakeCaseStrategy, removed in Jackson 2.20'
+        }
+    }
+}
+
 //This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
 tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
