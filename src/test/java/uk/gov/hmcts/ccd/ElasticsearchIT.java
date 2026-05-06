@@ -76,7 +76,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -1591,7 +1590,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(exceptionNode.get("message").asText(),
-                        startsWith("Resource not found when getting case type definition for INVALID"))
+                        is("Not Found"))
                 );
             }
 

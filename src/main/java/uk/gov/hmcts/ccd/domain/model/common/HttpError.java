@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -34,7 +35,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
-        this.message = exception.getMessage();
+        this.message = error;
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
     }
 
@@ -45,7 +46,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = getErrorReason(responseStatus, status);
-        this.message = exception.getMessage();
+        this.message = error;
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 
@@ -120,6 +121,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return DEFAULT_ERROR;
     }
 
+    @JsonIgnore
     public String getException() {
         return exception;
     }

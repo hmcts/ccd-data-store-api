@@ -37,6 +37,6 @@ public class DataStoreHttpStatusRequestRejectedHandler implements RequestRejecte
         final String errorMsg = requestRejectedException.getMessage();
         LOG.warn(errorMsg);
         appInsights.trackException(requestRejectedException);
-        response.sendError(httpError, errorMsg);
+        response.sendError(httpError);
     }
 }

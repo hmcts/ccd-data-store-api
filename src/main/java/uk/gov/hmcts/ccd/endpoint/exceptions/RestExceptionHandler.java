@@ -80,6 +80,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             exception.getFields(), exception);
         appInsights.trackException(exception, customProperties, SeverityLevel.Warning);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
+            .withMessage(exception.getMessage())
             .withDetails(exception.getDetails());
         return ResponseEntity
             .status(error.getStatus())
@@ -105,8 +106,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error(exception.getMessage());
         appInsights.trackException(exception);
 
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-            .withDetails(exception.getCause());
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
