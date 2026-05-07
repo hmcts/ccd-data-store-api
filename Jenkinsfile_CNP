@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@maven-mirror-auth")
 
 import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
