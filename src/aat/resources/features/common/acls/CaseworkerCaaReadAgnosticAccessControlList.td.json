@@ -1,0 +1,8 @@
+{
+  "_guid_": "CaseworkerCaaReadAgnosticAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-caa",
+  "delete": false,
+  "read": "[[ANYTHING_PRESENT]]"
+}
