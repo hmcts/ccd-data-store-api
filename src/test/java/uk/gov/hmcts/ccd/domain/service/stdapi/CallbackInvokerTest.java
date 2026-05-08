@@ -768,6 +768,113 @@ class CallbackInvokerTest {
                 caseDetails, false);
             verifyNoMoreInteractions(callbackService);
         }
+
+        @Test
+        @DisplayName("should propagate mid-event data into about-to-submit after multiple mid events")
+        void shouldPropagateMidEventDataIntoSubmission() {
+            Map<String, JsonNode> baseData = new HashMap<>();
+            baseData.put("letters", JsonNodeFactory.instance.arrayNode().add("B").add("A"));
+            caseDetails.setData(new HashMap<>(baseData));
+            caseDetailsBefore.setData(new HashMap<>(baseData));
+
+            Map<String, JsonNode> midData1 = new HashMap<>();
+            midData1.put("letters", JsonNodeFactory.instance.arrayNode().add("C").add("B").add("A"));
+            midData1.put("y_or_n", TextNode.valueOf("Yes"));
+
+            Map<String, JsonNode> midData2 = new HashMap<>();
+            midData2.put("letters", JsonNodeFactory.instance.arrayNode().add("D").add("C").add("B"));
+            midData2.put("y_or_n", TextNode.valueOf("No"));
+
+            Map<String, JsonNode> midData3 = new HashMap<>();
+            midData3.put("letters", JsonNodeFactory.instance.arrayNode().add("E").add("D").add("C"));
+            midData3.put("y_or_n", TextNode.valueOf("No"));
+
+            CallbackResponse midResponse1 = new CallbackResponse();
+            midResponse1.setData(midData1);
+            CallbackResponse midResponse2 = new CallbackResponse();
+            midResponse2.setData(midData2);
+            CallbackResponse midResponse3 = new CallbackResponse();
+            midResponse3.setData(midData3);
+
+            when(callbackService.send(URL_MID_EVENT, MID_EVENT, caseEventDefinition, caseDetailsBefore,
+                caseDetails, false)).thenReturn(Optional.of(midResponse1), Optional.of(midResponse2),
+                Optional.of(midResponse3));
+
+            when(caseSanitiser.sanitise(any(), any())).thenAnswer(invocation -> invocation.getArgument(1));
+            when(caseDataService.getDefaultSecurityClassifications(any(), any(), any()))
+                .thenReturn(new HashMap<>());
+            when(globalSearchProcessorService.populateGlobalSearchData(eq(caseTypeDefinition), any()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+            doNothing().when(timeToLiveService).verifyTTLContentNotChangedByCallback(any(), any());
+            doNothing().when(caseTypeService).validateData(any(), any());
+
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseTypeDefinition,
+                caseEventDefinition,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseTypeDefinition,
+                caseEventDefinition,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseTypeDefinition,
+                caseEventDefinition,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+
+            assertAll(
+                () -> assertEquals(midData3, caseDetails.getData())
+            );
+
+            CallbackResponse submitResponse = new CallbackResponse();
+            submitResponse.setData(midData3);
+            when(callbackService.send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT, caseEventDefinition, caseDetailsBefore,
+                caseDetails, IGNORE_WARNINGS)).thenReturn(Optional.of(submitResponse));
+
+            ArgumentCaptor<CaseDetails> caseDetailsCaptor = ArgumentCaptor.forClass(CaseDetails.class);
+            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
+                caseTypeDefinition, IGNORE_WARNINGS);
+
+            verify(callbackService).send(eq(URL_ABOUT_TO_SUBMIT), eq(ABOUT_TO_SUBMIT), same(caseEventDefinition),
+                same(caseDetailsBefore), caseDetailsCaptor.capture(), eq(IGNORE_WARNINGS));
+            assertEquals(midData3, caseDetailsCaptor.getValue().getData());
+        }
+
+        @Test
+        @DisplayName("should propagate third mid-event payload into about-to-submit with Yes->No toggle")
+        void shouldToggleYesToNoOnSubmissionAfterMidEvents() {
+            Map<String, JsonNode> midEventData = new HashMap<>();
+            midEventData.put("letters", JsonNodeFactory.instance.arrayNode().add("C").add("B").add("A"));
+            midEventData.put("y_or_n", TextNode.valueOf("Yes"));
+            caseDetails.setData(new HashMap<>(midEventData));
+            caseDetailsBefore.setData(new HashMap<>(midEventData));
+
+            CallbackResponse submissionResponse = new CallbackResponse();
+            Map<String, JsonNode> submissionData = new HashMap<>(midEventData);
+            submissionData.put("y_or_n", TextNode.valueOf("No"));
+            submissionResponse.setData(submissionData);
+
+            when(callbackService.send(URL_ABOUT_TO_SUBMIT, ABOUT_TO_SUBMIT, caseEventDefinition, caseDetailsBefore,
+                caseDetails, IGNORE_WARNINGS)).thenReturn(Optional.of(submissionResponse));
+            when(caseSanitiser.sanitise(any(), any())).thenAnswer(invocation -> invocation.getArgument(1));
+            when(caseDataService.getDefaultSecurityClassifications(any(), any(), any()))
+                .thenReturn(new HashMap<>());
+            when(globalSearchProcessorService.populateGlobalSearchData(eq(caseTypeDefinition), any()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+            doNothing().when(timeToLiveService).verifyTTLContentNotChangedByCallback(any(), any());
+            doNothing().when(caseTypeService).validateData(any(), any());
+
+            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
+                caseTypeDefinition, IGNORE_WARNINGS);
+
+            assertEquals("No", caseDetails.getData().get("y_or_n").asText(),
+                "Submission should see Yes->No toggle after mid-events");
+        }
     }
 
     @Nested
