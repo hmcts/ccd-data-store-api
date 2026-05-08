@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
-import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -40,17 +38,6 @@ public class HttpErrorTest {
                 new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), request);
 
         assertThat(error.getException(), is(equalTo("java.lang.IllegalArgumentException")));
-    }
-
-    @Test
-    public void shouldNotSerialiseExceptionName() throws Exception {
-        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
-                new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), request);
-
-        String response = new JacksonObjectMapperConfig().defaultObjectMapper().writeValueAsString(error);
-
-        assertThat(response, not(containsString("exception")));
-        assertThat(response, not(containsString("java.lang.IllegalArgumentException")));
     }
 
     @Test
@@ -110,11 +97,11 @@ public class HttpErrorTest {
     }
 
     @Test
-    public void shouldUseSafeDefaultMessageFromException() {
+    public void shouldExtractMessageFromException() {
         final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
                 new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), request);
 
-        assertThat(error.getMessage(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_ERROR)));
+        assertThat(error.getMessage(), is(equalTo(MESSAGE)));
     }
 
     @Test

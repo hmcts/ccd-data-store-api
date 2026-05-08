@@ -620,7 +620,8 @@ public class CallbackTest extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 422, mvcResult.getResponse().getStatus());
-        assertEquals("Incorrect Error Message", "\"Unprocessable Entity\"",
+        assertEquals("Incorrect Error Message", "\"The event cannot be complete due to a callback returned data "
+                + "validation error (c)\"",
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
     }
 

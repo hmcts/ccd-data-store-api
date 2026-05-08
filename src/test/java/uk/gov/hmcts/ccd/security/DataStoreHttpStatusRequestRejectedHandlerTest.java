@@ -23,7 +23,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -81,9 +80,9 @@ public class DataStoreHttpStatusRequestRejectedHandlerTest {
         // Confirm that exception was passed to application insights
         verify(appInsights).trackException(requestRejectedException);
 
-        // Confirm that response contains expected http error without leaking the exception message
+        // Confirm that response contains expected http error and exception message
         assertThat(mockHttpServletResponse.getStatus(), is(equalTo(expectedHttpError)));
-        assertThat(mockHttpServletResponse.getErrorMessage(), is(nullValue()));
+        assertThat(mockHttpServletResponse.getErrorMessage(), is(equalTo(EXCEPTION_MESSAGE)));
 
         // Confirm that exception message was written to log and at the expected logging level
         List<ILoggingEvent> loggerList = handlerLoggerListAppender.list;

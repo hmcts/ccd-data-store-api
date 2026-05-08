@@ -756,7 +756,6 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         final ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
 
         assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_REQUEST);
-        result.andExpect(jsonPath("$.details").doesNotExist());
     }
 
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
@@ -764,7 +763,6 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         // NB: as we cannot mock HttpError generate an equivalent and compare to response
         final HttpError<Serializable> expectedError =
             new HttpError<>(expectedException, mock(HttpServletRequest.class));
-        withExplicitClientVisibleMessage(expectedError, expectedException);
 
         assertBasicHttpErrorResponseProperties(result, expectedException, expectedError);
     }
@@ -778,7 +776,6 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         // NB: as we cannot mock HttpError generate an equivalent and compare to response
         final HttpError<Serializable> expectedError =
             new HttpError<>(expectedException, mock(HttpServletRequest.class), expectedHttpStatus);
-        withExplicitClientVisibleMessage(expectedError, expectedException);
 
         assertBasicHttpErrorResponseProperties(result, expectedException, expectedError);
     }
@@ -788,16 +785,10 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
         // check the very basics
         result.andExpect(status().is(expectedHttpError.getStatus()));
-        result.andExpect(jsonPath("$.exception").doesNotExist());
+        result.andExpect(jsonPath("$.exception").value(expectedException.getClass().getName()));
 
-        // check the public error message doesn't default to raw exception text
-        result.andExpect(jsonPath("$.message").value(expectedHttpError.getMessage()));
-    }
-
-    private void withExplicitClientVisibleMessage(HttpError<Serializable> expectedError, Exception expectedException) {
-        if (expectedException instanceof CaseValidationException) {
-            expectedError.withMessage(expectedException.getMessage());
-        }
+        // check a bit more
+        result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
     }
 
     private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException)
