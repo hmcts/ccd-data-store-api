@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Named
 @Singleton

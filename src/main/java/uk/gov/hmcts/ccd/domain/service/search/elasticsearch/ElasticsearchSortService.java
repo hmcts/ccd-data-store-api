@@ -73,8 +73,8 @@ public class ElasticsearchSortService {
         ObjectNode objectNode = objectMapper.createObjectNode();
         CommonField commonField =
             caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
-            new ServiceException(String.format("Case field '%s' does not exist in configuration for case type '%s'.",
-                sortOrderField.getCaseFieldId(), caseTypeDefinition.getId()))
+                new ServiceException(String.format("Case field '%s' does not exist in configuration for case type "
+                    + "'%s'.", sortOrderField.getCaseFieldId(), caseTypeDefinition.getId()))
         );
         FieldTypeDefinition fieldType = commonField.getFieldTypeDefinition();
 

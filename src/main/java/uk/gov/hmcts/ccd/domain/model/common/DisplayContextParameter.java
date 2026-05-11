@@ -32,8 +32,8 @@ public class DisplayContextParameter {
     }
 
     public static List<DisplayContextParameter> getDisplayContextParametersFor(String displayContextParameter) {
-        List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
-        List<String> displayContextParameters = new ArrayList<>();
+        final List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
+        final List<String> displayContextParameters = new ArrayList<>();
 
         if (Strings.isNullOrEmpty(displayContextParameter)) {
             return Collections.emptyList();
