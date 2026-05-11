@@ -36,9 +36,22 @@ public class ElasticsearchIndexSettings {
         ObjectNode objectNode = OBJECT_MAPPER.createObjectNode();
         objectNode.set("settings", settings.orElse(OBJECT_MAPPER.createObjectNode()));
         objectNode.set("aliases", aliases.orElse(OBJECT_MAPPER.createObjectNode()));
+
         ObjectNode mappingsObject = OBJECT_MAPPER.createObjectNode();
-        mappingsObject.setAll(types);
+
+        // Merge properties from all types (e.g. "_doc") into the root "mappings.properties"
+        ObjectNode mergedProperties = OBJECT_MAPPER.createObjectNode();
+
+        types.values().forEach(typeNode -> {
+            JsonNode props = typeNode.get("properties");
+            if (props != null && props.isObject()) {
+                mergedProperties.setAll((ObjectNode) props);
+            }
+        });
+
+        mappingsObject.set("properties", mergedProperties);
         objectNode.set("mappings", mappingsObject);
+
         return objectNode;
     }
 

@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import uk.gov.hmcts.ccd.ApplicationParams;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 @Named
 @Singleton
