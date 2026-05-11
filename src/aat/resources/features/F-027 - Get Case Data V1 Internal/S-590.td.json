@@ -51,6 +51,7 @@
           "retain_hidden_value": null,
           "publish": null,
           "publish_as": null,
+          "default_focus": "Y",
           "acls": []
         },
         {

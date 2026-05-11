@@ -23,6 +23,8 @@ public class CaseTypeTabDefinition implements Serializable, CommonDCPModel {
     private String role;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter = null;
+    @JsonProperty
+    private Boolean defaultFocus;
 
     public String getId() {
         return id;
@@ -78,5 +80,13 @@ public class CaseTypeTabDefinition implements Serializable, CommonDCPModel {
 
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
+    }
+
+    public Boolean getDefaultFocus() {
+        return defaultFocus;
+    }
+
+    public void setDefaultFocus(Boolean defaultFocus) {
+        this.defaultFocus = defaultFocus;
     }
 }

@@ -1,0 +1,66 @@
+{
+  "_guid_": "S-1029.5",
+  "_extends_": "F-1024_StartEventForCaseworker",
+
+  "title": "Successful response for caseType id and not having display_focus column",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "contains valid caseType id which has display_focus value set for tab",
+    "has the 200 OK code"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCaseTTLNullifyByDefault"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details" : {
+        "id" : null,
+        "jurisdiction" : "BEFTA_MASTER",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "FT_MasterCaseType",
+        "created_date" : null,
+        "last_modified" : null,
+        "last_state_modified_date" : null,
+        "security_classification" : null,
+        "case_data" : {
+          "TTL" : { }
+        },
+        "data_classification" : {
+          "TTL" : {
+            "classification" : "PUBLIC",
+            "value" : { }
+          }
+        },
+        "supplementary_data" : null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null
+      },
+      "event_id" : "createCaseTTLNullifyByDefault"
+    }
+  }
+}
