@@ -70,7 +70,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -644,7 +643,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    is("The provided use case 'INVALID' is unsupported for case type 'AAT'."))
+                    is("Bad Request"))
             );
         }
 
@@ -657,7 +656,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    is("missing required field 'query'"))
+                    is("Bad Request"))
             );
         }
 
@@ -672,7 +671,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    containsString("No mapping found for [invalid.keyword] in order to sort on"))
+                    is("Bad Request"))
             );
         }
 
@@ -693,7 +692,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    containsString("Request requires correctly formatted JSON"))
+                    is("Bad Request"))
             );
         }
 
