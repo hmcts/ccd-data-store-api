@@ -1,17 +1,33 @@
 package uk.gov.hmcts.ccd.test;
 
+import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch._types.ErrorResponse;
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ElasticsearchTestHelper {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchTestHelper.class);
 
     public static final String DATA_PREFIX = "data.";
     public static final String ALIAS_PREFIX = "alias.";
@@ -122,6 +138,8 @@ public class ElasticsearchTestHelper {
             .contentType(MediaType.APPLICATION_JSON)
             .content(searchRequest.toJsonString())
             .param(CASE_TYPE_ID_PARAM, caseTypeParam);
+        LOG.info("Executing request: {} with param: {}={} and body: {}", url, CASE_TYPE_ID_PARAM, caseTypeParam,
+            searchRequest.toJsonString());
 
         if (!Strings.isNullOrEmpty(useCase)) {
             postRequest.param(USE_CASE_PARAM, useCase);
@@ -141,5 +159,115 @@ public class ElasticsearchTestHelper {
 
         String responseAsString = result.getResponse().getContentAsString();
         return mapper.readValue(responseAsString, returnType);
+    }
+
+    public static MsearchResponse<ElasticSearchCaseDetailsDTO> createMsearchResponse(
+        List<MultiSearchResponseItem<ElasticSearchCaseDetailsDTO>> responseItems) {
+        LOG.info("createMsearchResponse with responseItems: {}", responseItems);
+        return new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
+            .responses(responseItems)
+            .took(1)
+            .build();
+    }
+
+    public static MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> createFailureItem(
+        Map<String, Object> errorMap) {
+        LOG.info("createFailureItem with errorMap: {}", errorMap);
+        String reason = (String) errorMap.getOrDefault("reason", "Unknown failure");
+        String type = (String) errorMap.getOrDefault("type", "search_phase_execution_exception");
+        int status = (int) errorMap.getOrDefault("status", 500);
+
+        ErrorCause errorCause = new ErrorCause.Builder()
+            .type(type)
+            .reason(reason)
+            .build();
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+            .error(errorCause)
+            .status(status)
+            .build();
+
+        return MultiSearchResponseItem.of(item -> item.failure(errorResponse));
+    }
+
+    public static MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> createSuccessItemWithNoHits(String indexName) {
+        LOG.info("createSuccessItemWithNoHits with indexName: {}", indexName);
+        Hit<ElasticSearchCaseDetailsDTO> hit = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+            .source(new ElasticSearchCaseDetailsDTO())
+            .index(indexName)
+            .build();
+
+        TotalHits totalHits = createTotalHits(0L);
+
+        return MultiSearchResponseItem.of(item -> item.result(r -> r
+            .hits(h -> h
+                .hits(List.of(hit))
+                .total(totalHits)
+            )
+            .took(1)
+            .timedOut(false)
+            .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
+        ));
+    }
+
+    public static MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> createSuccessItem(
+        Hit<ElasticSearchCaseDetailsDTO> hit, TotalHits totalHits) {
+        LOG.info("createSuccessItem with hit: {} and totalHits: {}", hit, totalHits);
+        return MultiSearchResponseItem.of(item ->
+            item.result(r -> r
+                .hits(h -> h
+                    .hits(List.of(hit))
+                    .total(totalHits)
+                )
+                .took(1)
+                .timedOut(false)
+                .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
+            ));
+    }
+
+    public static MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> createSuccessItem(String indexName) {
+        LOG.info("createSuccessItem with indexName: {}", indexName);
+        Hit<ElasticSearchCaseDetailsDTO> hit = createHit(indexName);
+
+        TotalHits totalHits = createTotalHits(1L);
+
+        return MultiSearchResponseItem.of(item ->
+            item.result(r -> r
+            .hits(h -> h
+                .hits(List.of(hit))
+                .total(totalHits)
+            )
+            .took(1)
+            .timedOut(false)
+            .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
+        ));
+    }
+
+    public static Hit<ElasticSearchCaseDetailsDTO> createHit(String indexName) {
+        LOG.info("createHit with indexName: {}", indexName);
+        return new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+            .source(new ElasticSearchCaseDetailsDTO())
+            .index(indexName)
+            .build();
+    }
+
+    public static HitsMetadata<ElasticSearchCaseDetailsDTO> createHitsMetadata(String indexName) {
+        LOG.info("createHitsMetadata with indexName: {}", indexName);
+        return new HitsMetadata.Builder<ElasticSearchCaseDetailsDTO>()
+            .hits(List.of(createHit(indexName)))
+            .total(createTotalHits())
+            .build();
+    }
+
+    public static TotalHits createTotalHits() {
+        return createTotalHits(1L);
+    }
+
+    public static TotalHits createTotalHits(Long value) {
+        LOG.info("createTotalHits with value: {}", value);
+        return new TotalHits.Builder()
+            .value(value)
+            .relation(TotalHitsRelation.Eq)
+            .build();
     }
 }

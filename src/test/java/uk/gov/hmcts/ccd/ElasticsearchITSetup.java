@@ -37,7 +37,7 @@ public class ElasticsearchITSetup {
     public static final String[] INDICES = {"aat_cases", "mapper_cases", "security_cases",
         "restricted_security_cases", "global_search"};
 
-    @Value("${search.elastic.port}")
+    @Value("${search.elastic.port:9200}")
     private int httpPortValue;
 
     private String url;
@@ -99,7 +99,7 @@ public class ElasticsearchITSetup {
                         responseBody = ElasticsearchIndexSettings.unwrapIO(response.getEntity().getContent());
                     } catch (IOException e) {
                         log.error("Error during reading response body", e);
-                        responseBody = "!! Failed to get the response boy !!";
+                        responseBody = "!! Failed to get the response body !!";
                     }
                     throw new RuntimeException("Call to elasticsearch resulted in error:\n" + responseBody);
                 }
@@ -123,7 +123,7 @@ public class ElasticsearchITSetup {
                 resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
             for (Resource resource : resources) {
                 String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                doIndex(idx, INDEX_TYPE, caseString);
+                doIndex(idx, null, caseString);
             }
         }
     }
@@ -163,7 +163,19 @@ public class ElasticsearchITSetup {
         HttpPost request = new HttpPost(requestUrl);
         request.setHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
         request.setEntity(new StringEntity(bulkRequestBody, UTF_8));
-        httpClient.execute(request, (r) -> {
+        log.debug("Bulk request body:\n{}", bulkRequestBody);
+        httpClient.execute(request, response -> {
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                String responseBody = "";
+                try {
+                    responseBody = ElasticsearchIndexSettings.unwrapIO(response.getEntity().getContent());
+                } catch (IOException e) {
+                    log.error("Error reading response body", e);
+                    responseBody = "!! Failed to get the response body !!";
+                }
+                throw new RuntimeException("Bulk request failed with status " + statusCode + ":\n" + responseBody);
+            }
             waitForClusterYellow(3);
         });
     }
