@@ -19,6 +19,6 @@ dependencies:
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: ccd
-    version: 9.2.2
+    version: 9.2.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
