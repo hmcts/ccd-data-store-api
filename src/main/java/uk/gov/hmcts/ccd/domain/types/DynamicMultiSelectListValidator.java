@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.util.List;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-import jakarta.inject.Inject;
 
 @Named
 @Singleton
