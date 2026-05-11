@@ -12,7 +12,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets.
-
 Repo-local workflow docs are indexed in `AGENTS.md`.
 
 ### Prerequisites
