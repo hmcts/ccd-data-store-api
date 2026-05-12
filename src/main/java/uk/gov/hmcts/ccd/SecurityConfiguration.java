@@ -58,7 +58,6 @@ public class SecurityConfiguration {
         "/health/liveness",
         "/health/readiness",
         "/health",
-        "/loggers/**",
         "/",
         "/status/health",
         "/swagger-resources/**",

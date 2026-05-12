@@ -55,8 +55,8 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
     }
 
     /**
-     * <p>Test cached behaviour of getDataStoreUserAccessToken method.  Caching is implemented using Spring
-     * Cacheable annotation so test is performed on the actual IdamRepository bean with mocked dependencies.</p>
+     * Test cached behaviour of getDataStoreUserAccessToken method.  Caching is implemented using Spring
+     * Cacheable annotation so test is performed on the actual IdamRepository bean with mocked dependencies.
      *
      * <p>As the caching behaviour is controlled by Spring it is not reset between tests.  For this reason
      * all tests have to be in a single method so that state can be controlled.</p>
