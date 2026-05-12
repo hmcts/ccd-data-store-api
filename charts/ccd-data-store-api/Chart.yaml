@@ -2,7 +2,7 @@ description: Helm chart for the HMCTS CCD Data Store
 name: ccd-data-store-api
 apiVersion: v2
 home: https://github.com/hmcts/ccd-data-store-api
-version: 2.0.40
+version: 2.0.41
 maintainers:
   - name: HMCTS CCD Dev Team
     email: ccd-devops@HMCTS.NET
@@ -19,6 +19,6 @@ dependencies:
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: ccd
-    version: 9.2.2
+    version: 9.2.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
