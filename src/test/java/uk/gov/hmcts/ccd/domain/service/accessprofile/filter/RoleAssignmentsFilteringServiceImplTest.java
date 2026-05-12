@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -56,15 +57,20 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     @Mock
     private CaseDataService caseDataService;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles())
+            .thenReturn(List.of("caseworker-caa", "caseworker-approver", "next-hearing-date-admin"));
         List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
             new CaseTypeMatcher(),
-            new JurisdictionMatcher(),
+            new JurisdictionMatcher(applicationParams),
             new LocationMatcher(),
             new RegionMatcher(),
             new SecurityClassificationMatcher(),
