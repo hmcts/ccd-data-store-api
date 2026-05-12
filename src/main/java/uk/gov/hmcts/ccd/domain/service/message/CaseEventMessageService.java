@@ -29,7 +29,7 @@ public class CaseEventMessageService extends AbstractMessageService {
                                    CaseAuditEventRepository caseAuditEventRepository,
                                    DefinitionBlockGenerator definitionBlockGenerator,
                                    DataBlockGenerator dataBlockGenerator,
-                                   @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+                                   @Qualifier("defaultObjectMapper") ObjectMapper objectMapper) {
         super(userRepository, caseAuditEventRepository, definitionBlockGenerator, dataBlockGenerator);
         this.messageCandidateRepository = messageCandidateRepository;
         this.objectMapper = objectMapper;

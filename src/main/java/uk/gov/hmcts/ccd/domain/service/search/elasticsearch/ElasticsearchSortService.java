@@ -34,7 +34,7 @@ public class ElasticsearchSortService {
     private final ElasticsearchMappings elasticsearchMappings;
 
     @Autowired
-    public ElasticsearchSortService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+    public ElasticsearchSortService(@Qualifier("defaultObjectMapper") ObjectMapper objectMapper,
                                     SearchQueryOperation searchQueryOperation,
                                     CaseTypeService caseTypeService,
                                     ElasticsearchMappings elasticsearchMappings) {

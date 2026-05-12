@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefinitionStoreClient;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
+    private final CallbackUrlValidator callbackUrlValidator;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -98,9 +100,12 @@ class TestConfiguration extends ContextCleanupListener {
             + "]";
 
     @Autowired
-    TestConfiguration(final ApplicationParams applicationParams, DefinitionStoreClient definitionStoreClient) {
+    TestConfiguration(final ApplicationParams applicationParams,
+                      DefinitionStoreClient definitionStoreClient,
+                      CallbackUrlValidator callbackUrlValidator) {
         this.applicationParams = applicationParams;
         this.definitionStoreClient = definitionStoreClient;
+        this.callbackUrlValidator = callbackUrlValidator;
     }
 
     @Bean
@@ -113,6 +118,7 @@ class TestConfiguration extends ContextCleanupListener {
 
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
         ReflectionTestUtils.setField(caseDefinitionRepository, "definitionStoreClient", definitionStoreClient);
+        ReflectionTestUtils.setField(caseDefinitionRepository, "callbackUrlValidator", callbackUrlValidator);
 
         when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();

@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackUrlValidator;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -214,7 +215,11 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should handle exception in printCallbackDetails gracefully")
         void shouldHandleExceptionInPrintCallbackDetailsGracefully() throws JsonProcessingException {
+            final String testUrl = "https://localhost/about-to-start";
             when(applicationParams.getCcdCallbackLogControl()).thenReturn(Collections.singletonList("*"));
+            when(applicationParams.getCallbackAllowedHosts()).thenReturn(Collections.singletonList("localhost"));
+            when(applicationParams.getCallbackAllowedHttpHosts()).thenReturn(Collections.singletonList("localhost"));
+            when(applicationParams.getCallbackAllowPrivateHosts()).thenReturn(Collections.singletonList("localhost"));
             doNothing().when(appinsights).trackCallbackEvent(any(), anyString(), anyString(), any(Duration.class));
 
             CallbackService callbackService = new CallbackService(securityUtils,
@@ -222,7 +227,8 @@ class CallbackInvokerTest {
                 applicationParams,
                 appinsights,
                 null,
-                objectMapper);
+                objectMapper,
+                new CallbackUrlValidator(applicationParams));
 
             when(objectMapper.writeValueAsString(any()))
                 .thenThrow(new RuntimeException("Mocked exception"));
@@ -232,7 +238,7 @@ class CallbackInvokerTest {
                 .thenReturn(new ResponseEntity<>(new CallbackResponse(), HttpStatus.OK));
 
             Optional<CallbackResponse> response = callbackService.sendSingleRequest(
-                URL_ABOUT_TO_START,
+                testUrl,
                 ABOUT_TO_START,
                 caseEventDefinition,
                 null,

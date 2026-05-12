@@ -21,7 +21,7 @@ public class JacksonObjectMapperConfig {
      * @return Default ObjectMapper, used by Spring and HAL to serialise responses, and deserialise requests.
      */
     @Primary
-    @Bean(name = "DefaultObjectMapper")
+    @Bean(name = "defaultObjectMapper")
     public ObjectMapper defaultObjectMapper() {
         return new ObjectMapper()
             .registerModule(new Jdk8Module())
@@ -30,7 +30,7 @@ public class JacksonObjectMapperConfig {
             .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     }
 
-    @Bean(name = "SimpleObjectMapper")
+    @Bean(name = "simpleObjectMapper")
     public ObjectMapper simpleObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
