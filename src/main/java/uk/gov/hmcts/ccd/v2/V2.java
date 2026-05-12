@@ -1,16 +1,18 @@
 package uk.gov.hmcts.ccd.v2;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class V2 {
-    private V2() {
-    }
 
     public static final String EXPERIMENTAL_HEADER = "experimental";
     public static final String EXPERIMENTAL_WARNING =
         "Experimental! Subject to change or removal, do not use in production!";
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class MediaType {
-        private MediaType() {
-        }
 
         // External API
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
@@ -109,9 +111,12 @@ public final class V2 {
             "Access to other user's case role assignments not granted";
         public static final String NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA =
             "Not authorised to update case supplementary data";
+        public static final String NOT_AUTHORISED_UPDATE_CASES_SUPPLEMENTARY_DATA =
+            "Not authorised to update supplementary cases data";
         public static final String CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION =
             "Client service not authorised to perform operation";
         public static final String SUPPLEMENTARY_DATA_UPDATE_INVALID = "Supplementary Data Update Invalid";
+        public static final String SUPPLEMENTARY_DATA_CASES_UPDATE_INVALID = "Supplementary Data Cases Update Invalid";
         public static final String MORE_THAN_ONE_NESTED_LEVEL =
             "Supplementary data properties with more than one nested level are currently not supported";
         public static final String UNKNOWN_SUPPLEMENTARY_UPDATE_OPERATION =
