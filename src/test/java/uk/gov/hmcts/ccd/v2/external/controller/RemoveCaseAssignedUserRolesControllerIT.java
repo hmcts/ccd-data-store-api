@@ -806,6 +806,15 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
     }
 
     private void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) throws Exception  {
+        List<String> organisationIds = caseUserRoles.stream()
+            .map(CaseAssignedUserRoleWithOrganisation::getOrganisationId)
+            .filter(organisationId -> organisationId != null && !organisationId.isBlank())
+            .distinct()
+            .toList();
+
+        if (organisationIds.size() == 1) {
+            stubCurrentUserOrganisation(organisationIds.get(0));
+        }
 
         mockMvc.perform(post(caseAssignedUserRoles)
                 .contentType(JSON_CONTENT_TYPE)

@@ -1,15 +1,20 @@
 {
-  "title": "Must successfully remove a user and case role for a specific case after caller organisation from PRD is used",
+  "title": "Must successfully remove a user and case role after unrestricted caller assignment",
 
-  "_guid_": "F-105_16_Remove_Case_Assigned_User_role_Orgs_for_Case_C1",
+  "_guid_": "S-105.19_Remove_Case_Assigned_User_role_for_Case_C1",
   "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
 
   "specs": [
-    "is made to remove Case Role CR-1"
+    "is made to remove Case Role CR-1 after unrestricted caller assignment"
   ],
 
   "users": {
-    "_extends_": "F-105_Users"
+    "userDil": {
+      "_extends_": "F-105_User_Dil"
+    },
+    "userOlawale": {
+      "_extends_": "F-105_User_Olawale"
+    }
   },
 
   "request": {
@@ -20,8 +25,8 @@
       "case_users": [
         {
           "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
-          "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
-          "case_role" : "[CR-1]"
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
         }
       ]
     }

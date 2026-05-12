@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.ProfessionalReferenceDataOrganisationRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -22,10 +23,13 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+import uk.gov.hmcts.ccd.v2.V2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +53,8 @@ public class CaseAccessOperation {
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final RoleAssignmentService roleAssignmentService;
     private final ApplicationParams applicationParams;
+    private final CaseAccessService caseAccessService;
+    private final ProfessionalReferenceDataOrganisationRepository professionalReferenceDataOrganisationRepository;
 
     public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                    CaseUserRepository caseUserRepository,
@@ -57,7 +63,10 @@ public class CaseAccessOperation {
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
                                @Qualifier("default") SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                RoleAssignmentService roleAssignmentService,
-                               ApplicationParams applicationParams) {
+                               ApplicationParams applicationParams,
+                               CaseAccessService caseAccessService,
+                               ProfessionalReferenceDataOrganisationRepository
+                                   professionalReferenceDataOrganisationRepository) {
 
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -65,6 +74,8 @@ public class CaseAccessOperation {
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.roleAssignmentService = roleAssignmentService;
         this.applicationParams = applicationParams;
+        this.caseAccessService = caseAccessService;
+        this.professionalReferenceDataOrganisationRepository = professionalReferenceDataOrganisationRepository;
     }
 
     @Transactional
@@ -151,9 +162,11 @@ public class CaseAccessOperation {
 
     @Transactional
     public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        final List<CaseAssignedUserRoleWithOrganisation> resolvedCaseUserRoles = resolveCaseUserRolesOrganisation(
+            caseUserRoles);
 
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
-            getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
+            getMapOfCaseAssignedUserRolesByCaseDetails(resolvedCaseUserRoles);
 
         // load all existing case user roles upfront
         List<CaseAssignedUserRole> existingCaseUserRoles = findCaseUserRoles(cauRolesByCaseDetails);
@@ -196,6 +209,44 @@ public class CaseAccessOperation {
         );
 
         newUserCounts.forEach(this::updateOrgsAssignedUsersCount);
+    }
+
+    private List<CaseAssignedUserRoleWithOrganisation> resolveCaseUserRolesOrganisation(
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        final Optional<String> callerOrganisation = professionalReferenceDataOrganisationRepository
+            .getCurrentUserOrganisationIdentifier();
+
+        return caseUserRoles.stream()
+            .map(caseUserRole -> resolveCaseUserRoleOrganisation(caseUserRole, callerOrganisation))
+            .collect(Collectors.toList());
+    }
+
+    private CaseAssignedUserRoleWithOrganisation resolveCaseUserRoleOrganisation(
+        CaseAssignedUserRoleWithOrganisation caseUserRole,
+        Optional<String> callerOrganisation) {
+        final String requestedOrganisation = caseUserRole.getOrganisationId();
+        final boolean orgBoundaryRestrictedCaller =
+            caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary();
+
+        if (callerOrganisation.isPresent() && requestedOrganisation != null
+            && requestedOrganisation.equals(callerOrganisation.get()) == false) {
+            throw new BadRequestException(V2.Error.ORGANISATION_ID_MISMATCH);
+        }
+
+        if (callerOrganisation.isPresent()) {
+            return new CaseAssignedUserRoleWithOrganisation(
+                caseUserRole.getCaseDataId(),
+                caseUserRole.getUserId(),
+                caseUserRole.getCaseRole(),
+                callerOrganisation.get()
+            );
+        }
+
+        if (orgBoundaryRestrictedCaller) {
+            throw new BadRequestException(V2.Error.ORGANISATION_ID_MISMATCH);
+        }
+
+        return caseUserRole;
     }
 
     @Transactional

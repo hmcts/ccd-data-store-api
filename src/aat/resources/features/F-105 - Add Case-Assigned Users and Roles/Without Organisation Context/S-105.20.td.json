@@ -1,0 +1,43 @@
+{
+  "title": "Must return an error response when a restricted BEFTA master solicitor omits organisation ID",
+
+  "_guid_": "S-105.20",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Becky - restricted BEFTA master solicitor caller",
+    "Hemanth - with an active solicitor profile and valid User ID",
+    "is made from an authorised application, by Becky, with the Case ID of C1, User ID of Hemanth and a proper Case Role CR-1 but no Organisation ID"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    },
+    "userHemanth": {
+      "_extends_": "F-105_User_Hemanth"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][invokingUser][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][S-105.20_Create_Case_Data][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Organisation ID does not match caller organisation"
+    }
+  }
+}

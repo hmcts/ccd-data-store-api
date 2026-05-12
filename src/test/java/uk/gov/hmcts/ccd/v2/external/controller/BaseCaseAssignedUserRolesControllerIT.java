@@ -53,6 +53,8 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
+    private static final String PRD_ORGANISATIONS_USERS_PATH = "/refdata/external/v1/organisations/users";
+
     protected static final Long INVALID_CASE_ID = 222L;
 
     protected static final String AUTHORISED_ADD_SERVICE_1 = "ADD_SERVICE_1";
@@ -174,6 +176,18 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         String s2SToken = MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_1);
         headers.add(SERVICE_AUTHORIZATION, "Bearer " + s2SToken);
         return headers;
+    }
+
+    protected void stubCurrentUserOrganisation(String organisationId) {
+        stubFor(WireMock.get(urlMatching(PRD_ORGANISATIONS_USERS_PATH))
+            .willReturn(okJson("{"
+                + "\"organisationIdentifier\":\"" + organisationId + "\""
+                + "}").withStatus(200)));
+    }
+
+    protected void stubCurrentUserOrganisationResponse(String responseBody) {
+        stubFor(WireMock.get(urlMatching(PRD_ORGANISATIONS_USERS_PATH))
+            .willReturn(okJson(responseBody).withStatus(200)));
     }
 
     protected void verifyAuditForAddCaseUserRoles(HttpStatus status,

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
@@ -36,6 +38,7 @@ import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
 @Service
+@Slf4j
 public class CallbackInvoker {
 
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
@@ -227,6 +230,13 @@ public class CallbackInvoker {
                                                                                       callbackResponse) {
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+
+        log.info("About-to-submit callback response for caseType={} state={} data={} errors={} warnings={}",
+            caseTypeDefinition.getId(),
+            callbackResponse.getState(),
+            callbackResponse.getData(),
+            callbackResponse.getErrors(),
+            callbackResponse.getWarnings());
 
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);

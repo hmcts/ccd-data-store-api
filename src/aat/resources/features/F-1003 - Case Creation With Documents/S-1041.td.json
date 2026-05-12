@@ -19,6 +19,7 @@
     "headers": {
       "Authorization": "[[DEFAULT_AUTO_VALUE]]",
       "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Request-Id": "S-1041-${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}",
       "Content-Type": "application/json;charset=UTF-8",
       "experimental": true
     },

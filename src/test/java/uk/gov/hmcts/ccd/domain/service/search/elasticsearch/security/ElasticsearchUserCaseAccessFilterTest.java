@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -80,6 +81,22 @@ class ElasticsearchUserCaseAccessFilterTest {
         assertTrue(optQueryBuilder.isEmpty());
 
         verifyNoInteractions(caseAccessService);
+    }
+
+    @Test
+    void shouldCreateEmptyTermsQueryBuilderWhenRestrictedUserHasNoOrgAccessibleCases() {
+        String caseTypeId = "caseType";
+        when(caseAccessService.getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition))
+            .thenReturn(Optional.of(java.util.List.of()));
+        when(caseDefinitionRepository.getCaseType(caseTypeId))
+            .thenReturn(caseTypeDefinition);
+
+        Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
+
+        assertTrue(optQueryBuilder.isPresent());
+        assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
+        TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
+        assertEquals(0, queryBuilder.values().size());
     }
 
 }

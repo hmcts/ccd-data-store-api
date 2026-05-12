@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-105.16_Verify_Counter_Changed",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to verify the count of users assigned to a case has changed for Dil's organisation"
+  ],
+
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Dil"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_childContexts.F-105_Get_Organisation_Identifier_Dil|siblingContexts.S-105\\.16_Prerequisite_Counter_Check_Call|1]}"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_childContexts.F-105_Get_Organisation_Identifier_Dil|siblingContexts.S-105\\.16_Prerequisite_Counter_Check_Call|1]}"
+    }
+  }
+}

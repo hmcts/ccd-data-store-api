@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -66,6 +68,12 @@ class AuthorisedGetCaseOperationTest {
     @Mock
     private AccessControlService accessControlService;
 
+    @Mock
+    private CaseAccessService caseAccessService;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
     private AuthorisedGetCaseOperation authorisedGetCaseOperation;
     private CaseDetails caseDetails;
     private final CaseTypeDefinition caseType = new CaseTypeDefinition();
@@ -105,10 +113,13 @@ class AuthorisedGetCaseOperationTest {
 
         doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
         authorisedGetCaseOperation = new AuthorisedGetCaseOperation(classifiedGetCaseOperation,
             caseDefinitionRepository,
             accessControlService,
-            caseDataAccessControl);
+            caseDataAccessControl,
+            caseAccessService,
+            applicationParams);
     }
 
     @Nested
@@ -400,6 +411,79 @@ class AuthorisedGetCaseOperationTest {
                     .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFieldDefinitions()),
                         eq(accessProfiles), eq(CAN_READ), anyBoolean()),
                 () -> assertThat(result.isPresent(), is(false))
+            );
+        }
+
+        @Test
+        @DisplayName("should deny restricted user access to another organisation case")
+        void shouldDenyRestrictedUserAccessToAnotherOrganisationCase() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(caseDataAccessControl.generateAccessProfilesForRestrictedCase(any(CaseDetails.class)))
+                .thenReturn(Sets.newHashSet());
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
+                .thenReturn(accessProfiles);
+
+            final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);
+
+            InOrder inOrder = inOrder(caseDefinitionRepository,
+                classifiedGetCaseOperation, accessControlService, caseDataAccessControl);
+            assertAll(
+                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+                () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
+                () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE),
+                () -> verify(accessControlService, never()).canAccessCaseTypeWithCriteria(any(), any(), any()),
+                () -> assertThat(result.isPresent(), is(false))
+            );
+        }
+
+        @Test
+        @DisplayName("should allow restricted user access to own organisation case")
+        void shouldAllowRestrictedUserAccessToOwnOrganisationCase() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(caseDataAccessControl.generateAccessProfilesForRestrictedCase(any(CaseDetails.class)))
+                .thenReturn(accessProfiles);
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
+                .thenReturn(accessProfiles);
+
+            final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);
+
+            InOrder inOrder = inOrder(caseDefinitionRepository,
+                classifiedGetCaseOperation, accessControlService, caseDataAccessControl);
+            assertAll(
+                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+                () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesForRestrictedCase(caseDetails),
+                () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()),
+                    eq(caseType), eq(accessProfiles), eq(CAN_READ)),
+                () -> assertThat(result.isPresent(), is(true))
+            );
+        }
+
+        @Test
+        @DisplayName("should keep case-reference access profiles for restricted user when ABAC is disabled")
+        void shouldKeepCaseReferenceAccessProfilesForRestrictedUserWhenAbacDisabled() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()).thenReturn(true);
+            when(caseDataAccessControl.generateAccessProfilesForRestrictedCase(any(CaseDetails.class)))
+                .thenReturn(Sets.newHashSet());
+
+            final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);
+
+            InOrder inOrder = inOrder(caseDefinitionRepository,
+                classifiedGetCaseOperation, accessControlService, caseDataAccessControl);
+            assertAll(
+                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+                () -> inOrder.verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE),
+                () -> verify(caseDataAccessControl, never()).generateAccessProfilesForRestrictedCase(any()),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+                    eq(accessProfiles), eq(CAN_READ)),
+                () -> inOrder.verify(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()),
+                    eq(caseType), eq(accessProfiles), eq(CAN_READ)),
+                () -> assertThat(result.isPresent(), is(true))
             );
         }
     }
