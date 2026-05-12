@@ -1,0 +1,70 @@
+{
+  "title": "must return caller supplied event summary and description in audit history",
+  "_guid_": "S-116.4",
+  "_extends_": "F-116_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference of the case just created",
+    "contains the Id of the case just created",
+    "Retrieve audit events by case ID",
+    "contains caller supplied event summary and description in audit history"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "auditEvents": [
+        {
+          "id" : "UPDATE",
+          "summary" : "BEFTA caller supplied summary",
+          "description" : "BEFTA caller supplied description",
+          "user_id" : "[[ANYTHING_PRESENT]]",
+          "user_last_name" : "[[ANYTHING_PRESENT]]",
+          "user_first_name" : "[[ANYTHING_PRESENT]]",
+          "event_name" : "Update",
+          "created_date" : "[[ANYTHING_PRESENT]]",
+          "case_type_id" : "AAT_AUTH_15",
+          "case_type_version" : "[[ANYTHING_PRESENT]]",
+          "state_id" : "TODO",
+          "state_name" : "To do",
+          "data" : null,
+          "data_classification" : null,
+          "security_classification" : "PUBLIC",
+          "significant_item" : null,
+          "proxied_by" : null,
+          "proxied_by_last_name" : null,
+          "proxied_by_first_name" : null
+        }, {
+          "id" : "CREATE",
+          "summary" : "",
+          "description" : "",
+          "user_id" : "[[ANYTHING_PRESENT]]",
+          "user_last_name" : "[[ANYTHING_PRESENT]]",
+          "user_first_name" : "[[ANYTHING_PRESENT]]",
+          "event_name" : "Create a new case",
+          "created_date" : "[[ANYTHING_PRESENT]]",
+          "case_type_id" : "AAT_AUTH_15",
+          "case_type_version" : "[[ANYTHING_PRESENT]]",
+          "state_id" : "TODO",
+          "state_name" : "To do",
+          "data" : null,
+          "data_classification" : null,
+          "security_classification" : "PUBLIC",
+          "significant_item" : null,
+          "proxied_by" : null,
+          "proxied_by_last_name" : null,
+          "proxied_by_first_name" : null
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}
