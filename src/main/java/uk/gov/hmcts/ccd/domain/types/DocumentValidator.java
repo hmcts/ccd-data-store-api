@@ -52,7 +52,6 @@ public class DocumentValidator implements BaseTypeValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
-        List<ValidationResult> validationResults;
 
         // Empty text should still check against MIN - MIN may or may not be 0
         if (isNullOrEmpty(dataValue)) {
@@ -87,6 +86,7 @@ public class DocumentValidator implements BaseTypeValidator {
                 + " does not match Document Management domain or expected URL path", dataFieldId));
         }
 
+        List<ValidationResult> validationResults;
         if (dataValue.has(DOCUMENT_BINARY_URL)) {
             final JsonNode documentBinaryUrl = dataValue.get(DOCUMENT_BINARY_URL);
             validationResults = validateDocumentBinaryURL(
