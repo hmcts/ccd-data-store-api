@@ -18,8 +18,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
@@ -113,7 +115,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
+    JwtDecoder jwtDecoder(AppInsights appInsights) {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
@@ -124,7 +126,7 @@ public class SecurityConfiguration {
         OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
 
         jwtDecoder.setJwtValidator(validator);
-        return jwtDecoder;
+        return new AppInsightsJwtDecoder(jwtDecoder, appInsights);
     }
 
 }
