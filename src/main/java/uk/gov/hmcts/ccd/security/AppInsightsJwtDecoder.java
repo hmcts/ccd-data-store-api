@@ -44,7 +44,7 @@ public class AppInsightsJwtDecoder implements JwtDecoder {
     private void logJwtValidationFailure(JwtException exception) {
         String failureMessage = sanitise(exception.getMessage());
 
-        log.warn("{}: {}", JWT_VALIDATION_FAILURE_MESSAGE, failureMessage, exception);
+        log.warn("{}: {}", JWT_VALIDATION_FAILURE_MESSAGE, failureMessage);
         appInsights.trackTrace(
             JWT_VALIDATION_FAILURE_MESSAGE + ": " + failureMessage,
             buildTelemetryProperties(exception, failureMessage),
