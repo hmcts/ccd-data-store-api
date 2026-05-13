@@ -54,7 +54,7 @@ public class AppInsightsJwtDecoder implements JwtDecoder {
 
     private Map<String, String> buildTelemetryProperties(JwtException exception, String failureMessage) {
         Map<String, String> properties = new HashMap<>();
-        properties.put(FAILURE_TYPE, exception.getClass().getSimpleName());
+        properties.put(FAILURE_TYPE, classifyJwtFailure(exception));
         properties.put(FAILURE_MESSAGE, failureMessage);
 
         if (exception instanceof JwtValidationException jwtValidationException) {
@@ -85,5 +85,28 @@ public class AppInsightsJwtDecoder implements JwtDecoder {
         }
 
         return message.replaceAll("\\s+", " ");
+    }
+
+    private String classifyJwtFailure(Exception e) {
+        String msg = e.getMessage();
+
+        if (msg == null) {
+            return "UNKNOWN";
+        }
+
+        if (msg.contains("expired")) {
+            return "TOKEN_EXPIRED";
+        }
+        if (msg.contains("signature")) {
+            return "INVALID_SIGNATURE";
+        }
+        if (msg.contains("audience")) {
+            return "INVALID_AUDIENCE";
+        }
+        if (msg.contains("issuer")) {
+            return "INVALID_ISSUER";
+        }
+
+        return "OTHER";
     }
 }
