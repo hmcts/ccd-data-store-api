@@ -13,11 +13,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 
 import java.util.List;
@@ -31,6 +34,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.FAILURE_MESSAGE;
 import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.FAILURE_TYPE;
+import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.JWT_VALIDATION_FAILURE_MESSAGE;
+import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.METHOD;
+import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.PATH;
 import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.VALIDATION_ERRORS;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +71,7 @@ class AppInsightsJwtDecoderTest {
     void tearDown() {
         listAppender.stop();
         logger.detachAppender(listAppender);
+        RequestContextHolder.resetRequestAttributes();
     }
 
     @Test
@@ -81,20 +88,22 @@ class AppInsightsJwtDecoderTest {
     void decodeShouldLogJwtFailureToAppInsightsAndRethrowException() {
         BadJwtException exception = new BadJwtException("Signed JWT rejected: Invalid signature");
         when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+        setCurrentRequest("GET", "/cases/123");
 
         assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
 
-        Map<String, String> properties = captureAppInsightsProperties(
-            "JWT validation failed: Signed JWT rejected: Invalid signature");
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
 
-        assertThat(properties.get(FAILURE_TYPE)).isEqualTo(BadJwtException.class.getSimpleName());
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo("INVALID_SIGNATURE");
         assertThat(properties.get(FAILURE_MESSAGE)).isEqualTo("Signed JWT rejected: Invalid signature");
+        assertThat(properties.get(METHOD)).isEqualTo("GET");
+        assertThat(properties.get(PATH)).isEqualTo("/cases/123");
         assertThat(properties).doesNotContainKey(VALIDATION_ERRORS);
 
         assertThat(listAppender.list).hasSize(1);
         assertThat(listAppender.list.get(0).getLevel()).isEqualTo(Level.WARN);
         assertThat(listAppender.list.get(0).getFormattedMessage())
-            .contains("JWT validation failed: Signed JWT rejected: Invalid signature");
+            .contains("JWT validation failed: INVALID_SIGNATURE");
     }
 
     @Test
@@ -106,13 +115,16 @@ class AppInsightsJwtDecoderTest {
             List.of(expiredToken, invalidClaim)
         );
         when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+        setCurrentRequest("POST", "/caseworkers/abc/jurisdictions");
 
         assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
 
-        Map<String, String> properties = captureAppInsightsProperties("JWT validation failed: Jwt validation failed");
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
 
-        assertThat(properties.get(FAILURE_TYPE)).isEqualTo(JwtValidationException.class.getSimpleName());
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo("TOKEN_EXPIRED");
         assertThat(properties.get(FAILURE_MESSAGE)).isEqualTo("Jwt validation failed");
+        assertThat(properties.get(METHOD)).isEqualTo("POST");
+        assertThat(properties.get(PATH)).isEqualTo("/caseworkers/abc/jurisdictions");
         assertThat(properties.get(VALIDATION_ERRORS))
             .isEqualTo("Jwt expired at 2026-04-28T10:00:00Z; The iss claim is not valid");
     }
@@ -128,5 +140,10 @@ class AppInsightsJwtDecoderTest {
         );
 
         return propertiesCaptor.getValue();
+    }
+
+    private void setCurrentRequest(String method, String requestUri) {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, requestUri);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 }
