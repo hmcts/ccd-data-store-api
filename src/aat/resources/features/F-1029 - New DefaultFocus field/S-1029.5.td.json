@@ -7,7 +7,7 @@
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details",
-    "contains valid caseType id which has display_focus value set for tab",
+    "contains valid caseType id which has no display_focus value set for tab",
     "has the 200 OK code"
   ],
 

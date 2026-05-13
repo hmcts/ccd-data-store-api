@@ -4,25 +4,12 @@ Feature: F-1029: Update Case - Start Case Event - DefaultFocus
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-#  @S-1029.1
-#  Scenario: Applying NullifyByDefault at start of case creation for v1_external#/case-details-endpoint/startCaseForCaseworkerUsingGET
-#    Given a user with [an active profile in CCD]
-#    When a request is prepared with appropriate values,
-#    And   the request [contains correctly configured event details]
-#    And   the request [is configured to trigger an About To Start callback that does not change any of the TTL values it is still null]
-#    And   it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store]
-#    Then  a positive response is received,
-#    And   the response [has the 200 OK code]
-#    And   the response has all other details as expected
-#    And   the response [contains the TTL set to null]
-
-
   @S-1029.4
   Scenario: Successful response for caseType id and having newly added display_focus column
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values,
     And  the request [contains valid caseType id which has display_focus value set for tab]
-    And a call is submitted to GET /api/display/tab-structure/{id}
+    And it is submitted to call the [GET /api/display/tab-structure/{id}] operation of [CCD Data Store]
     Then  a positive response is received,
     And in response with [200 success]and [All tabs for the caseType id is present in the response along with newly added display_focus value]
 
@@ -30,8 +17,7 @@ Feature: F-1029: Update Case - Start Case Event - DefaultFocus
   Scenario: Successful response for caseType id and not having display_focus column
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values,
-    And  the request [contains valid caseType id which has display_focus value set for tab]
-#    And a call is submitted to GET /api/display/tab-structure/{id}
+    And  the request [contains valid caseType id which has no display_focus value set for tab]
     And it is submitted to call the [GET /api/display/tab-structure/{id}] operation of [CCD Data Store]
     Then  a positive response is received,
     And in response with [200 success]and [All tabs for the caseType id is present in the response along with newly added display_focus value]
