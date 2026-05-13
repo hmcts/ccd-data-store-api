@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +45,7 @@ import static uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder.VALIDATION_ERRORS;
 class AppInsightsJwtDecoderTest {
 
     private static final String TOKEN = "jwt-token";
+    private static final String UNKNOWN = "UNKNOWN";
 
     @Mock
     private JwtDecoder jwtDecoder;
@@ -127,6 +130,56 @@ class AppInsightsJwtDecoderTest {
         assertThat(properties.get(PATH)).isEqualTo("/caseworkers/abc/jurisdictions");
         assertThat(properties.get(VALIDATION_ERRORS))
             .isEqualTo("Jwt expired at 2026-04-28T10:00:00Z; The iss claim is not valid");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "The aud claim is not valid, INVALID_AUDIENCE",
+        "The iss claim is not valid, INVALID_ISSUER",
+        "Malformed JWT, OTHER"
+    })
+    void decodeShouldClassifyJwtFailures(String failureMessage, String expectedFailureType) {
+        BadJwtException exception = new BadJwtException(failureMessage);
+        when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+
+        assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
+
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
+
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo(expectedFailureType);
+        assertThat(properties.get(FAILURE_MESSAGE)).isEqualTo(failureMessage);
+        assertThat(properties.get(METHOD)).isEqualTo(UNKNOWN);
+        assertThat(properties.get(PATH)).isEqualTo(UNKNOWN);
+    }
+
+    @Test
+    void decodeShouldClassifyJwtFailureWithNoMessageAsUnknown() {
+        BadJwtException exception = new BadJwtException(null);
+        when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+
+        assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
+
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
+
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo(UNKNOWN);
+        assertThat(properties.get(FAILURE_MESSAGE)).isEqualTo("No failure message provided");
+    }
+
+    @Test
+    void decodeShouldUseValidationErrorCodeWhenDescriptionIsMissing() {
+        OAuth2Error validationError = new OAuth2Error("invalid_token", null, null);
+        JwtValidationException exception = new JwtValidationException(
+            "Jwt validation failed",
+            List.of(validationError)
+        );
+        when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+
+        assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
+
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
+
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo("OTHER");
+        assertThat(properties.get(VALIDATION_ERRORS)).isEqualTo("invalid_token");
     }
 
     @SuppressWarnings("unchecked")
