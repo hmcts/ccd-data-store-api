@@ -133,6 +133,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
+        } else if (key.toString().startsWith("contains ") && key.toString().contains(" and does not contain ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String[] expectedValues = key.toString().split(" and does not contain ", 2);
+                String expectedPresentValueStr = expectedValues[0].replace("contains ", "");
+                String expectedAbsentValueStr = expectedValues[1];
+
+                if (actualValueStr.contains(expectedPresentValueStr)
+                    && !actualValueStr.contains(expectedAbsentValueStr)) {
+                    return actualValueStr;
+                }
+                return "response did not match plain text expectations";
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
         } else if (key.toString().startsWith("contains ")) {
             try {
                 String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
