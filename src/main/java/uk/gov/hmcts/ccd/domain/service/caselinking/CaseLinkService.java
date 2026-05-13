@@ -47,7 +47,7 @@ public class CaseLinkService {
 
     @Transactional
     public void updateCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
-        final Long caseReference = Objects.requireNonNull(
+        final String caseReference = Objects.requireNonNull(
             caseDetails.getReference(), "case reference must not be null");
         final List<CaseLink> caseLinksWithReferences =
             caseLinkExtractor.getCaseLinksFromData(caseDetails, caseFieldDefinitions);
@@ -58,7 +58,7 @@ public class CaseLinkService {
         createCaseLinks(caseReference, caseLinksWithReferences);
     }
 
-    private void createCaseLinks(Long caseReference, List<CaseLink> caseLinksWithReferences) {
+    private void createCaseLinks(String caseReference, List<CaseLink> caseLinksWithReferences) {
         caseLinksWithReferences.stream()
             .filter(caseLink -> caseLink != null && caseLink.getLinkedCaseReference() != null)
             .forEach(caseLink -> {
@@ -74,16 +74,16 @@ public class CaseLinkService {
 
     public List<CaseLink> findCaseLinks(String caseReference) {
         List<CaseLinkEntity> allByCaseReference =
-            caseLinkRepository.findAllByCaseReference(Long.parseLong(caseReference));
+            caseLinkRepository.findAllByCaseReference(caseReference);
         List<CaseLink> allLinkedCases =
             caseLinkMapper.entitiesToModels(allByCaseReference);
 
         return allLinkedCases.stream()
-            .map(caseLink -> setCaseLinkReferences(Long.parseLong(caseReference), caseLink))
+            .map(caseLink -> setCaseLinkReferences(caseReference, caseLink))
             .collect(Collectors.toList());
     }
 
-    private CaseLink setCaseLinkReferences(Long caseReference, CaseLink caseLink) {
+    private CaseLink setCaseLinkReferences(String caseReference, CaseLink caseLink) {
 
         caseLink.setCaseReference(caseReference);
         caseDetailsRepository.findById(null, caseLink.getLinkedCaseId())
@@ -92,8 +92,8 @@ public class CaseLinkService {
         return caseLink;
     }
 
-    private void lockCaseDataRows(Long caseReference, List<CaseLink> caseLinksWithReferences) {
-        List<Long> referencesToLock = new ArrayList<>();
+    private void lockCaseDataRows(String caseReference, List<CaseLink> caseLinksWithReferences) {
+        List<String> referencesToLock = new ArrayList<>();
         referencesToLock.add(caseReference);
         if (caseLinksWithReferences != null) {
             referencesToLock.addAll(caseLinksWithReferences.stream()

@@ -44,7 +44,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     private CaseDetailsRepository caseDetailsRepository;
 
     private CaseDetails originalCaseDetails;
-    private Long currentCaseReference;
+    private String currentCaseReference;
     @Inject
     private PlatformTransactionManager transactionManager;
 
@@ -55,7 +55,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private CaseDetails createOriginalCaseDetails() {
         CaseDetails caseDetails = new CaseDetails();
-        currentCaseReference = CASE_REFERENCE_SEQUENCE.getAndIncrement();
+        currentCaseReference = String.valueOf(CASE_REFERENCE_SEQUENCE.getAndIncrement());
         caseDetails.setReference(currentCaseReference);
         caseDetails.setJurisdiction(JURISDICTION);
         caseDetails.setCaseTypeId(CASE_TYPE_DECENTRALIZED);
@@ -90,7 +90,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         // And: The case pointer should be persisted in the database
         Optional<CaseDetails> pointerOptional = caseDetailsRepository.findById(
             JURISDICTION,
-            Long.valueOf(originalCaseDetails.getId())
+            originalCaseDetails.getId()
         );
         assertThat("Case pointer should exist in database", pointerOptional.isPresent(), is(true));
         CaseDetails pointer = pointerOptional.orElseThrow();
@@ -124,7 +124,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
         CaseDetails pointer = caseDetailsRepository.findById(
             JURISDICTION,
-            Long.valueOf(originalCaseDetails.getId())
+            originalCaseDetails.getId()
         ).orElse(null);
 
         assertThat(pointer, is(notNullValue()));

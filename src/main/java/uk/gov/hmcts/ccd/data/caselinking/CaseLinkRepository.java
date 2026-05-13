@@ -22,7 +22,7 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
     @Modifying
     @Query("delete from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
-    int deleteAllByCaseReference(@Param("caseReference") Long caseReference);
+    int deleteAllByCaseReference(@Param("caseReference") String caseReference);
 
     @Modifying
     @Query(value = "insert into case_link (case_id, linked_case_id, case_type_id, standard_link) values ("
@@ -30,13 +30,13 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         + "(select id from case_data cd where cd.reference=:linkedCaseReference), "
         + "(select case_type_id from case_data cd where cd.reference=:linkedCaseReference), "
         + ":standardLink)", nativeQuery = true)
-    void insertUsingCaseReferences(@Param("caseReference") Long caseReference,
-                                   @Param("linkedCaseReference") Long linkedCaseReference,
+    void insertUsingCaseReferences(@Param("caseReference") String caseReference,
+                                   @Param("linkedCaseReference") String linkedCaseReference,
                                    @Param("standardLink") Boolean standardLink);
 
     @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
         + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
-    List<CaseLinkEntity> findAllByCaseReference(@Param("caseReference") Long caseReference);
+    List<CaseLinkEntity> findAllByCaseReference(@Param("caseReference") String caseReference);
 
 
     @Query(value = "select cd.reference from CaseDetailsEntity cd where cd.id in "
@@ -48,8 +48,8 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         + "       and cle.standardLink=:standardLink)"
         + " order by cd.createdDate asc"
     )
-    List<Long> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
-        @Param("linkedCaseReference") Long linkedCaseReference,
+    List<String> findCaseReferencesByLinkedCaseReferenceAndStandardLink(
+        @Param("linkedCaseReference") String linkedCaseReference,
         @Param("standardLink") Boolean standardLink
     );
 

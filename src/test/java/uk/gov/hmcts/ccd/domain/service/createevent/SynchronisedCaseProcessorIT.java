@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sql/insert_case_pointer.sql")
 public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
 
-    private static final long CASE_REFERENCE = 1644062237356399L;
+    private static final String CASE_REFERENCE = "1644062237356399";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String JURISDICTION = "PROBATE";
 
@@ -40,7 +40,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        initialVersion = getCurrentVersion(CASE_REFERENCE);
+        initialVersion = Long.parseLong(getCurrentVersion(CASE_REFERENCE));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         assertThat(processedDetails.getReference()).isEqualTo(CASE_REFERENCE);
         assertThat(processedDetails.getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
 
-        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(newVersion);
+        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(String.valueOf(newVersion));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         synchronisedCaseProcessor.applyConditionallyWithLock(payload, operation);
 
         verify(operation, never()).accept(null);
-        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(initialVersion);
+        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(String.valueOf(initialVersion));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         synchronisedCaseProcessor.applyConditionallyWithLock(payload, operation);
 
         verify(operation, never()).accept(null);
-        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(initialVersion);
+        assertThat(getCurrentVersion(CASE_REFERENCE)).isEqualTo(String.valueOf(initialVersion));
     }
 
     private DecentralisedCaseDetails buildCasePayload(Long version) {
@@ -104,10 +104,10 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         return decentralisedCaseDetails;
     }
 
-    private Long getCurrentVersion(Long caseReference) {
+    private String getCurrentVersion(String caseReference) {
         return jdbcTemplate.queryForObject(
             "SELECT version FROM case_data WHERE reference = ?",
-            Long.class,
+            String.class,
             caseReference
         );
     }

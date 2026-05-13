@@ -53,7 +53,7 @@ import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
-    protected static final Long INVALID_CASE_ID = 222L;
+    protected static final String INVALID_CASE_ID = "222";
 
     protected static final String AUTHORISED_ADD_SERVICE_1 = "ADD_SERVICE_1";
     protected static final String AUTHORISED_ADD_SERVICE_2 = "ADD_SERVICE_2";

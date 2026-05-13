@@ -910,7 +910,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().getFirst().getReference(), is(1589460099608690L))
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getReference(), is("1589460099608690"))
                 );
             }
 
@@ -1071,12 +1071,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .build();
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
-                CaseDetails case1 = getCase(caseSearchResult, 1588870649839697L);
-                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
+                CaseDetails case1 = getCase(caseSearchResult, "1588870649839697");
+                CaseDetails case2 = getCase(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(2L)),
                     () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1588870649839697L, 1589460125872336L),
+                        .contains("1588870649839697", "1589460125872336"),
                     () -> assertThat(case1.getSecurityClassification(), is(SecurityClassification.PRIVATE)),
                     () -> assertThat(case2.getSecurityClassification(), is(SecurityClassification.PUBLIC))
                 );
@@ -1097,7 +1097,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
-                CaseDetails case1 = getCase(caseSearchResult, 1589460125872336L);
+                CaseDetails case1 = getCase(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(case1.getSecurityClassification(), is(SecurityClassification.PUBLIC))
@@ -1112,7 +1112,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
@@ -1127,7 +1127,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
 
-                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
@@ -1145,14 +1145,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult =
                     executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_RESTRICTED);
-                CaseDetails case1 = getCase(caseSearchResult, 1589460099608690L);
-                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
-                CaseDetails case3 = getCase(caseSearchResult, 1588870649839697L);
-                CaseDetails case4 = getCase(caseSearchResult, 1589781123682092L);
+                CaseDetails case1 = getCase(caseSearchResult, "1589460099608690");
+                CaseDetails case2 = getCase(caseSearchResult, "1589460125872336");
+                CaseDetails case3 = getCase(caseSearchResult, "1588870649839697");
+                CaseDetails case4 = getCase(caseSearchResult, "1589781123682092");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(4L)),
                     () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1588870649839697L, 1589460125872336L, 1589460099608690L, 1589781123682092L),
+                        .contains("1588870649839697", "1589460125872336", "1589460099608690", "1589781123682092"),
                     () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
                     () -> assertThat(case2.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
                     () -> assertThat(case3.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
@@ -1176,7 +1176,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult =
                     executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_PUBLIC);
-                CaseDetails case1 = getCase(caseSearchResult, 1589460125872336L);
+                CaseDetails case1 = getCase(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_C)) // PUBLIC
@@ -1191,7 +1191,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
@@ -1217,7 +1217,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
 
-                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
@@ -1264,16 +1264,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE,
                         AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
-                CaseDetails case1 = getCase(caseSearchResult, 1588870649839697L);
-                CaseDetails case2 = getCase(caseSearchResult, 1589460099608690L);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, "1589460125872336");
+                CaseDetails case1 = getCase(caseSearchResult, "1588870649839697");
+                CaseDetails case2 = getCase(caseSearchResult, "1589460099608690");
                 // Comments for assertions below describe some example scenarios for which a given role would usually
                 // NOT allow data/cases to be returned if a user conducting the search ONLY had that role - expressed in
                 // the form "<Scenario> (<role>)"
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
                     () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1588870649839697L, 1589460125872336L, 1589460099608690L),
+                        .contains("1588870649839697", "1589460125872336", "1589460099608690"),
                     () -> assertThat(case1.getSecurityClassification(),
                         is(SecurityClassification.PRIVATE)), // Case SC (caseworker-autotest1)
                     () -> assertThat(case2.getState(),
@@ -1310,12 +1310,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B,
                     CASE_TYPE_C),
                     AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
-                CaseDetails case1 = getCase(caseSearchResult, 1588870615652827L);
-                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
+                CaseDetails case1 = getCase(caseSearchResult, "1588870615652827");
+                CaseDetails case2 = getCase(caseSearchResult, "1589460125872336");
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(2L)),
                     () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1588870615652827L, 1589460125872336L),
+                        .contains("1588870615652827", "1589460125872336"),
                     () -> assertThat(case1.getJurisdiction(), is(AUTOTEST_2)),
                     () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_B)),
                     () -> assertThat(case2.getJurisdiction(), is(AUTOTEST_1)),
@@ -1353,7 +1353,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(2L)),
                 () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                    .contains(1589460125872336L, 1589460099608691L)
+                    .contains("1589460125872336", "1589460099608691")
             );
         }
 
@@ -1391,14 +1391,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             return caseSearchResult.getCases().getFirst().getData();
         }
 
-        private CaseDetails getCase(CaseSearchResult caseSearchResult, Long reference) {
+        private CaseDetails getCase(CaseSearchResult caseSearchResult, String reference) {
             return caseSearchResult.getCases().stream()
                 .filter(e -> e.getReference().equals(reference))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError(String.format("Case with reference %s not found", reference)));
         }
 
-        private Map<String, JsonNode> getCaseData(CaseSearchResult caseSearchResult, Long reference) {
+        private Map<String, JsonNode> getCaseData(CaseSearchResult caseSearchResult, String reference) {
             return getCase(caseSearchResult, reference).getData();
         }
     }
@@ -1495,7 +1495,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(2L)),
                     () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1588866820969121L, 1588870615652827L)
+                        .contains("1588866820969121", "1588870615652827")
                 );
             }
         }
@@ -1601,7 +1601,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertThat(caseDetails.getLastModified().toString(), is(LAST_MODIFIED_DATE_VALUE)),
                     () -> assertThat(caseDetails.getLastStateModifiedDate().toString(),
                         is(LAST_STATE_MODIFIED_DATE_VALUE)),
-                    () -> assertThat(caseDetails.getReference(), is(1588866820969121L)),
+                    () -> assertThat(caseDetails.getReference(), is("1588866820969121")),
                     () -> assertThat(caseDetails.getState(), is(STATE_VALUE)),
                     () -> assertThat(caseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC))
                 );

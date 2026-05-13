@@ -96,7 +96,7 @@ class RestrictedGetCaseOperationTest {
             .thenReturn(accessProfiles);
 
         doReturn(USER_ID).when(userRepository).getUserId();
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(CASE_REFERENCE, USER_ID);
         restrictedGetCaseOperation = new RestrictedGetCaseOperation(defaultGetCaseOperation,
             authorisedGetCaseOperation,
             caseDefinitionRepository,

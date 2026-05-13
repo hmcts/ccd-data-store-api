@@ -147,7 +147,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
-            caseDetails = caseDetailsRepository.findById(null, Long.parseLong(caseReference));
+            caseDetails = caseDetailsRepository.findById(null, caseReference);
             if (caseDetails.isEmpty()) {
                 return Sets.newHashSet();
             }
@@ -223,7 +223,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
             if (applicationParams.getEnableCaseUsersDbSync()) {
-                caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+                caseUserRepository.grantAccess(caseDetails.getId(), idamUserId, CREATOR.getRole());
             }
         }
     }

@@ -35,14 +35,14 @@
       "total": 2,
       "cases": [{
         "_extends_" : "F-108_Base_Case_Fields_expected",
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest1]}",
+        "id": "${[scenarioContext][customValues][caseIdAsStringFrom_S-914_Create_Case_Private_Autotest1]}",
         "case_data": {
           "NumberFieldAlias": "914",
           "EmailFieldAlias": "fuctional@test.com"
         }
       },{
         "_extends_" : "F-108_Base_Case_Fields_expected",
-        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest2]}",
+        "id": "${[scenarioContext][customValues][caseIdAsStringFrom_S-914_Create_Case_Private_Autotest2]}",
         "jurisdiction" : "AUTOTEST2",
         "case_type_id" : "AAT_PRIVATE2",
         "case_data": {

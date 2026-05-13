@@ -78,7 +78,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
 
         assertEquals(1, caseLinksResource.getCaseLinks().size());
         assertEquals(
-            Long.parseLong(CASE_03_REFERENCE), // pre-existing case link (see classpath:sql/insert_cases.sql)
+            CASE_03_REFERENCE, // pre-existing case link (see classpath:sql/insert_cases.sql)
             caseLinksResource.getCaseLinks().get(0).getLinkedCaseReference()
         );
     }
@@ -99,13 +99,13 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
             CaseLinksResource.class);
 
         final List<CaseLink> caseLinks = caseLinksResource.getCaseLinks();
-        final List<Long> foundCaseLinks = caseLinks.stream()
+        final List<String> foundCaseLinks = caseLinks.stream()
             .map(CaseLink::getLinkedCaseReference)
             .collect(Collectors.toList());
         assertEquals(2, foundCaseLinks.size());
         assertTrue(foundCaseLinks.containsAll(List.of(
-                Long.parseLong(CASE_03_REFERENCE), // pre-existing case link (see classpath:sql/insert_cases.sql)
-                Long.parseLong(CASE_04_REFERENCE)  // new case link
+                CASE_03_REFERENCE, // pre-existing case link (see classpath:sql/insert_cases.sql)
+                CASE_04_REFERENCE  // new case link
             )));
     }
 }

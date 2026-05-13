@@ -54,17 +54,17 @@ interface ServicePersistenceAPI {
         produces = MediaType.APPLICATION_JSON_VALUE)
     DecentralisedUpdateSupplementaryDataResponse updateSupplementaryData(
         URI baseURI,
-        @PathVariable("case-ref") Long caseRef,
+        @PathVariable("case-ref") String caseRef,
         @RequestBody SupplementaryDataUpdateRequest supplementaryData);
 
     @GetMapping(value = "/ccd-persistence/cases")
-    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<Long> caseRefs);
+    List<DecentralisedCaseDetails> getCases(URI baseURI, @RequestParam("case-refs") List<String> caseRefs);
 
     @GetMapping(value = "/ccd-persistence/cases/{case-ref}/history")
-    List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") Long caseReference);
+    List<DecentralisedAuditEvent> getCaseHistory(URI baseURI, @PathVariable("case-ref") String caseReference);
 
     @GetMapping(value = "/ccd-persistence/cases/{case-ref}/history/{event-id}")
     DecentralisedAuditEvent getCaseHistoryEvent(URI baseURI,
-                                   @PathVariable("case-ref") Long caseReference,
-                                   @PathVariable("event-id") Long eventId);
+                                   @PathVariable("case-ref") String caseReference,
+                                   @PathVariable("event-id") String eventId);
 }

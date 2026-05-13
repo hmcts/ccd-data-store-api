@@ -181,7 +181,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         CaseHistoryViewResource response = mapper.readValue(content, CaseHistoryViewResource.class);
-        assertThat(response.getEvent().getId(), is(1L));
+        assertThat(response.getEvent().getId(), is("1"));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());

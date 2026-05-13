@@ -117,13 +117,13 @@ public class ServicePersistenceClient {
             .toList();
     }
 
-    public AuditEvent getCaseHistoryEvent(CaseDetails caseDetails, Long eventId) {
+    public AuditEvent getCaseHistoryEvent(CaseDetails caseDetails, String eventId) {
         var uri = resolver.resolveUriOrThrow(caseDetails);
         var auditEvent = api.getCaseHistoryEvent(uri, caseDetails.getReference(), eventId);
         return extractValidatedAuditEvent(caseDetails, auditEvent);
     }
 
-    public JsonNode updateSupplementaryData(Long caseRef, SupplementaryDataUpdateRequest supplementaryData) {
+    public JsonNode updateSupplementaryData(String caseRef, SupplementaryDataUpdateRequest supplementaryData) {
         var uri = resolver.resolveUriOrThrow(caseRef);
         return api.updateSupplementaryData(uri, caseRef, supplementaryData).getSupplementaryData();
     }

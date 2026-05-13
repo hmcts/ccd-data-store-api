@@ -27,11 +27,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
 class CachedCaseDetailsRepositoryTest {
 
-    private static final long CASE_ID = 100000L;
-    private static final long CASE_REFERENCE = 999999L;
+    private static final String CASE_ID = "100000";
+    private static final String CASE_REFERENCE = "999999";
     private static final String CASE_REFERENCE_STR = "1234123412341236";
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
@@ -213,9 +214,10 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
+            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE).orElseThrow(() ->
+                new CaseNotFoundException(CASE_REFERENCE));
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
@@ -226,14 +228,15 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByReferenceAgain() {
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             cachedRepository.findByReference(CASE_REFERENCE);
 
             verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE);
 
-            doReturn(new CaseDetails()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
-            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE).orElseThrow(() ->
+                new CaseNotFoundException(CASE_REFERENCE));
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),

@@ -75,9 +75,9 @@ public class CaseAuditEventEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
         generator = "case_event_id_seq_generator")
-    @SequenceGenerator(name = "case_event_id_seq_generator", 
+    @SequenceGenerator(name = "case_event_id_seq_generator",
         sequenceName = "case_event_id_seq", allocationSize = 1)
     private Long id;
     @Column(name = "user_id")
@@ -95,7 +95,7 @@ public class CaseAuditEventEntity {
     @Column(name = "description")
     private String description;
     @Column(name = "case_data_id")
-    private Long caseDataId;
+    private String caseDataId;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
     @Column(name = "state_id")

@@ -204,7 +204,7 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
         int rowsUpdated = jdbcTemplate.update(
             "UPDATE case_data SET supplementary_data = ?::jsonb WHERE reference = ?",
             supplementaryDataJson,
-            Long.parseLong(caseReference)
+            caseReference
         );
 
         entityManager.flush();
@@ -219,7 +219,7 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
         String dbSupplementaryDataJson = jdbcTemplate.queryForObject(
             "SELECT supplementary_data::text FROM case_data WHERE reference = ?",
             String.class,
-            Long.parseLong(caseReference)
+            caseReference
         );
 
         // Verify the database contains the expected supplementary_data

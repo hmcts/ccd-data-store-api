@@ -39,8 +39,8 @@ import static org.mockito.Mockito.verify;
 class CaseEventMessageServiceTest {
 
     private static final String USER_ID = "123";
-    private static final Long EVENT_INSTANCE_ID = 2L;
-    private static final Long CASE_ID = 456L;
+    private static final String EVENT_INSTANCE_ID = "2";
+    private static final String CASE_ID = "456";
     private static final String EVENT_ID = "SomeEvent";
     private static final String EVENT_NAME = "Some event";
     private static final String CASE_EVENT = "CASE_EVENT";
@@ -119,7 +119,7 @@ class CaseEventMessageServiceTest {
 
     private MessageInformation buildMessageInformation() {
         final MessageInformation msgInfo = new MessageInformation();
-        msgInfo.setCaseId(caseDetails.getReference().toString());
+        msgInfo.setCaseId(caseDetails.getReference());
         msgInfo.setJurisdictionId(caseDetails.getJurisdiction());
         msgInfo.setCaseTypeId(caseDetails.getCaseTypeId());
         msgInfo.setEventInstanceId(EVENT_INSTANCE_ID);

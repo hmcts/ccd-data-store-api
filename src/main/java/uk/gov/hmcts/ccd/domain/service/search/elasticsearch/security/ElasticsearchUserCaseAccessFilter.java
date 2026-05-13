@@ -56,7 +56,7 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
         });
     }
 
-    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
+    private Optional<List<String>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
         return caseAccessService.getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
     }
 }

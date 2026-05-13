@@ -94,7 +94,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldResolveUriForCaseReferenceAndCacheCaseType() {
-        Long reference = 1234567890123456L;
+        String reference = "1234567890123456";
         resolver.setCaseTypeServiceUrls(Map.of("testcase", TEST_URI.toString()));
         when(casePointerRepository.findCaseTypeByReference(reference)).thenReturn("TestCase");
 
@@ -108,7 +108,7 @@ class PersistenceStrategyResolverTest {
 
     @Test
     void shouldThrowWhenNoRouteConfiguredForReference() {
-        Long reference = 9876543210987654L;
+        String reference = "9876543210987654";
         when(casePointerRepository.findCaseTypeByReference(reference)).thenReturn("UnknownType");
 
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,

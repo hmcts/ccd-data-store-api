@@ -76,7 +76,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     @Test
     void testSearchCaseDetails() throws Exception {
 
-        final long referenceId = 1535450291607660L;
+        final String referenceId = "1535450291607660";
         String caseDetailElastic = create1CaseDetailsElastic(referenceId);
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
 
@@ -130,8 +130,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(2));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607660"))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607670"))));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());

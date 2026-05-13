@@ -96,7 +96,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+    public Optional<CaseDetails> findById(String jurisdiction, String id) {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
 
@@ -107,12 +107,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      */
     @Override
     @Deprecated
-    public CaseDetails findById(final Long id) {
+    public CaseDetails findById(final String id) {
         return findById(null, id).orElse(null);
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+    public List<String> findCaseReferencesByIds(final List<String> ids) {
         return findReferencesByIds(ids);
     }
 
@@ -178,7 +178,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         final Query query = em.createNamedQuery("CaseDataEntity_FIND_CASE_WITH_LIMITS");
         query.setParameter("jurisdictionId", migrationParameters.getJurisdictionId());
         query.setParameter("caseTypeId", migrationParameters.getCaseTypeId());
-        query.setParameter("caseDataId", migrationParameters.getCaseDataId());
+        query.setParameter("caseDataId", Long.valueOf(migrationParameters.getCaseDataId()));
 
         paginateSetLimit(query, migrationParameters.getNumRecords());
         return caseDetailsMapper.entityToModel(query.getResultList());
@@ -202,7 +202,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
-    private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
+    private Optional<CaseDetailsEntity> find(String jurisdiction, String id, String reference) {
         final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectSecured(em);
 
         if (null != jurisdiction) {
@@ -212,8 +212,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return getCaseDetailsEntity(id, reference, qb);
     }
 
-    private List<Long> findReferencesByIds(List<Long> ids) {
-        final CaseDetailsQueryBuilder<Long> qb = queryBuilderFactory.selectByReferenceSecured(em);
+    private List<String> findReferencesByIds(List<String> ids) {
+        final CaseDetailsQueryBuilder<String> qb = queryBuilderFactory.selectByReferenceSecured(em);
         qb.whereIdsAreIn(ids);
 
         return qb.build().getResultList();
@@ -231,7 +231,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
-    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(String id,
                                                              String reference,
                                                              CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {

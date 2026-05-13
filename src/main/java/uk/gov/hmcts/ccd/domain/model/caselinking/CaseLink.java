@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Data
 public class CaseLink {
 
-    private Long caseReference;
-    private Long linkedCaseReference;
+    private String caseReference;
+    private String linkedCaseReference;
 
     @JsonIgnore
-    private Long caseId;
+    private String caseId;
     @JsonIgnore
-    private Long linkedCaseId;
+    private String linkedCaseId;
     private String caseTypeId;
 
     private Boolean standardLink;
