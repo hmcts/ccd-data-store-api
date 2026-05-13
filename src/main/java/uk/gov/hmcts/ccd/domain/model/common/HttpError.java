@@ -34,7 +34,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
-        this.message = exception.getMessage();
+        this.message = error;
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
     }
 
@@ -45,7 +45,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = getErrorReason(responseStatus, status);
-        this.message = exception.getMessage();
+        this.message = error;
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 
