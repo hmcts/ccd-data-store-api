@@ -1,0 +1,15 @@
+{
+  "_guid_" : "F-1029_Create_Draft",
+  "_extends_" : "S-1029.1",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1029_Get_Event_Token"
+  }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

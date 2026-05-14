@@ -31,10 +31,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItemInArray;
-import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -130,6 +127,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         assertAll(
             () -> verify(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(2)),
+//            () -> assertThat(caseHistoryView.getTabs()[0].getDefaultFocus(), is(true)),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id",
                     equalTo("dataTestField2")))),
             () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
