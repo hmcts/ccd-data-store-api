@@ -27,7 +27,7 @@
 ## Context
 
 - `src/main/java/uk/gov/hmcts/ccd/SecurityConfiguration.java` builds the decoder from `spring.security.oauth2.client.provider.oidc.issuer-uri`.
-- The service separately configures `oidc.issuer` so the trusted token issuer is explicit rather than inferred from discovery.
+- The service separately configures `oidc.issuer` because the discovered issuer is not the value trusted for validation.
 - The previous implementation instantiated `JwtIssuerValidator(issuerOverride)` but only applied `JwtTimestampValidator`, which meant an unexpected `iss` claim could still be accepted if signature and timestamps were valid.
 
 ## Implemented fix
@@ -49,7 +49,7 @@ OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withT
 | `IDAM_OIDC_URL` | Discovery base URL | Not the source of truth for token `iss` |
 | `OIDC_ISSUER` | Expected JWT issuer | Must match real caller token `iss` exactly |
 
-The enforced issuer is an explicit `OIDC_ISSUER` value supplied by Helm/Jenkins configuration. It is not a runtime fallback that appears automatically when issuer settings are absent.
+For this repo, the FORGEROCK issuer used in deployed environments is an explicit `OIDC_ISSUER` value supplied by Helm/Jenkins configuration. It is not a runtime fallback that appears automatically when issuer settings are absent.
 
 ## Tests
 
@@ -76,15 +76,17 @@ Before rollout, confirm:
 | Item | Current repo state |
 |---|---|
 | Service issuer model | Single configured issuer |
-| Issuer pattern used for PR preview | Public AAT IDAM issuer, `https://idam-web-public.aat.platform.hmcts.net/o`, verified from AAC/MCA tokens |
-| Repo wiring status | Preview Helm values and PR functional-test verifier wiring are aligned to the public AAT IDAM issuer |
+| Issuer pattern used for this service | Canonical FORGEROCK issuer pattern, consistent with the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and the external service issuer policy for `ccd-data-store-api` |
+| Repo wiring status | Helm values, preview values, and Jenkins wiring are already aligned to that FORGEROCK issuer pattern |
 
-This preview change follows the HMCTS guidance option for API providers to validate against a single explicitly
-configured issuer. Multi-issuer allow-list support is intentionally out of scope and tracked separately.
+Preview could not be switched to `https://idam-web-public.aat.platform.hmcts.net/o` while this service still uses
+single-issuer validation. The PR functional issuer verifier gets a real token through the CCD gateway OAuth client, and
+that token currently has the FORGEROCK `iss` value. Using the public AAT IDAM issuer as the only `OIDC_ISSUER` would
+therefore fail the verifier and reject existing CCD gateway/callback tokens until either those clients move to IDAM-issued
+tokens or Data Store supports the separate multi-issuer allow-list work.
 
-Do not infer `OIDC_ISSUER` from the public OIDC discovery URL alone. In PR preview, the correct
-`OIDC_ISSUER` is the issuer from decoded AAC/MCA public AAT IDAM tokens:
-`https://idam-web-public.aat.platform.hmcts.net/o`.
+Do not infer `OIDC_ISSUER` from the public OIDC discovery URL. In preview/AAT for this repo, the correct
+`OIDC_ISSUER` had to be taken from decoded real tokens and did not match the public `IDAM_OIDC_URL` base.
 
 Smoke and functional pipeline runs now perform a pre-check that acquires a real test token and fails fast if its
 `iss` claim does not match `OIDC_ISSUER`.
