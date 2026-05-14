@@ -4,17 +4,18 @@
   "_extends_": "F-1029.1_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "Fetch a draft for display",
+    "contains valid caseType id which has display_focus value set for tab",
+    "GET /api/display/display/tab-structure/{id}",
     "contains HTTP 200"
   ],
   "method": "GET",
-  "uri": "/internal/drafts/{did}",
+  "uri": "/api/display/tab-structure/{ctid}",
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "did": "${[scenarioContext][childContexts][F-1029_Create_Draft][testData][actualResponse][body][id]}"
+      "ctid": "TestAddressBookCase"
     }
   },
   "expectedResponse": {
@@ -41,6 +42,7 @@
         "id" : "Data",
         "label" : "Data",
         "order" : 1,
+        "defaultFocus": "[[ANY_NULLABLE]]",
         "fields" : [ {
           "id" : "TextField",
           "label" : "TextField",

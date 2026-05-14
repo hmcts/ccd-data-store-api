@@ -23,7 +23,7 @@ public class CaseTypeTabDefinition implements Serializable, CommonDCPModel {
     private String role;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter = null;
-    @JsonProperty
+    @JsonProperty("default_focus")
     private Boolean defaultFocus;
 
     public String getId() {

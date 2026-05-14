@@ -5,16 +5,16 @@
   "specs": [
     "an active profile in CCD",
     "Save draft as a caseworker",
-    "contains HTTP 201 Created"
+    "contains HTTP 200"
   ],
-  "method": "POST",
+  "method": "GET",
   "uri": "/api/display/tab-structure/{ctid}",
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "ctid": "FT_CRUD"
+      "ctid": "TestAddressBookCase"
     },
     "body": {
       "data": {
@@ -26,7 +26,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][F-068_Get_Event_Token][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][F-1029_Get_Event_Token][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {

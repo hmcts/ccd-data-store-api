@@ -17,9 +17,9 @@ Feature: F-1029.1: Validate calls for the Drafts Endpoint
 #    And it is submitted to call the [Save draft as a caseworker] operation of [CCD Data Store],
 #
 #    Then a positive response is received,
-#    And the response [contains HTTP 201 Created],
+#    And the response [contains HTTP 200],
 #    And the response has all other details as expected.
-#
+
 #  #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #  @S-1029.2
 #  Scenario: Update draft as a caseworker
@@ -36,14 +36,13 @@ Feature: F-1029.1: Validate calls for the Drafts Endpoint
 #
 #  #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-1029.3
-  Scenario: Fetch a draft for display
+  Scenario: Successful response for caseType id and having newly added display_focus column
 
     Given a user with [an active profile in CCD],
-    And a successful call [Save draft as a caseworker] as in [F-1029_Create_Draft],
-
+    When a request is prepared with appropriate values
+    And the request [contains valid caseType id which has display_focus value set for tab]
     When a request is prepared with appropriate values,
-    And it is submitted to call the [Fetch a draft for display] operation of [CCD Data Store],
-
+    And it is submitted to call the [GET /api/display/display/tab-structure/{id}] operation of [CCD Data Store],
     Then a positive response is received,
     And the response [contains HTTP 200],
     And the response has all other details as expected.
