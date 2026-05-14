@@ -410,7 +410,7 @@ public class CaseController {
                         + "\t\t\"orgs_assigned_users.OrgZ\": 34,\n"
                         + "\t\t\"processed\": true\n"
                         + "\t}\n"
-                        + "}" 
+                        + "}"
                 )
             )
     })
