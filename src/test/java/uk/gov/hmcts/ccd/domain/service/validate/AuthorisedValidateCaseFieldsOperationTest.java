@@ -48,6 +48,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 class AuthorisedValidateCaseFieldsOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -472,6 +479,217 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> verify(caseAccessService, times(2)).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> assertNotNull(result)
         );
+    }
+
+    @Test
+    @DisplayName("should throw when event is missing before mid event")
+    void shouldThrowWhenEventIsMissing() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_EVENT_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when event id is empty before mid event")
+    void shouldThrowWhenEventIdIsEmpty() {
+        CaseDataContent content = new CaseDataContent();
+        Event event = new Event();
+        event.setEventId("");
+        content.setEvent(event);
+        content.setCaseReference(CASE_REFERENCE);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_EVENT_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when create case user has no roles")
+    void shouldThrowWhenCreateCaseUserHasNoRoles() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference("");
+        content.setData(emptyMap());
+
+        when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(Set.of());
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ValidationException exception = assertThrows(ValidationException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals("Cannot find user roles for the user", exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when create case type access is denied")
+    void shouldThrowWhenCreateCaseTypeAccessDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference("");
+        content.setData(emptyMap());
+
+        when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_CREATE)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when create case event access is denied")
+    void shouldThrowWhenCreateCaseEventAccessDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference("");
+        content.setData(emptyMap());
+
+        when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), eq(CAN_CREATE)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_EVENT_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when create case field access is denied")
+    void shouldThrowWhenCreateCaseFieldAccessDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference("");
+        content.setData(null);
+
+        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), eq(CAN_CREATE)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_FIELD_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when update case is not found")
+    void shouldThrowWhenUpdateCaseNotFound() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(emptyMap());
+
+        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals("Case not found", exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when update case type access is denied")
+    void shouldThrowWhenUpdateCaseTypeAccessDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(emptyMap());
+
+        when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_UPDATE)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should throw when update case state access is denied")
+    void shouldThrowWhenUpdateCaseStateAccessDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(emptyMap());
+
+        when(accessControlService.canAccessCaseStateWithCriteria(anyString(), any(), any(), eq(CAN_UPDATE)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+
+        assertEquals(NO_CASE_STATE_FOUND, exception.getMessage());
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should return empty data when read access to case type is denied")
+    void shouldReturnEmptyDataWhenReadAccessToCaseTypeIsDenied() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
+
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID)))
+            .thenReturn(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
+        when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_READ)))
+            .thenReturn(false);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertTrue(result.containsKey(DATA));
+        assertTrue(result.get(DATA).isEmpty());
+        verify(accessControlService, never()).filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    @DisplayName("should return empty data when content data is null after mid event")
+    void shouldReturnEmptyDataWhenContentDataIsNullAfterMidEvent() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(null);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        Map<String, JsonNode> result = authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertTrue(result.containsKey(DATA));
+        assertTrue(result.get(DATA).isEmpty());
+        verify(accessControlService, never()).filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean());
     }
 
     @Test
