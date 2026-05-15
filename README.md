@@ -34,6 +34,7 @@ The following environment variables are required:
 | IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
 | IDAM_OIDC_URL | - | Base URL for IdAM OIDC discovery and JWKS lookup. This is used to resolve the OpenID configuration and signing keys. |
 | OIDC_ISSUER | - | Enforced JWT issuer value. This must match the `iss` claim in real access tokens accepted by this service. Do not guess it; derive it from a real token for the target environment. |
+| OIDC_ALLOWED_ISSUERS | - | Optional comma-separated additional issuer values accepted during migration. `OIDC_ISSUER` is always accepted; when unset, only `OIDC_ISSUER` is accepted. |
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DOCUMENT_URL_PATTERN | - |  URL Pattern for documents attachable to cases. |
@@ -50,7 +51,7 @@ The following environment variables are required:
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
 | DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
 
-`IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
+`IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER` plus any optional `OIDC_ALLOWED_ISSUERS`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
 
 ### Codex Workflow Docs
 Repo-local workflow docs are indexed in `AGENTS.md`.

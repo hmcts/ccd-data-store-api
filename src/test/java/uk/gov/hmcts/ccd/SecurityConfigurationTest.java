@@ -4,15 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
-
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 import com.nimbusds.jose.JOSEException;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.ccd.util.KeyGenerator.getRsaJWK;
 class SecurityConfigurationTest {
 
     private static final String VALID_ISSUER = "http://localhost:5000/o";
+    private static final String ADDITIONAL_ISSUER = "http://additional-issuer";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
 
     @Test
@@ -40,6 +42,26 @@ class SecurityConfigurationTest {
         Instant now = Instant.now();
         assertFalse(
             validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+        );
+    }
+
+    @Test
+    void shouldAcceptJwtFromAdditionalAllowedIssuer() {
+        Instant now = Instant.now();
+        assertFalse(
+            validator(ADDITIONAL_ISSUER)
+                .validate(buildJwt(ADDITIONAL_ISSUER, now.minusSeconds(60), now.plusSeconds(300)))
+                .hasErrors()
+        );
+    }
+
+    @Test
+    void shouldKeepPrimaryIssuerWhenAdditionalAllowedIssuersConfigured() {
+        Instant now = Instant.now();
+        assertFalse(
+            validator(ADDITIONAL_ISSUER)
+                .validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300)))
+                .hasErrors()
         );
     }
 
@@ -62,6 +84,12 @@ class SecurityConfigurationTest {
     }
 
     @Test
+    void shouldAcceptDecodedJwtFromAdditionalAllowedIssClaim() throws JOSEException, ParseException {
+        assertThat(decoder(ADDITIONAL_ISSUER).decode(signedJwt(ADDITIONAL_ISSUER)).getIssuer().toString())
+            .isEqualTo(ADDITIONAL_ISSUER);
+    }
+
+    @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
         Instant now = Instant.now();
         // Keep expiry clearly outside the default clock-skew allowance to avoid boundary flakiness.
@@ -71,15 +99,27 @@ class SecurityConfigurationTest {
     }
 
     private OAuth2TokenValidator<Jwt> validator() {
+        return validator(null);
+    }
+
+    private OAuth2TokenValidator<Jwt> validator(String allowedIssuers) {
+        Set<String> configuredIssuers = OidcIssuerConfiguration.allowedIssuers(VALID_ISSUER, allowedIssuers);
         return new DelegatingOAuth2TokenValidator<>(
             new JwtTimestampValidator(),
-            new JwtIssuerValidator(VALID_ISSUER)
+            new JwtClaimValidator<>(
+                "iss",
+                issuer -> issuer != null && configuredIssuers.contains(issuer.toString())
+            )
         );
     }
 
     private NimbusJwtDecoder decoder() throws JOSEException {
+        return decoder(null);
+    }
+
+    private NimbusJwtDecoder decoder(String allowedIssuers) throws JOSEException {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(getRsaJWK().toRSAPublicKey()).build();
-        decoder.setJwtValidator(validator());
+        decoder.setJwtValidator(validator(allowedIssuers));
         return decoder;
     }
 

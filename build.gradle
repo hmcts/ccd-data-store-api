@@ -757,7 +757,7 @@ task highLevelDataSetup(type: JavaExec) {
 }
 
 task verifyFunctionalTestJwtIssuer(type: JavaExec) {
-    description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+    description = 'Verifies the functional/smoke test token issuer matches configured OIDC issuers'
     group = 'Verification'
     dependsOn aatClasses
 
@@ -770,7 +770,7 @@ task verifyFunctionalTestJwtIssuer(type: JavaExec) {
 }
 
 task verifyOidcIssuerPolicy {
-    description = 'Fails if oidc.issuer is derived from discovery configuration'
+    description = 'Fails if OIDC issuer validation config is derived from discovery configuration'
     group = 'Verification'
 
     doLast {
@@ -784,8 +784,8 @@ task verifyOidcIssuerPolicy {
             def file = file(path)
             file.exists() && file.readLines().any { line ->
                 def normalized = line.replaceAll(/\s+/, '')
-                normalized.startsWith('oidc.issuer=') && normalized.contains('IDAM_OIDC_URL')
-                    || normalized.startsWith('oidc.issuer=') && normalized.contains('idam.api.url')
+                (normalized.startsWith('oidc.issuer=') || normalized.startsWith('oidc.allowed-issuers='))
+                    && (normalized.contains('IDAM_OIDC_URL') || normalized.contains('idam.api.url'))
             }
         }
 

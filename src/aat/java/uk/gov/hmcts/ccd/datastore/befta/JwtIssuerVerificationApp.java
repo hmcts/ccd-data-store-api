@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.datastore.tests.Env;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
+import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Set;
 
 public final class JwtIssuerVerificationApp {
 
@@ -17,7 +19,10 @@ public final class JwtIssuerVerificationApp {
     }
 
     public static void main(String[] args) throws Exception {
-        String expectedIssuer = Env.require("OIDC_ISSUER");
+        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(
+            Env.require("OIDC_ISSUER"),
+            System.getenv("OIDC_ALLOWED_ISSUERS")
+        );
         String idamBaseUrl = Env.require("IDAM_API_URL_BASE");
         String[] credentials = firstAvailableCredentials(
             "CCD_CASEWORKER_AUTOTEST_EMAIL", "CCD_CASEWORKER_AUTOTEST_PASSWORD",
@@ -28,13 +33,14 @@ public final class JwtIssuerVerificationApp {
         String accessToken = idamHelper.getIdamOauth2Token(credentials[0], credentials[1]);
         String actualIssuer = decodeIssuer(accessToken);
 
-        if (!expectedIssuer.equals(actualIssuer)) {
+        if (!allowedIssuers.contains(actualIssuer)) {
             throw new IllegalStateException(
-                "OIDC_ISSUER mismatch: expected `" + expectedIssuer + "` but token iss was `" + actualIssuer + "`"
+                "OIDC issuer mismatch: expected one of `" + String.join("`, `", allowedIssuers)
+                    + "` but token iss was `" + actualIssuer + "`"
             );
         }
 
-        System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
+        System.out.println("Verified functional test token iss is allowed: " + actualIssuer);
     }
 
     private static String[] firstAvailableCredentials(String... envNames) {
