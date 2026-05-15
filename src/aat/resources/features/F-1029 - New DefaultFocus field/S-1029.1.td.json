@@ -1,10 +1,11 @@
 {
   "_guid_": "S-1029.1",
-  "operationName": "Save draft as a caseworker",
+  "operationName": "GET /api/display/tab-structure/{id}",
   "_extends_": "F-1029.1_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "Save draft as a caseworker",
+    "contains valid caseType id which has defaultFocus value set for tab",
+    "GET /api/display/tab-structure/{id}",
     "contains HTTP 200"
   ],
   "method": "GET",
@@ -14,34 +15,13 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "ctid": "TestAddressBookCase"
-    },
-    "body": {
-      "data": {
-        "TextField": "field1",
-        "TextField2": "field2"
-      },
-      "event": {
-        "id": "createCase",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][childContexts][F-1029_Get_Event_Token][testData][actualResponse][body][token]}"
+      "ctid": "FT_MasterCaseType"
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
+    "_extends_": "Common_200_Response",
     "body": {
-      "id": "[[ANYTHING_PRESENT]]",
-      "document": null,
-      "type": null,
-      "created": null,
-      "updated": null,
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      }
+      "tabs": "[[ANYTHING_PRESENT]]"
     }
   }
 }
