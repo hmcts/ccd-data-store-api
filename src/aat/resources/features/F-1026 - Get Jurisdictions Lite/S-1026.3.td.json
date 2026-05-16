@@ -1,0 +1,507 @@
+{
+	"_guid_": "S-1026.3",
+	"_extends_": "F-1026_Test_Data_Base",
+	"title": "Get jurisdictions available to the user",
+
+	"specs": [
+		"appropriate idam roles but no CCD user profile",
+		"has CREATE as case access parameter",
+		"contains HTTP 200 Ok status code",
+		"contains the list of jurisdictions a user has access to"
+	],
+
+	"user": {
+		"username": "befta.caseworker.1.noprofile@gmail.com",
+		"password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"queryParams": {
+			"access": "create"
+		}
+	},
+
+  "expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"body": {
+			"arrayInMap": [
+        {
+          "__ordering__": "unordered"
+        },
+			{
+					"id": "BEFTA_JURISDICTION_1",
+					"name": "BEFTA_JURISDICTION_1",
+					"description": "Content for the Test Jurisdiction.",
+					"caseTypes": [
+						{
+							"__ordering__": "unordered"
+						},
+						{
+							"id": "BEFTA_CASETYPE_1_1",
+							"description": "Create a case of type BEFTA_CASETYPE_1_1",
+							"version": null,
+							"name": "BEFTA Case Type 1 1",
+							"events": [
+								{
+									"__ordering__": "unordered"
+								},
+								{
+									"id": "REVIEW",
+									"name": "Review",
+									"description": null,
+									"pre_states": [
+										"*"
+									],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "UPDATE",
+                  "name": "Update",
+                  "description": null,
+                  "pre_states": [
+                    "*"
+                  ],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										},
+										{
+                      "_extends_": "CaseworkerCaaAccessControlList"
+										}
+									]
+								},
+								{
+									"id": "COMPLETE",
+									"name": "Mark as done",
+									"description": null,
+									"pre_states": [
+										"IN_PROGRESS"
+									],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "STOP_PROGRESS",
+                  "name": "Stop",
+                  "description": null,
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "START_PROGRESS",
+                  "name": "Start",
+                  "description": null,
+                  "pre_states": [
+                    "TODO"
+                  ],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "CREATE",
+                  "name": "Create a new case",
+                  "description": null,
+                  "pre_states": [],
+									"acls": [
+										{
+											"__ordering__": "unordered",
+											"__elementId__": "role"
+										},
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                    }
+                  ]
+                }
+              ],
+              "states": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "id"
+                },
+                {
+                  "id": "TODO",
+                  "name": "To do",
+                  "description": null
+								},
+								{
+									"id": "IN_PROGRESS",
+									"name": "In progress",
+									"description": null
+								},
+								{
+									"id": "DONE",
+									"name": "Done",
+									"description": null
+								}
+							],
+							"security_classification": null
+						},
+            {
+              "id" : "BEFTA_CASETYPE_NO_READ",
+              "description" : "Create a case of type BEFTA_CASETYPE_NO_READ",
+              "version" : null,
+              "name" : "BEFTA Case Type No Read",
+              "events": [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                  "id": "REVIEW",
+                  "name": "Review",
+                  "description": null,
+                  "pre_states": [
+                    "*"
+                  ],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "UPDATE",
+                  "name": "Update",
+                  "description": null,
+                  "pre_states": [
+                    "*"
+                  ],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    },
+                    {
+                      "_extends_": "CaseworkerCaaNoReadAccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "COMPLETE",
+                  "name": "Mark as done",
+                  "description": null,
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "STOP_PROGRESS",
+                  "name": "Stop",
+                  "description": null,
+                  "pre_states": [
+                    "IN_PROGRESS"
+                  ],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "START_PROGRESS",
+                  "name": "Start",
+                  "description": null,
+                  "pre_states": [
+                    "TODO"
+                  ],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    }
+                  ]
+                },
+                {
+                  "id": "CREATE",
+                  "name": "Create a new case",
+                  "description": null,
+                  "pre_states": [],
+                  "acls": [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },
+                    {
+                      "_extends_": "CaseworkerBeftaJurisdiction1NoReadAccessControlList"
+                    }
+                  ]
+                }
+              ],
+              "states": [
+                {
+                  "__ordering__": "unordered",
+                  "__elementId__": "id"
+                },
+                {
+                  "id": "TODO",
+                  "name": "To do",
+                  "description": null
+                },
+                {
+                  "id": "IN_PROGRESS",
+                  "name": "In progress",
+                  "description": null
+                },
+                {
+                  "id": "DONE",
+                  "name": "Done",
+                  "description": null
+                }
+              ],
+              "security_classification": null
+            },
+						{
+							"id": "CASE_TYPE_WITH_NO_CASES",
+							"description": "Create a case of type CASE_TYPE_WITH_NO_CASES",
+							"version": null,
+							"name": "CT With No Cases -Don't Create",
+							"events": [
+								{
+									"__ordering__": "unordered"
+								},
+								{
+									"id": "REVIEW",
+									"name": "Review",
+									"description": null,
+									"pre_states": [
+										"*"
+									],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										}
+									]
+								},
+								{
+									"id": "UPDATE",
+									"name": "Update",
+									"description": null,
+									"pre_states": [
+										"*"
+									],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										}
+									]
+								},
+								{
+									"id": "COMPLETE",
+									"name": "Mark as done",
+									"description": null,
+									"pre_states": [
+										"IN_PROGRESS"
+									],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										}
+									]
+								},
+								{
+									"id": "STOP_PROGRESS",
+									"name": "Stop",
+									"description": null,
+									"pre_states": [
+										"IN_PROGRESS"
+									],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										}
+									]
+								},
+								{
+									"id": "START_PROGRESS",
+									"name": "Start",
+									"description": null,
+									"pre_states": [
+										"TODO"
+									],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+									}
+									]
+								},
+								{
+									"id": "CREATE",
+									"name": "Create a new case",
+									"description": null,
+									"pre_states": [],
+									"acls": [
+										{
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+										}
+									]
+								}
+							],
+							"states": [
+                {
+                  "__ordering__": "unordered"
+                },
+								{
+									"id": "TODO",
+									"name": "To do",
+									"description": null
+								},
+								{
+									"id": "IN_PROGRESS",
+									"name": "In progress",
+									"description": null
+								},
+								{
+									"id": "DONE",
+									"name": "Done",
+									"description": null
+								}
+							],
+							"security_classification": null
+						},
+            {
+              "id" : "ROLE_TO_ACCESS_PROFILE_CASE_TYPE",
+              "description" : "For testing role to access profile case type",
+              "version" : null,
+              "name" : "RTAP_CASE_TYPE",
+              "security_classification" : null,
+              "events" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "CREATE",
+                "name" : "Create a new case",
+                "description" : null,
+                "pre_states" : [ ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : false,
+                  "role" : "caseworker-caa"
+                } ]
+              } ],
+              "states" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "TODO",
+                "name" : "To do",
+                "description" : null
+              } ]
+            },
+            {
+              "id" : "CaseAccessGroups_Casetype",
+              "description" : "For testing Case Access Group",
+              "version" : null,
+              "name" : "CaseAccessGroups_Casetype",
+              "security_classification" : null,
+              "events" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "updateCase",
+                "name" : "Update Case",
+                "description" : null,
+                "pre_states" : [ "CaseCreated" ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_jurisdiction_1"
+                } ]
+              }, {
+                "id" : "createCase",
+                "name" : "Create a new case",
+                "description" : null,
+                "pre_states" : [ ],
+                "acls" : [ {
+                  "create" : true,
+                  "read" : true,
+                  "update" : true,
+                  "delete" : true,
+                  "role" : "caseworker-befta_jurisdiction_1"
+                } ]
+              } ],
+              "states" : [
+                {
+                  "__ordering__": "unordered"
+                },
+                {
+                "id" : "CaseCreated",
+                "name" : "Create Case",
+                "description" : null
+              }, {
+                "id" : "CaseUpdated",
+                "name" : "Update Case",
+                "description" : null
+              } ]
+            }
+					]
+				}
+			]
+		}
+	}
+}
