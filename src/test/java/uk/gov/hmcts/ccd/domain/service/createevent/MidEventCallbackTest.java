@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -37,6 +38,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -65,6 +68,8 @@ class MidEventCallbackTest {
     private UIDefinitionRepository uiDefinitionRepository;
     @Mock
     private CaseService caseService;
+    @Mock
+    private TimeToLiveService timeToLiveService;
 
     @Mock
     private CaseEventDefinition caseEventDefinition;
@@ -93,6 +98,7 @@ class MidEventCallbackTest {
         WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
+        given(timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)).willReturn(false);
     }
 
     @Test
@@ -437,6 +443,40 @@ class MidEventCallbackTest {
             existingCaseDetails,
             caseDetails,
             IGNORE_WARNINGS);
+    }
+
+    @Test
+    @DisplayName("should apply TTL increment before invoking mid event callback for an existing case")
+    void shouldApplyTtlIncrementBeforeInvokingMidEventCallbackForExistingCase() {
+        Map<String, JsonNode> populatedData = new HashMap<>(data);
+        populatedData.put("SystemTTLField", new TextNode("2036-05-18"));
+        CaseDetails existingCaseDetails = caseDetails(data);
+        CaseDetails populatedCaseDetails = caseDetails(populatedData);
+
+        CaseDataContent content = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withCaseReference(CASE_REFERENCE)
+            .withIgnoreWarning(IGNORE_WARNINGS)
+            .build();
+
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willReturn(existingCaseDetails);
+        given(caseService.clone(existingCaseDetails)).willReturn(existingCaseDetails);
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, existingCaseDetails))
+            .willReturn(populatedCaseDetails);
+        given(timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)).willReturn(true);
+        given(timeToLiveService.updateCaseDetailsWithTTL(populatedData, caseEventDefinition, caseTypeDefinition))
+            .willReturn(populatedData);
+        given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseTypeDefinition,
+            caseEventDefinition,
+            existingCaseDetails,
+            populatedCaseDetails,
+            IGNORE_WARNINGS)).willReturn(populatedCaseDetails);
+
+        midEventCallback.invoke(CASE_TYPE_ID, content, "createCase1");
+
+        verify(timeToLiveService).updateCaseDetailsWithTTL(populatedData, caseEventDefinition, caseTypeDefinition);
     }
 
     private Map<String, JsonNode> createData() {
