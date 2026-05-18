@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -93,6 +94,9 @@ class AuthorisedValidateCaseFieldsOperationTest {
     @Mock
     private EventTokenService eventTokenService;
 
+    @Mock
+    private CaseDetailsRepository caseDetailsRepository;
+
     private AuthorisedValidateCaseFieldsOperation authorisedValidateCaseFieldsOperation;
 
     AutoCloseable openMocks;
@@ -109,7 +113,8 @@ class AuthorisedValidateCaseFieldsOperationTest {
             applicationParams,
             midEventCallback,
             getCaseOperation,
-            eventTokenService
+            eventTokenService,
+            caseDetailsRepository
         );
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -117,6 +122,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
 
         CaseDetails loadedCase = new CaseDetails();
+        loadedCase.setReference(Long.valueOf(CASE_REFERENCE));
         loadedCase.setCaseTypeId(CASE_TYPE_ID);
         loadedCase.setState("Open");
         loadedCase.setData(new HashMap<>());
@@ -164,7 +170,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> assertTrue(result.containsKey("data")),
             () -> assertEquals("value1", result.get("data").get("field1").asText()),
             () -> verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
-            () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID)
+            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID)
         );
     }
 
@@ -207,7 +213,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         assertAll(
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
             () -> verify(caseAccessService, times(2)).getAccessProfilesByCaseReference(CASE_REFERENCE),
-            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
+            () -> verify(caseDefinitionRepository, times(3)).getCaseType(CASE_TYPE_ID),
             () -> assertNotNull(result),
             () -> assertEquals("filtered_value1", result.get(DATA).get("filtered_field1").asText())
         );
@@ -262,7 +268,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         assertAll(
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
             () -> verify(caseAccessService, times(2)).getAccessProfilesByCaseReference(CASE_REFERENCE),
-            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
+            () -> verify(caseDefinitionRepository, times(3)).getCaseType(CASE_TYPE_ID),
             () -> assertNotNull(result),
             () -> assertTrue(result.containsKey(DATA)),
             () -> assertEquals(2, result.get(DATA).size())
@@ -306,7 +312,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         assertAll(
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(operationContext),
             () -> verify(caseAccessService, times(2)).getAccessProfilesByCaseReference(CASE_REFERENCE),
-            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
+            () -> verify(caseDefinitionRepository, times(3)).getCaseType(CASE_TYPE_ID),
             () -> assertNotNull(result),
             () -> assertTrue(result.containsKey(DATA)),
             () -> assertEquals(3, result.get(DATA).size()),
@@ -497,7 +503,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(eventTokenService.parseToken("testToken")).thenThrow(new IllegalArgumentException("Malformed JWT"));
 
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(""))).thenReturn(emptyMap());
 
         ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
         when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
@@ -505,12 +511,12 @@ class AuthorisedValidateCaseFieldsOperationTest {
         when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
             .thenReturn(JacksonUtils.convertValue(filteredData));
 
-        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
 
         authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
         assertTrue(StringUtils.isEmpty(content.getCaseReference()));
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, "");
     }
 
     @Test
@@ -627,6 +633,50 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
+    @DisplayName("should resolve entity id from event token to case reference for update validate")
+    void shouldResolveEntityIdFromEventTokenToCaseReference() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setToken("event-token");
+        content.setData(emptyMap());
+
+        CaseDetails caseByEntityId = new CaseDetails();
+        caseByEntityId.setReference(Long.valueOf(CASE_REFERENCE));
+        caseByEntityId.setCaseTypeId(CASE_TYPE_ID);
+        caseByEntityId.setState("Open");
+
+        when(eventTokenService.parseToken("event-token")).thenReturn(new EventTokenProperties(
+            "user-id",
+            "42",
+            "BEFTA_MASTER",
+            EVENT_ID,
+            CASE_TYPE_ID,
+            "case-version",
+            "Open",
+            "1",
+            "1"
+        ));
+        when(getCaseOperation.execute("42")).thenReturn(Optional.empty());
+        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseByEntityId));
+        when(caseDetailsRepository.findById(42L)).thenReturn(caseByEntityId);
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertEquals(CASE_REFERENCE, content.getCaseReference());
+        verify(getCaseOperation).execute(CASE_REFERENCE);
+        verify(caseAccessService, atLeast(1)).getAccessProfilesByCaseReference(CASE_REFERENCE);
+    }
+
+    @Test
     @DisplayName("should use update path when case reference is resolved from event token")
     void shouldUseUpdatePathWhenCaseReferenceResolvedFromEventToken() {
         CaseDataContent content = new CaseDataContent();
@@ -659,7 +709,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
         assertEquals(CASE_REFERENCE, content.getCaseReference());
-        verify(getCaseOperation).execute(CASE_REFERENCE);
+        verify(getCaseOperation, atLeast(1)).execute(CASE_REFERENCE);
         verify(caseAccessService, atLeast(1)).getAccessProfilesByCaseReference(CASE_REFERENCE);
         verify(caseAccessService, never()).getCaseCreationRoles(anyString());
         verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);

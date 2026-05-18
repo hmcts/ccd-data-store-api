@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
@@ -50,6 +52,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private final MidEventCallback midEventCallback;
     private final GetCaseOperation getCaseOperation;
     private final EventTokenService eventTokenService;
+    private final CaseDetailsRepository caseDetailsRepository;
 
     public AuthorisedValidateCaseFieldsOperation(AccessControlService accessControlService,
                                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -61,7 +64,9 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
                                                  ApplicationParams applicationParams,
                                                  MidEventCallback midEventCallback,
                                                  @Qualifier("default") GetCaseOperation getCaseOperation,
-                                                 EventTokenService eventTokenService) {
+                                                 EventTokenService eventTokenService,
+                                                 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                 CaseDetailsRepository caseDetailsRepository) {
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
@@ -71,6 +76,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         this.midEventCallback = midEventCallback;
         this.getCaseOperation = getCaseOperation;
         this.eventTokenService = eventTokenService;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
@@ -84,7 +90,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         resolveCaseReferenceFromEventToken(content);
 
         if (StringUtils.isNotBlank(pageId)) {
-            verifyEventAccessBeforeMidEvent(operationContext);
+            verifyEventAccessBeforeMidEvent(operationContext, content);
         }
 
         callMidEventCallback(caseTypeId, content, pageId);
@@ -113,8 +119,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         return content.getData();
     }
 
-    private void verifyEventAccessBeforeMidEvent(OperationContext operationContext) {
-        CaseDataContent content = operationContext.content();
+    private void verifyEventAccessBeforeMidEvent(OperationContext operationContext, CaseDataContent content) {
         String caseTypeId = operationContext.caseTypeId();
 
         Event event = content.getEvent();
@@ -125,9 +130,12 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
 
         if (StringUtils.isEmpty(content.getCaseReference())) {
+            if (StringUtils.isNotEmpty(content.getToken())) {
+                throw new ResourceNotFoundException("Cannot find matching start trigger");
+            }
             verifyCreateCaseEventAccess(content, caseTypeDefinition);
         } else {
-            verifyUpdateCaseEventAccess(content, caseTypeDefinition);
+            verifyUpdateCaseEventAccess(content);
         }
     }
 
@@ -138,11 +146,26 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         try {
             EventTokenProperties eventTokenProperties = eventTokenService.parseToken(content.getToken());
             if (StringUtils.isNotEmpty(eventTokenProperties.getCaseId())) {
-                content.setCaseReference(eventTokenProperties.getCaseId());
+                content.setCaseReference(toCaseReference(eventTokenProperties.getCaseId()));
             }
         } catch (RuntimeException e) {
             log.debug("Unable to resolve case reference from event token: {}", e.getMessage());
         }
+    }
+
+    private String toCaseReference(String caseIdFromToken) {
+        if (getCaseOperation.execute(caseIdFromToken).isPresent()) {
+            return caseIdFromToken;
+        }
+        try {
+            CaseDetails caseDetails = caseDetailsRepository.findById(Long.valueOf(caseIdFromToken));
+            if (caseDetails != null && StringUtils.isNotEmpty(caseDetails.getReferenceAsString())) {
+                return caseDetails.getReferenceAsString();
+            }
+        } catch (NumberFormatException e) {
+            log.debug("Case id from event token is not a numeric entity id: {}", caseIdFromToken);
+        }
+        return caseIdFromToken;
     }
 
     private void verifyCreateCaseEventAccess(CaseDataContent content, CaseTypeDefinition caseTypeDefinition) {
@@ -165,12 +188,17 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         }
     }
 
-    private void verifyUpdateCaseEventAccess(CaseDataContent content, CaseTypeDefinition caseTypeDefinition) {
+    private void verifyUpdateCaseEventAccess(CaseDataContent content) {
         String caseReference = content.getCaseReference();
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
-        Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
+        final CaseTypeDefinition caseTypeDefinition =
+            getCaseDefinitionType(existingCaseDetails.getCaseTypeId());
+
+        String caseReferenceForAccess = existingCaseDetails.getReferenceAsString();
+        Set<AccessProfile> accessProfiles =
+            caseAccessService.getAccessProfilesByCaseReference(caseReferenceForAccess);
         if (accessProfiles == null || accessProfiles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }
