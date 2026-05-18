@@ -147,7 +147,8 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             EventTokenProperties eventTokenProperties = eventTokenService.parseToken(content.getToken());
             return StringUtils.isNotEmpty(eventTokenProperties.getCaseId());
         } catch (RuntimeException e) {
-            return true;
+            log.debug("Unable to determine case id from event token: {}", e.getMessage());
+            return false;
         }
     }
 
@@ -166,6 +167,9 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     }
 
     private String toCaseReference(String caseIdFromToken) {
+        if (StringUtils.isEmpty(caseIdFromToken)) {
+            return caseIdFromToken;
+        }
         if (getCaseOperation.execute(caseIdFromToken).isPresent()) {
             return caseIdFromToken;
         }

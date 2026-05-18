@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -80,7 +81,8 @@ public class EventTokenService {
 
     public EventTokenProperties parseToken(final String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(tokenSecret.getBytes());
+            SecretKey key = Keys.hmacShaKeyFor(
+                TextCodec.BASE64.encode(tokenSecret).getBytes(StandardCharsets.UTF_8));
             final Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
