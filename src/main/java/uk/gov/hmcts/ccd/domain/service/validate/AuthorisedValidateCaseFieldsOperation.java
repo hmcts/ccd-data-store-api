@@ -90,10 +90,14 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         resolveCaseReferenceFromEventToken(content);
 
         if (StringUtils.isNotBlank(pageId)) {
-            verifyEventAccessBeforeMidEvent(operationContext, content);
+            verifyEventIsPresent(content);
         }
 
         callMidEventCallback(caseTypeId, content, pageId);
+
+        if (StringUtils.isNotBlank(pageId)) {
+            verifyEventAccessAfterMidEvent(operationContext, content);
+        }
 
         if (applicationParams.getExcludeVerifyAccessCaseTypesForValidate()
             .stream()
@@ -119,13 +123,15 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         return content.getData();
     }
 
-    private void verifyEventAccessBeforeMidEvent(OperationContext operationContext, CaseDataContent content) {
-        String caseTypeId = operationContext.caseTypeId();
-
+    private void verifyEventIsPresent(CaseDataContent content) {
         Event event = content.getEvent();
         if (event == null || StringUtils.isEmpty(event.getEventId())) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
+    }
+
+    private void verifyEventAccessAfterMidEvent(OperationContext operationContext, CaseDataContent content) {
+        String caseTypeId = operationContext.caseTypeId();
 
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
 
@@ -170,8 +176,12 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         if (StringUtils.isEmpty(caseIdFromToken)) {
             return caseIdFromToken;
         }
-        if (getCaseOperation.execute(caseIdFromToken).isPresent()) {
-            return caseIdFromToken;
+        try {
+            if (getCaseOperation.execute(caseIdFromToken).isPresent()) {
+                return caseIdFromToken;
+            }
+        } catch (RuntimeException e) {
+            log.debug("Unable to load case by reference from event token: {}", e.getMessage());
         }
         try {
             CaseDetails caseDetails = caseDetailsRepository.findById(Long.valueOf(caseIdFromToken));
@@ -180,6 +190,8 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             }
         } catch (NumberFormatException e) {
             log.debug("Case id from event token is not a numeric entity id: {}", caseIdFromToken);
+        } catch (RuntimeException e) {
+            log.debug("Unable to load case by entity id from event token: {}", e.getMessage());
         }
         return caseIdFromToken;
     }
