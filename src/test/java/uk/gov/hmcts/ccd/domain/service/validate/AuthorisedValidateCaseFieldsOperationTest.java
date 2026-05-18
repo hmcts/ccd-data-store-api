@@ -494,6 +494,43 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
+    @DisplayName("should use create path when event token has no case id")
+    void shouldUseCreatePathWhenEventTokenHasNoCaseId() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setToken("create-event-token");
+        content.setData(emptyMap());
+
+        when(eventTokenService.parseToken("create-event-token")).thenReturn(new EventTokenProperties(
+            "user-id",
+            null,
+            "BEFTA_MASTER",
+            EVENT_ID,
+            CASE_TYPE_ID,
+            null,
+            null,
+            null,
+            null
+        ));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertTrue(StringUtils.isEmpty(content.getCaseReference()));
+        verify(getCaseOperation, never()).execute(anyString());
+        verify(caseAccessService, atLeast(1)).getCaseCreationRoles(CASE_TYPE_ID);
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+    }
+
+    @Test
     @DisplayName("should continue validate when event token cannot be parsed")
     void shouldContinueValidateWhenEventTokenCannotBeParsed() {
         CaseDataContent content = new CaseDataContent();

@@ -130,12 +130,24 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
 
         if (StringUtils.isEmpty(content.getCaseReference())) {
-            if (StringUtils.isNotEmpty(content.getToken())) {
+            if (hasUnresolvedCaseIdInEventToken(content)) {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");
             }
             verifyCreateCaseEventAccess(content, caseTypeDefinition);
         } else {
             verifyUpdateCaseEventAccess(content);
+        }
+    }
+
+    private boolean hasUnresolvedCaseIdInEventToken(CaseDataContent content) {
+        if (StringUtils.isEmpty(content.getToken()) || StringUtils.isNotEmpty(content.getCaseReference())) {
+            return false;
+        }
+        try {
+            EventTokenProperties eventTokenProperties = eventTokenService.parseToken(content.getToken());
+            return StringUtils.isNotEmpty(eventTokenProperties.getCaseId());
+        } catch (RuntimeException e) {
+            return true;
         }
     }
 
