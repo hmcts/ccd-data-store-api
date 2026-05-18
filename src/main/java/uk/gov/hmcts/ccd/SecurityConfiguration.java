@@ -122,16 +122,18 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // See docs/security/jwt-issuer-validation.md for discovery and issuer enforcement.
+        jwtDecoder.setJwtValidator(jwtValidator(issuerOverride, allowedIssuersOverride));
+        return jwtDecoder;
+    }
+
+    static OAuth2TokenValidator<Jwt> jwtValidator(String issuerOverride, String allowedIssuersOverride) {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(issuerOverride, allowedIssuersOverride);
         OAuth2TokenValidator<Jwt> withIssuer = new JwtClaimValidator<>(
             "iss",
             issuer -> issuer != null && allowedIssuers.contains(issuer.toString())
         );
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
-
-        jwtDecoder.setJwtValidator(validator);
-        return jwtDecoder;
+        return new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
     }
 
 }

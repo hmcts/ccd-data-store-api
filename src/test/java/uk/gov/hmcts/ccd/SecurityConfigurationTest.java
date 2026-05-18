@@ -1,19 +1,14 @@
 package uk.gov.hmcts.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
-import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 
 import com.nimbusds.jose.JOSEException;
@@ -74,6 +69,14 @@ class SecurityConfigurationTest {
     }
 
     @Test
+    void shouldRejectJwtWhenIssuerIsMissing() {
+        Instant now = Instant.now();
+        assertTrue(
+            validator().validate(buildJwtWithoutIssuer(now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+        );
+    }
+
+    @Test
     void shouldRejectDecodedJwtFromUnexpectedIssClaim() throws JOSEException, ParseException {
         JwtValidationException exception = assertThrows(
             JwtValidationException.class,
@@ -103,14 +106,7 @@ class SecurityConfigurationTest {
     }
 
     private OAuth2TokenValidator<Jwt> validator(String allowedIssuers) {
-        Set<String> configuredIssuers = OidcIssuerConfiguration.allowedIssuers(VALID_ISSUER, allowedIssuers);
-        return new DelegatingOAuth2TokenValidator<>(
-            new JwtTimestampValidator(),
-            new JwtClaimValidator<>(
-                "iss",
-                issuer -> issuer != null && configuredIssuers.contains(issuer.toString())
-            )
-        );
+        return SecurityConfiguration.jwtValidator(VALID_ISSUER, allowedIssuers);
     }
 
     private NimbusJwtDecoder decoder() throws JOSEException {
@@ -127,6 +123,15 @@ class SecurityConfigurationTest {
         return Jwt.withTokenValue("token")
             .header("alg", "RS256")
             .issuer(issuer)
+            .subject("user")
+            .issuedAt(issuedAt)
+            .expiresAt(expiresAt)
+            .build();
+    }
+
+    private Jwt buildJwtWithoutIssuer(Instant issuedAt, Instant expiresAt) {
+        return Jwt.withTokenValue("token")
+            .header("alg", "RS256")
             .subject("user")
             .issuedAt(issuedAt)
             .expiresAt(expiresAt)
