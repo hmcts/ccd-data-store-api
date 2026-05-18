@@ -487,6 +487,28 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
+    @DisplayName("should skip event access check when page id is blank")
+    void shouldSkipEventAccessCheckWhenPageIdIsBlank() {
+        CaseDataContent content = new CaseDataContent();
+        content.setCaseReference(CASE_REFERENCE);
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
+
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(""))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        verify(getCaseOperation, never()).execute(anyString());
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, "");
+    }
+
+    @Test
     @DisplayName("should throw when event is missing before mid event")
     void shouldThrowWhenEventIsMissing() {
         CaseDataContent content = new CaseDataContent();
