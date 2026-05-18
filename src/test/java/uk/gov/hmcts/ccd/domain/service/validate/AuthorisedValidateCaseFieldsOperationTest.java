@@ -12,11 +12,13 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
@@ -54,7 +56,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 class AuthorisedValidateCaseFieldsOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -88,6 +89,9 @@ class AuthorisedValidateCaseFieldsOperationTest {
     @Mock
     private GetCaseOperation getCaseOperation;
 
+    @Mock
+    private EventTokenService eventTokenService;
+
     private AuthorisedValidateCaseFieldsOperation authorisedValidateCaseFieldsOperation;
 
     AutoCloseable openMocks;
@@ -103,7 +107,8 @@ class AuthorisedValidateCaseFieldsOperationTest {
             conditionalFieldRestorer,
             applicationParams,
             midEventCallback,
-            getCaseOperation
+            getCaseOperation,
+            eventTokenService
         );
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -574,23 +579,42 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw when create case field access is denied")
-    void shouldThrowWhenCreateCaseFieldAccessDenied() {
+    @DisplayName("should use update path when case reference is resolved from event token")
+    void shouldUseUpdatePathWhenCaseReferenceResolvedFromEventToken() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
         content.setCaseReference("");
-        content.setData(null);
+        content.setToken("event-token");
+        content.setData(emptyMap());
 
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), eq(CAN_CREATE)))
-            .thenReturn(false);
+        when(eventTokenService.parseToken("event-token")).thenReturn(new EventTokenProperties(
+            "user-id",
+            CASE_REFERENCE,
+            "BEFTA_MASTER",
+            EVENT_ID,
+            CASE_TYPE_ID,
+            "case-version",
+            "Open",
+            "1",
+            "1"
+        ));
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
-        assertEquals(NO_FIELD_FOUND, exception.getMessage());
-        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+        assertEquals(CASE_REFERENCE, content.getCaseReference());
+        verify(getCaseOperation).execute(CASE_REFERENCE);
+        verify(caseAccessService, atLeast(1)).getAccessProfilesByCaseReference(CASE_REFERENCE);
+        verify(caseAccessService, never()).getCaseCreationRoles(anyString());
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
     @Test

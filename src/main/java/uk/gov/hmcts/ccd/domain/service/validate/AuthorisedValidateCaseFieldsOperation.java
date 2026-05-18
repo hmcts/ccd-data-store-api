@@ -9,16 +9,19 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -32,7 +35,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
 @Slf4j
@@ -48,6 +50,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
     private final ApplicationParams applicationParams;
     private final MidEventCallback midEventCallback;
     private final GetCaseOperation getCaseOperation;
+    private final EventTokenService eventTokenService;
 
     public AuthorisedValidateCaseFieldsOperation(AccessControlService accessControlService,
                                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -58,7 +61,8 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
                                                  ConditionalFieldRestorer conditionalFieldRestorer,
                                                  ApplicationParams applicationParams,
                                                  MidEventCallback midEventCallback,
-                                                 @Qualifier("default") GetCaseOperation getCaseOperation) {
+                                                 @Qualifier("default") GetCaseOperation getCaseOperation,
+                                                 EventTokenService eventTokenService) {
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
@@ -67,6 +71,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         this.applicationParams = applicationParams;
         this.midEventCallback = midEventCallback;
         this.getCaseOperation = getCaseOperation;
+        this.eventTokenService = eventTokenService;
     }
 
     @Override
@@ -116,10 +121,26 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
 
+        resolveCaseReferenceFromEventToken(content);
+
         if (StringUtils.isEmpty(content.getCaseReference())) {
             verifyCreateCaseEventAccess(content, caseTypeDefinition);
         } else {
             verifyUpdateCaseEventAccess(content, caseTypeDefinition);
+        }
+    }
+
+    private void resolveCaseReferenceFromEventToken(CaseDataContent content) {
+        if (StringUtils.isNotEmpty(content.getCaseReference()) || StringUtils.isEmpty(content.getToken())) {
+            return;
+        }
+        try {
+            EventTokenProperties eventTokenProperties = eventTokenService.parseToken(content.getToken());
+            if (StringUtils.isNotEmpty(eventTokenProperties.getCaseId())) {
+                content.setCaseReference(eventTokenProperties.getCaseId());
+            }
+        } catch (EventTokenException e) {
+            log.debug("Unable to resolve case reference from event token: {}", e.getMessage());
         }
     }
 
@@ -140,13 +161,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             userRoles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
-        }
-        if (!accessControlService.canAccessCaseFieldsWithCriteria(
-            JacksonUtils.convertValueJsonNode(content.getData() == null ? Map.of() : content.getData()),
-            caseTypeDefinition.getCaseFieldDefinitions(),
-            userRoles,
-            CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }
 
