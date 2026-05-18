@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -484,6 +485,32 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> verify(caseAccessService, times(2)).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> assertNotNull(result)
         );
+    }
+
+    @Test
+    @DisplayName("should continue validate when event token cannot be parsed")
+    void shouldContinueValidateWhenEventTokenCannotBeParsed() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setToken("testToken");
+        content.setData(emptyMap());
+
+        when(eventTokenService.parseToken("testToken")).thenThrow(new IllegalArgumentException("Malformed JWT"));
+
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        assertTrue(StringUtils.isEmpty(content.getCaseReference()));
+        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
     @Test

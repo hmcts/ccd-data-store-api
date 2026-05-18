@@ -21,7 +21,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -141,7 +140,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             if (StringUtils.isNotEmpty(eventTokenProperties.getCaseId())) {
                 content.setCaseReference(eventTokenProperties.getCaseId());
             }
-        } catch (EventTokenException e) {
+        } catch (RuntimeException e) {
             log.debug("Unable to resolve case reference from event token: {}", e.getMessage());
         }
     }
