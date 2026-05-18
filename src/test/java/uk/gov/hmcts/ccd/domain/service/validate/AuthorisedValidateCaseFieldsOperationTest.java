@@ -492,8 +492,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
 
-        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
-
         when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(""))).thenReturn(emptyMap());
 
         ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
@@ -502,6 +500,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
             .thenReturn(JacksonUtils.convertValue(filteredData));
 
+        final OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
         authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
         verify(getCaseOperation, never()).execute(anyString());
