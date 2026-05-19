@@ -19,7 +19,6 @@ def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
-
 GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
