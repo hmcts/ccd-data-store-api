@@ -26,9 +26,9 @@ class OidcIssuerConfigurationTest {
     }
 
     @Test
-    void shouldRejectEmptyIssuerConfiguration() {
-        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(" ", null))
+    void shouldRejectBlankPrimaryIssuerEvenWhenAllowedIssuersAreConfigured() {
+        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(" ", "secondary"))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("At least one OIDC issuer must be configured");
+            .hasMessage("oidc.issuer must not be blank");
     }
 }

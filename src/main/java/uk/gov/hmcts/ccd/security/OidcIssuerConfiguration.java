@@ -12,18 +12,22 @@ public final class OidcIssuerConfiguration {
 
     public static Set<String> allowedIssuers(String primaryIssuer, String configuredAllowedIssuers) {
         LinkedHashSet<String> issuers = new LinkedHashSet<>();
-        addIssuer(issuers, primaryIssuer);
+        issuers.add(requirePrimaryIssuer(primaryIssuer));
 
         if (configuredAllowedIssuers != null) {
             Arrays.stream(configuredAllowedIssuers.split(","))
                 .forEach(issuer -> addIssuer(issuers, issuer));
         }
 
-        if (issuers.isEmpty()) {
-            throw new IllegalStateException("At least one OIDC issuer must be configured");
+        return Collections.unmodifiableSet(issuers);
+    }
+
+    private static String requirePrimaryIssuer(String primaryIssuer) {
+        if (primaryIssuer == null || primaryIssuer.trim().isEmpty()) {
+            throw new IllegalStateException("oidc.issuer must not be blank");
         }
 
-        return Collections.unmodifiableSet(issuers);
+        return primaryIssuer.trim();
     }
 
     private static void addIssuer(Set<String> issuers, String issuer) {
