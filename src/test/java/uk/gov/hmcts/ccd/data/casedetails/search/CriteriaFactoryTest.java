@@ -83,7 +83,11 @@ public class CriteriaFactoryTest {
 
         List<Criterion> result = subject.build(metaData, params);
         assertEquals(3, result.size());
-        assertThat(result).filteredOn(m -> m.getField().equals("date(last_state_modified_date)"))
+        assertThat(result).filteredOn(DateRangeMetaDataCriterion.class::isInstance)
+            .hasSize(1)
+            .extracting(Criterion::getField)
+            .containsOnly("last_state_modified_date");
+        assertThat(result).filteredOn(m -> m.getField().equals("last_state_modified_date"))
             .hasSize(1)
             .extracting(e -> e.getSoughtValue())
             .containsOnly(LAST_STATE_MODIFIED_VALUE);

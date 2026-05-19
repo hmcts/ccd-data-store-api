@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -23,6 +25,14 @@ public class CriteraTest {
     public void checkMetaDataCreationTestCriteraString() {
         MetaDataCriterion subject = new MetaDataCriterion(META_DATA_1, META_DATA_1_VALUE);
         assertTrue(subject.buildClauseString("AND").contains(META_DATA_1));
+    }
+
+    @Test
+    public void checkDateRangeMetaDataCreationTestCriteraString() {
+        DateRangeMetaDataCriterion subject = new DateRangeMetaDataCriterion("created_date",
+            LocalDate.parse("2020-09-12"));
+        assertTrue(subject.buildClauseString("AND").contains("created_date >= :created_date_from"));
+        assertTrue(subject.buildClauseString("AND").contains("created_date < :created_date_to"));
     }
 
 }

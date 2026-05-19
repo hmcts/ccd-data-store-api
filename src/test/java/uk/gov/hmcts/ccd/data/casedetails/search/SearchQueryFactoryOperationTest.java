@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.Maps;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -138,5 +143,26 @@ class SearchQueryFactoryOperationTest {
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation).getUserId();
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
+    }
+
+    @Test
+    void shouldBindDateMetadataAsTimestampRange() {
+        Query query = mock(Query.class);
+        when(applicationParam.getEnableAttributeBasedAccessControl()).thenReturn(false);
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(anyString(), anyString(), any()))
+            .thenReturn(List.of("caseStateId_1"));
+        when(entityManager.createNativeQuery(anyString(), any(Class.class))).thenReturn(query);
+
+        MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
+        metadata.setCreatedDate(java.util.Optional.of("2020-09-12"));
+
+        classUnderTest.build(metadata, Maps.newHashMap(), false);
+
+        ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        verify(entityManager).createNativeQuery(queryCaptor.capture(), any(Class.class));
+        assertThat(queryCaptor.getValue()).contains("created_date >= :created_date_from");
+        assertThat(queryCaptor.getValue()).contains("created_date < :created_date_to");
+        verify(query).setParameter("created_date_from", LocalDateTime.of(2020, 9, 12, 0, 0));
+        verify(query).setParameter("created_date_to", LocalDateTime.of(2020, 9, 13, 0, 0));
     }
 }

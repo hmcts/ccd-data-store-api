@@ -133,7 +133,7 @@ public class SearchQueryFactoryOperation {
     }
 
     private void addParameters(final Query query, List<Criterion> criteria) {
-        criteria.forEach(criterion -> query.setParameter(criterion.buildParameterId(), criterion.getSoughtValue()));
+        criteria.forEach(criterion -> criterion.bindParameters(query));
     }
 
     private String toClauses(final List<Criterion> criteria) {
