@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -22,11 +21,11 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
