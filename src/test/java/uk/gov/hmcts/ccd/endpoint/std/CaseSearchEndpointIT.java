@@ -144,7 +144,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
     }
 
-    private String create1CaseDetailsElastic(Long reference) {
+    private String create1CaseDetailsElastic(String reference) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -159,7 +159,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String create2CaseDetailsElastic(Long reference1,Long reference2) {
+    private String create2CaseDetailsElastic(String reference1,String reference2) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -178,7 +178,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String createCaseDetails(Long reference) {
+    private String createCaseDetails(String reference) {
         return "{\n"
             + "\"reference\": " + reference + ",\n"
             + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"
