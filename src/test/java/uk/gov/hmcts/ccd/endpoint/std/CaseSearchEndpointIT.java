@@ -110,8 +110,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     @Test
     void shouldAuditLogSearchCases() throws Exception {
 
-        final long reference1 = 1535450291607660L;
-        final long reference2 = 1535450291607670L;
+        final String reference1 = "1535450291607660";
+        final String reference2 = "1535450291607670";
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
