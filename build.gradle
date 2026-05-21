@@ -14,7 +14,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'info.solidsoft.pitest' version '1.19.0'
     id 'uk.gov.hmcts.java' version '0.12.68'
-    id 'au.com.dius.pact' version '4.7.0'
+    id 'au.com.dius.pact' version '4.7.1'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '12.2.1'
 }
@@ -39,9 +39,9 @@ ext {
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
     elasticVersion = '9.2.4'
-    testContainersVersion = '2.0.2'
+    testContainersVersion = '2.0.5'
     cucumber = '7.34.3'
-    beftaFwVersion = '9.2.4'
+    beftaFwVersion = '9.2.6'
     ccdTestDefinitionVersion = '7.26.2'
     limits = [
             'instruction': 90,
