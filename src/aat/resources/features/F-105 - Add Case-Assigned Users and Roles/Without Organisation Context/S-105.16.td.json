@@ -1,5 +1,5 @@
 {
-  "title": "No organisation ID is provided by the user so Assigned User Count remains unchanged",
+  "title": "Must successfully assign a user and case role without organisation ID when caller organisation is available from PRD",
 
   "_guid_": "S-105.16",
   "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
@@ -8,7 +8,7 @@
     "Richard - who can create a case",
     "Dil - who is to add some case role assignment for a case",
     "Olawale - with an active solicitor profile and valid User ID",
-    "is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID"
+    "is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID, relying on caller organisation from PRD"
   ],
 
   "users": {

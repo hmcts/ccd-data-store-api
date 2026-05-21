@@ -130,6 +130,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", hostUrl);
+        ReflectionTestUtils.setField(applicationParams, "prdApiUrl", hostUrl);
     }
 
     public void stubFor(MappingBuilder mappingBuilder) {

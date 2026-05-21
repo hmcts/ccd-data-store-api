@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -40,7 +39,9 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
 
     @Autowired
     public DefaultGetCaseHistoryViewOperation(
-        @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
+        // History view assembly must not reuse the creator/restricted case lookup because that can
+        // hide the case before history-specific authorisation decides the correct response.
+        @Qualifier("default") GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,

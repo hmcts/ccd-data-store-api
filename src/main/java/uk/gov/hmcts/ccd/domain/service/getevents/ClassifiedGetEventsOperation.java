@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import static java.util.Collections.singletonList;
@@ -23,7 +22,9 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
 
     public ClassifiedGetEventsOperation(@Qualifier("default") GetEventsOperation getEventsOperation,
                                         SecurityClassificationServiceImpl classificationService,
-                                        @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+                                        // Event history/security classification should not inherit direct
+                                        // case-read hiding via the creator/restricted chain.
+                                        @Qualifier("default")
                                         final GetCaseOperation getCaseOperation) {
 
         this.getEventsOperation = getEventsOperation;

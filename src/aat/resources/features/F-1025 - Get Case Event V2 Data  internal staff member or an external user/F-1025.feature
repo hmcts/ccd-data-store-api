@@ -9,6 +9,26 @@ Background:
   #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-1025.1 # AC01
+  Scenario: must return negative response for direct internal case view access by External Parties
+
+    Given a user with [an active profile in CCD],
+
+    And a successful call [to create a token for case creation] as in [Private_Autotest_Default_Token_Creation_Data_For_Case_Creation_External],
+    And another successful call [to create a full case] as in [Private_Autotest_Case_Data_Extension_External],
+    When a request is prepared with appropriate values,
+    And the request [contains the reference of the case just created],
+    And it is submitted to call the [Retrieve a CaseView Event by case for access to External Parties] operation of [CCD Data Store],
+
+    Then a negative response is received,
+    And the response [contains HTTP 404 Not Found],
+    And the response has all other details as expected.
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1025_Remove_Case_Assigned_User_role_for_Case].
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-1025.4 # AC01B
   Scenario: must return negative response for CaseView Event Data for authorised access by External Parties
 
     Given a user with [an active profile in CCD],
@@ -49,14 +69,18 @@ Scenario: should retrieve case view with response code HTTP 200 when the case re
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @S-1025.3 # AC02B
-Scenario: must return negative response for unauthorised access by Internal Parties
+Scenario: must return negative response for invalid authentication by Internal Parties
 
     Given a user with [an active profile in CCD],
 
-      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation_NoRead],
-      And another successful call [to create a full case] as in [Befta_Case_Data_Extension_NoRead_Internal],
-      And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Case_Data_NoRead_Internal],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [to create a full case] as in [Befta_Case_Data_Extension_Internal],
+      And another successful call [to get the details about case event for the case just created] as in [S-1025_Get_Case_Data_Internal],
 
       When a request is prepared with appropriate values,
-      And the request [contains the reference of the case just created and the response will not contain event history case data]
+      And the request [contains an invalid user authentication token for the case event history request]
+      And it is submitted to call the [Retrieve a CaseView Event by case and event id for access to Internal Parties] operation of [CCD Data Store],
 
+      Then a negative response is received,
+      And the response [contains HTTP 401 Unauthorised],
+      And the response has all other details as expected.

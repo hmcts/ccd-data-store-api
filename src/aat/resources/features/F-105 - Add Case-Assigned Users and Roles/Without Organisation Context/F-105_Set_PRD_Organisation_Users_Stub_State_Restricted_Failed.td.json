@@ -1,0 +1,27 @@
+{
+  "_guid_": "F-105_Set_PRD_Organisation_Users_Stub_State_Restricted_Failed",
+  "productName": "CCD Test Stub Service",
+  "operationName": "Set PRD organisation users stub state",
+  "specs": [
+    "to configure PRD organisation users stub state to restricted-failed"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+  "method": "POST",
+  "uri": "{{BEFTA_TEST_STUB_SERVICE_BASE_URL}}/stub-state/prd-organisations-users",
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "stubMode": "restricted-failed"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "stubMode": "restricted-failed"
+    }
+  }
+}

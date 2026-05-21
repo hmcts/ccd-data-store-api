@@ -12,7 +12,8 @@
         {
           "__ordering__": "UNORDERED",
           "__elementId__": "case_id,user_id,case_role"
-        },{
+        },
+        {
           "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
           "case_role": "[CR-1]"

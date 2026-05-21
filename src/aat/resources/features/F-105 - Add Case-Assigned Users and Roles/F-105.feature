@@ -252,7 +252,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
 
    # RDM-8842 AC-3
    @S-105.16
-   Scenario: No organisation ID is provided by the user so Assigned User Count remains unchanged
+   Scenario: Must successfully assign a user and case role without organisation ID when caller organisation is available from PRD
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
      And a user [Dil - who is to add some case role assignment for a case],
@@ -260,14 +260,14 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
      And a successful call [to check the number of users having access to C1 in its supplementary data] as in [F-105_Prerequisite_Counter_Check_Call],
      When a request is prepared with appropriate values,
-     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID],
+     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and no Organisation ID, relying on caller organisation from PRD],
      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
      Then a positive response is received,
      And the response has all the details as expected,
      And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.16_Verify_Case_Roles_for_Case_C1],
-     And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged],
+     And a call [to verify the count of users assigned to a case has changed for Dil's organisation] will get the expected response as in [S-105.16_Verify_Counter_Changed],
       # Clean up role assignment made above
-     And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_16_Remove_Case_Assigned_User_role_Orgs_for_Case_C1].
+     And a successful call [is made to remove Case Role CR-1] as in [F-105_16_Remove_Case_Assigned_User_role_Orgs_for_Case_C1].
 
    # RDM-8842 AC-4
    @S-105.17
@@ -307,3 +307,39 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has changed] will get the expected response as in [F-105_Verify_Counter_Changed],
       # Clean up role assignment made above
      And a successful call [is made to remove Case Role CR-1 and CR-2] as in [F-105_18_Remove_Case_Assigned_User_role_Orgs_for_Case_C1_C2].
+
+   # CCD-7183
+   @S-105.19
+   Scenario: Must successfully assign a user and case role without organisation ID for an unrestricted caller
+     Given an appropriate test context as detailed in the test data source,
+     And a user [Richard - who can create a case],
+     And a user [Admin - who has only caseworker-caa role],
+     And a user [Dil - who is to add some case role assignment for a case],
+     And a user [Olawale - with an active solicitor profile],
+     And a successful call [to configure PRD organisation users stub state to unrestricted-failed] as in [F-105_Set_PRD_Organisation_Users_Stub_State_Unrestricted_Failed],
+     And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
+     When a request is prepared with appropriate values,
+     And the request [is made from an authorised application, by Admin, with the Case ID of C1, User ID of Olawale and a proper Case Role CR-1 but no Organisation ID],
+     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+     Then a positive response is received,
+     And the response has all the details as expected,
+     And a call [to verify Olawale's reception of the role CR-1 over the case C1 for unrestricted caller without organisation ID] will get the expected response as in [S-105.19_Get_Case_Roles_for_Case_C1],
+      # Clean up role assignment made above
+     And a successful call [is made to remove Case Role CR-1 after unrestricted caller assignment] as in [S-105.19_Remove_Case_Assigned_User_role_for_Case_C1].
+     And a successful call [to reset PRD organisation users stub state to present] as in [F-105_Reset_PRD_Organisation_Users_Stub_State_Present].
+
+   # CCD-7183
+   @S-105.20
+   Scenario: Must reject assignment without organisation ID for a restricted caller when PRD organisation is unavailable
+     Given an appropriate test context as detailed in the test data source,
+     And a user [Becky - restricted BEFTA master solicitor caller],
+     And a user [Hemanth - with an active solicitor profile and valid User ID],
+     And a successful call [to configure PRD organisation users stub state to restricted-failed] as in [F-105_Set_PRD_Organisation_Users_Stub_State_Restricted_Failed],
+     And a case [C1 master case, which Becky has just] created as in [S-105.20_Create_Case_Data],
+     When a request is prepared with appropriate values,
+     And the request [is made from an authorised application, by Becky, with the Case ID of C1, User ID of Hemanth and a proper Case Role CR-1 but no Organisation ID],
+     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+     Then a negative response is received,
+     And the response has all the details as expected,
+     And a call [to verify that Hemanth hasn't received the role CR-1 over the BEFTA master case after restricted caller omitted organisation ID] will get the expected response as in [S-105.20_Get_Case_Roles_for_Case_C1].
+     And a successful call [to reset PRD organisation users stub state to present] as in [F-105_Reset_PRD_Organisation_Users_Stub_State_Present].

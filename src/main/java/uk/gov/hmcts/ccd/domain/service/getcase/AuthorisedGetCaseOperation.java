@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.getcase;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -11,9 +12,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -24,17 +27,23 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final CaseAccessService caseAccessService;
+    private final ApplicationParams applicationParams;
 
 
     public AuthorisedGetCaseOperation(@Qualifier("classified") final GetCaseOperation getCaseOperation,
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                       final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
-                                      CaseDataAccessControl caseDataAccessControl) {
+                                      CaseDataAccessControl caseDataAccessControl,
+                                      CaseAccessService caseAccessService,
+                                      ApplicationParams applicationParams) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.caseDataAccessControl =  caseDataAccessControl;
+        this.caseAccessService = caseAccessService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -48,7 +57,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return getCaseOperation.execute(caseReference)
             .flatMap(caseDetails ->
                 verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
-                    getAccessProfiles(caseReference),
+                    getAccessProfiles(caseReference, caseDetails),
                     caseDetails));
     }
 
@@ -57,7 +66,19 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     }
 
 
-    private Set<AccessProfile> getAccessProfiles(String caseReference) {
+    private Set<AccessProfile> getAccessProfiles(String caseReference, CaseDetails caseDetails) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()
+            && caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary()) {
+            Set<String> restrictedAccessProfileNames = caseDataAccessControl.generateAccessProfilesForRestrictedCase(
+                caseDetails
+            ).stream()
+                .map(AccessProfile::getAccessProfile)
+                .collect(Collectors.toSet());
+
+            return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference).stream()
+                .filter(accessProfile -> restrictedAccessProfileNames.contains(accessProfile.getAccessProfile()))
+                .collect(Collectors.toSet());
+        }
         return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 

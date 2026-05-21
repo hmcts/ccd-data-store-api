@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Arrays;
@@ -17,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.ProfessionalReferenceDataOrganisationRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -47,6 +51,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CaseAccessServiceTest {
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private static final String USER_ID = "69";
 
@@ -79,6 +84,12 @@ class CaseAccessServiceTest {
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
+    private ProfessionalReferenceDataOrganisationRepository professionalReferenceDataOrganisationRepository;
+
+    @Mock
+    private CaseAccessGroupUtils caseAccessGroupUtils;
 
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
@@ -127,6 +138,14 @@ class CaseAccessServiceTest {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
         }
+    }
+
+    @Test
+    @DisplayName("should treat BEFTA solicitor suffix role as unrestricted for organisation boundary checks")
+    void shouldNotTreatBeftaSolicitorSuffixRoleAsOrganisationBoundaryRestricted() {
+        withRoles("caseworker-befta_jurisdiction_2-solicitor_2");
+
+        assertFalse(caseAccessService.userCanOnlyAccessCasesWithinOrganisationBoundary());
     }
 
     @Nested
@@ -409,13 +428,72 @@ class CaseAccessServiceTest {
             @DisplayName("should return granted case ids for user with solicitor role")
             void shouldReturnCaseIds() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                doReturn(true, true).when(userRepository).anyRoleMatches(any());
+                when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                    .thenReturn(Optional.of("ORG_1"));
+                when(caseDetailsRepository.findById(null, Long.valueOf(CASE_GRANTED_1_ID)))
+                    .thenReturn(Optional.of(caseDetails(CASE_GRANTED_1_ID)));
+                when(caseDetailsRepository.findById(null, Long.valueOf(CASE_GRANTED_2_ID)))
+                    .thenReturn(Optional.of(caseDetails(CASE_GRANTED_2_ID)));
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
-                doReturn(true).when(userRepository).anyRoleMatches(any());
+                when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_GRANTED_1_ID), USER_ID))
+                    .thenReturn(List.of("[SOLICITOR]"));
+                when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_GRANTED_2_ID), USER_ID))
+                    .thenReturn(List.of("[SOLICITOR]"));
+                when(caseAccessGroupUtils.findOrganisationPolicyNodeForCaseRole(any(CaseDetails.class), anyString()))
+                    .thenReturn(organisationPolicyNode("ORG_1"));
                 Optional<List<Long>> result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
 
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
+            }
+
+            @Test
+            @DisplayName("should filter granted case ids to caller organisation boundary")
+            void shouldFilterGrantedCaseIdsToCallerOrganisationBoundary() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                when(userRepository.getUserId()).thenReturn(USER_ID);
+                doReturn(true, true).when(userRepository).anyRoleMatches(any());
+                when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                    .thenReturn(Optional.of("ORG_1"));
+                when(caseDetailsRepository.findById(null, Long.valueOf(CASE_GRANTED_1_ID)))
+                    .thenReturn(Optional.of(caseDetails(CASE_GRANTED_1_ID)));
+                when(caseDetailsRepository.findById(null, Long.valueOf(CASE_GRANTED_2_ID)))
+                    .thenReturn(Optional.of(caseDetails(CASE_GRANTED_2_ID)));
+                when(caseDetailsRepository.findCaseReferencesByIds(List.of(Long.valueOf(CASE_GRANTED_1_ID))))
+                    .thenReturn(List.of(CASE_REFERENCE1));
+                when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_GRANTED_1_ID), USER_ID))
+                    .thenReturn(List.of("[SOLICITOR]"));
+                when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_GRANTED_2_ID), USER_ID))
+                    .thenReturn(List.of("[SOLICITOR]"));
+                when(caseAccessGroupUtils.findOrganisationPolicyNodeForCaseRole(any(CaseDetails.class), anyString()))
+                    .thenAnswer(invocation -> {
+                        CaseDetails caseDetails = invocation.getArgument(0);
+                        return CASE_GRANTED_1_ID.equals(caseDetails.getId()) ? organisationPolicyNode("ORG_1")
+                            : organisationPolicyNode("ORG_2");
+                    });
+
+                Optional<List<Long>> result = caseAccessService
+                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+
+                assertThat(result.isPresent(), is(true));
+                assertThat(result.get(), is(List.of(CASE_REFERENCE1)));
+            }
+
+            @Test
+            @DisplayName("should return no granted case ids when caller organisation is unavailable")
+            void shouldReturnNoGrantedCaseIdsWhenCallerOrganisationIsUnavailable() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                doReturn(true, true).when(userRepository).anyRoleMatches(any());
+                when(professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier())
+                    .thenReturn(Optional.empty());
+
+                Optional<List<Long>> result = caseAccessService
+                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+
+                assertThat(result.isPresent(), is(true));
+                assertTrue(result.get().isEmpty());
             }
 
 
@@ -525,7 +603,7 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with citizen role")
             void shouldReturnCaseIds() {
-                doReturn(true).when(userRepository).anyRoleMatches(any());
+                doReturn(true, false).when(userRepository).anyRoleMatches(any());
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 Optional<List<Long>> result = caseAccessService
@@ -553,7 +631,7 @@ class CaseAccessServiceTest {
             void shouldReturnCaseIds() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
-                doReturn(true).when(userRepository).anyRoleMatches(any());
+                doReturn(true, false).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService
                     .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
                 assertThat(result.isPresent(), is(true));
@@ -586,9 +664,9 @@ class CaseAccessServiceTest {
         private void assertGrantedCaseIds(List<Long> result) {
             assertAll(
                 () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
-                () -> verify(userRepository).getUserId(),
-                () -> verify(userRepository).anyRoleMatches(any()),
-                () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
+                () -> verify(userRepository, atLeastOnce()).getUserId(),
+                () -> verify(userRepository, atLeastOnce()).anyRoleMatches(any()),
+                () -> verify(caseUserRepository, atLeastOnce()).findCasesUserIdHasAccessTo(USER_ID)
             );
         }
 
@@ -756,6 +834,22 @@ class CaseAccessServiceTest {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(CASE_REVOKED_ID);
         return caseDetails;
+    }
+
+    private CaseDetails caseDetails(String id) {
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(id);
+        return caseDetails;
+    }
+
+    private JsonNode organisationPolicyNode(String organisationId) {
+        ObjectNode organisationNode = JSON_NODE_FACTORY.objectNode();
+        organisationNode.put("OrganisationID", organisationId);
+
+        ObjectNode policyNode = JSON_NODE_FACTORY.objectNode();
+        policyNode.set("Organisation", organisationNode);
+        policyNode.put("OrgPolicyCaseAssignedRole", "[SOLICITOR]");
+        return policyNode;
     }
 
     private void withRoles(String... roles) {

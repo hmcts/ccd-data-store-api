@@ -230,6 +230,9 @@ public class ApplicationParams {
     @Value("${reference.data.api.url}")
     private String referenceDataApiUrl;
 
+    @Value("${prd.api.url}")
+    private String prdApiUrl;
+
     @Value("${reference.data.cache.ttl.in.days}")
     private String referenceDataCacheTtlInDays;
 
@@ -614,6 +617,10 @@ public class ApplicationParams {
 
     public String getReferenceDataApiUrl() {
         return referenceDataApiUrl;
+    }
+
+    public String getPrdApiUrl() {
+        return prdApiUrl;
     }
 
     public int getRefDataCacheTtlInSec() {

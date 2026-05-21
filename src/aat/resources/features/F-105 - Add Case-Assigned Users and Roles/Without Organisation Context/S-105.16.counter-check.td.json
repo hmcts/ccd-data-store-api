@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-105.16_Prerequisite_Counter_Check_Call",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to check the number of users having access to C1 in its supplementary data for Dil's organisation"
+  ],
+
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Dil"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-105\\.16_Prerequisite_Counter_Check_Call.childContexts.F-105_Get_Organisation_Identifier_Dil]}"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

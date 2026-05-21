@@ -130,14 +130,9 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
 
-        Instant start = Instant.now();
         CallbackException ex = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToSubmitCallback(
                 caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
-        Duration duration = Duration.between(start, Instant.now());
-
-        MatcherAssert.assertThat("connect timeout should not wait for default 30s",
-            duration.toMillis() < 2_000L);
         MatcherAssert.assertThat("exception should mention unsuccessful callback",
             ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
     }

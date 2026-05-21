@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.ProfessionalReferenceDataOrganisationRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -48,16 +49,23 @@ public class CaseAccessService {
     private final ApplicationParams applicationParams;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final ProfessionalReferenceDataOrganisationRepository professionalReferenceDataOrganisationRepository;
+    private final CaseAccessGroupUtils caseAccessGroupUtils;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
             = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
             + "+-localAuthority$");
+    private static final Pattern ORG_BOUNDARY_RESTRICTED_ROLES_PATTERN
+        = Pattern.compile(".+-solicitor$|.+-panelmember$|^caseworker-.+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                              @Lazy CaseDataAccessControl caseDataAccessControl,
                              RoleAssignmentService roleAssignmentService, ApplicationParams applicationParams,
-                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+                             ProfessionalReferenceDataOrganisationRepository
+                                 professionalReferenceDataOrganisationRepository,
+                             CaseAccessGroupUtils caseAccessGroupUtils
     ) {
 
         this.userRepository = userRepository;
@@ -66,6 +74,8 @@ public class CaseAccessService {
         this.applicationParams = applicationParams;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.professionalReferenceDataOrganisationRepository = professionalReferenceDataOrganisationRepository;
+        this.caseAccessGroupUtils = caseAccessGroupUtils;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
@@ -104,10 +114,39 @@ public class CaseAccessService {
     private Optional<List<Long>> getGrantedCaseReferences() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
             final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-            final var caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
+            final var caseReferences = userCanOnlyAccessCasesWithinOrganisationBoundary()
+                ? filterCaseReferencesByOrganisationBoundary(ids)
+                : caseDetailsRepository.findCaseReferencesByIds(ids);
             return Optional.of(caseReferences);
         }
         return Optional.empty();
+    }
+
+    private List<Long> filterCaseReferencesByOrganisationBoundary(List<Long> caseIds) {
+        final Optional<String> callerOrganisation =
+            professionalReferenceDataOrganisationRepository.getCurrentUserOrganisationIdentifier();
+
+        if (callerOrganisation.isEmpty()) {
+            return List.of();
+        }
+
+        final List<Long> caseIdsWithinOrganisationBoundary = caseIds.stream()
+            .map(caseId -> caseDetailsRepository.findById(null, caseId).orElse(null))
+            .filter(caseDetails -> caseDetails != null && isCaseWithinCallerOrganisation(caseDetails,
+                callerOrganisation.get()))
+            .map(caseDetails -> Long.valueOf(caseDetails.getId()))
+            .collect(Collectors.toList());
+
+        return caseDetailsRepository.findCaseReferencesByIds(caseIdsWithinOrganisationBoundary);
+    }
+
+    private boolean isCaseWithinCallerOrganisation(CaseDetails caseDetails, String callerOrganisation) {
+        return caseUserRepository.findCaseRoles(Long.valueOf(caseDetails.getId()), userRepository.getUserId()).stream()
+            .map(caseRole -> caseAccessGroupUtils.findOrganisationPolicyNodeForCaseRole(caseDetails, caseRole))
+            .filter(node -> node != null && node.get("Organisation") != null
+                && node.get("Organisation").get("OrganisationID") != null)
+            .map(node -> node.get("Organisation").get("OrganisationID").asText())
+            .anyMatch(callerOrganisation::equals);
     }
 
     public Set<String> getCaseRoles(String caseId) {
@@ -169,5 +208,9 @@ public class CaseAccessService {
 
     public Boolean userCanOnlyAccessExplicitlyGrantedCases() {
         return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
+    }
+
+    public Boolean userCanOnlyAccessCasesWithinOrganisationBoundary() {
+        return userRepository.anyRoleMatches(ORG_BOUNDARY_RESTRICTED_ROLES_PATTERN);
     }
 }
