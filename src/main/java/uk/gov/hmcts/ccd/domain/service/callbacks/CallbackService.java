@@ -19,8 +19,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
-import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
-import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -139,7 +137,6 @@ public class CallbackService {
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
-        CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
         int httpStatus = 0;
         Instant startTime = Instant.now();
 

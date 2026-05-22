@@ -17,6 +17,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
+def appInsightsCloudRole = "ccd-data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 GradleBuilder builder = new GradleBuilder(this, product)
@@ -100,6 +101,7 @@ env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
 env.PACT_BROKER_PORT = "443"
 env.PACT_BROKER_SCHEME = "https"
+env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED = "true"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -221,6 +223,10 @@ withPipeline(type, product, component) {
       ]
     }
 
+    afterSuccess('functionalTest:preview') {
+        runTelemetrySmokeCheck('preview', appInsightsCloudRole)
+    }
+
     afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
         publishHTML target: [
@@ -231,6 +237,10 @@ withPipeline(type, product, component) {
             reportFiles          : "overview-features.html",
             reportName           : "Functional Test Report"
       ]
+    }
+
+    afterSuccess('functionalTest:aat') {
+        runTelemetrySmokeCheck('aat', appInsightsCloudRole)
     }
 
     afterAlways('pact-provider-verification') {
@@ -251,4 +261,55 @@ withPipeline(type, product, component) {
  */
 def copyIgnore(filePath, destinationDir) {
   steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
+}
+
+def runTelemetrySmokeCheck(environment, cloudRoleName) {
+  if (!env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED?.toBoolean()) {
+    echo "Skipping App Insights telemetry smoke check for ${environment}; set APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED=true to enable."
+    return
+  }
+
+  def appSelector = ''
+  if (env.APP_INSIGHTS_RESOURCE_ID?.trim()) {
+    appSelector = "--ids '${env.APP_INSIGHTS_RESOURCE_ID.trim()}'"
+  } else if (env.APP_INSIGHTS_APP?.trim()) {
+    appSelector = "--apps '${env.APP_INSIGHTS_APP.trim()}'"
+  } else {
+    error "APP_INSIGHTS_RESOURCE_ID or APP_INSIGHTS_APP must be set when APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED=true."
+  }
+
+  def resourceGroupSelector = env.APP_INSIGHTS_RESOURCE_GROUP?.trim()
+      ? "--resource-group '${env.APP_INSIGHTS_RESOURCE_GROUP.trim()}'"
+      : ''
+  def lookback = env.APP_INSIGHTS_TELEMETRY_LOOKBACK?.trim() ?: '2h'
+
+  ['requests', 'dependencies', 'traces'].each { telemetryTable ->
+    def analyticsQuery = "${telemetryTable} | where timestamp > ago(${lookback}) | where cloud_RoleName == '${cloudRoleName}' | summarize count()"
+    steps.sh(
+        script: """
+          set +x
+          for attempt in 1 2 3 4 5; do
+            count=\$(az monitor app-insights query ${appSelector} ${resourceGroupSelector} \\
+              --analytics-query "${analyticsQuery}" \\
+              --query 'tables[0].rows[0][0]' \\
+              -o tsv) || count=0
+
+            case "\${count}" in
+              ''|*[!0-9]*) count=0 ;;
+            esac
+
+            if [ "\${count:-0}" -gt 0 ]; then
+              echo "Found \${count} ${telemetryTable} telemetry items for cloud role ${cloudRoleName}."
+              exit 0
+            fi
+
+            echo "No ${telemetryTable} telemetry found for cloud role ${cloudRoleName}; retrying after ingestion delay."
+            sleep 60
+          done
+
+          echo "No ${telemetryTable} telemetry found for cloud role ${cloudRoleName} in the last ${lookback}."
+          exit 1
+        """
+    )
+  }
 }

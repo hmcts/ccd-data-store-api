@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.appinsights;
 
-import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
@@ -77,7 +76,7 @@ public class AppInsights {
 
     public void trackCallbackEvent(
         CallbackType callbackType, String url, String httpStatus, java.time.Duration duration) {
-        Map<String, String> properties = ImmutableMap.of(
+        Map<String, String> properties = Map.of(
             TYPE, callbackType.getValue(),
             CALLBACK_DURATION, String.valueOf(duration.toMillis()) + " ms",
             METHOD, "POST",
