@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,8 +92,11 @@ class SearchQueryFactoryOperationTest {
 
         classUnderTest.build(metadata, Maps.newHashMap(), true);
 
-        verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
-        verify(entityManager).createNativeQuery(anyString());
+        ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        verify(sortOrderQueryBuilder, never()).buildSortOrderClause(any(MetaData.class));
+        verify(entityManager).createNativeQuery(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).startsWith("SELECT count(*)");
+        assertThat(queryCaptor.getValue()).doesNotContain("ORDER BY");
     }
 
     @Test
