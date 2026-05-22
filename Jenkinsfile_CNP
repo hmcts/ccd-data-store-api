@@ -17,7 +17,6 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
-def appInsightsCloudRole = "ccd-data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 GradleBuilder builder = new GradleBuilder(this, product)
@@ -224,7 +223,7 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('functionalTest:preview') {
-        runTelemetrySmokeCheck('preview', appInsightsCloudRole)
+        runTelemetrySmokeCheck('preview')
     }
 
     afterAlways('functionalTest:aat') {
@@ -240,7 +239,7 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('functionalTest:aat') {
-        runTelemetrySmokeCheck('aat', appInsightsCloudRole)
+        runTelemetrySmokeCheck('aat')
     }
 
     afterAlways('pact-provider-verification') {
@@ -263,12 +262,13 @@ def copyIgnore(filePath, destinationDir) {
   steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }
 
-def runTelemetrySmokeCheck(environment, cloudRoleName) {
+def runTelemetrySmokeCheck(environment) {
   if (!env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED?.toBoolean()) {
     echo "Skipping App Insights telemetry smoke check for ${environment}; set APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED=true to enable."
     return
   }
 
+  def cloudRoleName = env.APP_INSIGHTS_ROLE_NAME?.trim() ?: 'ccd-data-store-api'
   def appSelector = ''
   if (env.APP_INSIGHTS_RESOURCE_ID?.trim()) {
     appSelector = "--ids '${env.APP_INSIGHTS_RESOURCE_ID.trim()}'"
