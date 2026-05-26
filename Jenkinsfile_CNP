@@ -270,13 +270,15 @@ def runTelemetrySmokeCheck(environment) {
   }
 
   def azureConfigDir = env.AZURE_CONFIG_DIR?.trim() ?: '/opt/jenkins/.azure-nonprod'
+  def appInsightsEnvironment = vaultOverrides[environment] ?: environment
 
   steps.echo("Running Application Insights telemetry smoke check for ${environment}")
   steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
+  steps.echo("Using ${appInsightsEnvironment} Application Insights for ${environment} telemetry check")
   def status = steps.sh(
       script: """
         AZURE_CONFIG_DIR='${azureConfigDir}' \\
-        APP_INSIGHTS_ENV='${environment}' \\
+        APP_INSIGHTS_ENV='${appInsightsEnvironment}' \\
         ./scripts/check-app-insights-telemetry.sh
       """,
       returnStatus: true
