@@ -275,12 +275,12 @@ def runTelemetrySmokeCheck(environment) {
   } else if (env.APP_INSIGHTS_APP?.trim()) {
     appSelector = "--apps '${env.APP_INSIGHTS_APP.trim()}'"
   } else {
-    error "APP_INSIGHTS_RESOURCE_ID or APP_INSIGHTS_APP must be set when APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED=true."
+    appSelector = "--apps 'ccd-${environment}'"
   }
 
   def resourceGroupSelector = env.APP_INSIGHTS_RESOURCE_GROUP?.trim()
       ? "--resource-group '${env.APP_INSIGHTS_RESOURCE_GROUP.trim()}'"
-      : ''
+      : "--resource-group 'ccd-shared-${environment}'"
   def lookback = env.APP_INSIGHTS_TELEMETRY_LOOKBACK?.trim() ?: '2h'
 
   ['requests', 'dependencies', 'traces'].each { telemetryTable ->
