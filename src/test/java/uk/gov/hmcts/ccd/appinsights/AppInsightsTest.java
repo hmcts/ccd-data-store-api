@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.appinsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
+import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +25,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_DEPENDENCY_PROPERTY;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_DURATION;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_EVENT_NAME;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_TYPE_PROPERTY;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.MANUAL_CALLBACK_DEPENDENCY_PROPERTY;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.METHOD;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.STATUS;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.TYPE;
@@ -217,7 +221,7 @@ public class AppInsightsTest {
     }
 
     @Test
-    public void trackCallBackDependency() {
+    public void trackCallbackEvent_shouldTrackCallbackEventProperties() {
 
         // ARRANGE
         CallbackType callbackType = CallbackType.ABOUT_TO_START;
@@ -237,6 +241,79 @@ public class AppInsightsTest {
         assertThat(captor.getValue().get(STATUS), is(equalTo(status)));
         assertThat(captor.getValue().get(METHOD), is(equalTo("POST")));
         assertThat(captor.getValue().get(CALLBACK_DURATION), is(equalTo("1200 ms")));
+    }
+
+    @Test
+    public void trackCallbackDependency_shouldTrackCallbackDependencyProperties() {
+
+        // ARRANGE
+        CallbackType callbackType = CallbackType.ABOUT_TO_START;
+        String url = "http://sscs.service.core-compute-aat.internal/callback";
+        String status = "200";
+        java.time.Duration duration = java.time.Duration.ofMillis(1200);
+
+        // ACT
+        classUnderTest.trackCallbackDependency(callbackType, url, status, duration);
+
+        // ASSERT
+        ArgumentCaptor<RemoteDependencyTelemetry> captor =
+            ArgumentCaptor.forClass(RemoteDependencyTelemetry.class);
+        verify(telemetryClient).trackDependency(captor.capture());
+
+        RemoteDependencyTelemetry dependencyTelemetry = captor.getValue();
+        assertThat(dependencyTelemetry.getName(), is(equalTo("POST sscs.service.core-compute-aat.internal")));
+        assertThat(dependencyTelemetry.getCommandName(), is(equalTo(url)));
+        assertThat(dependencyTelemetry.getTarget(), is(equalTo("sscs.service.core-compute-aat.internal")));
+        assertThat(dependencyTelemetry.getType(), is(equalTo("Http")));
+        assertThat(dependencyTelemetry.getResultCode(), is(equalTo(status)));
+        assertThat(dependencyTelemetry.getDuration().getTotalMilliseconds(), is(equalTo(1200L)));
+        assertTrue(dependencyTelemetry.getSuccess());
+        assertThat(dependencyTelemetry.getProperties().get(CALLBACK_DEPENDENCY_PROPERTY), is(equalTo("true")));
+        assertThat(dependencyTelemetry.getProperties().get(CALLBACK_TYPE_PROPERTY), is(equalTo(callbackType.getValue())));
+        assertThat(dependencyTelemetry.getProperties().get(MANUAL_CALLBACK_DEPENDENCY_PROPERTY), is(equalTo("true")));
+    }
+
+    @Test
+    public void trackCallbackDependency_shouldMarkFailedHttpStatusAsUnsuccessful() {
+
+        // ARRANGE
+        String url = "/test-callback";
+        String status = "500";
+        java.time.Duration duration = java.time.Duration.ofMillis(50);
+
+        // ACT
+        classUnderTest.trackCallbackDependency(CallbackType.ABOUT_TO_SUBMIT, url, status, duration);
+
+        // ASSERT
+        ArgumentCaptor<RemoteDependencyTelemetry> captor =
+            ArgumentCaptor.forClass(RemoteDependencyTelemetry.class);
+        verify(telemetryClient).trackDependency(captor.capture());
+
+        RemoteDependencyTelemetry dependencyTelemetry = captor.getValue();
+        assertThat(dependencyTelemetry.getTarget(), is(equalTo(url)));
+        assertThat(dependencyTelemetry.getResultCode(), is(equalTo(status)));
+        assertFalse(dependencyTelemetry.getSuccess());
+    }
+
+    @Test
+    public void trackCallbackDependency_shouldHandleNullUrl() {
+
+        // ARRANGE
+        String status = "0";
+        java.time.Duration duration = java.time.Duration.ofMillis(50);
+
+        // ACT
+        classUnderTest.trackCallbackDependency(CallbackType.ABOUT_TO_SUBMIT, null, status, duration);
+
+        // ASSERT
+        ArgumentCaptor<RemoteDependencyTelemetry> captor =
+            ArgumentCaptor.forClass(RemoteDependencyTelemetry.class);
+        verify(telemetryClient).trackDependency(captor.capture());
+
+        RemoteDependencyTelemetry dependencyTelemetry = captor.getValue();
+        assertThat(dependencyTelemetry.getTarget(), is(equalTo("unknown")));
+        assertThat(dependencyTelemetry.getCommandName(), is(equalTo("unknown")));
+        assertFalse(dependencyTelemetry.getSuccess());
     }
 
 }

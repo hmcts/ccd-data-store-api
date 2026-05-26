@@ -172,6 +172,7 @@ public class CallbackService {
         } finally {
             Duration duration = Duration.between(startTime, Instant.now());
             appinsights.trackCallbackEvent(callbackType, url, String.valueOf(httpStatus), duration);
+            appinsights.trackCallbackDependency(callbackType, url, String.valueOf(httpStatus), duration);
         }
     }
 
