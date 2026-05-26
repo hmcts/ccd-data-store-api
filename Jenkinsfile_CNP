@@ -101,6 +101,7 @@ env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
 env.PACT_BROKER_PORT = "443"
 env.PACT_BROKER_SCHEME = "https"
 env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED = "true"
+env.APP_INSIGHTS_TELEMETRY_REQUIRED = "true"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -268,67 +269,26 @@ def runTelemetrySmokeCheck(environment) {
     return
   }
 
-  def cloudRoleName = env.APP_INSIGHTS_ROLE_NAME?.trim() ?: 'ccd-data-store-api'
-  def appSelector = ''
-  if (env.APP_INSIGHTS_RESOURCE_ID?.trim()) {
-    appSelector = "--ids '${env.APP_INSIGHTS_RESOURCE_ID.trim()}'"
-  } else if (env.APP_INSIGHTS_APP?.trim()) {
-    appSelector = "--apps '${env.APP_INSIGHTS_APP.trim()}'"
-  } else {
-    appSelector = "--apps 'ccd-${environment}'"
-  }
-
-  def resourceGroupSelector = env.APP_INSIGHTS_RESOURCE_GROUP?.trim()
-      ? "--resource-group '${env.APP_INSIGHTS_RESOURCE_GROUP.trim()}'"
-      : "--resource-group 'ccd-shared-${environment}'"
-  def lookback = env.APP_INSIGHTS_TELEMETRY_LOOKBACK?.trim() ?: '2h'
   def azureConfigDir = env.AZURE_CONFIG_DIR?.trim() ?: '/opt/jenkins/.azure-nonprod'
 
-  def azStatus = steps.sh(
+  steps.echo("Running Application Insights telemetry smoke check for ${environment}")
+  steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
+  def status = steps.sh(
       script: """
-        set +x
-        command -v az >/dev/null 2>&1 && AZURE_CONFIG_DIR='${azureConfigDir}' az account show >/dev/null 2>&1
+        AZURE_CONFIG_DIR='${azureConfigDir}' \\
+        APP_INSIGHTS_ENV='${environment}' \\
+        ./scripts/check-app-insights-telemetry.sh
       """,
       returnStatus: true
   )
-  if (azStatus != 0) {
-    echo "Application Insights telemetry smoke check is inconclusive for ${environment}; Azure CLI is not available or not authenticated."
+
+  if (status == 0) {
     return
   }
 
-  ['requests', 'dependencies', 'traces'].each { telemetryTable ->
-    def analyticsQuery = "${telemetryTable} | where timestamp > ago(${lookback}) | where cloud_RoleName == '${cloudRoleName}' | summarize count()"
-    steps.sh(
-        script: """
-          set +x
-          for attempt in 1 2 3 4 5; do
-            count=\$(AZURE_CONFIG_DIR='${azureConfigDir}' az monitor app-insights query ${appSelector} ${resourceGroupSelector} \\
-              --analytics-query "${analyticsQuery}" \\
-              --query 'tables[0].rows[0][0]' \\
-              -o tsv 2>&1)
-            queryStatus=\$?
-            if [ "\${queryStatus}" -ne 0 ]; then
-              echo "Failed to query ${telemetryTable} telemetry from Application Insights:"
-              echo "\${count}"
-              exit "\${queryStatus}"
-            fi
-
-            case "\${count}" in
-              ''|*[!0-9]*) count=0 ;;
-            esac
-
-            if [ "\${count:-0}" -gt 0 ]; then
-              echo "Found \${count} ${telemetryTable} telemetry items for cloud role ${cloudRoleName}."
-              exit 0
-            fi
-
-            echo "No ${telemetryTable} telemetry found for cloud role ${cloudRoleName}; retrying after ingestion delay."
-            sleep 60
-          done
-
-          echo "No ${telemetryTable} telemetry found for cloud role ${cloudRoleName} in the last ${lookback}."
-          exit 1
-        """
-    )
+  def message = "Application Insights telemetry check did not pass for ${environment} (exit code ${status})."
+  if (env.APP_INSIGHTS_TELEMETRY_REQUIRED?.toBoolean()) {
+    steps.error(message)
   }
+  steps.echo("${message} Continuing because APP_INSIGHTS_TELEMETRY_REQUIRED is not true.")
 }

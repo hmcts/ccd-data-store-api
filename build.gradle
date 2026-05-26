@@ -433,6 +433,20 @@ task projectVersion {
     }
 }
 
+task printAuditLogFormatterTag {
+    dependsOn classes
+
+    doLast {
+        def urls = sourceSets.main.runtimeClasspath.files.collect { it.toURI().toURL() } as URL[]
+        def loader = new URLClassLoader(urls, Thread.currentThread().contextClassLoader)
+        try {
+            println loader.loadClass('uk.gov.hmcts.ccd.auditlog.AuditLogFormatter').getField('TAG').get(null)
+        } finally {
+            loader.close()
+        }
+    }
+}
+
 // copied from https://github.com/joelittlejohn/jsonschema2pojo/tree/master/jsonschema2pojo-gradle-plugin
 // Note A problem was found with the configuration of task ':generateJsonSchema2Pojo'.
 // Registering invalid inputs and outputs via TaskInputs and TaskOutputs methods has been deprecated
