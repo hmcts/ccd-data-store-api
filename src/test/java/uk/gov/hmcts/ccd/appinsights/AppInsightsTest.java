@@ -269,7 +269,8 @@ public class AppInsightsTest {
         assertThat(dependencyTelemetry.getDuration().getTotalMilliseconds(), is(equalTo(1200L)));
         assertTrue(dependencyTelemetry.getSuccess());
         assertThat(dependencyTelemetry.getProperties().get(CALLBACK_DEPENDENCY_PROPERTY), is(equalTo("true")));
-        assertThat(dependencyTelemetry.getProperties().get(CALLBACK_TYPE_PROPERTY), is(equalTo(callbackType.getValue())));
+        assertThat(dependencyTelemetry.getProperties().get(CALLBACK_TYPE_PROPERTY),
+            is(equalTo(callbackType.getValue())));
         assertThat(dependencyTelemetry.getProperties().get(MANUAL_CALLBACK_DEPENDENCY_PROPERTY), is(equalTo("true")));
     }
 
