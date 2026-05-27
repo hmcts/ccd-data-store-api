@@ -1,26 +1,14 @@
 {
-  "_guid_": "S-595",
-  "_extends_": "F-063_Base_Test_Data",
+  "_guid_": "S-063.1",
+  "_extends_": "F-063_Base_Test_Data_dataType",
   "title": "should retrieve search inputs for dynamic display",
 
   "specs": [
     "an active profile in CCD",
     "contains a valid case type",
     "contains the correct search inputs for the given case type, along with an HTTP 200 OK",
-    "body has LAST_STATE_MODIFIED_DATE as one of the items"
+    "body has dataType of complex and collection as one of the items"
   ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaCaseworker3"
-    }
-  },
-
-  "request": {
-    "pathVariables": {
-      "ctid": "BEFTA_CASETYPE_3_4"
-    }
-  },
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
@@ -35,6 +23,50 @@
           "__elementId__": "label"
         },
         {
+          "label": "Search `complex` field",
+          "order": 3,
+          "field": {
+            "id": "ComplexField",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": {
+              "id": "ComplexType",
+              "type": "Complex",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": "[[ANYTHING_PRESENT]]",
+              "collection_field_type": null
+            },
+            "show_condition": null
+          },
+          "dataType": "complex",
+          "display_context_parameter": null
+        },
+        {
+          "label" : "Search `collection address` field",
+          "order" : 2,
+          "field" : {
+            "id" : "AddressCollectionField",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": {
+              "id": "[[ANYTHING_PRESENT]]",
+              "type": "Collection",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": "[[ANYTHING_PRESENT]]"
+            },
+            "show_condition": null
+          },
+          "dataType": "collection",
+          "display_context_parameter": null
+        },
+        {
           "label": "Search `Text` field",
           "order": 1,
           "field": {
@@ -45,28 +77,6 @@
             "field_type": {
               "id": "Text",
               "type": "Text",
-              "min": null,
-              "max": null,
-              "regular_expression": null,
-              "fixed_list_items": [],
-              "complex_fields": [],
-              "collection_field_type": null
-            }
-          },
-          "dataType": null,
-          "display_context_parameter": null
-        },
-        {
-          "label": "Last State Modified Date",
-          "order": 2,
-          "field": {
-            "id": "[LAST_STATE_MODIFIED_DATE]",
-            "elementPath": null,
-            "metadata": true,
-            "show_condition": null,
-            "field_type": {
-              "id": "DateTime",
-              "type": "DateTime",
               "min": null,
               "max": null,
               "regular_expression": null,
