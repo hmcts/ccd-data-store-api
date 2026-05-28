@@ -14,4 +14,8 @@ public class CaseNotFoundException extends ResourceNotFoundException {
     public CaseNotFoundException(String caseReference) {
         super(String.format("No case found for reference: %s", caseReference));
     }
+
+    public CaseNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
