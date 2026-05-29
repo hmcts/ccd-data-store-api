@@ -30,6 +30,7 @@ public class DefaultClosedCaseSearchOperation implements ClosedCaseSearchOperati
             .stream()
             .map(DateCaseClosedEntity::getCcdCaseNumber)
             .map(String::valueOf)
+            .distinct()
             .toList();
 
         return new DateCaseClosedResponse(caseReferences);
