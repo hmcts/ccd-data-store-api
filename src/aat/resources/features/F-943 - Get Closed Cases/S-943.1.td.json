@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-943.1",
+  "_extends_": "F-943_Test_Data_Base",
+  "title": "Return list of closed cases successfully",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains Date field"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "caseReferences": [
+        "${[scenarioContext][customValues][caseIdAsStringFrom_Standard_Full_Case_Creation_Data]}"
+      ]
+    }
+  }
+}

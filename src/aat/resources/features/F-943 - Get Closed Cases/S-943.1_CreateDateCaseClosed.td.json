@@ -1,0 +1,42 @@
+{
+  "_guid_": "S-943.1_CreateDateCaseClosed",
+  "title": "Create date case closed record for get closed cases",
+  "specs": [
+    "to create a date case closed record"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "create date case closed record",
+
+  "method": "POST",
+  "uri": "/testing-support/date-case-closed",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "ccdCaseNumber": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "state": "Closed",
+      "stateCategory": "Closed",
+      "stateChangedDate": "1799-01-01T00:00:00"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "ccdCaseNumber": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "state": "Closed",
+      "stateCategory": "Closed",
+      "stateChangedDate": "1799-01-01T00:00:00"
+    }
+  }
+}

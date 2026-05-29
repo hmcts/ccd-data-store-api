@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-943.2",
+  "_extends_": "F-943_Test_Data_Base",
+  "title": "Return 400 if date is not before current date",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains Date field",
+    "code is HTTP-400 Bad Request"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "date": "2999-01-01T00:00:00Z"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "Date is not valid",
+      "path": "/internal/searchCases/getClosedCases/2999-01-01T00%253A00%253A00Z",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

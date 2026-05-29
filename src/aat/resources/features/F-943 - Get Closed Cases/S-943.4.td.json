@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-943.4",
+  "_extends_": "F-943_Test_Data_Base",
+  "title": "Return 404 not found if no closed cases are found",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains Date field for which there are no cases available",
+    "code is HTTP-404"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "date": "1700-01-01T00:00:00Z"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "status": 404,
+      "error": "Not Found",
+      "message": "Case data not found",
+      "path": "/internal/searchCases/getClosedCases/1700-01-01T00%253A00%253A00Z",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

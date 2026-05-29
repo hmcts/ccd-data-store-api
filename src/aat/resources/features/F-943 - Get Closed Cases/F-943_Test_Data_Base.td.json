@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-943_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "get closed cases",
+
+  "method": "GET",
+  "uri": "/internal/searchCases/getClosedCases/{date}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "date": "1799-01-01T00:00:00Z"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 200
+  }
+}
