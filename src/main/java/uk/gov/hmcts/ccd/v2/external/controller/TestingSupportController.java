@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.type.BasicTypeReference;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,8 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 import jakarta.inject.Inject;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -128,19 +131,32 @@ public class TestingSupportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dateCaseClosedRepository.save(entity));
     }
 
-    @DeleteMapping(value = "/date-case-closed/{caseReference}")
-    @Operation(summary = "Delete DATE_CASE_CLOSED records for a case reference")
+    @DeleteMapping(value = "/date-case-closed")
+    @Operation(summary = "Delete DATE_CASE_CLOSED records for functional tests")
     @ApiResponse(responseCode = "204", description = "Success")
     public ResponseEntity<Void> dateCaseClosedDelete(
-        @PathVariable @Parameter(name = "Case Reference", required = true) Long caseReference) {
+        @RequestParam @Parameter(name = "Case Type ID", required = true) String caseTypeId,
+        @RequestParam @Parameter(name = "State", required = true) String state,
+        @RequestParam @Parameter(name = "State Category", required = true) String stateCategory,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        @Parameter(name = "State Changed Date", required = true) LocalDate stateChangedDate) {
         Session session = sessionFactory.openSession();
 
-        executeSql(
-            session,
-            "DELETE FROM date_case_closed WHERE ccd_case_number IN (:caseReferences)",
-            "caseReferences",
-            List.of(caseReference),
-            StandardBasicTypes.LONG);
+        session.beginTransaction();
+        session.createNativeQuery(
+                "DELETE FROM date_case_closed "
+                    + "WHERE ccd_case_number IN ("
+                    + "SELECT reference FROM case_data WHERE case_type_id = :caseTypeId"
+                    + ") "
+                    + "AND state = :state "
+                    + "AND state_category = :stateCategory "
+                    + "AND state_changed_date < :stateChangedDateEnd")
+            .setParameter("caseTypeId", caseTypeId)
+            .setParameter("state", state)
+            .setParameter("stateCategory", stateCategory)
+            .setParameter("stateChangedDateEnd", Timestamp.valueOf(stateChangedDate.plusDays(1).atStartOfDay()))
+            .executeUpdate();
+        session.getTransaction().commit();
 
         session.close();
 

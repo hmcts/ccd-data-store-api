@@ -11,6 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -111,19 +113,36 @@ class TestingSupportControllerTest {
     }
 
     @Test
-    void shouldDeleteDateCaseClosedRecord() {
+    void shouldDeleteExistingDateCaseClosedRecords() {
         when(sessionFactory.openSession())
             .thenReturn(session);
         when(session.createNativeQuery(anyString()))
             .thenReturn(nativeQuery);
-        when(nativeQuery.setParameterList(eq("caseReferences"), anyList(), any(BasicTypeReference.class)))
+        when(nativeQuery.setParameter(anyString(), any()))
             .thenReturn(nativeQuery);
         when(session.getTransaction())
             .thenReturn(transaction);
 
-        ResponseEntity<Void> response = testingSupportController.dateCaseClosedDelete(1234567890123456L);
+        ResponseEntity<Void> response = testingSupportController.dateCaseClosedDelete(
+            "AAT_AUTH_15",
+            "Closed",
+            "Closed",
+            LocalDate.of(2025, 1, 1)
+        );
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(session).createNativeQuery("DELETE FROM date_case_closed WHERE ccd_case_number IN (:caseReferences)");
+        verify(session).createNativeQuery(
+            "DELETE FROM date_case_closed "
+                + "WHERE ccd_case_number IN ("
+                + "SELECT reference FROM case_data WHERE case_type_id = :caseTypeId"
+                + ") "
+                + "AND state = :state "
+                + "AND state_category = :stateCategory "
+                + "AND state_changed_date < :stateChangedDateEnd"
+        );
+        verify(nativeQuery).setParameter("caseTypeId", "AAT_AUTH_15");
+        verify(nativeQuery).setParameter("state", "Closed");
+        verify(nativeQuery).setParameter("stateCategory", "Closed");
+        verify(nativeQuery).setParameter("stateChangedDateEnd", Timestamp.valueOf("2025-01-02 00:00:00"));
     }
 }

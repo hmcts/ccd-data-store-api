@@ -24,8 +24,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DefaultClosedCaseSearchOperationTest {
 
-    private static final Instant CLOSED_CASES_INSTANT = Instant.parse("2026-05-18T00:00:00Z");
-    private static final Date CLOSED_CASES_DATE = Date.from(CLOSED_CASES_INSTANT);
+    private static final Date CLOSED_CASES_DATE = Date.from(Instant.parse("2026-05-18T00:00:00Z"));
+    private static final Date NEXT_DAY_START = Date.from(Instant.parse("2026-05-19T00:00:00Z"));
 
     @Mock
     private DateCaseClosedRepository dateCaseClosedRepository;
@@ -37,26 +37,26 @@ class DefaultClosedCaseSearchOperationTest {
     void shouldReturnClosedCaseReferences() {
         DateCaseClosedEntity firstClosedCase = createDateCaseClosedEntity(1234567890123456L);
         DateCaseClosedEntity secondClosedCase = createDateCaseClosedEntity(2345678901234567L);
-        when(dateCaseClosedRepository.findByStateChangedDateLessThanEqual(CLOSED_CASES_DATE))
+        when(dateCaseClosedRepository.findByStateChangedDateBefore(NEXT_DAY_START))
             .thenReturn(List.of(firstClosedCase, secondClosedCase));
 
         DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(CLOSED_CASES_DATE);
 
         assertAll(
-            () -> verify(dateCaseClosedRepository).findByStateChangedDateLessThanEqual(CLOSED_CASES_DATE),
+            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(NEXT_DAY_START),
             () -> assertThat(response.getCaseReferences(), is(List.of("1234567890123456", "2345678901234567")))
         );
     }
 
     @Test
     void shouldReturnNullCaseReferencesWhenNoClosedCasesFound() {
-        when(dateCaseClosedRepository.findByStateChangedDateLessThanEqual(CLOSED_CASES_DATE))
+        when(dateCaseClosedRepository.findByStateChangedDateBefore(NEXT_DAY_START))
             .thenReturn(Collections.emptyList());
 
         DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(CLOSED_CASES_DATE);
 
         assertAll(
-            () -> verify(dateCaseClosedRepository).findByStateChangedDateLessThanEqual(CLOSED_CASES_DATE),
+            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(NEXT_DAY_START),
             () -> assertThat(response.getCaseReferences(), is(nullValue()))
         );
     }

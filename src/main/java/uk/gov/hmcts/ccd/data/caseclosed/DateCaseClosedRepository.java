@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface DateCaseClosedRepository extends CrudRepository<DateCaseClosedEntity, Long> {
 
-    List<DateCaseClosedEntity> findByStateChangedDateLessThanEqual(Date stateChangedDate);
+    List<DateCaseClosedEntity> findByStateChangedDateBefore(Date stateChangedDate);
 }
