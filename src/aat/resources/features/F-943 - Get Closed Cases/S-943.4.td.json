@@ -11,7 +11,7 @@
 
   "request": {
     "pathVariables": {
-      "date": "1700-01-01T00:00:00Z"
+      "date": "2024-01-01T00:00:00Z"
     }
   },
 
@@ -22,7 +22,7 @@
       "status": 404,
       "error": "Not Found",
       "message": "Case data not found",
-      "path": "/internal/searchCases/getClosedCases/1700-01-01T00%253A00%253A00Z",
+      "path": "/internal/searchCases/getClosedCases/2024-01-01T00%253A00%253A00Z",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

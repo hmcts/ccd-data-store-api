@@ -25,7 +25,7 @@
       "ccdCaseNumber": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "state": "Closed",
       "stateCategory": "Closed",
-      "stateChangedDate": "1799-01-01T00:00:00"
+      "stateChangedDate": "2025-01-01T00:00:00"
     }
   },
 
@@ -36,7 +36,7 @@
       "ccdCaseNumber": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "state": "Closed",
       "stateCategory": "Closed",
-      "stateChangedDate": "1799-01-01T00:00:00"
+      "stateChangedDate": "2025-01-01T00:00:00"
     }
   }
 }
