@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import org.hibernate.Session;
@@ -85,6 +87,7 @@ class TestingSupportControllerTest {
     @Test
     void shouldCreateDateCaseClosedRecord() {
         final LocalDateTime stateChangedDate = LocalDateTime.of(2025, 5, 8, 12, 30);
+        final Date expectedStateChangedDate = Date.from(stateChangedDate.toInstant(ZoneOffset.UTC));
         TestingSupportController.DateCaseClosedRequest request =
             new TestingSupportController.DateCaseClosedRequest();
         request.setCcdCaseNumber(1234567890123456L);
@@ -104,7 +107,7 @@ class TestingSupportControllerTest {
         assertEquals(1234567890123456L, responseBody.getCcdCaseNumber());
         assertEquals("Closed", responseBody.getState());
         assertEquals("Closed", responseBody.getStateCategory());
-        assertEquals(stateChangedDate, responseBody.getStateChangedDate());
+        assertEquals(expectedStateChangedDate, responseBody.getStateChangedDate());
     }
 
     @Test

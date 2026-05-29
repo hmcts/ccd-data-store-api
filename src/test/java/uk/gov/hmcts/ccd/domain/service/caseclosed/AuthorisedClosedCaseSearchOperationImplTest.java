@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthorisedClosedCaseSearchOperationImplTest {
 
-    private static final Instant CLOSED_CASES_INSTANT = Instant.parse("2026-05-18T10:15:30Z");
+    private static final Instant CLOSED_CASES_INSTANT = Instant.parse("2026-05-18T00:00:00Z");
     private static final Date CLOSED_CASES_DATE = Date.from(CLOSED_CASES_INSTANT);
 
     @Mock

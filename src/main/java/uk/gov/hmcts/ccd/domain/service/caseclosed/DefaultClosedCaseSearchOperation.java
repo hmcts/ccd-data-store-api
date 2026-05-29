@@ -6,8 +6,6 @@ import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +22,7 @@ public class DefaultClosedCaseSearchOperation implements ClosedCaseSearchOperati
 
     @Override
     public DateCaseClosedResponse execute(Date closedCaseDate) {
-        LocalDateTime stateChangedDate = LocalDateTime.ofInstant(closedCaseDate.toInstant(), ZoneOffset.UTC);
-
-        List<String> caseReferences = dateCaseClosedRepository.findByStateChangedDateLessThanEqual(stateChangedDate)
+        List<String> caseReferences = dateCaseClosedRepository.findByStateChangedDateLessThanEqual(closedCaseDate)
             .stream()
             .map(DateCaseClosedEntity::getCcdCaseNumber)
             .map(String::valueOf)

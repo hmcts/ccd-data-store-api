@@ -31,7 +31,9 @@ import uk.gov.hmcts.ccd.v2.V2;
 import jakarta.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -121,7 +123,7 @@ public class TestingSupportController {
         entity.setCcdCaseNumber(request.getCcdCaseNumber());
         entity.setState(request.getState());
         entity.setStateCategory(request.getStateCategory());
-        entity.setStateChangedDate(request.getStateChangedDate());
+        entity.setStateChangedDate(toDate(request.getStateChangedDate()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(dateCaseClosedRepository.save(entity));
     }
@@ -152,6 +154,10 @@ public class TestingSupportController {
             .setParameterList(parameterName, ids, type)
             .executeUpdate();
         session.getTransaction().commit();
+    }
+
+    private Date toDate(LocalDateTime dateTime) {
+        return dateTime == null ? null : Date.from(dateTime.toInstant(ZoneOffset.UTC));
     }
 
     @Data

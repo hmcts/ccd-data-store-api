@@ -9,7 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Data
@@ -35,5 +37,6 @@ public class DateCaseClosedEntity {
     private String stateCategory;
 
     @Column(name = "state_changed_date")
-    private LocalDateTime stateChangedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date stateChangedDate;
 }
