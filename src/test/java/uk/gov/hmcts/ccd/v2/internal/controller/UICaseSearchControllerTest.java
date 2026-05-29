@@ -24,8 +24,8 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortSer
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -136,7 +136,10 @@ class UICaseSearchControllerTest {
 
     @Test
     void shouldGetClosedCases() {
-        Date closedCasesDate = Date.from(Instant.now().minus(Duration.ofDays(1)));
+        Date closedCasesDate = Date.from(LocalDate.now(ZoneOffset.UTC)
+            .minusDays(1)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant());
         DateCaseClosedResponse dateCaseClosedResponse =
             new DateCaseClosedResponse(List.of("1234567890123456", "2345678901234567"));
         when(closedCaseSearchOperation.execute(closedCasesDate)).thenReturn(dateCaseClosedResponse);
@@ -152,7 +155,10 @@ class UICaseSearchControllerTest {
 
     @Test
     void shouldRejectClosedCasesDateThatIsNotBeforeCurrentDate() {
-        Date closedCasesDate = Date.from(Instant.now().plus(Duration.ofDays(1)));
+        Date closedCasesDate = Date.from(LocalDate.now(ZoneOffset.UTC)
+            .plusDays(1)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant());
 
         BadSearchRequest exception = assertThrows(
             BadSearchRequest.class,

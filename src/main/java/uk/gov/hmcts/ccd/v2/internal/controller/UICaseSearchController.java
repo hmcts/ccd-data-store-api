@@ -208,7 +208,7 @@ public class UICaseSearchController {
     public ResponseEntity<DateCaseClosedResponse> getClosedCases(
         @Parameter(name = "date", required = true)
         @PathVariable("date")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date closedCasesDate) {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date closedCasesDate) {
         if (!closedCasesDate.toInstant().isBefore(Instant.now())) {
             throw new BadSearchRequest("Date is not valid");
         }
