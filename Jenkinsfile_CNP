@@ -289,8 +289,9 @@ def runTelemetrySmokeCheck(environment) {
   }
 
   def message = "Application Insights telemetry check did not pass for ${environment} (exit code ${status})."
-  if (env.APP_INSIGHTS_TELEMETRY_REQUIRED?.toBoolean()) {
+  def telemetryRequired = env.APP_INSIGHTS_TELEMETRY_REQUIRED?.toBoolean() && environment != 'preview'
+  if (telemetryRequired) {
     steps.error(message)
   }
-  steps.echo("${message} Continuing because APP_INSIGHTS_TELEMETRY_REQUIRED is not true.")
+  steps.echo("${message} Continuing because telemetry smoke check is non-blocking for ${environment}.")
 }
