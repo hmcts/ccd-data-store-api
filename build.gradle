@@ -1,6 +1,7 @@
 import groovy.xml.XmlParser
 
 plugins {
+    id 'maven-publish'
     id 'application'
     id 'jacoco'
     id 'idea'
@@ -34,7 +35,7 @@ ext {
     junitPlatform = '1.14.4'
     jjwt = '0.13.0'
     appInsightsVersion = '3.7.8'
-    pactProviderVersion = '4.7.0'
+    pactProviderVersion = '4.7.1'
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
@@ -42,7 +43,7 @@ ext {
     testContainersVersion = '2.0.5'
     cucumber = '7.34.3'
     beftaFwVersion = '9.2.6'
-    ccdTestDefinitionVersion = '7.26.2'
+    ccdTestDefinitionVersion = '7.26.4'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -293,7 +294,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.2'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.1'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.2'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.0'
 
     // Elasticsearch
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: elasticVersion
@@ -349,6 +350,19 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
     }
 }
 
@@ -804,6 +818,8 @@ task smoke(type: JavaExec) {
 }
 
 def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+//temporary to check feature working on its own in pipeline or not
+//tags = tags + " and (@S-164 or @S-1025.3)"
 
 task functional(type: JavaExec) {
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
