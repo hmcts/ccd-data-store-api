@@ -80,7 +80,7 @@ def vaultOverrides = [
 ]
 
 environment {
-    ENABLE_CASE_GROUP_ACCESS_FILTERING = 'true'
+    ENABLE_CASE_GROUP_ACCESS_FILTERING = 'false'
 }
 
 // vars needed for functional tests
@@ -107,7 +107,7 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
-env.ENABLE_CASE_GROUP_ACCESS_FILTERING = "true"
+env.ENABLE_CASE_GROUP_ACCESS_FILTERING = "false"
 
 withNightlyPipeline(type, product, component) {
 
