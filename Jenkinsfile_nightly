@@ -78,6 +78,11 @@ def vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
+
+environment {
+    ENABLE_CASE_GROUP_ACCESS_FILTERING = 'true'
+}
+
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
 env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
