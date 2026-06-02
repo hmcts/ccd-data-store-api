@@ -106,12 +106,12 @@ env.ENABLE_CASE_GROUP_ACCESS_FILTERING = "true"
 
 withNightlyPipeline(type, product, component) {
 
-    stage('Wait for ccd-definition-store-api job') {
-        script {
-            echo "Waiting for upstream ccd-definition-store-api job to complete..."
-            build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
-        }
-    }
+    //stage('Wait for ccd-definition-store-api job') {
+    //    script {
+    //        echo "Waiting for upstream ccd-definition-store-api job to complete..."
+    //        build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
+    //    }
+    //}
 
     overrideVaultEnvironments(vaultOverrides)
     disableLegacyDeploymentOnAAT()
