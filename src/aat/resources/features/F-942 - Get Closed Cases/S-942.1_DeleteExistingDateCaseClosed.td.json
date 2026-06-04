@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-943.1_DeleteExistingDateCaseClosed",
+  "_guid_": "S-942.1_DeleteExistingDateCaseClosed",
   "title": "Delete existing date case closed records for get closed cases",
   "specs": [
     "to delete existing date case closed records"

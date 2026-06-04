@@ -28,7 +28,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -136,10 +135,7 @@ class UICaseSearchControllerTest {
 
     @Test
     void shouldGetClosedCases() {
-        Date closedCasesDate = Date.from(LocalDate.now(ZoneOffset.UTC)
-            .minusDays(1)
-            .atStartOfDay(ZoneOffset.UTC)
-            .toInstant());
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC).minusDays(1);
         DateCaseClosedResponse dateCaseClosedResponse =
             new DateCaseClosedResponse(List.of("1234567890123456", "2345678901234567"));
         when(closedCaseSearchOperation.execute(closedCasesDate)).thenReturn(dateCaseClosedResponse);
@@ -155,10 +151,7 @@ class UICaseSearchControllerTest {
 
     @Test
     void shouldRejectClosedCasesDateThatIsNotBeforeCurrentDate() {
-        Date closedCasesDate = Date.from(LocalDate.now(ZoneOffset.UTC)
-            .plusDays(1)
-            .atStartOfDay(ZoneOffset.UTC)
-            .toInstant());
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC).plusDays(1);
 
         BadSearchRequest exception = assertThrows(
             BadSearchRequest.class,

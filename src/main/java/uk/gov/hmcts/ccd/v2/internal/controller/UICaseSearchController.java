@@ -41,8 +41,9 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -180,7 +181,7 @@ public class UICaseSearchController {
         return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
     }
 
-    @GetMapping(path = "/getClosedCases/{date}", consumes = MediaType.ALL_VALUE)
+    @GetMapping(path = "/getClosedCases/{date}")
     @Operation(description = "Retrieve closed cases from date_case_closed by state changed date.")
     @ApiResponse(
         responseCode = "200",
@@ -208,8 +209,8 @@ public class UICaseSearchController {
     public ResponseEntity<DateCaseClosedResponse> getClosedCases(
         @Parameter(name = "date", required = true)
         @PathVariable("date")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date closedCasesDate) {
-        if (!closedCasesDate.toInstant().isBefore(Instant.now())) {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate closedCasesDate) {
+        if (!closedCasesDate.isBefore(LocalDate.now(ZoneOffset.UTC))) {
             throw new BadSearchRequest("Date is not valid");
         }
         return ResponseEntity.ok(closedCaseSearchOperation.execute(closedCasesDate));

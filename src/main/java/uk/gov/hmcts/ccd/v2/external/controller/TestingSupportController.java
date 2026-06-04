@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.inject.Inject;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.BasicTypeReference;
@@ -17,19 +23,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinksResource;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.v2.V2;
 
-import jakarta.inject.Inject;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -126,7 +125,7 @@ public class TestingSupportController {
         entity.setCcdCaseNumber(request.getCcdCaseNumber());
         entity.setState(request.getState());
         entity.setStateCategory(request.getStateCategory());
-        entity.setStateChangedDate(toDate(request.getStateChangedDate()));
+        entity.setStateChangedDate(request.getStateChangedDate());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(dateCaseClosedRepository.save(entity));
     }

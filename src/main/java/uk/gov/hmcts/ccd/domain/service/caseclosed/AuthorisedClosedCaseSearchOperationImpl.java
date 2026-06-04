@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_DATA_NOT_FOUND;
@@ -28,7 +28,7 @@ public class AuthorisedClosedCaseSearchOperationImpl implements ClosedCaseSearch
 
     @Override
     @Transactional
-    public DateCaseClosedResponse execute(Date closedCaseDate) {
+    public DateCaseClosedResponse execute(LocalDate closedCaseDate) {
         List<String> closedCaseReferences = closedCaseSearchOperation.execute(closedCaseDate).getCaseReferences();
 
         if (closedCaseReferences == null || closedCaseReferences.isEmpty()) {

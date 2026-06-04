@@ -10,9 +10,8 @@ import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthorisedClosedCaseSearchOperationImplTest {
 
-    private static final Instant CLOSED_CASES_INSTANT = Instant.parse("2026-05-18T00:00:00Z");
-    private static final Date CLOSED_CASES_DATE = Date.from(CLOSED_CASES_INSTANT);
+    private static final LocalDate CLOSED_CASES_DATE = LocalDate.of(2026, 5, 18);
 
     @Mock
     private ClosedCaseSearchOperation closedCaseSearchOperation;

@@ -9,9 +9,9 @@ import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -24,8 +24,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DefaultClosedCaseSearchOperationTest {
 
-    private static final Date CLOSED_CASES_DATE = Date.from(Instant.parse("2026-05-18T00:00:00Z"));
-    private static final Date NEXT_DAY_START = Date.from(Instant.parse("2026-05-19T00:00:00Z"));
+    private static final LocalDate CLOSED_CASES_DATE = LocalDate.of(2026, 5, 18);
+    private static final LocalDateTime NEXT_DAY_START = LocalDateTime.of(2026, 5, 19, 0, 0);
 
     @Mock
     private DateCaseClosedRepository dateCaseClosedRepository;

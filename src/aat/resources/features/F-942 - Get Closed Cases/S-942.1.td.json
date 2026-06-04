@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-943.1",
-  "_extends_": "F-943_Test_Data_Base",
+  "_guid_": "S-942.1",
+  "_extends_": "F-942_Test_Data_Base",
   "title": "Return list of closed cases successfully",
 
   "specs": [

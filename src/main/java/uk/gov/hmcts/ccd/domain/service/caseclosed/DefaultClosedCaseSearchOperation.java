@@ -7,8 +7,7 @@ import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,8 +22,8 @@ public class DefaultClosedCaseSearchOperation implements ClosedCaseSearchOperati
     }
 
     @Override
-    public DateCaseClosedResponse execute(Date closedCaseDate) {
-        Date nextDayStart = getNextDayStart(closedCaseDate);
+    public DateCaseClosedResponse execute(LocalDate closedCaseDate) {
+        LocalDateTime nextDayStart = closedCaseDate.plusDays(1).atStartOfDay();
         List<String> caseReferences = dateCaseClosedRepository.findByStateChangedDateBefore(nextDayStart)
             .stream()
             .map(DateCaseClosedEntity::getCcdCaseNumber)
@@ -33,10 +32,5 @@ public class DefaultClosedCaseSearchOperation implements ClosedCaseSearchOperati
             .toList();
 
         return new DateCaseClosedResponse(caseReferences);
-    }
-
-    private Date getNextDayStart(Date closedCaseDate) {
-        LocalDate closedCaseLocalDate = closedCaseDate.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
-        return Date.from(closedCaseLocalDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
     }
 }
