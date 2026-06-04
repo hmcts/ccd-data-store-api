@@ -192,17 +192,6 @@ public class UICaseSearchController {
         description = "Date is not valid."
     )
     @ApiResponse(
-        responseCode = "401",
-        description = "Request doesn't include a valid `Authorization` header. "
-                      + "This applies to all missing, malformed & expired tokens."
-    )
-    @ApiResponse(
-        responseCode = "403",
-        description = "Request doesn't include a valid `ServiceAuthorization` header. "
-                      + "This applies to all missing, malformed & expired tokens.\n"
-                      + "A valid S2S token issued to the name of a non-permitted API Client will also return the same."
-    )
-    @ApiResponse(
         responseCode = "404",
         description = V2.Error.CASE_DATA_NOT_FOUND
     )
