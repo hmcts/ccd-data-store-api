@@ -34,6 +34,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
     }
 
+    @Before("@groupaccess")
+    public void skipGroupAccessTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("GROUP_ACCESS_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Group Access not Enabled");
+        }
+    }
+
     @Before
     public void createUID(Scenario scenario) {
         String tag = getDataFileTag(scenario);
