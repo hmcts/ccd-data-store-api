@@ -29,15 +29,19 @@ public class PersistenceStrategyResolver {
     private final CasePointerRepository pointerRepository;
     private final Cache<Long, String> caseTypeCache;
 
+    private static final String TEMPLATE_PLACEHOLDER = "%s";
+
     /**
      * A map where the key is a lowercase(case-type-id-prefix) and the value is the base URL
-     * of the owning service responsible for its persistence.
+     * or template URL of the owning service responsible for its persistence.
      * e.g., 'mycasetype': 'http://my-service-host:port' would match 'MyCaseType-1234'.
+     * Template values can contain a single '%s' placeholder which will be replaced with
+     * the case type suffix (the part after the prefix).
      *
      * <p>This can be set via application properties and environment variables.
      */
     @NotNull
-    private Map<String, URI> caseTypeServiceUrls = Map.of();
+    private Map<String, String> caseTypeServiceUrls = Map.of();
 
 
     @Autowired
@@ -56,7 +60,7 @@ public class PersistenceStrategyResolver {
      * Sets the case type service URLs when the application starts.
      * The keys in the map are converted to lowercase to ensure case-insensitivity.
      */
-    public void setCaseTypeServiceUrls(Map<String, URI> caseTypeServiceUrls) {
+    public void setCaseTypeServiceUrls(Map<String, String> caseTypeServiceUrls) {
         this.caseTypeServiceUrls = new HashMap<>();
         caseTypeServiceUrls.forEach((key, value) ->
             this.caseTypeServiceUrls.put(key.toLowerCase(), value)
@@ -122,10 +126,24 @@ public class PersistenceStrategyResolver {
             .filter(lowerCaseTypeId::startsWith)
             .toList();
 
-        if (matchingPrefixes.size() > 1) {
-            String conflictingPrefixes = String.join(", ", matchingPrefixes);
+        if (matchingPrefixes.isEmpty()) {
+            log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
+            return Optional.empty();
+        }
+
+        int maxPrefixLength = matchingPrefixes.stream()
+            .mapToInt(String::length)
+            .max()
+            .orElse(0);
+
+        List<String> longestMatches = matchingPrefixes.stream()
+            .filter(prefix -> prefix.length() == maxPrefixLength)
+            .toList();
+
+        if (longestMatches.size() > 1) {
+            String conflictingPrefixes = String.join(", ", longestMatches);
             String message = String.format(
-                "Ambiguous configuration for case type '%s'. Multiple prefix matches found: [%s]",
+                "Ambiguous configuration for case type '%s'. Multiple longest prefix matches found: [%s]",
                 caseTypeId,
                 conflictingPrefixes
             );
@@ -133,19 +151,55 @@ public class PersistenceStrategyResolver {
             throw new IllegalStateException(message);
         }
 
-        Optional<String> matchingPrefixOptional = matchingPrefixes.stream().findFirst();
+        String prefix = longestMatches.getFirst();
+        String template = caseTypeServiceUrls.get(prefix);
+        URI url = resolveTemplate(caseTypeId, prefix, template);
+        log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
+            caseTypeId,
+            prefix,
+            url);
+        return Optional.of(url);
+    }
 
-        if (matchingPrefixOptional.isPresent()) {
-            String prefix = matchingPrefixOptional.get();
-            URI url = caseTypeServiceUrls.get(prefix);
-            log.debug("Case type '{}' matches decentralised persistence rule with prefix '{}'. Routing to: {}",
-                caseTypeId,
+    /**
+     * Template URLs can contain a single %s placeholder.
+     * If present, the placeholder will be replaced with the suffix of the case type ID (the part after the prefix).
+     * e.g., with a prefix of 'mycasetype' and a case type ID of 'MyCaseType-1234', the suffix would be '-1234'.
+     * This allows for dynamic routing based on the case type ID while still using a single configuration entry for
+     * reusing AAT instances of CCD from preview PRs.
+     */
+    private URI resolveTemplate(String caseTypeId, String prefix, String template) {
+        int firstPlaceholder = template.indexOf(TEMPLATE_PLACEHOLDER);
+        String resolved = template;
+        if (firstPlaceholder != -1) {
+            if (firstPlaceholder != template.lastIndexOf(TEMPLATE_PLACEHOLDER)) {
+                throw new IllegalStateException(String.format(
+                    "Decentralised persistence URL template for prefix '%s' contains multiple '%s' placeholders",
+                    prefix,
+                    TEMPLATE_PLACEHOLDER
+                ));
+            }
+
+            String suffix = caseTypeId.substring(prefix.length());
+            if (suffix.isBlank()) {
+                throw new IllegalStateException(String.format(
+                    "Case type '%s' matches prefix '%s' but has no suffix for template substitution",
+                    caseTypeId,
+                    prefix
+                ));
+            }
+            resolved = template.replace(TEMPLATE_PLACEHOLDER, suffix);
+        }
+
+        try {
+            return URI.create(resolved);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalStateException(String.format(
+                "Invalid decentralised persistence URL '%s' for prefix '%s' and case type '%s'",
+                resolved,
                 prefix,
-                url);
-            return Optional.of(url);
-        } else {
-            log.debug("Case type '{}' is not configured for decentralised persistence. Using default.", caseTypeId);
-            return Optional.empty();
+                caseTypeId
+            ), ex);
         }
     }
 

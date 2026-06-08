@@ -24,6 +24,8 @@ Background:
     Then a negative response is received,
     And the response [contains HTTP 403 Forbidden],
     And the response has all other details as expected.
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1025_Remove_Case_Assigned_User_role_for_Case].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,14 +3,12 @@ package uk.gov.hmcts.ccd.domain.service.lau;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAndAuditFeignClient;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.lau.ActionLog;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostRequest;
 import uk.gov.hmcts.ccd.domain.model.lau.CaseActionPostResponse;
@@ -40,15 +38,11 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private final LogAndAuditFeignClient logAndAuditFeignClient;
 
-    private final SecurityUtils securityUtils;
-
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
     @Autowired
-    public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
-                                    LogAndAuditFeignClient logAndAuditFeignClient,
+    public AuditCaseRemoteOperation(LogAndAuditFeignClient logAndAuditFeignClient,
                                     final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
-        this.securityUtils = securityUtils;
         this.logAndAuditFeignClient = logAndAuditFeignClient;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
     }
@@ -120,12 +114,12 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             if (LAU_CASE_ACTION_CREATE.equals(activity) || LAU_CASE_ACTION_UPDATE.equals(activity)
                 || LAU_CASE_ACTION_VIEW.equals(activity)) {
                 CompletableFuture<ResponseEntity<CaseActionPostResponse>> future = CompletableFuture.supplyAsync(() ->
-                    logAndAuditFeignClient.postCaseAction(securityUtils.getServiceAuthorization(), capr));
+                    logAndAuditFeignClient.postCaseAction(capr));
                 future.whenComplete((response, error) ->
                     handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             } else if ("SEARCH".equals(activity)) {
                 CompletableFuture<ResponseEntity<CaseSearchPostResponse>> future = CompletableFuture.supplyAsync(() ->
-                    logAndAuditFeignClient.postCaseSearch(securityUtils.getServiceAuthorization(), cspr));
+                    logAndAuditFeignClient.postCaseSearch(cspr));
                 future.whenComplete((response, error) ->
                     handleAuditResponse(response, error, entry.getRequestId(), activity, url, auditLogId));
             }

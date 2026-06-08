@@ -322,6 +322,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1018.21-VerifyCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.22 #AC-22
     Scenario: Case Link value changed and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -337,6 +339,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1018.22-VerifyCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_22_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.23 #AC-23
     Scenario: CaseLink in database exists but CaseLink field in the Request contains blank/null value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -351,6 +355,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1018_VerifyRemovedCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_23_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.24 #AC-24
     Scenario: CaseLink in database exists and CaseLink field in the Request is unchanged and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -365,6 +371,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1018_VerifyCitizenLinkedCaseLinksUnchanged]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_23_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.25 #AC-25
     Scenario: CaseLink in database Does NOT exist and CaseLink field in the Request is blank and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -378,6 +386,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1018_VerifyBlankCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_25_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.26 #AC-26
     Scenario: Case Link does not exist at present and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -391,6 +401,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1018_VerifyBlankCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_25_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.27 #AC-27
     Scenario: Case Link value changed and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -405,6 +417,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1018_VerifyCitizenLinkedCaseLinksUnchanged]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_23_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.28 #AC-28
     Scenario: CaseLink in database exists but CaseLink field in the Request contains blank/null value, some invalid case data is submitted and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -419,6 +433,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1018_VerifyCitizenLinkedCaseLinksUnchanged]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_23_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.29 #AC-29
     Scenario: Case Link does not exist at present and CaseLink field in the Request contains CaseReference value but Invalid Case data and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -434,6 +450,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1018_VerifyBlankCitizenCaseLinks]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.30 #AC-30
     Scenario: Case Link value changed and CaseLink field in the Request contains CaseReference value, but Invalid case data and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -450,6 +468,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1018_VerifyCitizenLinkedCaseLinksUnchanged]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_22_Remove_Case_Assigned_User_role_for_Case].
 
 
    #=======================================
@@ -627,6 +647,8 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1018_VerifyMultipleCaseLinksUsingStandardLinkField_Citizen]
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1018_42_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1018.43
     Scenario: Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Event Creation is invoked on v2_external#/case-controller/createEventUsingPOST

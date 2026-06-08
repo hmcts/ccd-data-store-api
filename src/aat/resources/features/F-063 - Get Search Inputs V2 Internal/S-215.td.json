@@ -35,6 +35,7 @@
               "collection_field_type": null
             }
           },
+          "dataType": null,
           "display_context_parameter": null
         }
       ],

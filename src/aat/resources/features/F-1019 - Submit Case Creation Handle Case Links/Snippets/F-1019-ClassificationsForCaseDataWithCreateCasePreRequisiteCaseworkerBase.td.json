@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-1019-ClassificationsForCaseDataWithCreateCasePreRequisiteCaseworkerBase",
+
+  "TextField" : "PUBLIC",
+  "CaseLinkField" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "CaseReference" : "PUBLIC"
+    }
+  },
+  "SearchCriteria" : {
+    "classification" : "PUBLIC",
+    "value" : { }
+  },
+  "caseLinks" : {
+    "classification" : "PUBLIC",
+    "value" : [
+      {
+        "value": {
+          "CaseReference": "PUBLIC"
+        },
+        "id": "d7e67a81-0000-CreateCasePreRequisiteCaseworkerBase"
+      }
+    ]
+  }
+}
