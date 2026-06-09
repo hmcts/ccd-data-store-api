@@ -46,10 +46,19 @@ The following environment variables are required:
 | HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_TIMEOUT | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
-| DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
-| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT        | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html      |
+| DRAFT_STORE_URL                              | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance.                                                                                    |
+| DRAFT_ENCRYPTION_KEY                         | - | Draft encryption key. The encryption key used by draft store to encrypt documents with.                                                                                             |
+| DRAFT_TTL_DAYS                               | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                           |
+| DRAFT_TTL_DAYS                               | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                           |
+
+The following environment variables are optional:
+
+| Name                                         | Default            | Description                                   |
+|----------------------------------------------|--------------------|-----------------------------------------------|
+| ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
+| GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
+| ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
 
 `IDAM_OIDC_URL` and `OIDC_ISSUER` are intentionally separate. Discovery and JWKS retrieval use `IDAM_OIDC_URL`, while JWT validation enforces `OIDC_ISSUER` plus any optional `OIDC_ALLOWED_ISSUERS`. If these do not align with the issuer used in real caller tokens, authenticated requests will be rejected with `401`.
 
