@@ -51,8 +51,9 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
             String.class
         );
 
-        // This integration harness currently surfaces the rejected JWT as 403, although deployed runtime
-        // invalid-issuer responses are expected to return 401 with invalid_token details.
+        // The full integration harness runs through CCD's S2S and V1 security filters, so the rejected JWT
+        // currently surfaces as 403 here. Deployed invalid-issuer responses are expected to return 401 with
+        // invalid_token details.
         assertThat(response.getStatusCode().value()).isEqualTo(403);
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
         WireMock.verify(0, getRequestedFor(urlEqualTo("/o/userinfo")));

@@ -40,22 +40,16 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${oidc.issuer}")
-    private String issuerOverride;
-
-    @Value("${oidc.allowed-issuers:}")
-    private String allowedIssuersOverride;
-
+    private final String issuerUri;
+    private final String primaryIssuer;
+    private final String configuredAllowedIssuers;
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
-    private CustomHeadersFilter customHeadersFilter;
-    private JwtAuthenticationConverter jwtAuthenticationConverter;
-    private ApplicationParams applicationParams;
+    private final CustomHeadersFilter customHeadersFilter;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
@@ -78,7 +72,13 @@ public class SecurityConfiguration {
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                  final SecurityUtils securityUtils,
                                  final ApplicationParams applicationParams,
+                                 @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}") String issuerUri,
+                                 @Value("${oidc.issuer}") String primaryIssuer,
+                                 @Value("${oidc.allowed-issuers:}") String configuredAllowedIssuers,
                                  @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
+        this.issuerUri = issuerUri;
+        this.primaryIssuer = primaryIssuer;
+        this.configuredAllowedIssuers = configuredAllowedIssuers;
         this.applicationParams = applicationParams;
         this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
@@ -122,13 +122,13 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // See docs/security/jwt-issuer-validation.md for discovery and issuer enforcement.
-        jwtDecoder.setJwtValidator(jwtValidator(issuerOverride, allowedIssuersOverride));
+        jwtDecoder.setJwtValidator(jwtValidator(primaryIssuer, configuredAllowedIssuers));
         return jwtDecoder;
     }
 
-    static OAuth2TokenValidator<Jwt> jwtValidator(String issuerOverride, String allowedIssuersOverride) {
+    static OAuth2TokenValidator<Jwt> jwtValidator(String primaryIssuer, String configuredAllowedIssuers) {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(issuerOverride, allowedIssuersOverride);
+        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(primaryIssuer, configuredAllowedIssuers);
         OAuth2TokenValidator<Jwt> withIssuer = new JwtClaimValidator<>(
             "iss",
             issuer -> issuer != null && allowedIssuers.contains(issuer.toString())

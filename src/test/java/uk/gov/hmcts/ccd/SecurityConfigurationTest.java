@@ -77,7 +77,7 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    void shouldRejectDecodedJwtFromUnexpectedIssClaim() throws JOSEException, ParseException {
+    void shouldRejectDecodedJwtFromUnexpectedIssuer() throws JOSEException, ParseException {
         JwtValidationException exception = assertThrows(
             JwtValidationException.class,
             () -> decoder().decode(signedJwt(INVALID_ISSUER))
@@ -87,7 +87,7 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    void shouldAcceptDecodedJwtFromAdditionalAllowedIssClaim() throws JOSEException, ParseException {
+    void shouldAcceptDecodedJwtFromAdditionalAllowedIssuer() throws JOSEException, ParseException {
         assertThat(decoder(ADDITIONAL_ISSUER).decode(signedJwt(ADDITIONAL_ISSUER)).getIssuer().toString())
             .isEqualTo(ADDITIONAL_ISSUER);
     }

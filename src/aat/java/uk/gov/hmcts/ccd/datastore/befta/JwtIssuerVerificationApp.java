@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.datastore.tests.Env;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Set;
 
+@Slf4j
 public final class JwtIssuerVerificationApp {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -40,7 +42,7 @@ public final class JwtIssuerVerificationApp {
             );
         }
 
-        System.out.println("Verified functional test token iss is allowed: " + actualIssuer);
+        log.info("Verified functional test token iss is allowed: {}", actualIssuer);
     }
 
     private static String[] firstAvailableCredentials(String... envNames) {
