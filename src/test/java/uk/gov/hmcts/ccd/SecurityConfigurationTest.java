@@ -6,7 +6,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -31,73 +30,73 @@ class SecurityConfigurationTest {
     private static final String VALID_ISSUER = "http://localhost:5000/o";
     private static final String ADDITIONAL_ISSUER = "http://additional-issuer";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
+    private static final Instant VALID_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant VALID_EXPIRES_AT = Instant.parse("2999-01-01T00:00:00Z");
+    private static final Instant EXPIRED_ISSUED_AT = Instant.parse("2000-01-01T00:00:00Z");
+    private static final Instant EXPIRED_AT = Instant.parse("2000-01-01T00:01:00Z");
 
     @Test
     void shouldAcceptJwtFromConfiguredIssuer() {
-        Instant now = Instant.now();
         assertFalse(
-            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+            validator().validate(buildJwt(VALID_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT)).hasErrors()
         );
     }
 
     @Test
     void shouldAcceptJwtFromAdditionalAllowedIssuer() {
-        Instant now = Instant.now();
         assertFalse(
             validator(ADDITIONAL_ISSUER)
-                .validate(buildJwt(ADDITIONAL_ISSUER, now.minusSeconds(60), now.plusSeconds(300)))
+                .validate(buildJwt(ADDITIONAL_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT))
                 .hasErrors()
         );
     }
 
     @Test
     void shouldKeepPrimaryIssuerWhenAdditionalAllowedIssuersConfigured() {
-        Instant now = Instant.now();
         assertFalse(
             validator(ADDITIONAL_ISSUER)
-                .validate(buildJwt(VALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300)))
+                .validate(buildJwt(VALID_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT))
                 .hasErrors()
         );
     }
 
     @Test
     void shouldRejectJwtFromUnexpectedIssuer() {
-        Instant now = Instant.now();
         assertTrue(
-            validator().validate(buildJwt(INVALID_ISSUER, now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+            validator().validate(buildJwt(INVALID_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT)).hasErrors()
         );
     }
 
     @Test
     void shouldRejectJwtWhenIssuerIsMissing() {
-        Instant now = Instant.now();
         assertTrue(
-            validator().validate(buildJwtWithoutIssuer(now.minusSeconds(60), now.plusSeconds(300))).hasErrors()
+            validator().validate(buildJwtWithoutIssuer(VALID_ISSUED_AT, VALID_EXPIRES_AT)).hasErrors()
         );
     }
 
     @Test
-    void shouldRejectDecodedJwtFromUnexpectedIssuer() throws JOSEException, ParseException {
+    void shouldRejectDecodedJwtFromUnexpectedIssuer() {
+        NimbusJwtDecoder jwtDecoder = decoder();
+        String jwt = signedJwt(INVALID_ISSUER);
+
         JwtValidationException exception = assertThrows(
             JwtValidationException.class,
-            () -> decoder().decode(signedJwt(INVALID_ISSUER))
+            () -> jwtDecoder.decode(jwt)
         );
 
         assertThat(exception.getMessage()).contains("iss");
     }
 
     @Test
-    void shouldAcceptDecodedJwtFromAdditionalAllowedIssuer() throws JOSEException, ParseException {
-        assertThat(decoder(ADDITIONAL_ISSUER).decode(signedJwt(ADDITIONAL_ISSUER)).getIssuer().toString())
-            .isEqualTo(ADDITIONAL_ISSUER);
+    void shouldAcceptDecodedJwtFromAdditionalAllowedIssuer() {
+        assertThat(decoder(ADDITIONAL_ISSUER).decode(signedJwt(ADDITIONAL_ISSUER)).getIssuer())
+            .hasToString(ADDITIONAL_ISSUER);
     }
 
     @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
-        Instant now = Instant.now();
-        // Keep expiry clearly outside the default clock-skew allowance to avoid boundary flakiness.
         assertTrue(
-            validator().validate(buildJwt(VALID_ISSUER, now.minusSeconds(300), now.minusSeconds(121))).hasErrors()
+            validator().validate(buildJwt(VALID_ISSUER, EXPIRED_ISSUED_AT, EXPIRED_AT)).hasErrors()
         );
     }
 
@@ -109,14 +108,18 @@ class SecurityConfigurationTest {
         return SecurityConfiguration.jwtValidator(VALID_ISSUER, allowedIssuers);
     }
 
-    private NimbusJwtDecoder decoder() throws JOSEException {
+    private NimbusJwtDecoder decoder() {
         return decoder(null);
     }
 
-    private NimbusJwtDecoder decoder(String allowedIssuers) throws JOSEException {
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(getRsaJWK().toRSAPublicKey()).build();
-        decoder.setJwtValidator(validator(allowedIssuers));
-        return decoder;
+    private NimbusJwtDecoder decoder(String allowedIssuers) {
+        try {
+            NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(getRsaJWK().toRSAPublicKey()).build();
+            decoder.setJwtValidator(validator(allowedIssuers));
+            return decoder;
+        } catch (JOSEException exception) {
+            throw new IllegalStateException("Failed to build test JWT decoder", exception);
+        }
     }
 
     private Jwt buildJwt(String issuer, Instant issuedAt, Instant expiresAt) {
@@ -138,23 +141,25 @@ class SecurityConfigurationTest {
             .build();
     }
 
-    private String signedJwt(String issuer) throws JOSEException, ParseException {
-        Instant now = Instant.now();
-
-        SignedJWT signedJwt = new SignedJWT(
-            new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .type(JOSEObjectType.JWT)
-                .keyID(getRsaJWK().getKeyID())
-                .build(),
-            new JWTClaimsSet.Builder()
-                .jwtID(UUID.randomUUID().toString())
-                .issuer(issuer)
-                .subject("user")
-                .issueTime(Date.from(now.minusSeconds(60)))
-                .expirationTime(Date.from(now.plusSeconds(300)))
-                .build()
-        );
-        signedJwt.sign(new RSASSASigner(getRsaJWK().toPrivateKey()));
-        return signedJwt.serialize();
+    private String signedJwt(String issuer) {
+        try {
+            SignedJWT signedJwt = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                    .type(JOSEObjectType.JWT)
+                    .keyID(getRsaJWK().getKeyID())
+                    .build(),
+                new JWTClaimsSet.Builder()
+                    .jwtID(UUID.randomUUID().toString())
+                    .issuer(issuer)
+                    .subject("user")
+                    .issueTime(Date.from(VALID_ISSUED_AT))
+                    .expirationTime(Date.from(VALID_EXPIRES_AT))
+                    .build()
+            );
+            signedJwt.sign(new RSASSASigner(getRsaJWK().toPrivateKey()));
+            return signedJwt.serialize();
+        } catch (JOSEException exception) {
+            throw new IllegalStateException("Failed to sign test JWT", exception);
+        }
     }
 }

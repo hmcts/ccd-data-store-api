@@ -17,7 +17,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -33,12 +32,14 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
     private static final String CASE_URL =
         "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final Instant VALID_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant VALID_EXPIRES_AT = Instant.parse("2999-01-01T00:00:00Z");
 
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Test
-    void shouldRejectJwtWhenIssuerDoesNotMatchConfiguredIssuer() throws JOSEException, ParseException {
+    void shouldRejectJwtWhenIssuerDoesNotMatchConfiguredIssuer() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + signedJwt(INVALID_ISSUER));
         headers.add("ServiceAuthorization", "ServiceToken");
@@ -59,24 +60,26 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
         WireMock.verify(0, getRequestedFor(urlEqualTo("/o/userinfo")));
     }
 
-    private String signedJwt(String issuer) throws JOSEException, ParseException {
-        Instant now = Instant.now();
-
-        SignedJWT signedJwt = new SignedJWT(
-            new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .type(JOSEObjectType.JWT)
-                .keyID(getRsaJWK().getKeyID())
-                .build(),
-            new JWTClaimsSet.Builder()
-                .jwtID(UUID.randomUUID().toString())
-                .issuer(issuer)
-                .subject("123")
-                .claim("tokenName", "access_token")
-                .issueTime(Date.from(now.minusSeconds(60)))
-                .expirationTime(Date.from(now.plusSeconds(300)))
-                .build()
-        );
-        signedJwt.sign(new RSASSASigner(getRsaJWK().toPrivateKey()));
-        return signedJwt.serialize();
+    private String signedJwt(String issuer) {
+        try {
+            SignedJWT signedJwt = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                    .type(JOSEObjectType.JWT)
+                    .keyID(getRsaJWK().getKeyID())
+                    .build(),
+                new JWTClaimsSet.Builder()
+                    .jwtID(UUID.randomUUID().toString())
+                    .issuer(issuer)
+                    .subject("123")
+                    .claim("tokenName", "access_token")
+                    .issueTime(Date.from(VALID_ISSUED_AT))
+                    .expirationTime(Date.from(VALID_EXPIRES_AT))
+                    .build()
+            );
+            signedJwt.sign(new RSASSASigner(getRsaJWK().toPrivateKey()));
+            return signedJwt.serialize();
+        } catch (JOSEException exception) {
+            throw new IllegalStateException("Failed to sign test JWT", exception);
+        }
     }
 }

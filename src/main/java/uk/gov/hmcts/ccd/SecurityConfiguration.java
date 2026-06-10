@@ -49,7 +49,6 @@ public class SecurityConfiguration {
     private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final CustomHeadersFilter customHeadersFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
-    private final ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
@@ -79,7 +78,6 @@ public class SecurityConfiguration {
         this.issuerUri = issuerUri;
         this.primaryIssuer = primaryIssuer;
         this.configuredAllowedIssuers = configuredAllowedIssuers;
-        this.applicationParams = applicationParams;
         this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
             userIdExtractor, authorizedRolesExtractor, securityUtils);
