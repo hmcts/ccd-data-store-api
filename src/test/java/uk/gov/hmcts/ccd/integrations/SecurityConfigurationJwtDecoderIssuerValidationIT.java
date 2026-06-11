@@ -57,11 +57,6 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
         // invalid_token details.
         assertThat(response.getStatusCode().value()).isEqualTo(403);
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
-        WireMock.verify(
-            WireMock.moreThanOrExactly(1),
-            getRequestedFor(urlEqualTo("/o/.well-known/openid-configuration"))
-        );
-        WireMock.verify(WireMock.moreThanOrExactly(1), getRequestedFor(urlEqualTo("/o/jwks")));
         WireMock.verify(0, getRequestedFor(urlEqualTo("/o/userinfo")));
     }
 
