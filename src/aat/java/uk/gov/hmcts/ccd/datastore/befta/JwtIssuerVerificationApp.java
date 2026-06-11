@@ -10,7 +10,9 @@ import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 public final class JwtIssuerVerificationApp {
@@ -26,13 +28,13 @@ public final class JwtIssuerVerificationApp {
             System.getenv("OIDC_ALLOWED_ISSUERS")
         );
         String idamBaseUrl = Env.require("IDAM_API_URL_BASE");
-        String[] credentials = firstAvailableCredentials(
-            "CCD_CASEWORKER_AUTOTEST_EMAIL", "CCD_CASEWORKER_AUTOTEST_PASSWORD",
-            "DEFINITION_IMPORTER_USERNAME", "DEFINITION_IMPORTER_PASSWORD"
-        );
+        CredentialValuePair credentials = firstAvailableCredentials(List.of(
+            new CredentialVariablePair("CCD_CASEWORKER_AUTOTEST_EMAIL", "CCD_CASEWORKER_AUTOTEST_PASSWORD"),
+            new CredentialVariablePair("DEFINITION_IMPORTER_USERNAME", "DEFINITION_IMPORTER_PASSWORD")
+        ));
 
         IdamHelper idamHelper = new IdamHelper(idamBaseUrl, OAuth2.INSTANCE);
-        String accessToken = idamHelper.getIdamOauth2Token(credentials[0], credentials[1]);
+        String accessToken = idamHelper.getIdamOauth2Token(credentials.username(), credentials.password());
         String actualIssuer = decodeIssuer(accessToken);
 
         if (!allowedIssuers.contains(actualIssuer)) {
@@ -45,19 +47,24 @@ public final class JwtIssuerVerificationApp {
         log.info("Verified functional test token iss is allowed: {}", actualIssuer);
     }
 
-    private static String[] firstAvailableCredentials(String... envNames) {
-        for (int i = 0; i < envNames.length; i += 2) {
-            String username = System.getenv(envNames[i]);
-            String password = System.getenv(envNames[i + 1]);
-            if (username != null && password != null) {
-                return new String[]{username, password};
+    private static CredentialValuePair firstAvailableCredentials(
+        List<CredentialVariablePair> credentialVariablePairs
+    ) {
+        for (CredentialVariablePair credentialVariablePair : credentialVariablePairs) {
+            String username = System.getenv(credentialVariablePair.usernameVariable());
+            String password = System.getenv(credentialVariablePair.passwordVariable());
+            if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+                return new CredentialValuePair(username, password);
             }
         }
 
+        String expectedVariables = credentialVariablePairs.stream()
+            .map(pair -> pair.usernameVariable() + "/" + pair.passwordVariable())
+            .collect(Collectors.joining(", "));
+
         throw new IllegalStateException(
             "No credentials available for JWT issuer verification. "
-                + "Expected one of: CCD_CASEWORKER_AUTOTEST_EMAIL/PASSWORD or "
-                + "DEFINITION_IMPORTER_USERNAME/PASSWORD"
+                + "Expected one of: " + expectedVariables
         );
     }
 
@@ -79,5 +86,11 @@ public final class JwtIssuerVerificationApp {
     private static String padBase64(String value) {
         int remainder = value.length() % 4;
         return remainder == 0 ? value : value + "=".repeat(4 - remainder);
+    }
+
+    private record CredentialVariablePair(String usernameVariable, String passwordVariable) {
+    }
+
+    private record CredentialValuePair(String username, String password) {
     }
 }

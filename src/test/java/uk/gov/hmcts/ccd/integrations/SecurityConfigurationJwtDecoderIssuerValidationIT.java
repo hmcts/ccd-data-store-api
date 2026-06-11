@@ -26,8 +26,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ccd.util.KeyGenerator.getRsaJWK;
 
-// Full integration coverage for issuer rejection through the real app and OIDC/JWKS test wiring.
-class JwtIssuerValidationIT extends WireMockBaseTest {
+// Proves SecurityConfiguration wires the real OIDC-discovered JwtDecoder with issuer validation.
+class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest {
 
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
     private static final String CASE_URL =
@@ -39,7 +39,7 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void shouldRejectJwtWhenIssuerDoesNotMatchConfiguredIssuer() {
+    void shouldRejectJwtWithUnexpectedIssuerThroughConfiguredDecoder() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + signedJwt(INVALID_ISSUER));
         headers.add("ServiceAuthorization", "ServiceToken");
@@ -57,6 +57,11 @@ class JwtIssuerValidationIT extends WireMockBaseTest {
         // invalid_token details.
         assertThat(response.getStatusCode().value()).isEqualTo(403);
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
+        WireMock.verify(
+            WireMock.moreThanOrExactly(1),
+            getRequestedFor(urlEqualTo("/o/.well-known/openid-configuration"))
+        );
+        WireMock.verify(WireMock.moreThanOrExactly(1), getRequestedFor(urlEqualTo("/o/jwks")));
         WireMock.verify(0, getRequestedFor(urlEqualTo("/o/userinfo")));
     }
 

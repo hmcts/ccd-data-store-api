@@ -60,13 +60,15 @@ For this repo, the FORGEROCK issuer used in deployed environments is an explicit
 
 | Test | Coverage |
 |---|---|
-| `src/test/java/uk/gov/hmcts/ccd/SecurityConfigurationTest.java` | Accept primary issuer, accept additional allowed issuer, reject unexpected issuer, reject expired token |
+| `src/test/java/uk/gov/hmcts/ccd/JwtIssuerValidatorTest.java` | Fast validator coverage for accepting primary/additional issuers, rejecting unexpected/missing issuers, and rejecting expired tokens |
 | `src/test/java/uk/gov/hmcts/ccd/security/OidcIssuerConfigurationTest.java` | Primary issuer behavior when optional allowed issuers are unset, comma-separated parsing, blank config rejection |
-| `src/test/java/uk/gov/hmcts/ccd/integrations/JwtIssuerValidationIT.java` | Full-stack rejection of a signed JWT whose `iss` does not match configured issuers |
+| `src/test/java/uk/gov/hmcts/ccd/integrations/SecurityConfigurationJwtDecoderIssuerValidationIT.java` | Full-stack wiring coverage for `SecurityConfiguration` creating the OIDC-discovered decoder and rejecting a signed JWT whose `iss` does not match configured issuers |
 
 The test fixtures use valid JWT timelines so failures reflect validator behavior rather than builder constraints.
 
-Coverage is intentionally two-layered here: validator-only behavior in `SecurityConfigurationTest` and full integration wiring in `JwtIssuerValidationIT`. A lighter Spring web-security slice test was not kept because it introduced unwanted test-context complexity in this repo.
+Coverage is intentionally two-layered here: validator-only behavior in `JwtIssuerValidatorTest` and full
+`SecurityConfiguration` decoder wiring in `SecurityConfigurationJwtDecoderIssuerValidationIT`. A lighter Spring
+web-security slice test was not kept because it introduced unwanted test-context complexity in this repo.
 
 ## Configuration and deployment notes
 

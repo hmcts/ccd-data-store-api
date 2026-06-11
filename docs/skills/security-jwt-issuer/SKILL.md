@@ -15,8 +15,8 @@ Read `docs/security/jwt-issuer-validation.md` first for the detailed behavior, c
 2. Review `SecurityConfiguration` and confirm how `IDAM_OIDC_URL` and `OIDC_ISSUER` are used.
 3. For code changes, check:
    - `src/main/java/uk/gov/hmcts/ccd/SecurityConfiguration.java`
-   - `src/test/java/uk/gov/hmcts/ccd/SecurityConfigurationTest.java`
-   - `src/test/java/uk/gov/hmcts/ccd/integrations/JwtIssuerValidationIT.java`
+   - `src/test/java/uk/gov/hmcts/ccd/JwtIssuerValidatorTest.java`
+   - `src/test/java/uk/gov/hmcts/ccd/integrations/SecurityConfigurationJwtDecoderIssuerValidationIT.java`
 4. For pipeline/test-run alignment, check:
    - `src/aat/java/uk/gov/hmcts/ccd/datastore/befta/JwtIssuerVerificationApp.java`
    - `build.gradle`
@@ -24,5 +24,6 @@ Read `docs/security/jwt-issuer-validation.md` first for the detailed behavior, c
    - `Jenkinsfile_nightly`
 5. For issuer values, token `iss` diagnosis, CI verifier behavior, and Helm vs Jenkins env alignment, follow `docs/security/jwt-issuer-validation.md` rather than duplicating that guidance here.
 6. Start verification with the narrowest useful test:
-   - `./gradlew test --tests uk.gov.hmcts.ccd.SecurityConfigurationTest`
+   - `./gradlew test --tests uk.gov.hmcts.ccd.JwtIssuerValidatorTest`
+   - `./gradlew test --tests uk.gov.hmcts.ccd.integrations.SecurityConfigurationJwtDecoderIssuerValidationIT`
 7. Preserve in-flight local work and continue from the existing patch state rather than recreating it.
