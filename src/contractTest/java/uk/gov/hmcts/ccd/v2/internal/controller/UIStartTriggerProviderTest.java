@@ -11,48 +11,38 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
-/** Provider PACT verification for the internal start-trigger endpoints (UIStartTriggerController). */
+/**
+ * Provider PACT verification for the internal start-trigger endpoints (UIStartTriggerController).
+ */
 @Provider("ccdDataStoreAPI_startTrigger")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
     providerTags = "${pactbroker.providerTags:master}",
     enablePendingPacts = "${pactbroker.enablePending:true}")
-@TestPropertySource(locations = "/application.properties")
-@WebMvcTest({UIStartTriggerController.class})
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("SECURITY_MOCK")
-@ContextConfiguration(classes = {TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
-public class UIStartTriggerProviderTest extends WireMockBaseContractTest {
+public class UIStartTriggerProviderTest {
 
-    @MockitoBean
-    ApplicationParams applicationParams;
-    @MockitoBean
-    SecurityUtils securityUtils;
-    @MockitoBean
-    @Qualifier("authorised")
-    GetEventTriggerOperation getEventTriggerOperation;
-    @MockitoBean
-    UIDService caseReferenceService;
-    @Autowired
-    UIStartTriggerController uiStartTriggerController;
+    @Mock
+    private GetEventTriggerOperation getEventTriggerOperation;
+
+    @Mock
+    private UIDService caseReferenceService;
+
+
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        testTarget.setControllers(new UIStartTriggerController(getEventTriggerOperation, caseReferenceService));
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -62,15 +52,6 @@ public class UIStartTriggerProviderTest extends WireMockBaseContractTest {
         }
     }
 
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(uiStartTriggerController);
-        if (context != null) {
-            context.setTarget(testTarget);
-        }
-    }
 
     @State("A start trigger is requested for dynamic display")
     public void startTriggerRequested() {

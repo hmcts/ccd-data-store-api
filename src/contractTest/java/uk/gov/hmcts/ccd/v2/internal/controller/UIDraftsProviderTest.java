@@ -11,53 +11,42 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
-/** Provider PACT verification for the internal drafts endpoints (UIDraftsController). */
+/**
+ * Provider PACT verification for the internal drafts endpoints (UIDraftsController).
+ */
 @Provider("ccdDataStoreAPI_drafts")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
     providerTags = "${pactbroker.providerTags:master}",
     enablePendingPacts = "${pactbroker.enablePending:true}")
-@TestPropertySource(locations = "/application.properties")
-@WebMvcTest({UIDraftsController.class})
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("SECURITY_MOCK")
-@ContextConfiguration(classes = {TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
-public class UIDraftsProviderTest extends WireMockBaseContractTest {
+public class UIDraftsProviderTest {
 
-    @MockitoBean
-    ApplicationParams applicationParams;
-    @MockitoBean
-    SecurityUtils securityUtils;
-    @MockitoBean
-    @Qualifier("default")
-    UpsertDraftOperation upsertDraftOperation;
-    @MockitoBean
-    @Qualifier("defaultDraft")
-    GetCaseViewOperation getDraftViewOperation;
-    @MockitoBean
-    @Qualifier("cached")
-    DraftGateway draftGateway;
-    @Autowired
-    UIDraftsController uiDraftsController;
+    @Mock
+    private UpsertDraftOperation upsertDraftOperation;
+
+    @Mock
+    private GetCaseViewOperation getDraftViewOperation;
+
+    @Mock
+    private DraftGateway draftGateway;
+
+
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        testTarget.setControllers(new UIDraftsController(upsertDraftOperation, getDraftViewOperation, draftGateway));
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -67,15 +56,6 @@ public class UIDraftsProviderTest extends WireMockBaseContractTest {
         }
     }
 
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(uiDraftsController);
-        if (context != null) {
-            context.setTarget(testTarget);
-        }
-    }
 
     @State("A draft is requested for display")
     public void draftRequested() {

@@ -11,21 +11,8 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkRetrievalService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.GetLinkedCasesResponseCreator;
@@ -35,6 +22,11 @@ import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.v2.V2;
 
 import java.util.Optional;
@@ -43,92 +35,71 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * Provider PACT verification for the Retrieve Case by ID endpoint
- * (GET /cases/{caseId}, served by {@link CaseController}).
- *
- * <p>Verifies the consumer contract published by wa_task_management_api under the provider
- * name {@code ccd_data_store_get_case_by_id} (see wa-task-management-api
- * src/contractTest/.../ccd/CcdGetCasesByCaseIdPactTest.java, state "a case exists").</p>
- *
- * <p>The endpoint requires the {@code experimental} header, which the consumer contract does
- * not declare; it is injected into the replayed request via the
- * {@link MockHttpServletRequestBuilder} test-template parameter.</p>
+ * Provider PACT verification for GET /cases/{caseId} (CaseController). Verifies the consumer
+ * contract published by wa_task_management_api (state "a case exists"). The endpoint requires the
+ * experimental header, which the contract does not declare; it is injected into every replayed
+ * request via a standalone MockMvc default request header.
  */
 @Provider("ccd_data_store_get_case_by_id")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
     providerTags = "${pactbroker.providerTags:master}",
     enablePendingPacts = "${pactbroker.enablePending:true}")
-@TestPropertySource(locations = "/application.properties")
-@WebMvcTest({CaseController.class})
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("SECURITY_MOCK")
-@ContextConfiguration(classes = {TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
-public class GetCaseByIdProviderTest extends WireMockBaseContractTest {
+public class GetCaseByIdProviderTest {
 
-    @MockitoBean
-    ApplicationParams applicationParams;
+    @Mock
+    private GetCaseOperation getCaseOperation;
 
-    @MockitoBean
-    SecurityUtils securityUtils;
+    @Mock
+    private CreateEventOperation createEventOperation;
 
-    @MockitoBean
-    @Qualifier("creator")
-    GetCaseOperation getCaseOperation;
+    @Mock
+    private CreateCaseOperation createCaseOperation;
 
-    @MockitoBean
-    @Qualifier("authorised")
-    CreateEventOperation createEventOperation;
+    @Mock
+    private UIDService caseReferenceService;
 
-    @MockitoBean
-    @Qualifier("authorised")
-    CreateCaseOperation createCaseOperation;
+    @Mock
+    private GetEventsOperation getEventsOperation;
 
-    @MockitoBean
-    UIDService caseReferenceService;
+    @Mock
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
 
-    @MockitoBean
-    @Qualifier("authorised")
-    GetEventsOperation getEventsOperation;
+    @Mock
+    private SupplementaryDataUpdateRequestValidator requestValidator;
 
-    @MockitoBean
-    @Qualifier("authorised")
-    SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+    @Mock
+    private CaseLinkRetrievalService caseLinkRetrievalService;
 
-    @MockitoBean
-    SupplementaryDataUpdateRequestValidator requestValidator;
+    @Mock
+    private GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
 
-    @MockitoBean
-    CaseLinkRetrievalService caseLinkRetrievalService;
 
-    @MockitoBean
-    GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
-
-    @Autowired
-    CaseController caseController;
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        CaseController caseController = new CaseController(
+            getCaseOperation, createEventOperation, createCaseOperation, caseReferenceService,
+            getEventsOperation, supplementaryDataUpdateOperation, requestValidator, caseLinkRetrievalService,
+            getLinkedCasesResponseCreator);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(caseController)
+            .defaultRequest(MockMvcRequestBuilders.get("/").header(V2.EXPERIMENTAL_HEADER, "true"))
+            .build();
+        MockMvcTestTarget testTarget = new MockMvcTestTarget(mockMvc);
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void pactVerificationTestTemplate(PactVerificationContext context, MockHttpServletRequestBuilder request) {
-        if (request != null) {
-            request.header(V2.EXPERIMENTAL_HEADER, "true");
-        }
+    void pactVerificationTestTemplate(PactVerificationContext context) {
         if (context != null) {
             context.verifyInteraction();
         }
     }
 
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(caseController);
-        if (context != null) {
-            context.setTarget(testTarget);
-        }
-    }
 
     @State("a case exists")
     public void caseExists() {

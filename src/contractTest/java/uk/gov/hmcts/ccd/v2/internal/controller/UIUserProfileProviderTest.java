@@ -11,45 +11,34 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
-import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
-/** Provider PACT verification for GET /internal/profile (UIUserProfileController). */
+/**
+ * Provider PACT verification for GET /internal/profile (UIUserProfileController).
+ */
 @Provider("ccdDataStoreAPI_userProfile")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
     providerTags = "${pactbroker.providerTags:master}",
     enablePendingPacts = "${pactbroker.enablePending:true}")
-@TestPropertySource(locations = "/application.properties")
-@WebMvcTest({UIUserProfileController.class})
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("SECURITY_MOCK")
-@ContextConfiguration(classes = {TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
-public class UIUserProfileProviderTest extends WireMockBaseContractTest {
+public class UIUserProfileProviderTest {
 
-    @MockitoBean
-    ApplicationParams applicationParams;
-    @MockitoBean
-    SecurityUtils securityUtils;
-    @MockitoBean
-    @Qualifier("authorised")
-    GetUserProfileOperation getUserProfileOperation;
-    @Autowired
-    UIUserProfileController uiUserProfileController;
+    @Mock
+    private GetUserProfileOperation getUserProfileOperation;
+
+
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        testTarget.setControllers(new UIUserProfileController(getUserProfileOperation));
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -59,15 +48,6 @@ public class UIUserProfileProviderTest extends WireMockBaseContractTest {
         }
     }
 
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(uiUserProfileController);
-        if (context != null) {
-            context.setTarget(testTarget);
-        }
-    }
 
     @State("A user profile is requested")
     public void userProfileRequested() {

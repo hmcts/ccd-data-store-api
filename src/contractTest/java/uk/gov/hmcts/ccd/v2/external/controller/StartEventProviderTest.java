@@ -11,47 +11,38 @@ import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.WireMockBaseContractTest;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 
-/** Provider PACT verification for the external Start Event triggers (StartEventController). */
+/**
+ * Provider PACT verification for the v2 start-event trigger endpoints (StartEventController).
+ */
 @Provider("ccdDataStoreAPI_startEvent")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")},
     providerTags = "${pactbroker.providerTags:master}",
     enablePendingPacts = "${pactbroker.enablePending:true}")
-@TestPropertySource(locations = "/application.properties")
-@WebMvcTest({StartEventController.class})
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("SECURITY_MOCK")
-@ContextConfiguration(classes = {TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
-public class StartEventProviderTest extends WireMockBaseContractTest {
+public class StartEventProviderTest {
 
-    @MockitoBean
-    ApplicationParams applicationParams;
-    @MockitoBean
-    SecurityUtils securityUtils;
-    @MockitoBean
-    @Qualifier("authorised")
-    StartEventOperation startEventOperation;
-    @MockitoBean
-    UIDService caseReferenceService;
-    @Autowired
-    StartEventController startEventController;
+    @Mock
+    private StartEventOperation startEventOperation;
+
+    @Mock
+    private UIDService caseReferenceService;
+
+
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        testTarget.setControllers(new StartEventController(startEventOperation, caseReferenceService));
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
+    }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -61,15 +52,6 @@ public class StartEventProviderTest extends WireMockBaseContractTest {
         }
     }
 
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(startEventController);
-        if (context != null) {
-            context.setTarget(testTarget);
-        }
-    }
 
     @State("A start event trigger is requested")
     public void startEventTriggerRequested() {
