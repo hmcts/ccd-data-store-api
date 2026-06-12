@@ -40,6 +40,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -336,6 +337,35 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
             callbackService.send(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
                 caseDetails, false)
         );
+    }
+
+    @Test
+    public void shouldRejectRedirectCallbackWithoutFollowingLocation() throws Exception {
+        final String redirectPath = "/test-callback-redirect";
+        final String leakedSinkPath = "/leaked-sink";
+        final String testUrl = hostUrl + redirectPath;
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("test case type");
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId("TEST-EVENT");
+
+        stubFor(post(urlMatching(redirectPath + ".*"))
+            .willReturn(aResponse()
+                .withStatus(307)
+                .withHeader("Location", "http://127.0.0.1:" + wiremockPort + leakedSinkPath)
+                .withHeader("Connection", "close")));
+        stubFor(post(urlMatching(leakedSinkPath + ".*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
+
+        CallbackException exception = assertThrows(CallbackException.class, () ->
+            callbackService.sendSingleRequest(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
+                caseDetails, false)
+        );
+
+        assertTrue(exception.getMessage().contains("redirect responses are not permitted"));
+        verify(exactly(1), postRequestedFor(urlMatching(redirectPath + ".*")));
+        verify(exactly(0), postRequestedFor(urlMatching(leakedSinkPath + ".*")));
     }
 
     @Test

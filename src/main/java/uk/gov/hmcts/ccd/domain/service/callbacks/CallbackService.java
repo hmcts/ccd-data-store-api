@@ -66,7 +66,7 @@ public class CallbackService {
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           @Qualifier("restTemplate") final RestTemplate restTemplate,
+                           @Qualifier("callbackRestTemplate") final RestTemplate restTemplate,
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
                            HttpServletRequest request,
