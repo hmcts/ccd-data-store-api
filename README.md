@@ -22,27 +22,27 @@ Repo-local workflow docs are indexed in `AGENTS.md`.
 #### Environment variables
 The following environment variables are required:
 
-| Name | Default | Description |
-|------|---------|-------------|
-| DATA_STORE_DB_HOST | localhost | Host for database |
-| DATA_STORE_DB_PORT | 5432 | Port for database |
-| DATA_STORE_DB_USERNAME | - | Username for database |
-| DATA_STORE_DB_PASSWORD | - | Password for database |
-| DATA_STORE_TOKEN_SECRET | `<random string>` | Secret for generating internal JWT tokens for events |
-| DATA_STORE_IDAM_KEY | - | Definition store's IDAM S2S micro-service secret key. This must match the IDAM instance it's being run against. |
-| DATA_STORE_S2S_AUTHORISED_SERVICES | ccd_gw | Authorised micro-service names for S2S calls |
-| IDAM_USER_URL | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance. |
-| IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
-| USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
-| DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
-| CCD_DOCUMENT_URL_PATTERN | - |  URL Pattern for documents attachable to cases. |
-| AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
-| DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
-| HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_MAX_CLIENT_PER_ROUTE | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_CONNECTION_TIMEOUT | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| Name                                         | Default | Description                                                                                                                                                                         |
+|----------------------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DATA_STORE_DB_HOST                           | localhost | Host for database                                                                                                                                                                   |
+| DATA_STORE_DB_PORT                           | 5432 | Port for database                                                                                                                                                                   |
+| DATA_STORE_DB_USERNAME                       | - | Username for database                                                                                                                                                               |
+| DATA_STORE_DB_PASSWORD                       | - | Password for database                                                                                                                                                               |
+| DATA_STORE_TOKEN_SECRET                      | `<random string>` | Secret for generating internal JWT tokens for events                                                                                                                                |
+| DATA_STORE_IDAM_KEY                          | - | Definition store's IDAM S2S micro-service secret key. This must match the IDAM instance it's being run against.                                                                     |
+| DATA_STORE_S2S_AUTHORISED_SERVICES           | ccd_gw | Authorised micro-service names for S2S calls                                                                                                                                        |
+| IDAM_USER_URL                                | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance.                                              |
+| IDAM_S2S_URL                                 | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance.                                  |
+| USER_PROFILE_HOST                            | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance.                                                                                   |
+| DEFINITION_STORE_HOST                        | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance.                                                                               |
+| CCD_DOCUMENT_URL_PATTERN                     | - | URL Pattern for documents attachable to cases.                                                                                                                                      |
+| AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment.                                                               |
+| DATA_STORE_DEFAULT_LOG_LEVEL                 | INFO | Default log level for classes under package uk.gov.hmcts.ccd                                                                                                                        |
+| HTTP_CLIENT_MAX_TOTAL                        | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                                        |
+| HTTP_CLIENT_SECONDS_IDLE_CONNECTION          | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                                        |
+| HTTP_CLIENT_MAX_CLIENT_PER_ROUTE             | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                                        |
+| HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY        | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                                        |
+| HTTP_CLIENT_CONNECTION_TIMEOUT               | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                            |
 | HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
@@ -54,6 +54,15 @@ The following environment variables are required:
 
 For callback hardening rollout guidance, allowlist pattern syntax, and environment examples (including preview/AAT allowlist hosts),
 see [`docs/api/security.md`](docs/api/security.md).
+
+The following environment variables are optional:
+
+| Name                                         | Default            | Description                                   |
+|----------------------------------------------|--------------------|-----------------------------------------------|
+| ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
+| GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
+| ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
+
 
 ### Building
 
