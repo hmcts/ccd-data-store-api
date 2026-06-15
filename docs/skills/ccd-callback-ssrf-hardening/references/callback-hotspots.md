@@ -38,11 +38,11 @@
 - Scheme: `https` by default; `http` only for explicitly approved hosts (`CCD_CALLBACK_ALLOWED_HTTP_HOSTS`).
 - Host allowlist: exact domains, controlled subdomain rules, and/or regex patterns (`CCD_CALLBACK_ALLOWED_HOSTS`).
 - DNS/IP checks: reject loopback, private, link-local, multicast, and metadata service ranges unless explicitly approved (`CCD_CALLBACK_ALLOW_PRIVATE_HOSTS`).
+- Redirects: do not follow callback redirects; return `3xx` responses to application code and reject them.
 
 ## Recommended Next Controls (Not Yet Enforced Here)
 
 - Port restrictions: allow only expected ports.
-- Redirect policy: do not follow redirects to untrusted hosts.
 
 ## Test Matrix
 
