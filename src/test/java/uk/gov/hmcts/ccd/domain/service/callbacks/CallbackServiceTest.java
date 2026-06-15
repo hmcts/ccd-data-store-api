@@ -58,6 +58,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
 
 class CallbackServiceTest {
 
@@ -236,9 +237,7 @@ class CallbackServiceTest {
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         HttpHeaders headers = argument.getValue().getHeaders();
         assertTrue(headers.containsKey(SecurityUtils.SERVICE_AUTHORIZATION));
-        assertFalse(headers.containsKey(HttpHeaders.AUTHORIZATION));
-        assertFalse(headers.containsKey("user-id"));
-        assertFalse(headers.containsKey("user-roles"));
+        availableCredentials().forEach(header -> assertFalse(headers.containsKey(header)));
     }
 
     @Test
@@ -431,7 +430,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should add callback passthru headers from request header")
     void shouldAddCallbackPassthruHeadersFromRequestHeader() throws Exception {
-        List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
+        List<String> customHeaders = List.of(CLIENT_CONTEXT, "Dummy-Context1", "DummyContext-2");
         List<String> customHeaderValues = List.of("{json1:{test:1221}}","{json2:{test:2332}}");
 
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
@@ -452,26 +451,25 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should block sensitive callback passthru header contexts")
     void shouldBlockSensitiveCallbackPassthruHeaderContexts() {
-        List<String> customHeaders = List.of("Client-Context", "Authorization", "user-id", "ServiceAuthorization");
+        List<String> customHeaders = new ArrayList<>(availableCredentials());
+        customHeaders.add(CLIENT_CONTEXT);
+        customHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION);
         when(applicationParams.getCallbackPassthruHeaderContexts()).thenReturn(customHeaders);
-        when(request.getHeader("Client-Context")).thenReturn("{ctx:true}");
-        when(request.getHeader("Authorization")).thenReturn("Bearer leaked");
-        when(request.getHeader("user-id")).thenReturn("u123");
-        when(request.getHeader("ServiceAuthorization")).thenReturn("s2s-token");
+        customHeaders.forEach(header -> when(request.getHeader(header)).thenReturn("leaked-" + header));
 
         HttpHeaders httpHeaders = new HttpHeaders();
         callbackService.addPassThroughHeaders(httpHeaders);
 
-        assertTrue(httpHeaders.containsKey("Client-Context"));
-        assertFalse(httpHeaders.containsKey("Authorization"));
-        assertFalse(httpHeaders.containsKey("user-id"));
-        assertFalse(httpHeaders.containsKey("ServiceAuthorization"));
+        assertTrue(httpHeaders.containsKey(CLIENT_CONTEXT));
+        customHeaders.stream()
+            .filter(header -> !CLIENT_CONTEXT.equals(header))
+            .forEach(header -> assertFalse(httpHeaders.containsKey(header)));
     }
 
     @Test
     @DisplayName("Should add callback passthru headers from request attribute")
     void shouldAddCallbackPassthruHeadersFromRequestAttribute() throws Exception {
-        List<String> customHeaders = List.of("Client-Context","Dummy-Context1","DummyContext-2");
+        List<String> customHeaders = List.of(CLIENT_CONTEXT, "Dummy-Context1", "DummyContext-2");
         JSONObject responseAttr1 = new JSONObject(responseAttrJson1);
         JSONObject responseAttr2 = new JSONObject(responseAttrJson2);
         JSONObject responseHdr1 = new JSONObject(responseHdrJson1);
@@ -590,6 +588,10 @@ class CallbackServiceTest {
         doReturn(principal).when(authentication).getPrincipal();
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    private List<String> availableCredentials() {
+        return List.of(HttpHeaders.AUTHORIZATION, SecurityUtils.USER_ID, SecurityUtils.USER_ROLES);
     }
 
 }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -14,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.Configurable;
 import org.apache.hc.core5.util.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.net.URI;
@@ -24,10 +25,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -91,23 +92,23 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         assertThrows(ResourceAccessException.class, () -> restTemplate.exchange(request, String.class));
     }
 
-    @Test
-    void callbackRestTemplateShouldNotFollowRedirects() {
+    @ParameterizedTest
+    @ValueSource(ints = {301, 302, 303, 307, 308})
+    void callbackRestTemplateShouldNotFollowRedirects(final int redirectStatus) {
         assertNotNull(callbackRestTemplate);
-        final String redirectUrl = "/ng/redirect";
-        final String redirectTargetUrl = "/ng/redirect-target";
+        final String redirectUrl = "/ng/redirect-" + redirectStatus;
+        final String redirectTargetUrl = "/ng/redirect-target-" + redirectStatus;
         stubFor(put(urlEqualTo(redirectUrl)).willReturn(aResponse()
-            .withStatus(HttpStatus.TEMPORARY_REDIRECT.value())
+            .withStatus(redirectStatus)
             .withHeader("Location", hostUrl + redirectTargetUrl)));
-        stubFor(put(urlEqualTo(redirectTargetUrl)).willReturn(aResponse().withStatus(SC_OK)));
 
         final RequestEntity<String> request =
             new RequestEntity<>(PUT, URI.create(hostUrl + redirectUrl));
 
         final ResponseEntity<String> response = callbackRestTemplate.exchange(request, String.class);
 
-        assertThat(response.getStatusCode().value(), is(HttpStatus.TEMPORARY_REDIRECT.value()));
-        verify(exactly(0), putRequestedFor(urlEqualTo(redirectTargetUrl)));
+        assertThat(response.getStatusCode().value(), is(redirectStatus));
+        verify(exactly(0), anyRequestedFor(urlEqualTo(redirectTargetUrl)));
     }
 
     @Disabled("for local dev only")

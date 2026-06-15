@@ -27,6 +27,8 @@ import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -41,6 +43,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -339,12 +342,12 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         );
     }
 
-    @Test
-    void shouldRejectRedirectCallbackWithoutFollowingLocation() throws Exception {
-        final String redirectPath = "/test-callback-redirect";
-        final String leakedSinkPath = "/leaked-sink";
+    @ParameterizedTest
+    @ValueSource(ints = {301, 302, 303, 307, 308})
+    void shouldRejectRedirectCallbackWithoutFollowingLocation(final int redirectStatus) {
+        final String redirectPath = "/test-callback-redirect-" + redirectStatus;
+        final String leakedSinkPath = "/leaked-sink-" + redirectStatus;
         final String testUrl = hostUrl + redirectPath;
-        final CallbackResponse callbackResponse = new CallbackResponse();
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId("test case type");
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
@@ -352,11 +355,9 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         stubFor(post(urlMatching(redirectPath + ".*"))
             .willReturn(aResponse()
-                .withStatus(307)
+                .withStatus(redirectStatus)
                 .withHeader("Location", "http://127.0.0.1:" + wiremockPort + leakedSinkPath)
                 .withHeader("Connection", "close")));
-        stubFor(post(urlMatching(leakedSinkPath + ".*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         CallbackException exception = assertThrows(CallbackException.class, () ->
             callbackService.sendSingleRequest(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
@@ -365,7 +366,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         assertTrue(exception.getMessage().contains("redirect responses are not permitted"));
         verify(exactly(1), postRequestedFor(urlMatching(redirectPath + ".*")));
-        verify(exactly(0), postRequestedFor(urlMatching(leakedSinkPath + ".*")));
+        verify(exactly(0), anyRequestedFor(urlMatching(leakedSinkPath + ".*")));
     }
 
     @Test

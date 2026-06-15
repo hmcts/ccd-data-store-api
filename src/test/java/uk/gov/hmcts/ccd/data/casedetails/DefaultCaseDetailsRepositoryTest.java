@@ -631,8 +631,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         "classpath:sql/insert_case_users.sql"
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
-        String userId = "123";
+        final String userId = "123";
         CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/bookcase-definition.json");
+        useCurrentWireMockCallbackUrl(caseTypeDefinition);
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
@@ -859,6 +860,13 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(caseDetails.getId(), equalTo(id));
         assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         assertThat(caseDetails.getReference(), equalTo(caseReference));
+    }
+
+    private void useCurrentWireMockCallbackUrl(CaseTypeDefinition caseTypeDefinition) {
+        String callbackUrl = hostUrl + "/callback/aboutToSubmit";
+        caseTypeDefinition.getEvents().stream()
+            .filter(event -> event.getCallBackURLAboutToSubmitEvent() != null)
+            .forEach(event -> event.setCallBackURLAboutToSubmitEvent(callbackUrl));
     }
 
 }
