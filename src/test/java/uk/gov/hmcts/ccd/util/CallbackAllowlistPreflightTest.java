@@ -90,9 +90,11 @@ class CallbackAllowlistPreflightTest {
 
     @Test
     void shouldRejectInvalidAllowlistPattern() {
+        List<String> requiredHosts = List.of("pr-123.preview.platform.hmcts.net");
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
             CallbackAllowlistPreflight.findAllowlistIssues(
-                List.of("pr-123.preview.platform.hmcts.net"),
+                requiredHosts,
                 "*preview.platform.hmcts.net",
                 ".*\\.preview\\.platform\\.hmcts\\.net",
                 ".*\\.preview\\.platform\\.hmcts\\.net"));

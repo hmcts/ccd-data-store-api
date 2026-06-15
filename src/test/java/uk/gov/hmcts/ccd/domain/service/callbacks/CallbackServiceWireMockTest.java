@@ -340,7 +340,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldRejectRedirectCallbackWithoutFollowingLocation() throws Exception {
+    void shouldRejectRedirectCallbackWithoutFollowingLocation() throws Exception {
         final String redirectPath = "/test-callback-redirect";
         final String leakedSinkPath = "/leaked-sink";
         final String testUrl = hostUrl + redirectPath;

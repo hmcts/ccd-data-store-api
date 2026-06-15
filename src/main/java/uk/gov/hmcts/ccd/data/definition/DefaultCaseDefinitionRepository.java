@@ -153,8 +153,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
-                LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
-                throw toServiceException("Error while retrieving classification for user role " + userRole, e);
+                throw new ServiceException("Error while retrieving classification for user role " + userRole
+                    + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -171,8 +171,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .invokeGetRequest(applicationParams.userRolesClassificationsURL(),
                 UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw toServiceException("Error while retrieving classification for user roles " + userRoles, e);
+            throw new ServiceException("Error while retrieving classification for user roles " + userRoles
+                + " because of " + e.getMessage(), e);
         }
     }
 
@@ -293,19 +293,27 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         while (matcher.find()) {
             String variableName = matcher.group(1);
             String defaultValue = matcher.group(2);
-            String envValue = System.getenv(variableName);
-            String systemPropertyValue = System.getProperty(variableName);
-            String replacement = StringUtils.defaultIfBlank(envValue,
-                StringUtils.defaultIfBlank(systemPropertyValue, defaultValue));
-
-            if (replacement == null) {
-                throw new CallbackException("Callback URL contains unresolved placeholder: ${" + variableName + "}");
-            }
+            String replacement = resolveCallbackUrlPlaceholderValue(variableName, defaultValue);
             matcher.appendReplacement(resolvedValue, Matcher.quoteReplacement(replacement));
         }
 
         matcher.appendTail(resolvedValue);
         return resolvedValue.toString();
+    }
+
+    private String resolveCallbackUrlPlaceholderValue(String variableName, String defaultValue) {
+        String envValue = System.getenv(variableName);
+        if (StringUtils.isNotBlank(envValue)) {
+            return envValue;
+        }
+        String systemPropertyValue = System.getProperty(variableName);
+        if (StringUtils.isNotBlank(systemPropertyValue)) {
+            return systemPropertyValue;
+        }
+        if (defaultValue != null) {
+            return defaultValue;
+        }
+        throw new CallbackException("Callback URL contains unresolved placeholder: ${" + variableName + "}");
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
@@ -341,7 +349,4 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             && httpClientErrorException.getStatusCode().value() == RESOURCE_NOT_FOUND;
     }
 
-    private ServiceException toServiceException(String prefixMessage, Exception e) {
-        return new ServiceException(prefixMessage + " because of " + e.getMessage(), e);
-    }
 }

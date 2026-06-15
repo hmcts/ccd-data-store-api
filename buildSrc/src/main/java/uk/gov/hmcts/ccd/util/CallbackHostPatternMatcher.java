@@ -94,25 +94,29 @@ public final class CallbackHostPatternMatcher {
     public static List<String> splitRawAllowlist(String rawAllowlist) {
         List<String> entries = new ArrayList<>();
         StringBuilder currentEntry = new StringBuilder();
+        boolean escapingComma = false;
 
         for (int i = 0; i < rawAllowlist.length(); i++) {
             char currentChar = rawAllowlist.charAt(i);
-            if (currentChar == '\\' && i + 1 < rawAllowlist.length()) {
-                char nextChar = rawAllowlist.charAt(i + 1);
-                if (nextChar == ',') {
+            if (escapingComma) {
+                if (currentChar == ',') {
                     currentEntry.append(',');
-                    i++;
-                    continue;
+                } else {
+                    currentEntry.append('\\').append(currentChar);
                 }
-                currentEntry.append(currentChar);
-                continue;
-            }
-            if (currentChar == ',') {
+                escapingComma = false;
+            } else if (currentChar == '\\') {
+                escapingComma = true;
+            } else if (currentChar == ',') {
                 entries.add(currentEntry.toString());
                 currentEntry.setLength(0);
-                continue;
+            } else {
+                currentEntry.append(currentChar);
             }
-            currentEntry.append(currentChar);
+        }
+
+        if (escapingComma) {
+            currentEntry.append('\\');
         }
 
         entries.add(currentEntry.toString());

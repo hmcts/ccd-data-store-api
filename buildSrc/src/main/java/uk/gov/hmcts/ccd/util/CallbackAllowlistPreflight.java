@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.util;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ public final class CallbackAllowlistPreflight {
     private static final String ALLOWED_HOSTS_KEY = "CCD_CALLBACK_ALLOWED_HOSTS";
     private static final String ALLOWED_HTTP_HOSTS_KEY = "CCD_CALLBACK_ALLOWED_HTTP_HOSTS";
     private static final String ALLOW_PRIVATE_HOSTS_KEY = "CCD_CALLBACK_ALLOW_PRIVATE_HOSTS";
+    private static final String MISSING_ENTRY_MESSAGE = " missing ";
 
     private CallbackAllowlistPreflight() {
     }
@@ -57,13 +59,13 @@ public final class CallbackAllowlistPreflight {
             .toList();
 
         if (!missingFromAllowed.isEmpty()) {
-            issues.add(ALLOWED_HOSTS_KEY + " missing " + missingFromAllowed);
+            issues.add(ALLOWED_HOSTS_KEY + MISSING_ENTRY_MESSAGE + missingFromAllowed);
         }
         if (!missingFromHttpAllowed.isEmpty()) {
-            issues.add(ALLOWED_HTTP_HOSTS_KEY + " missing " + missingFromHttpAllowed);
+            issues.add(ALLOWED_HTTP_HOSTS_KEY + MISSING_ENTRY_MESSAGE + missingFromHttpAllowed);
         }
         if (!missingFromPrivateAllowed.isEmpty()) {
-            issues.add(ALLOW_PRIVATE_HOSTS_KEY + " missing " + missingFromPrivateAllowed);
+            issues.add(ALLOW_PRIVATE_HOSTS_KEY + MISSING_ENTRY_MESSAGE + missingFromPrivateAllowed);
         }
 
         return issues;
@@ -74,7 +76,19 @@ public final class CallbackAllowlistPreflight {
     }
 
     public static String parseUrlHost(String urlValue) throws MalformedURLException {
-        return new URL(normaliseYamlScalar(urlValue)).getHost();
+        String normalizedValue = normaliseYamlScalar(urlValue);
+        try {
+            URI uri = new URI(normalizedValue);
+            if (!hasText(uri.getScheme()) || !hasText(uri.getHost())) {
+                throw new MalformedURLException("URL must include a scheme and host: " + normalizedValue);
+            }
+            return uri.getHost();
+        } catch (URISyntaxException exception) {
+            MalformedURLException malformedURLException =
+                new MalformedURLException("Invalid URL: " + normalizedValue);
+            malformedURLException.initCause(exception);
+            throw malformedURLException;
+        }
     }
 
     public static String normaliseYamlScalar(String value) {

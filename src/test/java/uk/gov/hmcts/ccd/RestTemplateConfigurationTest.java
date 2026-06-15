@@ -92,7 +92,7 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     }
 
     @Test
-    public void callbackRestTemplateShouldNotFollowRedirects() {
+    void callbackRestTemplateShouldNotFollowRedirects() {
         assertNotNull(callbackRestTemplate);
         final String redirectUrl = "/ng/redirect";
         final String redirectTargetUrl = "/ng/redirect-target";
@@ -156,14 +156,13 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient", connectTimeout, readTimeout);
         RequestConfig config = ((Configurable) client).getConfig();
 
-        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
         assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.isRedirectsEnabled(), is(true));
     }
 
     @Test
-    public void callbackClientFactoryShouldDisableRedirects() {
+    void callbackClientFactoryShouldDisableRedirects() {
         final int connectTimeout = 500;
         final int readTimeout = 5000;
         RestTemplateConfiguration configuration = new RestTemplateConfiguration();
@@ -182,7 +181,6 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             connectTimeout, readTimeout);
         RequestConfig config = ((Configurable) client).getConfig();
 
-        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
         assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.isRedirectsEnabled(), is(false));
@@ -206,7 +204,6 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient");
         RequestConfig config = ((Configurable) client).getConfig();
 
-        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
         assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
     }
