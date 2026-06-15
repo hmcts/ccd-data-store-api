@@ -183,11 +183,14 @@ public class SubmitCaseTransaction implements AccessControl {
             );
             caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, savedCaseDetails.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
         }
 
@@ -203,11 +206,14 @@ public class SubmitCaseTransaction implements AccessControl {
 
         caseDataAccessControl.grantAccess(newCaseDetails, idamUser.getId());
 
+        final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+            .filterDocumentHashesAgainstSavedData(documentHashes, newCaseDetails.getData());
+
         caseDocumentService.attachCaseDocuments(
             newCaseDetails.getReferenceAsString(),
             newCaseDetails.getCaseTypeId(),
             newCaseDetails.getJurisdiction(),
-            documentHashes
+            verifiedDocumentHashes
         );
 
         try {
