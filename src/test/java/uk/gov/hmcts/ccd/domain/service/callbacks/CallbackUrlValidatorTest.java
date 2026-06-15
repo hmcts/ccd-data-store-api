@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.util.CallbackHostPatternMatcher;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -36,6 +37,12 @@ class CallbackUrlValidatorTest {
     @Test
     void shouldRejectInvalidUri() {
         assertThrows(CallbackException.class, () -> subject.validateCallbackUrl("not-a-uri"));
+    }
+
+    @Test
+    void shouldRejectEmptyUri() {
+        assertThrows(CallbackException.class, () -> subject.validateCallbackUrl(null));
+        assertThrows(CallbackException.class, () -> subject.validateCallbackUrl(""));
     }
 
     @Test
@@ -70,18 +77,16 @@ class CallbackUrlValidatorTest {
 
     @Test
     void shouldMatchWildcardSubdomainPattern() {
-        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
-            "sub.allowed.example", "*.allowed.example"));
-        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
-            "allowed.example", "*.allowed.example"));
+        assertTrue(CallbackHostPatternMatcher.matches("sub.allowed.example", "*.allowed.example"));
+        assertFalse(CallbackHostPatternMatcher.matches("allowed.example", "*.allowed.example"));
     }
 
     @Test
     void shouldMatchRegexPattern() {
-        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
-            "pr-123.demo.platform.hmcts.net", ".*\\.demo\\.platform\\.hmcts\\.net"));
-        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches",
-            "demo.platform.hmcts.net", ".*\\.demo\\.platform\\.hmcts\\.net"));
+        assertTrue(CallbackHostPatternMatcher.matches("pr-123.demo.platform.hmcts.net",
+            ".*\\.demo\\.platform\\.hmcts\\.net"));
+        assertFalse(CallbackHostPatternMatcher.matches("demo.platform.hmcts.net",
+            ".*\\.demo\\.platform\\.hmcts\\.net"));
     }
 
     @Test
@@ -156,13 +161,13 @@ class CallbackUrlValidatorTest {
 
     @Test
     void shouldMatchAllowlistWildcardDirectly() {
-        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "any.host", "*"));
+        assertTrue(CallbackHostPatternMatcher.matches("any.host", "*"));
     }
 
     @Test
     void shouldFallbackToLiteralComparisonForInvalidRegex() {
-        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "literal.host", "literal.host"));
-        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(subject, "hostMatches", "other.host", "literal.host"));
+        assertTrue(CallbackHostPatternMatcher.matches("literal.host", "literal.host"));
+        assertFalse(CallbackHostPatternMatcher.matches("other.host", "literal.host"));
     }
 
     @Test

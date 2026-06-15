@@ -221,6 +221,8 @@ task testUnit(type: Test) {
     description = "Runs unit tests (parallel)"
     group = "Verification"
     useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     include '**/*Test.class'
     exclude '**/*IT.class', '**/*ITest.class'
     maxParallelForks = (System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6) as int
@@ -230,6 +232,8 @@ task testIt(type: Test) {
     description = "Runs integration-style tests (*IT, *ITest) serially for WireMock/Spring stability"
     group = "Verification"
     useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     include '**/*IT.class', '**/*ITest.class'
     maxParallelForks = (System.getenv('MAX_NUM_PARALLEL_THREADS_IT') ?: 1) as int
 }

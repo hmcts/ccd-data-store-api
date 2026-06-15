@@ -29,6 +29,10 @@ public class CallbackUrlValidator {
     }
 
     public void validateCallbackUrl(String url) {
+        if (!StringUtils.hasLength(url)) {
+            throw new CallbackException("Callback URL must not be empty");
+        }
+
         final URI callbackUri;
         try {
             callbackUri = new URI(url);
@@ -80,10 +84,6 @@ public class CallbackUrlValidator {
         } catch (IllegalArgumentException ex) {
             throw new CallbackException(ex.getMessage());
         }
-    }
-
-    private boolean hostMatches(String host, String allowedHost) {
-        return CallbackHostPatternMatcher.matches(host, allowedHost);
     }
 
     private boolean resolvesToPrivateAddress(String host) {
