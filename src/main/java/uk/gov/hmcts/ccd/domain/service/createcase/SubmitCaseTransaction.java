@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import feign.FeignException;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -42,6 +44,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +70,8 @@ public class SubmitCaseTransaction implements AccessControl {
     private final PersistenceStrategyResolver resolver;
     private final CasePointerRepository casePointerRepository;
     private final SynchronisedCaseProcessor synchronisedCaseProcessor;
+    private final DateCaseClosedRepository dateCaseClosedRepository;
+    private static final String CLOSED_FOR_PAYMENT = "CLOSED FOR PAYMENT";
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -85,8 +90,9 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction,
                                  final PersistenceStrategyResolver resolver,
                                  final CasePointerRepository casePointerRepository,
-                                 final SynchronisedCaseProcessor synchronisedCaseProcessor
-                                 ) {
+                                 final SynchronisedCaseProcessor synchronisedCaseProcessor,
+                                 final DateCaseClosedRepository dateCaseClosedRepository
+    ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
@@ -103,6 +109,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.resolver = resolver;
         this.casePointerRepository = casePointerRepository;
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
+        this.dateCaseClosedRepository = dateCaseClosedRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -188,8 +195,31 @@ public class SubmitCaseTransaction implements AccessControl {
             );
         }
 
+        updateDateCaseClosed(savedCaseDetails, caseTypeDefinition);
 
         return savedCaseDetails;
+    }
+
+    private void updateDateCaseClosed(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
+        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
+        String stateCategory = caseStateDefinition.getStateCategory();
+
+        if (hasClosedForPaymentCategory(stateCategory)) {
+            DateCaseClosedEntity dateCaseClosedEntity = new DateCaseClosedEntity();
+            dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
+            dateCaseClosedEntity.setState(caseDetails.getState());
+            dateCaseClosedEntity.setStateCategory(stateCategory);
+            dateCaseClosedEntity.setStateChangedDate(caseDetails.getLastStateModifiedDate());
+
+            dateCaseClosedRepository.save(dateCaseClosedEntity);
+        }
+    }
+
+    private boolean hasClosedForPaymentCategory(String stateCategory) {
+        return stateCategory != null
+               && Arrays.stream(stateCategory.split(","))
+                   .map(String::trim)
+                   .anyMatch(CLOSED_FOR_PAYMENT::equalsIgnoreCase);
     }
 
     private CaseDetails submitDecentralisedCase(Event event, CaseTypeDefinition caseTypeDefinition, IdamUser idamUser,
