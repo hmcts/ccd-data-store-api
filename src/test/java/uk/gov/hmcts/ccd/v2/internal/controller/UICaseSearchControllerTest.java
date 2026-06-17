@@ -150,7 +150,23 @@ class UICaseSearchControllerTest {
     }
 
     @Test
-    void shouldRejectClosedCasesDateThatIsNotBeforeCurrentDate() {
+    void shouldGetClosedCasesForCurrentDate() {
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC);
+        DateCaseClosedResponse dateCaseClosedResponse =
+            new DateCaseClosedResponse(List.of("1234567890123456"));
+        when(closedCaseSearchOperation.execute(closedCasesDate)).thenReturn(dateCaseClosedResponse);
+
+        ResponseEntity<DateCaseClosedResponse> response = controller.getClosedCases(closedCasesDate);
+
+        verify(closedCaseSearchOperation).execute(closedCasesDate);
+        assertAll(
+            () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+            () -> assertThat(response.getBody(), is(dateCaseClosedResponse))
+        );
+    }
+
+    @Test
+    void shouldRejectClosedCasesDateThatIsAfterCurrentDate() {
         LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC).plusDays(1);
 
         BadSearchRequest exception = assertThrows(

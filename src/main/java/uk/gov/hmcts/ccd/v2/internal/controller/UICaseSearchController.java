@@ -199,7 +199,7 @@ public class UICaseSearchController {
         @Parameter(name = "date", required = true)
         @PathVariable("date")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate closedCasesDate) {
-        if (!closedCasesDate.isBefore(LocalDate.now(ZoneOffset.UTC))) {
+        if (closedCasesDate.isAfter(LocalDate.now(ZoneOffset.UTC))) {
             throw new BadSearchRequest("Date is not valid");
         }
         return ResponseEntity.ok(closedCaseSearchOperation.execute(closedCasesDate));

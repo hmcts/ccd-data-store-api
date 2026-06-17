@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.caseclosed;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
@@ -30,8 +31,12 @@ class DefaultClosedCaseSearchOperationTest {
     @Mock
     private DateCaseClosedRepository dateCaseClosedRepository;
 
-    @InjectMocks
     private DefaultClosedCaseSearchOperation defaultClosedCaseSearchOperation;
+
+    @BeforeEach
+    void setUp() {
+        defaultClosedCaseSearchOperation = new DefaultClosedCaseSearchOperation(dateCaseClosedRepository);
+    }
 
     @Test
     void shouldReturnClosedCaseReferences() {
@@ -58,6 +63,23 @@ class DefaultClosedCaseSearchOperationTest {
         assertAll(
             () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(NEXT_DAY_START),
             () -> assertThat(response.getCaseReferences(), is(nullValue()))
+        );
+    }
+
+    @Test
+    void shouldUseNextDayStartAsCutoffForCurrentDate() {
+        ArgumentCaptor<LocalDateTime> stateChangedDateCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+        DateCaseClosedEntity closedCase = createDateCaseClosedEntity(1234567890123456L);
+        LocalDate currentDate = LocalDate.now();
+        when(dateCaseClosedRepository.findByStateChangedDateBefore(currentDate.plusDays(1).atStartOfDay()))
+            .thenReturn(List.of(closedCase));
+
+        DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(currentDate);
+
+        assertAll(
+            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(stateChangedDateCaptor.capture()),
+            () -> assertThat(stateChangedDateCaptor.getValue(), is(currentDate.plusDays(1).atStartOfDay())),
+            () -> assertThat(response.getCaseReferences(), is(List.of("1234567890123456")))
         );
     }
 
