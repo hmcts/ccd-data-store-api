@@ -91,13 +91,10 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         if (StringUtils.isNotBlank(pageId)) {
             verifyEventIsPresent(content);
+            verifyEventAccess(operationContext, content);
         }
 
         callMidEventCallback(caseTypeId, content, pageId);
-
-        if (StringUtils.isNotBlank(pageId)) {
-            verifyEventAccessAfterMidEvent(operationContext, content);
-        }
 
         if (applicationParams.getExcludeVerifyAccessCaseTypesForValidate()
             .stream()
@@ -130,7 +127,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         }
     }
 
-    private void verifyEventAccessAfterMidEvent(OperationContext operationContext, CaseDataContent content) {
+    private void verifyEventAccess(OperationContext operationContext, CaseDataContent content) {
         String caseTypeId = operationContext.caseTypeId();
 
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);

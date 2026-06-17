@@ -231,12 +231,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         assertThrows(ValidationException.class,
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -621,7 +620,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setData(emptyMap());
 
         when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(Set.of());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -629,7 +627,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals("Cannot find user roles for the user", exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -642,7 +640,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_CREATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -650,7 +647,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -663,7 +660,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), eq(CAN_CREATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -671,7 +667,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_EVENT_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -766,7 +762,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setData(emptyMap());
 
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -774,7 +769,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals("Case not found", exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -787,7 +782,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_UPDATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -795,7 +789,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -808,7 +802,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseStateWithCriteria(anyString(), any(), any(), eq(CAN_UPDATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -816,7 +809,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_STATE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -860,14 +853,13 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should invoke mid event before rejecting when user lacks case event access")
-    void shouldInvokeMidEventBeforeRejectingWhenUserLacksCaseEventAccess() {
+    @DisplayName("should not invoke mid event when user lacks case event access")
+    void shouldNotInvokeMidEventWhenUserLacksCaseEventAccess() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
         content.setCaseReference(CASE_REFERENCE);
         content.setData(new HashMap<>());
 
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), any()))
             .thenReturn(false);
 
@@ -876,7 +868,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
         assertThrows(ResourceNotFoundException.class,
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     private static void attachEvent(CaseDataContent content) {
