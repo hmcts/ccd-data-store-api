@@ -33,9 +33,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -169,10 +167,6 @@ public class TestingSupportController {
             .setParameterList(parameterName, ids, type)
             .executeUpdate();
         session.getTransaction().commit();
-    }
-
-    private Date toDate(LocalDateTime dateTime) {
-        return dateTime == null ? null : Date.from(dateTime.toInstant(ZoneOffset.UTC));
     }
 
     @Data
