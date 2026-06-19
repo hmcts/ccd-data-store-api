@@ -526,6 +526,22 @@ class SubmitCaseTransactionTest {
         verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
     }
 
+    @Test
+    @DisplayName("should not save date case closed when state category only partially matches closed for payment")
+    void shouldNotSaveDateCaseClosedWhenStateCategoryOnlyPartiallyMatchesClosedForPayment() {
+        state.setStateCategory("CLOSED FOR PAYMENT EXAMPLE, End");
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
+    }
+
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {
         assertAll("Audit event",
             () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
