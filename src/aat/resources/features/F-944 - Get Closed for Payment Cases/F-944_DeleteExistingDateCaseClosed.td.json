@@ -10,7 +10,7 @@
     "queryParams": {
       "caseTypeId": "FT_DateCaseClosed",
       "state": "CaseClosedForPayment",
-      "stateCategory": "Closed for payment,End",
+      "stateCategory": "CLOSED FOR PAYMENT,End",
       "stateChangedDate": "${[scenarioContext][customValues][today]}"
     }
   }

@@ -485,7 +485,7 @@ class SubmitCaseTransactionTest {
     @DisplayName("should save date case closed when state category contains closed for payment")
     void shouldSaveDateCaseClosedWhenStateCategoryContainsClosedForPayment() {
         LocalDateTime stateChangedDate = LocalDateTime.of(2026, 6, 16, 10, 30);
-        state.setStateCategory("Closed for payment, End");
+        state.setStateCategory("CLOSED FOR PAYMENT, End");
         doReturn(stateChangedDate).when(savedCaseDetails).getLastStateModifiedDate();
 
         ArgumentCaptor<DateCaseClosedEntity> dateCaseClosedEntityCaptor =
@@ -505,7 +505,7 @@ class SubmitCaseTransactionTest {
         assertAll(
             () -> assertThat(dateCaseClosedEntity.getCcdCaseNumber(), is(1234567890L)),
             () -> assertThat(dateCaseClosedEntity.getState(), is(STATE_ID)),
-            () -> assertThat(dateCaseClosedEntity.getStateCategory(), is("Closed for payment, End")),
+            () -> assertThat(dateCaseClosedEntity.getStateCategory(), is("CLOSED FOR PAYMENT, End")),
             () -> assertThat(dateCaseClosedEntity.getStateChangedDate(), is(stateChangedDate))
         );
     }
