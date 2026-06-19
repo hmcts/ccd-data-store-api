@@ -84,11 +84,12 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         this.accessControlLists = accessControlLists;
     }
 
-    @JsonProperty("state_category")
+    @JsonIgnore
     public String getStateCategory() {
         return stateCategory;
     }
 
+    @JsonProperty("state_category")
     public void setStateCategory(String stateCategory) {
         this.stateCategory = stateCategory;
     }
