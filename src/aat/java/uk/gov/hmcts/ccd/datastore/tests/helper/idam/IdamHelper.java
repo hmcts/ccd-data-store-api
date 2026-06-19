@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +9,7 @@ import feign.jackson.JacksonEncoder;
 
 public class IdamHelper {
 
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CODE = "code";
-    private static final String BASIC = "Basic ";
+    private static final String GRANT_TYPE = "password";
 
     private final Map<String, AuthenticatedUser> users = new HashMap<>();
 
@@ -37,24 +34,16 @@ public class IdamHelper {
     }
 
     public String getIdamOauth2Token(String username, String password) {
-        String authorisation = username + ":" + password;
-        String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
-
-        IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
-            BASIC + base64Authorisation,
-            CODE,
-            oauth2.getClientId(),
-            oauth2.getRedirectUri()
-        );
-
-        IdamApi.TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
-            authenticateUserResponse.getCode(),
-            AUTHORIZATION_CODE,
+        IdamApi.TokenResponse tokenResponse = idamApi.generateOpenIdToken(
+            GRANT_TYPE,
             oauth2.getClientId(),
             oauth2.getClientSecret(),
-            oauth2.getRedirectUri()
+            oauth2.getRedirectUri(),
+            oauth2.getScope(),
+            username,
+            password
         );
 
-        return tokenExchangeResponse.getAccessToken();
+        return tokenResponse.getAccessToken();
     }
 }
