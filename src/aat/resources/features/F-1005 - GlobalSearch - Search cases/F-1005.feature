@@ -203,3 +203,15 @@ Feature: F-1005: Global Search - Search cases
     Then a positive response is received,
      And the response [has 200 return code],
      And the response has all other details as expected.
+
+  @S-1005.20 #CCD-5867
+  Scenario: searchCases with global=true returns the previously created case from the global search index
+    Given a user with [an active profile in CCD]
+
+    When a request is prepared with appropriate values
+     And the request [searches for the previously created case by reference with global set to true]
+     And it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API]
+
+    Then a positive response is received,
+     And the response [the case is returned from the global search index],
+     And the response has all other details as expected.

@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-1005.20",
+  "_extends_": "F-108_Test_Data_Base",
+  "title": "searchCases with global=true returns the previously created case from the global search index by reference",
+
+  "specs": [
+    "an active profile in CCD",
+    "searches for the previously created case by reference with global set to true",
+    "the case is returned from the global search index"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "FT_GlobalSearch",
+      "global": "true"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 1
+    }
+  }
+}
