@@ -54,7 +54,7 @@ The following environment variables are optional:
 | Name                                         | Default            | Description                                   |
 |----------------------------------------------|--------------------|-----------------------------------------------|
 | ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
-| GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
+| GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access testing (functional tests). |
 | ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
 
 ### Building
@@ -134,6 +134,60 @@ Will run only S-1023.5:
 ```bash
 ./gradlew functional -P tags="@S-1023.5"
 ```
+
+For remote AAT runs, create or refresh the app runtime file with `./gradlew reloadEnvSecrets -Penv=aat`,
+then source `./scripts/aat-env.sh` before running `runRemoteAAT` or `smoke`. The default profile fetches only
+the required smoke/base secrets and prints `GROUP_ACCESS_ENABLED`. Set `AAT_ENV_MODE=full` before the full functional
+suite.
+
+```bash
+az login
+./gradlew reloadEnvSecrets -Penv=aat
+source ./scripts/aat-env.sh
+./scripts/check-remote-env.sh aat
+./gradlew runRemoteAAT
+./gradlew --no-daemon smoke
+
+AAT_ENV_MODE=full source ./scripts/aat-env.sh
+./gradlew --no-daemon functional
+```
+
+By default, leave `AAT_DEFINITION_STORE_HOST` unset. Data-store then uses the AAT definition-store URL from
+`.aat-remote-env`.
+
+```bash
+unset AAT_DEFINITION_STORE_HOST
+source ./scripts/aat-env.sh
+./gradlew runRemoteAAT
+```
+
+To override this and run `ccd-data-store-api` against a local `ccd-definition-store-api` on port `4451`, start
+definition-store against AAT with group access enabled, then set `AAT_DEFINITION_STORE_HOST` for data-store:
+
+```bash
+cd ../ccd-definition-store-api
+az login
+./gradlew reloadEnvSecrets -Penv=aat
+grep '^ENABLE_CASE_GROUP_ACCESS=' .aat-remote-env
+./scripts/check-remote-env.sh aat
+./gradlew runRemoteAat
+```
+
+Expected:
+
+```text
+ENABLE_CASE_GROUP_ACCESS=true
+```
+
+```bash
+cd ../ccd-data-store-api
+export AAT_DEFINITION_STORE_HOST=http://localhost:4451
+source ./scripts/aat-env.sh
+./scripts/check-remote-env.sh aat
+./gradlew runRemoteAAT
+```
+
+See `scripts/README.md` for the full data-store remote-run notes and troubleshooting table.
 
 ## LICENSE
 

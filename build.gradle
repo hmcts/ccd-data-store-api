@@ -1,4 +1,5 @@
 import groovy.xml.XmlParser
+import java.nio.charset.StandardCharsets
 
 plugins {
     id 'maven-publish'
@@ -42,6 +43,10 @@ ext {
     elasticVersion = '9.2.4'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.3'
+    cucumberMessages = '30.1.0'
+    cucumberQuery = '14.7.0'
+    beftaCucumberMessages = '24.1.0'
+    beftaCucumberQuery = '12.2.0'
     beftaFwVersion = '9.2.6'
     ccdTestDefinitionVersion = '7.26.4'
     limits = [
@@ -184,6 +189,43 @@ configurations {
     all.collect { configuration ->
         configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
         all*.exclude module: 'spring-boot-starter-logging'
+    }
+}
+
+configurations.matching {
+    it.name in [
+        'testCompileClasspath',
+        'testRuntimeClasspath',
+        'aatCompileClasspath',
+        'aatRuntimeClasspath',
+        'contractTestCompileClasspath',
+        'contractTestRuntimeClasspath',
+        'integrationTestCompileClasspath',
+        'integrationTestRuntimeClasspath'
+    ]
+}.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'io.cucumber' && details.requested.name == 'messages') {
+            details.useVersion beftaCucumberMessages
+            details.because 'BEFTA Cucumber dependencies declare io.cucumber:messages as a version range, which can fail dynamic resolution'
+        }
+        if (details.requested.group == 'io.cucumber' && details.requested.name == 'query') {
+            details.useVersion beftaCucumberQuery
+            details.because 'BEFTA Cucumber XML formatters declare io.cucumber:query as a version range, which can fail dynamic resolution'
+        }
+    }
+}
+
+configurations.matching { it.name == 'cucumberRuntime' }.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'io.cucumber' && details.requested.name == 'messages') {
+            details.useVersion cucumberMessages
+            details.because 'Cucumber runtime dependencies declare io.cucumber:messages as a version range, which can fail dynamic resolution'
+        }
+        if (details.requested.group == 'io.cucumber' && details.requested.name == 'query') {
+            details.useVersion cucumberQuery
+            details.because 'Cucumber runtime formatters declare io.cucumber:query as a version range, which can fail dynamic resolution'
+        }
     }
 }
 
@@ -780,7 +822,6 @@ task smoke(type: JavaExec) {
         into "$buildDir/test-results/test"
     }
 
-    generateCucumberReports.enabled = true
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     args = ['--plugin', "json:${rootDir}/target/cucumber.json",
@@ -790,16 +831,7 @@ task smoke(type: JavaExec) {
             '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
     jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
-    finalizedBy {
-        generateCucumberReports {
-            doLast{
-                delete "${rootDir}/BEFTA Report for Smoke Tests/"
-                new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
-                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
-                logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
-            }
-        }
-    }
+    finalizedBy 'moveSmokeCucumberReport'
 
     outputs.upToDateWhen { false }
 }
@@ -815,7 +847,6 @@ task functional(type: JavaExec) {
 
     group = "Verification"
 
-    generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
     args = [
@@ -831,17 +862,7 @@ task functional(type: JavaExec) {
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
 
-    finalizedBy {
-        generateCucumberReports.enabled = true
-        generateCucumberReports {
-            doLast{
-                delete "${rootDir}/BEFTA Report for Functional Tests/"
-                new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
-                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
-                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
-            }
-        }
-    }
+    finalizedBy 'moveFunctionalCucumberReport'
 
     outputs.upToDateWhen { false }
 }
@@ -880,22 +901,65 @@ cucumberReports {
     notFailingStatuses = ["skipped", "passed"]
 }
 
+tasks.named('generateCucumberReports') {
+    enabled = true
+}
+
+tasks.register('moveSmokeCucumberReport') {
+    dependsOn 'generateCucumberReports'
+
+    doLast {
+        moveCucumberReport('Smoke Tests')
+    }
+}
+
+tasks.register('moveFunctionalCucumberReport') {
+    dependsOn 'generateCucumberReports'
+
+    doLast {
+        moveCucumberReport('Functional Tests')
+    }
+}
+
+void moveCucumberReport(String reportName) {
+    def source = file("${rootDir}/target/cucumber/cucumber-html-reports")
+    def destination = file("${rootDir}/BEFTA Report for ${reportName}")
+
+    if (!source.exists()) {
+        throw new GradleException("Cucumber HTML report was not generated at ${source}")
+    }
+
+    delete destination
+    copy {
+        from source
+        into destination
+    }
+    delete source
+
+    logger.quiet("${reportName} report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20${reportName.replace(' ', '%20')}/overview-features.html")
+}
+
+task reloadEnvSecrets {
+    doFirst {
+        def env = project.findProperty('env') ?: 'demo'
+        reloadRemoteEnvSecrets(env.toString())
+    }
+}
+
 task reloadEnvSecretsDemo {
     doFirst {
-        reloadEnvSecrets("demo")
+        reloadRemoteEnvSecrets("demo")
     }
 }
 
 task reloadEnvSecretsAAT {
     doFirst {
-        reloadEnvSecrets("aat")
+        reloadRemoteEnvSecrets("aat")
     }
 }
 
-void reloadEnvSecrets(String env) {
-    if (project.file("./.${env}-remote-env").exists()) {
-        project.file("./.${env}-remote-env").delete()
-    }
+void reloadRemoteEnvSecrets(String env) {
+    loadEnvSecrets(env, true)
 }
 
 task runRemoteDemo(type: JavaExec) {
@@ -923,28 +987,98 @@ tasks.named("processContractTestResources") {
 }
 
 void configRemoteRunTask(Task execTask, String env) {
-    loadEnvSecrets(env)
-    project.file("./.${env}-remote-env").readLines().each() {
+    def envFile = loadEnvSecrets(env)
+    envFile.readLines().each() {
         def index = it.indexOf("=")
         def key = it.substring(0, index)
         def value = it.substring(index + 1)
         execTask.environment(key, value)
     }
+    applyRemoteRunOverrides(execTask)
 }
 
-void loadEnvSecrets(String env) {
-    def azCmd = ['az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env']
-    if (!project.file("./.${env}-remote-env").exists()) {
-        new ByteArrayOutputStream().withStream { os ->
-            exec {
-                if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    commandLine ['cmd', '/c'] + azCmd
-                } else {
-                    commandLine azCmd
-                }
-                standardOutput = os
-            }
-            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
-        }
+void applyRemoteRunOverrides(Task execTask) {
+    def definitionStoreHostOverride = project.findProperty('definitionStoreHost') ?: System.getenv('AAT_DEFINITION_STORE_HOST')
+    def caseGroupAccessFiltering = project.findProperty('enableCaseGroupAccessFiltering')
+        ?: System.getenv('ENABLE_CASE_GROUP_ACCESS_FILTERING')
+        ?: System.getenv('GROUP_ACCESS_ENABLED')
+
+    if (definitionStoreHostOverride) {
+        execTask.environment('DEFINITION_STORE_HOST', definitionStoreHostOverride.toString())
+        execTask.environment('DEFINITION_STORE_URL_BASE', definitionStoreHostOverride.toString())
+        execTask.environment('ENABLE_CASE_GROUP_ACCESS_FILTERING', (caseGroupAccessFiltering ?: 'true').toString())
+        logger.lifecycle("Using definition-store override: ${definitionStoreHostOverride}")
+        logger.lifecycle("Using case group access filtering: ${(caseGroupAccessFiltering ?: 'true')}")
+    } else if (caseGroupAccessFiltering) {
+        execTask.environment('ENABLE_CASE_GROUP_ACCESS_FILTERING', caseGroupAccessFiltering.toString())
     }
+}
+
+File loadEnvSecrets(String env) {
+    return loadEnvSecrets(env, isRemoteEnvRefreshRequested())
+}
+
+File loadEnvSecrets(String env, boolean refreshRemoteEnv) {
+    def azCmd = ['az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env']
+    def envFile = project.file("./.${env}-remote-env")
+    def targetEnvFile = project.file("./target/.${env}-remote-env")
+
+    if (!refreshRemoteEnv && envFile.exists()) {
+        ensureRemoteEnvDefaults(envFile, env)
+        return envFile
+    }
+    if (!refreshRemoteEnv && targetEnvFile.exists()) {
+        ensureRemoteEnvDefaults(targetEnvFile, env)
+        return targetEnvFile
+    }
+
+    try {
+        def encodedSecrets = providers.exec {
+            if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                commandLine ['cmd', '/c'] + azCmd
+            } else {
+                commandLine azCmd
+            }
+        }.standardOutput.asText.get()
+
+        envFile.write(new String(encodedSecrets.replace('\n', '').replace('\r', '').decodeBase64(), StandardCharsets.UTF_8))
+        ensureRemoteEnvDefaults(envFile, env)
+        return envFile
+    } catch (Exception e) {
+        if (refreshRemoteEnv) {
+            throw new GradleException("Failed to refresh ${envFile.name}", e)
+        }
+        if (envFile.exists()) {
+            logger.warn("Failed to refresh ${envFile.name}; using the existing file. Cause: ${e.message}")
+            ensureRemoteEnvDefaults(envFile, env)
+            return envFile
+        }
+        if (targetEnvFile.exists()) {
+            logger.warn("Failed to refresh ${envFile.name}; using ${targetEnvFile}. Cause: ${e.message}")
+            ensureRemoteEnvDefaults(targetEnvFile, env)
+            return targetEnvFile
+        }
+        throw e
+    }
+}
+
+void ensureRemoteEnvDefaults(File envFile, String env) {
+    if (!remoteEnvContainsKey(envFile, 'DATA_STORE_DB_HOST')) {
+        appendRemoteEnvValue(envFile, 'DATA_STORE_DB_HOST', "ccd-data-store-api-postgres-db-v15-${env}.postgres.database.azure.com")
+    }
+}
+
+boolean remoteEnvContainsKey(File envFile, String key) {
+    envFile.readLines().any { it.startsWith("${key}=") }
+}
+
+void appendRemoteEnvValue(File envFile, String key, String value) {
+    def contents = envFile.getText(StandardCharsets.UTF_8.name())
+    def linePrefix = contents.isEmpty() || contents.endsWith('\n') ? '' : System.lineSeparator()
+    envFile.append("${linePrefix}${key}=${value}${System.lineSeparator()}", StandardCharsets.UTF_8.name())
+}
+
+boolean isRemoteEnvRefreshRequested() {
+    def refreshRemoteEnv = project.findProperty('refreshRemoteEnv') ?: System.getProperty('refreshRemoteEnv')
+    return refreshRemoteEnv != null && refreshRemoteEnv.toString().toBoolean()
 }
