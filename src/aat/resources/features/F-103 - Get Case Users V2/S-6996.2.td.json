@@ -1,6 +1,6 @@
 {
   "title": "GET /case-users returns 200 when the Accept header is application/json (backwards compatibility)",
-  "_guid_": "S-606",
+  "_guid_": "S-6996.2",
   "_extends_": "F-103_Get_Case_Assigned_User_Roles_Base",
 
   "specs": [

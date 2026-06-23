@@ -130,7 +130,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
     Then a negative response is received,
     And the response has all other details as expected.
 
-  @S-605
+  @S-6996.1
   Scenario: GET Case-Assigned Users and Roles returns 200 when the Accept header is application/hal+json
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -147,7 +147,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
       # Clean up role assignment made above
     And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
 
-  @S-606
+  @S-6996.2
   Scenario: GET Case-Assigned Users and Roles returns 200 when the Accept header is application/json (backwards compatibility)
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -164,7 +164,7 @@ Feature: F-103: Get Case-Assigned Users and Roles
       # Clean up role assignment made above
     And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
 
-  @S-607
+  @S-6996.3
   Scenario: GET Case-Assigned Users and Roles returns 406 when the Accept header is an unsupported media type
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
