@@ -127,4 +127,9 @@ public class CaseDocumentUtils {
             .collect(Collectors.toUnmodifiableList());
     }
 
+    public Set<String> findDocumentIds(final Map<String, JsonNode> data) {
+        return findDocumentNodes(data).stream()
+            .map(this::getDocumentId)
+            .collect(Collectors.toSet());
+    }
 }

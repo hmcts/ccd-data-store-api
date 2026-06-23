@@ -131,6 +131,9 @@ public class ApplicationParams {
     @Value("#{'${search.elastic.data.hosts}'.split(',')}")
     private List<String> elasticSearchDataHosts;
 
+    @Value("${search.elastic.port:9200}")
+    private int elasticSearchPort;
+
     @Value("${search.elastic.request.timeout}")
     private Integer elasticSearchRequestTimeout;
 
@@ -470,6 +473,11 @@ public class ApplicationParams {
     public String getCasesIndexNameFormat() {
         return casesIndexNameFormat;
     }
+
+    public int getElasticSearchPort() {
+        return elasticSearchPort;
+    }
+
 
     public String getCasesIndexType() {
         return casesIndexType;
