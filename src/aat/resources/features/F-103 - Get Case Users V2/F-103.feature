@@ -130,3 +130,54 @@ Feature: F-103: Get Case-Assigned Users and Roles
     Then a negative response is received,
     And the response has all other details as expected.
 
+  @S-6996.1
+  Scenario: GET Case-Assigned Users and Roles returns 200 when the Accept header is application/hal+json
+    Given an appropriate test context as detailed in the test data source,
+    And a user [Richard - who can create a case],
+    And a case [C1, which has just been] created as in [F103_Case_Data_Create_C1],
+    And a user [Dil - with an active profile],
+    And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+    When a request is prepared with appropriate values,
+    And the request [is made by Jamal with the Case ID of C1 & Dil's User ID, requesting application/hal+json],
+    And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    Then a positive response is received,
+    And the response [contains the list of case roles just granted to Dil, as per above],
+    And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
+
+  @S-6996.2
+  Scenario: GET Case-Assigned Users and Roles returns 200 when the Accept header is application/json (backwards compatibility)
+    Given an appropriate test context as detailed in the test data source,
+    And a user [Richard - who can create a case],
+    And a case [C1, which has just been] created as in [F103_Case_Data_Create_C1],
+    And a user [Dil - with an active profile],
+    And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+    When a request is prepared with appropriate values,
+    And the request [is made by Jamal with the Case ID of C1 & Dil's User ID, requesting application/json],
+    And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    Then a positive response is received,
+    And the response [contains the list of case roles just granted to Dil, as per above],
+    And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
+
+  @S-6996.3
+  Scenario: GET Case-Assigned Users and Roles returns 406 when the Accept header is an unsupported media type
+    Given an appropriate test context as detailed in the test data source,
+    And a user [Richard - who can create a case],
+    And a case [C1, which has just been] created as in [F103_Case_Data_Create_C1],
+    And a user [Dil - with an active profile],
+    And a user [Jamal - who is a privileged user with permissions to access the case assignments of other users],
+    And a successful call [by Jamal to assign Dil a few case roles to access C1] as in [F-103_Jamal_Assign_Dil_Case_Role_To_C1],
+    When a request is prepared with appropriate values,
+    And the request [is made by Jamal with the Case ID of C1 & Dil's User ID, requesting application/xml],
+    And it is submitted to call the [Get Case-Assigned Users and Roles] operation of [CCD Data Store api],
+    Then a negative response is received,
+    And the response [has a 406 Not Acceptable status code],
+    And the response has all other details as expected.
+      # Clean up role assignment made above
+    And a successful call [is made to remove Case Role CR-1] as in [F-103_Remove_Case_Assigned_User_role_for_Case_C1].
+
