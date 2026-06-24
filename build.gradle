@@ -747,7 +747,6 @@ jacocoTestReport {
 test {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'CLDR'
 
     useJUnitPlatform()
@@ -895,14 +894,25 @@ def timestamp() {
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
+def cucumberJsonReport = file("${projectDir}/target/cucumber.json")
+
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
-    reports = files("${projectDir}/target/cucumber.json")
+    reports = files(cucumberJsonReport)
     notFailingStatuses = ["skipped", "passed"]
 }
 
 tasks.named('generateCucumberReports') {
-    enabled = true
+    onlyIf {
+        cucumberJsonReport.exists()
+            && (gradle.taskGraph.hasTask(':smoke')
+                || gradle.taskGraph.hasTask(':functional')
+                || gradle.taskGraph.hasTask(':moveSmokeCucumberReport')
+                || gradle.taskGraph.hasTask(':moveFunctionalCucumberReport')
+                || gradle.startParameter.taskNames.any {
+                    it == 'generateCucumberReports' || it.endsWith(':generateCucumberReports')
+                })
+    }
 }
 
 tasks.register('moveSmokeCucumberReport') {
