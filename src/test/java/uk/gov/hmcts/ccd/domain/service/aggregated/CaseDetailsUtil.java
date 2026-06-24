@@ -23,7 +23,7 @@ public class CaseDetailsUtil extends CaseDetails {
             return new CaseDetailsBuilder();
         }
 
-        public CaseDetailsBuilder withReference(Long reference) {
+        public CaseDetailsBuilder withReference(String reference) {
             caseDetails.setReference(reference);
             return this;
         }

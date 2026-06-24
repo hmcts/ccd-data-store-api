@@ -166,8 +166,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     // data values as per: classpath:sql/insert_cases_case_links.sql
     private static final String CASE_LINKS_CASE_998_REFERENCE = "1504259907353545";
     private static final String CASE_LINKS_CASE_999_REFERENCE = "1504259907353537";
-    private static final Long CASE_LINKS_CASE_998_ID = 998L;
-    private static final Long CASE_LINKS_CASE_999_ID = 999L;
+    private static final String CASE_LINKS_CASE_998_ID = "998";
+    private static final String CASE_LINKS_CASE_999_ID = "999";
     private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
     private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
 
@@ -282,7 +282,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -531,7 +531,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             containsString(caseAuditEvent.getId().toString()));
         assertEquals("null", messageQueueList.getFirst().getMessageInformation()
             .findPath("PreviousStateId").toString());
-        assertThat(messageQueueList.getFirst().getId(), equalTo(1L));
+        assertThat(messageQueueList.getFirst().getId(), equalTo("1"));
         assertEquals("CASE_EVENT", messageQueueList.getFirst().getMessageType());
     }
 
@@ -1607,7 +1607,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             final CaseDetails caseDetails =
                 mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-            assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+            assertEquals("1504259907353529", caseDetails.getReference());
 
             assertEquals("TestAddressBookCase", caseDetails.getCaseTypeId());
             assertEquals("PROBATE", caseDetails.getJurisdiction());
@@ -1655,7 +1655,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             final CaseDetails caseDetails =
                 mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-            assertEquals(1504259907353537L, caseDetails.getReference().longValue());
+            assertEquals("1504259907353537", caseDetails.getReference());
 
             assertEquals("TestAddressBookCase", caseDetails.getCaseTypeId());
             assertEquals("PROBATE", caseDetails.getJurisdiction());
@@ -1698,7 +1698,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-        assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+        assertEquals("1504259907353529", caseDetails.getReference());
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -1743,7 +1743,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             final CaseDetails caseDetails =
                 mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-            assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+            assertEquals("1504259907353529", caseDetails.getReference());
 
             assertEquals("TestAddressBookCase", caseDetails.getCaseTypeId());
             assertEquals("PROBATE", caseDetails.getJurisdiction());
@@ -1785,7 +1785,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(),
                 CaseDetails.class);
 
-            assertEquals(1504259907353537L, caseDetails.getReference().longValue());
+            assertEquals("1504259907353537", caseDetails.getReference());
 
             assertEquals("TestAddressBookCase", caseDetails.getCaseTypeId());
             assertEquals("PROBATE", caseDetails.getJurisdiction());
@@ -1827,7 +1827,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-        assertEquals(1504259907353529L, caseDetails.getReference().longValue());
+        assertEquals("1504259907353529", caseDetails.getReference());
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -2046,7 +2046,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2156,7 +2156,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2230,8 +2230,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -2244,8 +2244,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertNotNull(updatedCaseDetails);
         assertEquals("state4", updatedCaseDetails.getState());
         assertNotEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -2265,8 +2265,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
 
-        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails initialCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertEquals("CaseCreated", initialCaseDetails.getState());
         assertNotNull(initialCaseDetails.getLastStateModifiedDate());
 
@@ -2276,8 +2276,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = "
-            + caseReference, this::mapCaseData);
+        final CaseDetails updatedCaseDetails = template.queryForObject("SELECT * FROM case_data where reference = ?",
+            this::mapCaseData, caseReference);
         assertNotNull(updatedCaseDetails);
         assertEquals("CaseCreated", updatedCaseDetails.getState());
         assertEquals(initialCaseDetails.getLastStateModifiedDate(), updatedCaseDetails.getLastStateModifiedDate());
@@ -2345,7 +2345,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2418,7 +2418,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2488,7 +2488,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2559,7 +2559,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2706,7 +2706,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2742,7 +2742,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2778,7 +2778,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2824,7 +2824,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2873,7 +2873,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2910,7 +2910,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2947,7 +2947,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -2984,7 +2984,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3020,7 +3020,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3056,7 +3056,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3090,7 +3090,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3124,7 +3124,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3142,7 +3142,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, 1504259907353537L, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, CASE_TYPE, "1504259907353537", PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
@@ -3167,7 +3167,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, 1504259907353537L, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, CASE_TYPE, "1504259907353537", PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL)
@@ -3192,7 +3192,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L,
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, "1504259907353537",
             hasPreStatesEvent);
         caseDetailsToSave.setToken(token);
 
@@ -3218,7 +3218,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(hasPreStatesEvent, SUMMARY, DESCRIPTION));
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, 1504259907353537L,
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, "1504259907353537",
             hasPreStatesEvent);
         caseDetailsToSave.setToken(token);
 
@@ -3269,7 +3269,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3320,7 +3320,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -3859,7 +3859,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         String expected = "{  \n" +
             "   \"case_details\":{  \n" +
-            "      \"id\":1504259907353610,\n" +
+            "      \"id\":\"1504259907353610\",\n" +
             "      \"jurisdiction\":\"PROBATE\",\n" +
             "      \"state\":\"CaseCreated\",\n" +
             "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +
@@ -3947,7 +3947,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
             CaseLink.builder()
@@ -4007,7 +4007,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(201))
             .andReturn();
 
-        Long expectedCaseId = CASE_22_ID;
+        String expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
             CaseLink.builder()
@@ -4208,7 +4208,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             final CaseDetails caseDetails =
                 mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
 
-            assertEquals(1504259907353628L, caseDetails.getReference().longValue());
+            assertEquals("1504259907353628", caseDetails.getReference());
 
             JsonNode nodeData = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
@@ -4295,7 +4295,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -4381,7 +4381,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -5020,7 +5020,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<CaseDetails> caseDetailsPage4 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
         assertThat(caseDetailsPage4, hasSize(0));
 
-        Set<Long> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
+        Set<String> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
         //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
         assertThat(references, hasSize(6));
     }
@@ -5639,7 +5639,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: case with case links should be created", 4, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         List<CaseLink> expectedCaseLinks = List.of(
             CaseLink.builder()
@@ -5688,7 +5688,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: No case should be created", 3, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         List<CaseLink> expectedCaseLinks = List.of(
             CaseLink.builder()
@@ -5734,7 +5734,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases: No case should be created", 4, caseDetailsList.size());
 
-        Long expectedCaseId = 1L;
+        String expectedCaseId = "1";
 
         assertCaseLinks(expectedCaseId, Collections.emptyList());
     }
@@ -5824,7 +5824,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -5936,7 +5936,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -6071,7 +6071,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
-            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .filter(c -> caseReference.equals(c.getReference()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
@@ -6925,7 +6925,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
+    private void assertCaseLinks(String expectedCaseId, List<CaseLink> expectedCaseLinks) {
         List<CaseLink> caseLinks = template.query(
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
             new BeanPropertyRowMapper<>(CaseLink.class));

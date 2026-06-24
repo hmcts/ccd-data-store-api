@@ -61,7 +61,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
@@ -207,7 +206,7 @@ class SubmitCaseTransactionTest {
         doReturn("12345").when(savedCaseDetails).getReferenceAsString();
         doReturn("TestType").when(savedCaseDetails).getCaseTypeId();
         doReturn("TestJurisdiction").when(savedCaseDetails).getJurisdiction();
-        doReturn(1234567890L).when(savedCaseDetails).getReference();
+        doReturn("1234567890").when(savedCaseDetails).getReference();
         doReturn(LocalDate.of(2030, 1, 1)).when(savedCaseDetails).getResolvedTTL();
 
         doReturn("12345").when(caseDetails).getReferenceAsString();
@@ -270,7 +269,7 @@ class SubmitCaseTransactionTest {
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
             () -> order.verify(caseDetails).setCreatedDate(notNull()),
             () -> order.verify(caseDetails).setLastStateModifiedDate(notNull()),
-            () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
+            () -> order.verify(caseDetails).setReference(CASE_UID),
             () -> order.verify(caseDetailsRepository).set(caseDetails)
         );
     }
@@ -411,7 +410,7 @@ class SubmitCaseTransactionTest {
                 eq(savedDecentralisedCaseDetails),
                 any()
             ),
-            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
+            () -> verify(casePointerRepository).updateResolvedTtl("1234567890", LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
             () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
@@ -446,7 +445,7 @@ class SubmitCaseTransactionTest {
                 eq(savedDecentralisedCaseDetails),
                 any()
             ),
-            () -> verify(casePointerRepository).updateResolvedTtl(1234567890L, LocalDate.of(2030, 1, 1)),
+            () -> verify(casePointerRepository).updateResolvedTtl("1234567890", LocalDate.of(2030, 1, 1)),
             () -> verify(caseDetailsRepository, never()).set(caseDetails),
             () -> verify(caseAuditEventRepository, never()).set(isNotNull()),
             () -> verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID),
@@ -594,7 +593,7 @@ class SubmitCaseTransactionTest {
     void shouldRollbackCasePointerWhenApiExceptionHasErrors() {
         // Setup for decentralised case
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         // Setup ApiException with errors
         ApiException apiException = new ApiException("Validation failed")
@@ -612,16 +611,16 @@ class SubmitCaseTransactionTest {
 
         // Verify case pointer was persisted then deleted
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(casePointerRepository).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
     @Test
     @DisplayName("should rollback case pointer when ApiException has warnings and ignoreWarning is false")
     void shouldRollbackCasePointerWhenApiExceptionHasWarningsAndIgnoreWarningFalse() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         ApiException apiException = new ApiException("Warnings present")
             .withWarnings(Collections.singletonList("Upstream validation warning"));
@@ -635,16 +634,16 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, Boolean.FALSE, null));
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(casePointerRepository).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
     @Test
     @DisplayName("should rollback case pointer when FeignException has 4xx status code")
     void shouldRollbackCasePointerWhenFeignExceptionIs4xx() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         FeignException feignException = FeignException.errorStatus("submitEvent",
             feign.Response.builder()
@@ -664,16 +663,16 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository).deleteCasePointer(1234567890L);
+        verify(casePointerRepository).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
     @Test
     @DisplayName("should not rollback case pointer when FeignException has 5xx status code")
     void shouldNotRollbackCasePointerWhenFeignExceptionIs5xx() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         // Setup FeignException with 500 status code
         FeignException feignException = FeignException.errorStatus("submitEvent",
@@ -694,16 +693,16 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(casePointerRepository, never()).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
     @Test
     @DisplayName("should not rollback case pointer when ApiException has no errors")
     void shouldNotRollbackCasePointerWhenApiExceptionHasNoErrors() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         ApiException apiException = new ApiException("Some other error");
 
@@ -716,16 +715,16 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(casePointerRepository, never()).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
     @Test
     @DisplayName("should not rollback case pointer when ApiException has empty errors list")
     void shouldNotRollbackCasePointerWhenApiExceptionHasEmptyErrors() {
         doReturn(true).when(resolver).isDecentralised(caseDetails);
-        doReturn(1234567890L).when(caseDetails).getReference();
+        doReturn("1234567890").when(caseDetails).getReference();
 
         ApiException apiException = new ApiException("Some other error")
             .withErrors(Collections.emptyList());
@@ -739,9 +738,9 @@ class SubmitCaseTransactionTest {
                 caseEventDefinition, caseDetails, IGNORE_WARNING, null));
 
         verify(casePointerRepository).persistCasePointerAndInitId(caseDetails);
-        verify(casePointerRepository, never()).deleteCasePointer(1234567890L);
+        verify(casePointerRepository, never()).deleteCasePointer("1234567890");
         verify(synchronisedCaseProcessor, never()).applyConditionallyWithLock(any(), any());
-        verify(casePointerRepository, never()).updateResolvedTtl(anyLong(), any());
+        verify(casePointerRepository, never()).updateResolvedTtl(anyString(), any());
     }
 
 }

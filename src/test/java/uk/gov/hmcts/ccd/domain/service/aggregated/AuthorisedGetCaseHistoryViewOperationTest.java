@@ -53,7 +53,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
     private static final String USER_ID = "26";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
@@ -64,7 +64,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE)
-            .withCaseTypeId(CASE_TYPE_ID).withReference(Long.valueOf(CASE_REFERENCE)).build();
+            .withCaseTypeId(CASE_TYPE_ID).withReference(CASE_REFERENCE).build();
     private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT)
             .withEvent(CASE_EVENT_2).build();
@@ -145,7 +145,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(ACCESS_PROFILES).when(caseDataAccessControl)
             .generateAccessProfilesByCaseReference(anyString());
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(CASE_REFERENCE, USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         authorisedGetCaseHistoryViewOperation =

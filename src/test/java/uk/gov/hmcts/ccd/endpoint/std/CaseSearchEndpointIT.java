@@ -76,7 +76,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     @Test
     void testSearchCaseDetails() throws Exception {
 
-        final long referenceId = 1535450291607660L;
+        final String referenceId = "1535450291607660";
         String caseDetailElastic = create1CaseDetailsElastic(referenceId);
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
 
@@ -110,8 +110,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     @Test
     void shouldAuditLogSearchCases() throws Exception {
 
-        final long reference1 = 1535450291607660L;
-        final long reference2 = 1535450291607670L;
+        final String reference1 = "1535450291607660";
+        final String reference2 = "1535450291607670";
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
         stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
@@ -130,8 +130,8 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(2));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607670L))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607660"))));
+        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo("1535450291607670"))));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
@@ -144,7 +144,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase,TestAddressBookCase4"));
     }
 
-    private String create1CaseDetailsElastic(Long reference) {
+    private String create1CaseDetailsElastic(String reference) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -159,7 +159,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String create2CaseDetailsElastic(Long reference1,Long reference2) {
+    private String create2CaseDetailsElastic(String reference1,String reference2) {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
@@ -178,7 +178,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             "}";
     }
 
-    private String createCaseDetails(Long reference) {
+    private String createCaseDetails(String reference) {
         return "{\n"
             + "\"reference\": " + reference + ",\n"
             + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"

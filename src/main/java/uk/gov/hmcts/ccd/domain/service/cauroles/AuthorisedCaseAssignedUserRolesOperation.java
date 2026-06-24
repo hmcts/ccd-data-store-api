@@ -37,7 +37,7 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         this.cauRolesOperation.removeCaseUserRoles(caseUserRoles);
     }
 
-    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseIds, List<String> userIds) {
         if (this.cauRoleValidator.canAccessUserCaseRoles(userIds)) {
             return this.cauRolesOperation.findCaseUserRoles(caseIds, userIds);
         }

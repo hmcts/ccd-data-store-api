@@ -19,7 +19,7 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     public static final String QUALIFIER = "cached";
 
-    private final Map<String, List<Long>> casesUserHasAccess = newHashMap();
+    private final Map<String, List<String>> casesUserHasAccess = newHashMap();
     private final Map<String, List<String>> caseUserRoles = newHashMap();
 
     public CachedCaseUserRepository(@Qualifier(DefaultCaseUserRepository.QUALIFIER)
@@ -28,27 +28,27 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public void grantAccess(Long caseId, String userId, String caseRole) {
+    public void grantAccess(String caseId, String userId, String caseRole) {
         caseUserRepository.grantAccess(caseId, userId, caseRole);
     }
 
     @Override
-    public void revokeAccess(Long caseId, String userId, String caseRole) {
+    public void revokeAccess(String caseId, String userId, String caseRole) {
         caseUserRepository.revokeAccess(caseId, userId, caseRole);
     }
 
     @Override
-    public List<Long> findCasesUserIdHasAccessTo(final String userId) {
+    public List<String> findCasesUserIdHasAccessTo(final String userId) {
         return casesUserHasAccess.computeIfAbsent(userId, e -> caseUserRepository.findCasesUserIdHasAccessTo(userId));
     }
 
     @Override
-    public List<String> findCaseRoles(final Long caseId, final String userId) {
+    public List<String> findCaseRoles(final String caseId, final String userId) {
         return caseUserRoles.computeIfAbsent(caseId + userId, e -> caseUserRepository.findCaseRoles(caseId, userId));
     }
 
     @Override
-    public List<CaseUserEntity> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
+    public List<CaseUserEntity> findCaseUserRoles(List<String> caseIds, List<String> userIds) {
         return caseUserRepository.findCaseUserRoles(caseIds, userIds);
     }
 

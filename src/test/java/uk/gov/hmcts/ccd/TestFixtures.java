@@ -37,7 +37,7 @@ public abstract class TestFixtures {
     protected static final String JURISDICTION_ID = "SSCS";
     protected static final String JURISDICTION_NAME = "Social Security and Child Support";
     protected static final String CASE_REFERENCE = "1234123412341236";
-    protected static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
+    protected static final String REFERENCE = CASE_REFERENCE;
     protected static final String CASE_TYPE_ID = "Claim";
     protected static final String CASE_TYPE_NAME = "Claim Case Type";
     protected static final String STATE = "CreatedState";

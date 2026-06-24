@@ -8,8 +8,8 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Data
 public class DecentralisedAuditEvent {
-    private Long id;
-    private Long caseReference;
+    private String id;
+    private String caseReference;
     private AuditEvent event;
 
     public AuditEvent getEvent(String caseDataId) {

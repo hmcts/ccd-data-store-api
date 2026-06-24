@@ -9,5 +9,5 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 public interface AuditEventLoader {
     List<AuditEvent> getEvents(CaseDetails caseDetails);
 
-    Optional<AuditEvent> getEvent(CaseDetails caseDetails, Long eventId);
+    Optional<AuditEvent> getEvent(CaseDetails caseDetails, String eventId);
 }

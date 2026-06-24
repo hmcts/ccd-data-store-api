@@ -65,7 +65,7 @@ public class DocumentsOperationTest extends WireMockBaseTest {
     public void setUp() {
         ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
-        caseDetails.setReference(Long.valueOf(TEST_CASE_REFERENCE));
+        caseDetails.setReference(TEST_CASE_REFERENCE);
         caseDetails.setJurisdiction(TEST_JURISDICTION);
         caseDetails.setCaseTypeId(TEST_CASE_TYPE);
 

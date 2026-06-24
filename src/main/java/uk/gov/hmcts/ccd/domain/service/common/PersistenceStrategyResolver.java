@@ -27,7 +27,7 @@ import java.util.Optional;
 public class PersistenceStrategyResolver {
 
     private final CasePointerRepository pointerRepository;
-    private final Cache<Long, String> caseTypeCache;
+    private final Cache<String, String> caseTypeCache;
 
     private static final String TEMPLATE_PLACEHOLDER = "%s";
 
@@ -78,17 +78,17 @@ public class PersistenceStrategyResolver {
         return getCaseTypeServiceUrl(details.getCaseTypeId()).isPresent();
     }
 
-    public boolean isDecentralised(Long reference) {
+    public boolean isDecentralised(String reference) {
         var caseType = getCaseTypeByReference(reference);
         return getCaseTypeServiceUrl(caseType).isPresent();
     }
 
-    public URI resolveUriOrThrow(Long caseReference) {
+    public URI resolveUriOrThrow(String caseReference) {
         var caseType = getCaseTypeByReference(caseReference);
 
         return getCaseTypeServiceUrl(caseType).orElseThrow(() -> {
             String message = String.format(
-                "No decentralised persistence route configured for case type %s (from case reference %d)",
+                "No decentralised persistence route configured for case type %s (from case reference %s)",
                 caseType,
                 caseReference
             );
@@ -203,7 +203,7 @@ public class PersistenceStrategyResolver {
         }
     }
 
-    private String getCaseTypeByReference(Long reference) {
+    private String getCaseTypeByReference(String reference) {
         return caseTypeCache.get(reference, ref -> {
             log.debug("Cache miss for case reference: {}. Looking up case type from repository.", ref);
             return this.pointerRepository.findCaseTypeByReference(ref);

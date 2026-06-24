@@ -77,7 +77,7 @@ public class CaseAccessOperation {
     @Transactional
     public void grantAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
+            caseReference);
 
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
 
@@ -91,14 +91,14 @@ public class CaseAccessOperation {
             }
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+            caseUserRepository.grantAccess(caseDetails.getId(), userId, CREATOR.getRole());
         }
     }
 
     @Transactional
     public void revokeAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
+            caseReference);
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
@@ -110,7 +110,7 @@ public class CaseAccessOperation {
             roleAssignmentService.deleteRoleAssignments(List.of(deleteRequest));
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+            caseUserRepository.revokeAccess(caseDetails.getId(), userId, CREATOR.getRole());
         }
     }
 
@@ -120,7 +120,7 @@ public class CaseAccessOperation {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return roleAssignmentService.getCaseReferencesForAGivenUser(userId);
         } else {
-            List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
+            List<String> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
             if (usersCases.isEmpty()) {
                 return List.of();
             } else {
@@ -148,7 +148,7 @@ public class CaseAccessOperation {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, targetCaseRoles, true);
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
-            final var caseId = Long.valueOf(caseDetails.getId());
+            final var caseId = caseDetails.getId();
             final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 
             grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
@@ -194,7 +194,7 @@ public class CaseAccessOperation {
                     );
                 }
                 if (applicationParams.getEnableCaseUsersDbSync()) {
-                    Long caseId = Long.parseLong(caseDetails.getId());
+                    String caseId = caseDetails.getId();
                     caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
                         caseRoles.forEach(caseRole ->
                             caseUserRepository.grantAccess(caseId, userId, caseRole)));
@@ -249,7 +249,7 @@ public class CaseAccessOperation {
         }
         if (applicationParams.getEnableCaseUsersDbSync()) {
             filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                    Long caseId = Long.parseLong(caseDetails.getId());
+                    String caseId = caseDetails.getId();
                     requestedAssignments.forEach(requestedAssignment ->
                         caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
                             requestedAssignment.getCaseRole())
@@ -333,11 +333,10 @@ public class CaseAccessOperation {
             .collect(Collectors.toList());
     }
 
-    private List<Long> getCaseIdsFromCaseDetailsList(List<CaseDetails> caseDetailsList) {
+    private List<String> getCaseIdsFromCaseDetailsList(List<CaseDetails> caseDetailsList) {
         return caseDetailsList.stream()
             .map(CaseDetails::getId)
             .distinct()
-            .map(Long::parseLong)
             .collect(Collectors.toList());
     }
 
@@ -360,14 +359,13 @@ public class CaseAccessOperation {
 
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseCaseDetails = new HashMap<>();
 
-        List<Long> caseReferences = caseUserRoles.stream()
+        List<String> caseReferences = caseUserRoles.stream()
             .map(CaseAssignedUserRoleWithOrganisation::getCaseDataId)
             .distinct()
-            .map(Long::parseLong)
             .collect(Collectors.toCollection(ArrayList::new));
 
         // create map of case references to case details
-        Map<Long, CaseDetails> caseDetailsByReferences = getCaseDetailsList(caseReferences).stream()
+        Map<String, CaseDetails> caseDetailsByReferences = getCaseDetailsList(caseReferences).stream()
             .collect(Collectors.toMap(CaseDetails::getReference, caseDetails -> caseDetails));
 
         // group roles by case reference
@@ -376,9 +374,8 @@ public class CaseAccessOperation {
 
         // merge both maps to check we have found all cases
         cauRolesByCaseReference.forEach((key, roles) -> {
-            final Long caseReference = Long.parseLong(key);
-            if (caseDetailsByReferences.containsKey(caseReference)) {
-                cauRolesByCaseCaseDetails.put(caseDetailsByReferences.get(caseReference), roles);
+            if (caseDetailsByReferences.containsKey(key)) {
+                cauRolesByCaseCaseDetails.put(caseDetailsByReferences.get(key), roles);
             } else {
                 throw new CaseNotFoundException(key);
             }
@@ -416,12 +413,12 @@ public class CaseAccessOperation {
         }
 
         // find existing Case-User relationships for all the relevant cases + users found
-        Map<Long, List<String>> existingCaseUserRelationships =
+        Map<String, List<String>> existingCaseUserRelationships =
             existingCaseUserRoles.stream()
                 // filter out [CREATOR] case role
                 .filter(caseUserRole -> !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
                 .collect(Collectors.groupingBy(
-                    caseUserRole -> Long.parseLong(caseUserRole.getCaseDataId()),
+                    caseUserRole -> caseUserRole.getCaseDataId(),
                     Collectors.collectingAndThen(
                         Collectors.toList(),
                         caseUserRole -> caseUserRole.stream()
@@ -454,7 +451,7 @@ public class CaseAccessOperation {
         return result;
     }
 
-    public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseReferences, List<String> userIds) {
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             final var caseIds = caseReferences.stream().map(String::valueOf).collect(Collectors.toList());
@@ -466,7 +463,7 @@ public class CaseAccessOperation {
                 return Lists.newArrayList();
             }
 
-            List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
+            List<String> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
             return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
@@ -483,7 +480,7 @@ public class CaseAccessOperation {
                 .map(CaseDetails::getReferenceAsString).collect(Collectors.toList());
             return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
         } else {
-            List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
+            List<String> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
             return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
@@ -493,7 +490,7 @@ public class CaseAccessOperation {
         List<CaseUserEntity> caseUserEntities,
         List<CaseDetails> caseDetailsList
     ) {
-        Map<String, Long> caseReferenceAndIds = caseDetailsList.stream()
+        Map<String, String> caseReferenceAndIds = caseDetailsList.stream()
             .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
         return caseUserEntities.stream()
@@ -504,7 +501,7 @@ public class CaseAccessOperation {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
+    private List<CaseDetails> getCaseDetailsList(List<String> caseReferences) {
         return caseReferences.stream()
             .map(caseReference -> {
                 Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(null, caseReference);
@@ -523,7 +520,7 @@ public class CaseAccessOperation {
     }
 
     private void grantAddedCaseRoles(String userId,
-                                     Long caseId,
+                                     String caseId,
                                      List<String> currentCaseRoles,
                                      Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
@@ -532,7 +529,7 @@ public class CaseAccessOperation {
     }
 
     private void revokeRemovedCaseRoles(String userId,
-                                        Long caseId,
+                                        String caseId,
                                         List<String> currentCaseRoles,
                                         Set<String> targetCaseRoles) {
         currentCaseRoles.stream()

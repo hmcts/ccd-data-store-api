@@ -125,7 +125,7 @@ public class SubmitCaseTransaction implements AccessControl {
 
         caseDetails.setCreatedDate(now);
         caseDetails.setLastStateModifiedDate(now);
-        caseDetails.setReference(Long.valueOf(uidService.generateUID()));
+        caseDetails.setReference(uidService.generateUID());
 
         final CaseDetails caseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
 
@@ -320,7 +320,7 @@ public class SubmitCaseTransaction implements AccessControl {
         }
     }
 
-    private void rollbackCasePointer(Long caseReference) {
+    private void rollbackCasePointer(String caseReference) {
         try {
             log.info("Rolling back case pointer for case reference: {}", caseReference);
             casePointerRepository.deleteCasePointer(caseReference);

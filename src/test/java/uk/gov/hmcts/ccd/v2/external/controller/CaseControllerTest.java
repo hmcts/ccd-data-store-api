@@ -125,7 +125,7 @@ class CaseControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        when(caseDetails.getReference()).thenReturn(Long.valueOf(CASE_REFERENCE));
+        when(caseDetails.getReference()).thenReturn(CASE_REFERENCE);
 
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));

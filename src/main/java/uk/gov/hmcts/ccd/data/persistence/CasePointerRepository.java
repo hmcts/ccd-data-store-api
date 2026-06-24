@@ -53,7 +53,7 @@ public class CasePointerRepository {
         caseDetails.setId(result.getId());
     }
 
-    public String findCaseTypeByReference(Long caseReference) {
+    public String findCaseTypeByReference(String caseReference) {
         try {
             return em.createQuery(
                     "SELECT cd.caseType FROM CaseDetailsEntity cd WHERE cd.reference = :reference",
@@ -65,7 +65,7 @@ public class CasePointerRepository {
         }
     }
 
-    public void updateResolvedTtl(Long caseReference, LocalDate resolvedTtl) {
+    public void updateResolvedTtl(String caseReference, LocalDate resolvedTtl) {
         log.info("Updating resolved TTL for caseReference {}: {}", caseReference, resolvedTtl);
         em.createQuery("UPDATE CaseDetailsEntity SET resolvedTTL = :ttl WHERE reference = :caseReference")
             .setParameter("ttl", resolvedTtl)
@@ -77,7 +77,7 @@ public class CasePointerRepository {
      * Ensure a case pointer is deleted regardless of the state of any outer transaction.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void deleteCasePointer(Long caseReference) {
+    public void deleteCasePointer(String caseReference) {
         log.info("Deleting case pointer for caseReference: {}", caseReference);
         // Case pointers are stored with empty data, as an additional precaution.
         int deletedCount = em.createNativeQuery("""

@@ -67,7 +67,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     // These delegate to the primary methods above.
 
     @Override
-    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+    public Optional<CaseDetails> findById(String jurisdiction, String id) {
         return findAndDelegate(
             () -> localRepository.findById(jurisdiction, id),
             decentralisedClient::getCase
@@ -82,7 +82,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Deprecated(since = "2018-04-04")
     @SuppressWarnings("java:S1133") // keep legacy API for backward compatibility
-    public CaseDetails findById(Long id) {
+    public CaseDetails findById(String id) {
         return findById(null, id).orElse(null);
     }
 
@@ -134,7 +134,7 @@ public class DelegatingCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<Long> findCaseReferencesByIds(List<Long> ids) {
+    public List<String> findCaseReferencesByIds(List<String> ids) {
         // Case references and IDs are always stored locally.
         return localRepository.findCaseReferencesByIds(ids);
     }

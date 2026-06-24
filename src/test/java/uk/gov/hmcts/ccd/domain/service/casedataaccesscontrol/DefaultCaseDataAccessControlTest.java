@@ -673,12 +673,12 @@ class DefaultCaseDataAccessControlTest {
         doReturn(optionalCaseDetails).when(caseDetailsRepository).findByReference(CASE_ID);
 
         Optional<CaseDetails> optionalCaseDetails1 = Optional.empty();
-        doReturn(optionalCaseDetails1).when(caseDetailsRepository).findById(null, Long.parseLong(CASE_ID));
+        doReturn(optionalCaseDetails1).when(caseDetailsRepository).findById(null, CASE_ID);
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfilesByCaseReference(CASE_ID);
         assertTrue(accessProfiles.isEmpty());
         verify(caseDetailsRepository).findByReference(CASE_ID);
-        verify(caseDetailsRepository).findById(null, Long.parseLong(CASE_ID));
+        verify(caseDetailsRepository).findById(null, CASE_ID);
     }
 
     @Test
@@ -902,7 +902,7 @@ class DefaultCaseDataAccessControlTest {
         ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
         verify(roleAssignmentService).createCaseRoleAssignments(
             eq(caseDetails), eq(USER_ID), captor.capture(), eq(false));
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), USER_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole());
         assertEquals(1, captor.getValue().size());
         assertEquals(CREATOR.getRole(), captor.getValue().iterator().next());
     }

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class CaseHistoryViewResourceTest {
 
     private static final String REFERENCE = "1234123412341238";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final String LINK_SELF = String.format("/internal/cases/%s/events/%s", REFERENCE, EVENT_ID);
 
     @Mock

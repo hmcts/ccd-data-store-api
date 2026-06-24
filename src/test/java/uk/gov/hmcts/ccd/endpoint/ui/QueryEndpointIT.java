@@ -150,7 +150,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     private static final String GET_CASE_HISTORY_FOR_EVENT =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/"
-            + "events/%d/case-history";
+            + "events/%s/case-history";
 
     private static final String GET_CASE_EVENT_ENABLING_CONDITION = "/aggregated/caseworkers"
         + "/0/jurisdictions/PROBATE/case-types/"
@@ -838,7 +838,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID","1504259907353529", caseView.getCaseId());
 
         final CaseViewType caseViewType = caseView.getCaseType();
         assertNotNull("Case View Type is null", caseViewType);
@@ -1024,7 +1024,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID", "1504259907353529", caseView.getCaseId());
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 0, actionableEvents.length);
@@ -1047,7 +1047,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID", "1504259907353529", caseView.getCaseId());
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 1, actionableEvents.length);
@@ -1070,7 +1070,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(3479829222340505L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID", "3479829222340505", caseView.getCaseId());
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 1, actionableEvents.length);
@@ -1093,7 +1093,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID", "1504259907353529", caseView.getCaseId());
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 1, actionableEvents.length);
@@ -1179,7 +1179,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353537L), Long.valueOf(caseView.getCaseId()));
+        assertEquals("Unexpected Case ID", "1504259907353537", caseView.getCaseId());
 
         final CaseViewType caseViewType = caseView.getCaseType();
         assertNotNull("Case View Type is null", caseViewType);
@@ -1603,7 +1603,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final CaseHistoryView caseHistoryView = mapper.readValue(result.getResponse().getContentAsString(),
                                                                  CaseHistoryView.class);
         assertNotNull("Case View is null", caseHistoryView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseHistoryView.getCaseId()));
+        assertEquals("Unexpected Case ID", "1504259907353529", caseHistoryView.getCaseId());
 
         final CaseViewType caseViewType = caseHistoryView.getCaseType();
         assertNotNull("Case View Type is null", caseViewType);

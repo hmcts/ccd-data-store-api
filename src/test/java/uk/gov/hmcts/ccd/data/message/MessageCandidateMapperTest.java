@@ -14,11 +14,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 class MessageCandidateMapperTest {
-    private static final Long CASE_DATA_ID = 101111L;
+    private static final String CASE_DATA_ID = "101111";
     private static final String MESSAGE_TYPE = "CASE_EVENT";
     private static final String CASE_TYPE_ID = "121212";
     private static final String EVENT_ID = "eventName";
-    private static final Long EVENT_INSTNACE_ID = 2L;
+    private static final String EVENT_INSTNACE_ID = "2";
     private static final String STATE_NAME = "stateName";
     private static final String JURISDICTION = "Jurisdiction";
     private static final String USER_ID = "USER_ID";
@@ -85,7 +85,7 @@ class MessageCandidateMapperTest {
 
         final MessageInformation messageInformation = new MessageInformation();
 
-        messageInformation.setCaseId(CASE_DATA_ID.toString());
+        messageInformation.setCaseId(CASE_DATA_ID);
         messageInformation.setJurisdictionId(JURISDICTION);
         messageInformation.setCaseTypeId(CASE_TYPE_ID);
         messageInformation.setEventInstanceId(EVENT_INSTNACE_ID);

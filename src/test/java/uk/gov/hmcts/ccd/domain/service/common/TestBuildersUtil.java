@@ -379,7 +379,7 @@ public class TestBuildersUtil {
             caseDetails = new CaseDetails();
         }
 
-        public CaseDetailsBuilder withReference(Long reference) {
+        public CaseDetailsBuilder withReference(String reference) {
             caseDetails.setReference(reference);
             return this;
         }

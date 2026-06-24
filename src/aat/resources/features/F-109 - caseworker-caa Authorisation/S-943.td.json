@@ -31,7 +31,7 @@
       "cases": [
         {
           "_extends_" : "F-109_Base_Case_Fields_expected",
-          "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
+          "id": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
           "jurisdiction": "BEFTA_JURISDICTION_2",
           "case_type_id": "BEFTA_CASETYPE_2_1",
           "case_data": {

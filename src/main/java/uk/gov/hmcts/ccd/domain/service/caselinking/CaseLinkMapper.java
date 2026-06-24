@@ -13,8 +13,8 @@ public class CaseLinkMapper {
 
     public CaseLink entityToModel(@NonNull final CaseLinkEntity caseLinkEntity) {
         return CaseLink.builder()
-            .caseId(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId())
-            .linkedCaseId(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId())
+            .caseId(String.valueOf(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId()))
+            .linkedCaseId(String.valueOf(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId()))
             .caseTypeId(caseLinkEntity.getCaseTypeId())
             .standardLink(caseLinkEntity.getStandardLink())
             .build();

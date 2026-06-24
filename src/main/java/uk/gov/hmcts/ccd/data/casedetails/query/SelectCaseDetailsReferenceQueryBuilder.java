@@ -5,21 +5,21 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 
-public class SelectCaseDetailsReferenceQueryBuilder extends CaseDetailsQueryBuilder<Long> {
+public class SelectCaseDetailsReferenceQueryBuilder extends CaseDetailsQueryBuilder<String> {
 
     SelectCaseDetailsReferenceQueryBuilder(EntityManager em) {
         super(em);
     }
 
     @Override
-    public TypedQuery<Long> build() {
+    public TypedQuery<String> build() {
         return em.createQuery(query.select(root.get("reference"))
             .orderBy(orders)
             .where(predicates.toArray(new Predicate[]{})));
     }
 
     @Override
-    protected CriteriaQuery<Long> createQuery() {
-        return cb.createQuery(Long.class);
+    protected CriteriaQuery<String> createQuery() {
+        return cb.createQuery(String.class);
     }
 }

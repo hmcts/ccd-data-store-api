@@ -73,7 +73,7 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_ID = "1226";
     private static final String CASE_REFERENCE = "1111222233334444";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final String STATE = "Plop";
     private static final String USER_ID = "26";
     private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE, STATE);

@@ -132,7 +132,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
         AtomicInteger invocation = new AtomicInteger();
         doAnswer(invocationOnMock -> {
             boolean firstCall = invocation.getAndIncrement() == 0;
-            Long linkedRef = firstCall ? linkedA.getReference() : linkedB.getReference();
+            String linkedRef = firstCall ? linkedA.getReference() : linkedB.getReference();
             return List.of(CaseLink.builder()
                 .caseReference(sourceCase.getReference())
                 .linkedCaseReference(linkedRef)
@@ -162,7 +162,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
         assertFalse(links.isEmpty(), "Expected case links to be written without deadlock");
     }
 
-    private Void insertLink(Long firstRef, Long secondRef,
+    private Void insertLink(String firstRef, String secondRef,
                             CountDownLatch firstLocks, CountDownLatch proceed) {
         TransactionTemplate template = new TransactionTemplate(transactionManager);
         template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -188,7 +188,7 @@ class CaseLinkServiceExternalDbDeadlockIT {
 
     private CaseDetails persistCase(Long reference) {
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setReference(reference);
+        caseDetails.setReference(String.valueOf(reference));
         caseDetails.setCaseTypeId("FT_MasterCaseType");
         caseDetails.setJurisdiction("BEFTA_MASTER");
         LocalDateTime now = LocalDateTime.now();

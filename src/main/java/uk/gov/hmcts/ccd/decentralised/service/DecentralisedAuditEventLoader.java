@@ -22,7 +22,7 @@ public class DecentralisedAuditEventLoader implements AuditEventLoader {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, Long eventId) {
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String eventId) {
         return Optional.of(serviceClient.getCaseHistoryEvent(caseDetails, eventId));
     }
 }

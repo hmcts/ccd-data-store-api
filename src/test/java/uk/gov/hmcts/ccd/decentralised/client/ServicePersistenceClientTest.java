@@ -40,7 +40,7 @@ public class ServicePersistenceClientTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE = "TestCaseType";
-    private static final Long CASE_REFERENCE = 1234567890123456L;
+    private static final String CASE_REFERENCE = "1234567890123456";
     private static final String CASE_ID = "1";
     private static final String CASE_STATE = "CaseCreated";
     private static final URI SERVICE_URI = URI.create("http://test-service.com");
@@ -155,7 +155,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void getCase_shouldThrowServiceException_whenReferenceDoesNotMatch() {
         CaseDetails mismatchedCaseDetails = createCaseDetails();
-        mismatchedCaseDetails.setReference(9999999999999999L);
+        mismatchedCaseDetails.setReference("9999999999999999");
 
         DecentralisedCaseDetails mismatchedDetails = new DecentralisedCaseDetails();
         mismatchedDetails.setCaseDetails(mismatchedCaseDetails);
@@ -337,7 +337,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void createEvent_shouldThrowServiceException_whenResponseHasMismatchedCaseDetails() {
         CaseDetails mismatchedCaseDetails = createCaseDetails();
-        mismatchedCaseDetails.setReference(9999999999999999L);
+        mismatchedCaseDetails.setReference("9999999999999999");
 
         DecentralisedCaseDetails mismatchedDecentralisedCaseDetails = new DecentralisedCaseDetails();
         mismatchedDecentralisedCaseDetails.setCaseDetails(mismatchedCaseDetails);
@@ -431,7 +431,7 @@ public class ServicePersistenceClientTest {
         AuditEvent expectedEvent = new AuditEvent();
         expectedEvent.setCaseTypeId(CASE_TYPE);
         DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
-        auditEvent.setId(321L);
+        auditEvent.setId("321");
         auditEvent.setCaseReference(CASE_REFERENCE);
         auditEvent.setEvent(expectedEvent);
 
@@ -453,7 +453,7 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCaseHistoryEvent_shouldReturnSingleAuditEvent() {
-        Long eventId = 123L;
+        String eventId = "123";
         AuditEvent expectedEvent = new AuditEvent();
         expectedEvent.setCaseTypeId(CASE_TYPE);
         DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
@@ -478,7 +478,7 @@ public class ServicePersistenceClientTest {
     @Test
     public void getCaseHistory_shouldThrowServiceException_whenAuditEventCaseReferenceDiffers() {
         DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
-        auditEvent.setCaseReference(9999999999999999L);
+        auditEvent.setCaseReference("9999999999999999");
         auditEvent.setEvent(new AuditEvent());
 
         when(resolver.resolveUriOrThrow(caseDetails)).thenReturn(SERVICE_URI);
@@ -506,10 +506,10 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCaseHistoryEvent_shouldThrowServiceException_whenAuditEventCaseReferenceDiffers() {
-        Long eventId = 321L;
+        String eventId = "321";
         DecentralisedAuditEvent auditEvent = new DecentralisedAuditEvent();
         auditEvent.setId(eventId);
-        auditEvent.setCaseReference(9999999999999999L);
+        auditEvent.setCaseReference("9999999999999999");
         AuditEvent event = new AuditEvent();
         event.setCaseTypeId(CASE_TYPE);
         auditEvent.setEvent(event);
@@ -524,7 +524,7 @@ public class ServicePersistenceClientTest {
 
     @Test
     public void getCaseHistoryEvent_shouldThrowServiceException_whenAuditEventCaseTypeDiffers() {
-        Long eventId = 321L;
+        String eventId = "321";
         AuditEvent event = new AuditEvent();
         event.setCaseTypeId("WrongCaseType");
 

@@ -48,7 +48,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
-    private static final Long EVENT_ID = 100L;
+    private static final String EVENT_ID = "100";
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
@@ -87,7 +87,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setJurisdiction(JURISDICTION_ID);
-        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setState(STATE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
