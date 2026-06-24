@@ -69,13 +69,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -644,7 +642,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    is("The provided use case 'INVALID' is unsupported for case type 'AAT'."))
+                    is("Bad Request"))
             );
         }
 
@@ -657,7 +655,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    is("missing required field 'query'"))
+                    is("Bad Request"))
             );
         }
 
@@ -672,7 +670,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    containsString("No mapping found for [invalid.keyword] in order to sort on"))
+                    is("Bad Request"))
             );
         }
 
@@ -693,7 +691,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
-                    containsString("Request requires correctly formatted JSON"))
+                    is("Bad Request"))
             );
         }
 
@@ -1589,7 +1587,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(exceptionNode.get("message").asText(),
-                        startsWith("Resource not found when getting case type definition for INVALID"))
+                        is("Not Found"))
                 );
             }
 

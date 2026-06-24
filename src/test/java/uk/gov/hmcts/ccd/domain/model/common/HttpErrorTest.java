@@ -97,11 +97,11 @@ public class HttpErrorTest {
     }
 
     @Test
-    public void shouldExtractMessageFromException() {
+    public void shouldUseSafeDefaultMessageFromException() {
         final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
                 new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), request);
 
-        assertThat(error.getMessage(), is(equalTo(MESSAGE)));
+        assertThat(error.getMessage(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_ERROR)));
     }
 
     @Test
