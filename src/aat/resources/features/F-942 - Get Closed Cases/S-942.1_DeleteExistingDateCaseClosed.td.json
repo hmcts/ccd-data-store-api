@@ -25,7 +25,7 @@
       "caseTypeId": "AAT_AUTH_15",
       "state": "Closed",
       "stateCategory": "Closed",
-      "stateChangedDate": "${[scenarioContext][customValues][today]}"
+      "stateChangedDate": "2025-01-01"
     }
   },
 

@@ -204,14 +204,6 @@ public class SubmitCaseTransaction implements AccessControl {
         CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         String stateCategory = caseStateDefinition.getStateCategory();
 
-        log.info(
-            "CME-944 date_case_closed check: caseReference={}, caseTypeId={}, state={}, stateCategory={}",
-            caseDetails.getReference(),
-            caseDetails.getCaseTypeId(),
-            caseDetails.getState(),
-            stateCategory
-        );
-
         if (hasClosedForPaymentCategory(stateCategory)) {
             DateCaseClosedEntity dateCaseClosedEntity = new DateCaseClosedEntity();
             dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
