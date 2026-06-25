@@ -102,6 +102,7 @@ env.PACT_BROKER_PORT = "443"
 env.PACT_BROKER_SCHEME = "https"
 env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED = "true"
 env.APP_INSIGHTS_TELEMETRY_REQUIRED = "true"
+env.APP_INSIGHTS_TRACE_MARKER = "CLA-CCD"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -275,10 +276,21 @@ def runTelemetrySmokeCheck(environment) {
   steps.echo("Running Application Insights telemetry smoke check for ${environment}")
   steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
   steps.echo("Using ${appInsightsEnvironment} Application Insights for ${environment} telemetry check")
+  def requestUrlContains = env.TEST_URL?.trim() ?: ''
+  if (!requestUrlContains && environment == 'preview') {
+    requestUrlContains = "https://ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net"
+  }
+  if (!requestUrlContains && environment == 'aat') {
+    requestUrlContains = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+  }
+  requestUrlContains = requestUrlContains.replaceFirst('^https?://', '').replaceFirst('/.*$', '').toLowerCase()
   def status = steps.sh(
       script: """
         AZURE_CONFIG_DIR='${azureConfigDir}' \\
+        APP_INSIGHTS_SOURCE_ENV='${environment}' \\
         APP_INSIGHTS_ENV='${appInsightsEnvironment}' \\
+        APP_INSIGHTS_REQUEST_URL_CONTAINS='${requestUrlContains}' \\
+        APP_INSIGHTS_TRACE_MARKER='${env.APP_INSIGHTS_TRACE_MARKER}' \\
         ./scripts/check-app-insights-telemetry.sh
       """,
       returnStatus: true
