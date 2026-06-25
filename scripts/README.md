@@ -133,6 +133,52 @@ echo "ENABLE_CASE_GROUP_ACCESS_FILTERING=${ENABLE_CASE_GROUP_ACCESS_FILTERING}"
 ./gradlew runRemoteAAT -PdefinitionStoreHost=http://localhost:4451 -PenableCaseGroupAccessFiltering=true
 ```
 
+### Verify Group Access Definitions
+
+For F-1026, the generated test definitions must be loaded into the running definition-store, not only present under
+`build/tmp`. The expected extracted files are:
+
+| File | Expected content |
+|------|------------------|
+| `build/tmp/BEFTA_MASTER_GROUPACCESS/common/CaseType.json` | `FT_CaseProfessionalGroupAccess` |
+| `build/tmp/BEFTA_MASTER_GROUPACCESS/FT_CaseProfessionalGroupAccess/CaseField.json` | `CaseAccessGroups` and `OrganisationPolicyField` |
+| `build/tmp/BEFTA_MASTER_GROUPACCESS/common/AccessTypeRole.json` | `CaseAssignedRoleField=CaseProfessionalGroupAccess_GA_Role` and `CaseAccessGroupIDTemplate=BEFTA_MASTER:FT_CaseProfessionalGroupAccess:CaseProfessionalGroupAccess_GA_Role:$ORGID$` |
+
+If a F-1026 create-case response returns `201` and removes the submitted `CCD:all-cases-access` entry, then
+`ENABLE_CASE_GROUP_ACCESS_FILTERING=true` is active in data-store. If data-store does not add the replacement
+`CaseAccessGroups` value, the full case type returned by definition-store is missing the matching `AccessTypeRole`
+metadata, or data-store has cached an older case type definition.
+
+Load the group-access definitions into the running local definition-store before starting data-store:
+
+```bash
+cd ../ccd-definition-store-api
+ENABLE_CASE_GROUP_ACCESS=true GROUP_ACCESS_ENABLED=true ./gradlew runRemoteAat
+```
+
+In a second terminal, run the data setup from this repo so BEFTA imports this repo's test definitions into the
+definition-store instance on `localhost:4451`:
+
+```bash
+cd ../ccd-data-store-api
+export AAT_DEFINITION_STORE_HOST=http://localhost:4451
+source ./scripts/aat-env.sh
+./gradlew highLevelDataSetup --args='aat'
+```
+
+Running a targeted functional scenario also performs the same BEFTA definition import before the scenario runs:
+
+```bash
+GROUP_ACCESS_ENABLED=true ./gradlew functional -Ptags='@S-1026.1'
+```
+
+| Check | Expected result | Action if it fails |
+|-------|-----------------|--------------------|
+| `ccd-definition-store-api` started with `ENABLE_CASE_GROUP_ACCESS=true` | Definition-store exposes group-access metadata in case type responses. | Restart definition-store with the flag set before running data-store. |
+| `ccd-data-store-api` started after definition-store is ready | Data-store reads the group-access case type after metadata is available. | Restart data-store to clear the cached case type definition. |
+| Data-store startup uses `-PdefinitionStoreHost=http://localhost:4451 -PenableCaseGroupAccessFiltering=true` | `DEFINITION_STORE_HOST`, `DEFINITION_STORE_URL_BASE`, and `ENABLE_CASE_GROUP_ACCESS_FILTERING` are set for the app process. | Restart data-store with those properties, or export the equivalent env vars before startup. |
+| Local definition-store response for `FT_CaseProfessionalGroupAccess` contains `accessTypeRoles` for `CaseProfessionalGroupAccess_GA_Role` | Data-store has the metadata needed to generate `BEFTA_MASTER:FT_CaseProfessionalGroupAccess:CaseProfessionalGroupAccess_GA_Role:orgID1`. | Re-run `./gradlew highLevelDataSetup --args='aat'` from this repo, or run the targeted functional scenario so BEFTA imports `BEFTA_MASTER_GROUPACCESS`. |
+
 ### AAT S2S URL
 
 For this repo's normal AAT flow, `runRemoteAAT` runs directly on the host machine, not inside Docker. In that setup,
@@ -171,7 +217,7 @@ host-machine Elasticsearch tunnel. It fails fast if Elasticsearch is configured 
 | `FAIL elastic search: AAT ELASTIC_SEARCH_HOSTS/ELASTIC_SEARCH_DATA_NODES_HOSTS uses http://host.docker.internal:<port>` | A Docker-only host alias is configured for the host-based AAT run. | Use the AAT `ccd-data-*` Elasticsearch hosts, or use `http://localhost:<port>` if a local Elasticsearch tunnel is intentionally running on the host. |
 | `401` from `http://localhost:4451/api/data/case-type/<case-type>/version` | The request reached local definition-store, but definition-store rejected data-store's forwarded AAT `Authorization` or `ServiceAuthorization` headers. | Check definition-store logs at the same timestamp. Confirm it was started with `runRemoteAat`, can reach AAT S2S, and allows the `ccd_data` S2S service. |
 | `Timeout connecting to ccd-data-<n>.service.core-compute-aat.internal:9200` or `Exception executing Elasticsearch search: Connection reset` from `/internal/searchCases` | DNS resolved, but data-store could not open or keep a TCP connection to an AAT Elasticsearch data node. | Run `./scripts/check-remote-env.sh aat`. It checks every value in `ELASTIC_SEARCH_HOSTS` or `ELASTIC_SEARCH_DATA_NODES_HOSTS`; all configured nodes should be reachable on port `9200`. If only one node fails, refresh `.aat-remote-env` and check whether that AAT node is down or unreachable from the VPN/bastion route. |
-| `actualResponse.body.case_data.CaseAccessGroups is unavailable` or `actualResponse.body.data_classification.CaseAccessGroups is unavailable` in F-1023/F-1026 | BEFTA ran the scenario, but data-store did not run group-access enrichment or definition-store did not expose the required metadata. | Check the group-access flag table above. Restart data-store with `-PenableCaseGroupAccessFiltering=true` and restart local definition-store with `ENABLE_CASE_GROUP_ACCESS=true`. |
+| `actualResponse.body.case_data.CaseAccessGroups is unavailable` or `actualResponse.body.data_classification.CaseAccessGroups is unavailable` in F-1023/F-1026 | BEFTA ran the scenario. If the submitted `CCD:all-cases-access` entry was removed, data-store filtering is active but no matching `AccessTypeRole` metadata was available. | Use the group-access definition checks above. Restart definition-store first with `ENABLE_CASE_GROUP_ACCESS=true`, then restart data-store with `-PdefinitionStoreHost=http://localhost:4451 -PenableCaseGroupAccessFiltering=true` so it does not use a stale cached case type. |
 
 If `DATA_STORE_DB_HOST` is missing from the Key Vault value, the Gradle helper adds the standard host for the selected
 environment:
