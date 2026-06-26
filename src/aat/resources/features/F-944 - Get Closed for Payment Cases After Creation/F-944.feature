@@ -1,5 +1,5 @@
 @F-944
-Feature: F-944: Get closed for payment cases
+Feature: F-944: Get closed for payment cases after creation
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
