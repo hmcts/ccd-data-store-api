@@ -220,6 +220,33 @@ query_telemetry_counts() {
   printf '%s %s %s %s %s %s\n' "$1" "$2" "$3" "$4" "$5" "$6"
 }
 
+query_telemetry_samples() {
+  sample_query="$1"
+  escaped_sample_query="$(json_escape "$sample_query")"
+  sample_body="{\"query\":\"${escaped_sample_query}\"}"
+  error_file="$(mktemp)"
+
+  if ! samples=$(az rest \
+      --method post \
+      --uri "$app_insights_query_uri" \
+      --headers "Content-Type=application/json" \
+      --body "$sample_body" \
+      --query "tables[0].rows" \
+      --output tsv 2>"$error_file"); then
+    echo "Failed to query telemetry samples from Application Insights:" >&2
+    cat "$error_file" >&2
+    rm -f "$error_file"
+    return
+  fi
+  rm -f "$error_file"
+
+  if [ -n "$samples" ]; then
+    printf '%s\n' "$samples"
+  else
+    echo "<no samples>"
+  fi
+}
+
 role_name="$(kql_escape "$APP_INSIGHTS_ROLE_NAME")"
 base_filter="timestamp > ago(${APP_INSIGHTS_LOOKBACK}) | where cloud_RoleName == '${role_name}'"
 request_url_filter=""
@@ -260,6 +287,9 @@ fi
 telemetry_query="${telemetry_query} print RequestCount=toscalar(matching_requests | summarize Count=count()), RoleRequestCount=toscalar(filtered_requests | summarize Count=count()), DependencyCount=${dependency_count_expression}, RoleDependencyCount=${role_dependency_count_expression}, TraceCount=${trace_count_expression}, RoleTraceMarkerCount=${role_trace_marker_count_expression}"
 escaped_telemetry_query="$(json_escape "$telemetry_query")"
 telemetry_query_body="{\"query\":\"${escaped_telemetry_query}\"}"
+
+sample_filter="timestamp > ago(${APP_INSIGHTS_LOOKBACK}) | where cloud_RoleName == '${role_name}'"
+telemetry_sample_query="requests | where ${sample_filter} | summarize Count=count() by cloud_RoleInstance, url | order by Count desc | take 10"
 
 deadline=$(( $(date +%s) + APP_INSIGHTS_TIMEOUT_SECONDS ))
 
@@ -341,6 +371,8 @@ while true; do
       echo "  - role trace telemetry containing '${APP_INSIGHTS_TRACE_MARKER}': ${role_trace_marker_count}"
       echo "  - correlated trace telemetry containing '${APP_INSIGHTS_TRACE_MARKER}': ${trace_count}"
     fi
+    echo "Sample request telemetry for role '${APP_INSIGHTS_ROLE_NAME}' within ${APP_INSIGHTS_LOOKBACK}:"
+    query_telemetry_samples "$telemetry_sample_query"
     exit "$TELEMETRY_FAILURE_EXIT_CODE"
   fi
 
