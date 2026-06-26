@@ -225,7 +225,7 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('functionalTest:preview') {
-        runTelemetrySmokeCheck('preview')
+        runTelemetrySmokeCheckAfterFunctional('preview')
     }
 
     afterAlways('functionalTest:aat') {
@@ -241,7 +241,7 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('functionalTest:aat') {
-        runTelemetrySmokeCheck('aat')
+        runTelemetrySmokeCheckAfterFunctional('aat')
     }
 
     afterAlways('pact-provider-verification') {
@@ -262,6 +262,14 @@ withPipeline(type, product, component) {
  */
 def copyIgnore(filePath, destinationDir) {
   steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
+}
+
+def runTelemetrySmokeCheckAfterFunctional(environment) {
+  steps.stage("Application Insights telemetry - ${environment}") {
+    steps.catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+      runTelemetrySmokeCheck(environment)
+    }
+  }
 }
 
 def runTelemetrySmokeCheck(environment) {
