@@ -293,12 +293,14 @@ def runTelemetrySmokeCheck(environment) {
     requestUrlContains = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   }
   requestUrlContains = requestUrlContains.replaceFirst('^https?://', '').replaceFirst('/.*$', '').toLowerCase()
+  def roleInstanceContains = environment == 'preview' ? "ccd-data-store-api-${env.BRANCH_NAME}".toLowerCase() : ''
   def status = steps.sh(
       script: """
         AZURE_CONFIG_DIR='${azureConfigDir}' \\
         APP_INSIGHTS_SOURCE_ENV='${environment}' \\
         APP_INSIGHTS_ENV='${appInsightsEnvironment}' \\
         APP_INSIGHTS_REQUEST_URL_CONTAINS='${requestUrlContains}' \\
+        APP_INSIGHTS_ROLE_INSTANCE_CONTAINS='${roleInstanceContains}' \\
         APP_INSIGHTS_TRACE_MARKER='${env.APP_INSIGHTS_TRACE_MARKER}' \\
         ./scripts/check-app-insights-telemetry.sh
       """,

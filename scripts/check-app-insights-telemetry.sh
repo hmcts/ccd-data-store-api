@@ -27,8 +27,9 @@ APP_INSIGHTS_LOOKBACK="${APP_INSIGHTS_LOOKBACK:-$DEFAULT_APP_INSIGHTS_LOOKBACK}"
 APP_INSIGHTS_TIMEOUT_SECONDS="${APP_INSIGHTS_TIMEOUT_SECONDS:-$DEFAULT_APP_INSIGHTS_TIMEOUT_SECONDS}"
 APP_INSIGHTS_POLL_SECONDS="${APP_INSIGHTS_POLL_SECONDS:-$DEFAULT_APP_INSIGHTS_POLL_SECONDS}"
 APP_INSIGHTS_SOURCE_ENV="${APP_INSIGHTS_SOURCE_ENV:-${APP_INSIGHTS_ENV}}"
-# Optional request URL host/path filter. Use it to scope shared App Insights data to this pipeline's app instance.
+# Optional filters. Use at least one to scope shared App Insights data to this pipeline's app instance.
 APP_INSIGHTS_REQUEST_URL_CONTAINS="${APP_INSIGHTS_REQUEST_URL_CONTAINS:-}"
+APP_INSIGHTS_ROLE_INSTANCE_CONTAINS="${APP_INSIGHTS_ROLE_INSTANCE_CONTAINS:-}"
 APP_INSIGHTS_TRACE_MARKER="${APP_INSIGHTS_TRACE_MARKER:-}"
 APP_INSIGHTS_API_VERSION="${APP_INSIGHTS_API_VERSION:-$DEFAULT_APP_INSIGHTS_API_VERSION}"
 REQUIRE_DEPENDENCY_TELEMETRY="${REQUIRE_DEPENDENCY_TELEMETRY:-true}"
@@ -39,6 +40,14 @@ if [ "$APP_INSIGHTS_SOURCE_ENV" = "$PREVIEW_ENV" ] && [ -z "$APP_INSIGHTS_REQUES
   case "${BRANCH_NAME:-}" in
     PR-*|pr-*)
       APP_INSIGHTS_REQUEST_URL_CONTAINS="$(printf '%s' "${APP_INSIGHTS_ROLE_NAME}-${BRANCH_NAME}.preview.platform.hmcts.net" | tr '[:upper:]' '[:lower:]')"
+      ;;
+  esac
+fi
+
+if [ "$APP_INSIGHTS_SOURCE_ENV" = "$PREVIEW_ENV" ] && [ -z "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ]; then
+  case "${BRANCH_NAME:-}" in
+    PR-*|pr-*)
+      APP_INSIGHTS_ROLE_INSTANCE_CONTAINS="$(printf '%s' "${APP_INSIGHTS_ROLE_NAME}-${BRANCH_NAME}" | tr '[:upper:]' '[:lower:]')"
       ;;
   esac
 fi
@@ -104,8 +113,9 @@ if is_true "$REQUIRE_TRACE_TELEMETRY"; then
   require_trace_telemetry=true
 fi
 
-if [ -z "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ] && ! is_true "$ALLOW_UNSCOPED_TELEMETRY_CHECK"; then
-  echo "Telemetry check requires APP_INSIGHTS_REQUEST_URL_CONTAINS to scope shared App Insights data." >&2
+if [ -z "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ] && [ -z "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ] \
+    && ! is_true "$ALLOW_UNSCOPED_TELEMETRY_CHECK"; then
+  echo "Telemetry check requires APP_INSIGHTS_REQUEST_URL_CONTAINS or APP_INSIGHTS_ROLE_INSTANCE_CONTAINS to scope shared App Insights data." >&2
   echo "Set ALLOW_UNSCOPED_TELEMETRY_CHECK=true only for intentional broad role-level checks." >&2
   exit "$CONFIG_ERROR_EXIT_CODE"
 fi
@@ -214,7 +224,12 @@ role_name="$(kql_escape "$APP_INSIGHTS_ROLE_NAME")"
 base_filter="timestamp > ago(${APP_INSIGHTS_LOOKBACK}) | where cloud_RoleName == '${role_name}'"
 request_url_filter=""
 
-if [ -n "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ]; then
+if [ -n "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ]; then
+  role_instance_contains="$(kql_escape "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS")"
+  base_filter="${base_filter} | where cloud_RoleInstance contains '${role_instance_contains}'"
+fi
+
+if [ -z "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ] && [ -n "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ]; then
   request_url_contains="$(kql_escape "$APP_INSIGHTS_REQUEST_URL_CONTAINS")"
   request_url_filter=" | where url contains '${request_url_contains}'"
 fi
@@ -253,6 +268,7 @@ echo "  app: ${APP_INSIGHTS_APP_NAME}"
 echo "  resource group: ${APP_INSIGHTS_RESOURCE_GROUP}"
 echo "  resource id: ${APP_INSIGHTS_RESOURCE_ID:-}"
 echo "  cloud role: ${APP_INSIGHTS_ROLE_NAME}"
+echo "  role instance contains: ${APP_INSIGHTS_ROLE_INSTANCE_CONTAINS:-<not set>}"
 echo "  source env: ${APP_INSIGHTS_SOURCE_ENV}"
 echo "  request URL contains: ${APP_INSIGHTS_REQUEST_URL_CONTAINS:-<not set>}"
 echo "  marker: ${APP_INSIGHTS_TRACE_MARKER:-<not required>}"
