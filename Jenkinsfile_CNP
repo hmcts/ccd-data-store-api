@@ -1,6 +1,7 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import groovy.transform.Field
 properties(
     [
         [
@@ -84,7 +85,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-def vaultOverrides = [
+@Field Map<String, String> vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
