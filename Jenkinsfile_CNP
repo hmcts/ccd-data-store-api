@@ -12,7 +12,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@DTSPO-30107-jenkins-agents")
 
 import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"

@@ -1,5 +1,5 @@
 #!groovy
-@Library("Infrastructure") _
+@Library("Infrastructure@DTSPO-30107-jenkins-agents") _
 
 properties([
     parameters([
