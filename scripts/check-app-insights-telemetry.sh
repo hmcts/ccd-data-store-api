@@ -44,14 +44,6 @@ if [ "$APP_INSIGHTS_SOURCE_ENV" = "$PREVIEW_ENV" ] && [ -z "$APP_INSIGHTS_REQUES
   esac
 fi
 
-if [ "$APP_INSIGHTS_SOURCE_ENV" = "$PREVIEW_ENV" ] && [ -z "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ]; then
-  case "${BRANCH_NAME:-}" in
-    PR-*|pr-*)
-      APP_INSIGHTS_ROLE_INSTANCE_CONTAINS="$(printf '%s' "${APP_INSIGHTS_ROLE_NAME}-${BRANCH_NAME}" | tr '[:upper:]' '[:lower:]')"
-      ;;
-  esac
-fi
-
 is_true() {
   case "$1" in
     true|TRUE|True|1|yes|YES|Yes) return 0 ;;
@@ -249,16 +241,20 @@ query_telemetry_samples() {
 
 role_name="$(kql_escape "$APP_INSIGHTS_ROLE_NAME")"
 base_filter="timestamp > ago(${APP_INSIGHTS_LOOKBACK}) | where cloud_RoleName == '${role_name}'"
-request_url_filter=""
+matching_request_filter=""
 
 if [ -n "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ]; then
   role_instance_contains="$(kql_escape "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS")"
-  base_filter="${base_filter} | where cloud_RoleInstance contains '${role_instance_contains}'"
+  matching_request_filter=" | where cloud_RoleInstance contains '${role_instance_contains}'"
 fi
 
-if [ -z "$APP_INSIGHTS_ROLE_INSTANCE_CONTAINS" ] && [ -n "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ]; then
+if [ -n "$APP_INSIGHTS_REQUEST_URL_CONTAINS" ]; then
   request_url_contains="$(kql_escape "$APP_INSIGHTS_REQUEST_URL_CONTAINS")"
-  request_url_filter=" | where url contains '${request_url_contains}'"
+  if [ -n "$matching_request_filter" ]; then
+    matching_request_filter=" | where cloud_RoleInstance contains '${role_instance_contains}' or url contains '${request_url_contains}'"
+  else
+    matching_request_filter=" | where url contains '${request_url_contains}'"
+  fi
 fi
 
 dependency_count_expression="$DISABLED_TELEMETRY_COUNT_EXPRESSION"
@@ -267,7 +263,7 @@ trace_count_expression="$DISABLED_TELEMETRY_COUNT_EXPRESSION"
 role_trace_marker_count_expression="$DISABLED_TELEMETRY_COUNT_EXPRESSION"
 
 telemetry_query="let filtered_requests = requests | where ${base_filter};"
-telemetry_query="${telemetry_query} let matching_requests = filtered_requests${request_url_filter} | project operation_Id;"
+telemetry_query="${telemetry_query} let matching_requests = filtered_requests${matching_request_filter} | project operation_Id;"
 telemetry_query="${telemetry_query} let request_operations = matching_requests | distinct operation_Id;"
 
 if [ "$require_dependency_telemetry" = "true" ]; then
