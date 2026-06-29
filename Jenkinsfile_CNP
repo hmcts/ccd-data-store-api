@@ -89,6 +89,10 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     'preview' : 'aat',
     'spreview': 'saat'
 ]
+
+@Field Map<String, String> appInsightsEnvironmentOverrides = [
+    'spreview': 'saat'
+]
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -280,7 +284,7 @@ def runTelemetrySmokeCheck(environment) {
   }
 
   def azureConfigDir = env.AZURE_CONFIG_DIR?.trim() ?: '/opt/jenkins/.azure-nonprod'
-  def appInsightsEnvironment = vaultOverrides[environment] ?: environment
+  def appInsightsEnvironment = appInsightsEnvironmentOverrides[environment] ?: environment
 
   steps.echo("Running Application Insights telemetry smoke check for ${environment}")
   steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
