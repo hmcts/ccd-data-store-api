@@ -90,8 +90,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     'spreview': 'saat'
 ]
 
-@Field Map<String, String> appInsightsEnvironmentOverrides = [
-    'spreview': 'saat'
+@Field Map<String, String> appInsightsResourceGroupOverrides = [
+    'preview': 'ccd-shared'
 ]
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
@@ -284,11 +284,13 @@ def runTelemetrySmokeCheck(environment) {
   }
 
   def azureConfigDir = env.AZURE_CONFIG_DIR?.trim() ?: '/opt/jenkins/.azure-nonprod'
-  def appInsightsEnvironment = appInsightsEnvironmentOverrides[environment] ?: environment
+  def appInsightsEnvironment = environment
+  def appInsightsResourceGroup = appInsightsResourceGroupOverrides[environment] ?: ''
 
   steps.echo("Running Application Insights telemetry smoke check for ${environment}")
   steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
   steps.echo("Using ${appInsightsEnvironment} Application Insights for ${environment} telemetry check")
+  steps.echo("Using Application Insights resource group: ${appInsightsResourceGroup ?: 'default'}")
   steps.echo("Functional TEST_URL for ${environment}: ${env.TEST_URL ?: '<not set>'}")
   def requestUrlContains = environment == 'preview' ? (env.TEST_URL?.trim() ?: '') : ''
   if (!requestUrlContains && environment == 'aat') {
@@ -300,6 +302,7 @@ def runTelemetrySmokeCheck(environment) {
         AZURE_CONFIG_DIR='${azureConfigDir}' \\
         APP_INSIGHTS_SOURCE_ENV='${environment}' \\
         APP_INSIGHTS_ENV='${appInsightsEnvironment}' \\
+        APP_INSIGHTS_RESOURCE_GROUP='${appInsightsResourceGroup}' \\
         APP_INSIGHTS_REQUEST_URL_CONTAINS='${requestUrlContains}' \\
         APP_INSIGHTS_TRACE_MARKER='${env.APP_INSIGHTS_TRACE_MARKER}' \\
         ./scripts/check-app-insights-telemetry.sh
