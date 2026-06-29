@@ -286,10 +286,7 @@ def runTelemetrySmokeCheck(environment) {
   steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
   steps.echo("Using ${appInsightsEnvironment} Application Insights for ${environment} telemetry check")
   steps.echo("Functional TEST_URL for ${environment}: ${env.TEST_URL ?: '<not set>'}")
-  def requestUrlContains = env.TEST_URL?.trim() ?: ''
-  if (!requestUrlContains && environment == 'preview') {
-    requestUrlContains = "https://ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net"
-  }
+  def requestUrlContains = environment == 'preview' ? (env.TEST_URL?.trim() ?: '') : ''
   if (!requestUrlContains && environment == 'aat') {
     requestUrlContains = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   }
