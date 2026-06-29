@@ -399,8 +399,19 @@ public class CaseDetailsEndpoint {
                                                     content);
     }
 
+    /**
+     * Gets printable documents for a case (deprecated).
+     *
+     * @deprecated This endpoint is deprecated and will be removed in a future release.
+     *     Use {@code /{caseId}/documents} instead.
+     */
+    @Deprecated
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
-    @Operation(summary = "Get a list of printable documents for the given case id ")
+    @Operation(
+        summary = "Get a list of printable documents for the given case id",
+        deprecated = true,
+        description = "Deprecated. Use /{caseId}/documents instead."
+    )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Documents list for the given case id")
     })

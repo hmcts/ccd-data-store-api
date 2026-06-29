@@ -569,7 +569,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "TEST", false);
+                "TEST");
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
@@ -584,7 +584,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource =
-                executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782", false);
+                executeRequest(searchRequest, CASE_TYPE_A, "RDM-8782");
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             List<String> expectedFields = Collections.singletonList(EMAIL_FIELD);
@@ -612,7 +612,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-                "RDM-8782NOACCESS", false);
+                "RDM-8782NOACCESS");
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().getFirst();
 
             assertAll(

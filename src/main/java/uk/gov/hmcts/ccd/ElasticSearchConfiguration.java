@@ -17,7 +17,6 @@ import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchMappings;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableConfigurationProperties(ElasticsearchMappings.class)
@@ -59,12 +60,12 @@ public class ElasticSearchConfiguration {
 
     @Bean
     public ElasticsearchClient elasticsearchClient(ObjectMapper objectMapper) {
+        HttpHost[] esHosts = applicationParams.getElasticSearchDataHosts().stream()
+            .map(HttpHost::create)
+            .toArray(HttpHost[]::new);
+        Arrays.stream(esHosts).forEach(host -> log.info("ES Host: {}", host));
 
-        RestClientBuilder builder = RestClient.builder(
-                new HttpHost(
-                    getElasticsearchHost(),
-                    applicationParams.getElasticSearchPort(),
-                    HttpHost.DEFAULT_SCHEME_NAME))
+        RestClientBuilder builder = RestClient.builder(esHosts)
             .setFailureListener(new RestClient.FailureListener() {
                 @Override
                 public void onFailure(Node node) {
@@ -97,17 +98,4 @@ public class ElasticSearchConfiguration {
                     .build()
             );
     }
-
-    private String getElasticsearchHost() {
-        String esHost = stripProtocolAndPort(applicationParams.getElasticSearchHosts().getFirst());
-        log.info("esHost: {}", esHost);
-        return esHost;
-    }
-
-    public String stripProtocolAndPort(String url) {
-        String noProtocol = url.replaceFirst("^https?://", "");
-        // Remove port (e.g., :9200)
-        return noProtocol.replaceFirst(":\\d+$", "");
-    }
-
 }

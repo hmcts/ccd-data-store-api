@@ -150,6 +150,8 @@ public class ElasticsearchTestHelper {
             .contentType(MediaType.APPLICATION_JSON)
             .content(searchRequest.toJsonString())
             .param(CASE_TYPE_ID_PARAM, caseTypeParam);
+        LOG.info("Executing request: {} with param: {}={} and body: {}", url, CASE_TYPE_ID_PARAM, caseTypeParam,
+            searchRequest.toJsonString());
 
         StringBuilder msgInfo = new StringBuilder("Executing request: ").append(url).append(" with params: ")
             .append(CASE_TYPE_ID_PARAM).append("=").append(caseTypeParam);
