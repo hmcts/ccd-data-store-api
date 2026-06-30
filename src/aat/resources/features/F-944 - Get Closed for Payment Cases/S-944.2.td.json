@@ -1,6 +1,6 @@
 {
   "_guid_": "S-944.2",
-  "_extends_": "F-944_Test_Data_Base",
+  "_extends_": "F-944_Get_Closed_For_Payment_Cases_Base",
   "title": "Do not return created case when state category is not closed for payment",
 
   "specs": [

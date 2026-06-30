@@ -445,7 +445,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     void shouldUseAboutToSubmitStateOverrideWhenUpdatingDateCaseClosed() throws Exception {
         CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
         CaseStateDefinition newState = state(POST_STATE, "End");
-
         String callbackState = "CallbackClosedForPayment";
 
         CaseStateDefinition callbackStateDefinition = new CaseStateDefinition();

@@ -14,5 +14,29 @@
     "CaseEventID": "createNotClosedForPaymentCase",
     "UserRole": "caseworker-befta_master",
     "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "CaseEventID": "updateToClosedForPaymentCase",
+    "UserRole": "caseworker-befta_master",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "CaseEventID": "updateToNotClosedForPaymentCase",
+    "UserRole": "caseworker-befta_master",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "CaseEventID": "updateToNotClosedForPaymentCaseFromNotClosed",
+    "UserRole": "caseworker-befta_master",
+    "CRUD": "CRUD"
   }
 ]

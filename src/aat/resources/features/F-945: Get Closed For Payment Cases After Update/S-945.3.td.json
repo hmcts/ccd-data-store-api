@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-944.1",
+  "_guid_": "S-945.3",
   "_extends_": "F-944_Get_Closed_For_Payment_Cases_Base",
-  "title": "Return created case when state category is closed for payment",
+  "title": "Do not return updated case after moving out of closed for payment state",
 
   "specs": [
     "an active profile in CCD",
