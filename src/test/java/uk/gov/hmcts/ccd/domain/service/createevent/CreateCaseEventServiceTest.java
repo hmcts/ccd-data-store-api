@@ -382,9 +382,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Test
     @DisplayName("should save date case closed when case moves into closed for payment state category")
     void shouldSaveDateCaseClosedWhenCaseMovesIntoClosedForPaymentStateCategory() throws Exception {
-        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
-        CaseStateDefinition newState = state(POST_STATE, "CLOSED FOR PAYMENT,End");
-
         // Case object after save
         CaseDetails savedCaseDetails = caseDetails.shallowClone();
         savedCaseDetails.setState(POST_STATE);
@@ -393,6 +390,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         // Case object during update before save
         CaseDetails updatedCaseDetails = caseDetails.shallowClone();
+
+        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
+        CaseStateDefinition newState = state(POST_STATE, "CLOSED FOR PAYMENT,End");
 
         doReturn(caseDetailsBefore, updatedCaseDetails).when(caseService).clone(caseDetails);
         doReturn(previousState).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
@@ -418,9 +418,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @DisplayName("should remove date case closed when case moves out of closed for payment state category")
     void shouldRemoveDateCaseClosedWhenCaseMovesOutOfClosedForPaymentStateCategory() throws Exception {
         String closedForPaymentState = "ClosedForPayment";
-        CaseStateDefinition previousState = state(closedForPaymentState, "CLOSED FOR PAYMENT,End");
-        CaseStateDefinition newState = state(POST_STATE, "End");
-
         caseDetails.setState(closedForPaymentState);
         caseDetailsBefore.setState(closedForPaymentState);
 
@@ -428,6 +425,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         CaseDetails savedCaseDetails = caseDetails.shallowClone();
         savedCaseDetails.setState(POST_STATE);
         savedCaseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+
+        CaseStateDefinition previousState = state(closedForPaymentState, "CLOSED FOR PAYMENT,End");
+        CaseStateDefinition newState = state(POST_STATE, "End");
 
         doReturn(caseDetailsBefore, updatedCaseDetails).when(caseService).clone(caseDetails);
         doReturn(true).when(eventTriggerService).isPreStateValid(closedForPaymentState, caseEventDefinition);
@@ -443,8 +443,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Test
     @DisplayName("should use about to submit state override when updating date case closed")
     void shouldUseAboutToSubmitStateOverrideWhenUpdatingDateCaseClosed() throws Exception {
-        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
-        CaseStateDefinition newState = state(POST_STATE, "End");
         String callbackState = "CallbackClosedForPayment";
 
         CaseStateDefinition callbackStateDefinition = new CaseStateDefinition();
@@ -469,6 +467,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
             any());
         // Return the callback-mutated case as the saved final case
         doAnswer(invocation -> invocation.getArgument(0)).when(caseDetailsRepository).set(any(CaseDetails.class));
+        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
+        CaseStateDefinition newState = state(POST_STATE, "End");
         doReturn(previousState).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
         doReturn(newState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(callbackStateDefinition).when(caseTypeService).findState(caseTypeDefinition, callbackState);
