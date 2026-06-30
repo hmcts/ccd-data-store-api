@@ -48,10 +48,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.InOrder;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -221,7 +223,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should reject validate when user has no access profiles for case")
+    @DisplayName("should reject validate when user has no access profiles for case before mid event")
     void shouldRejectValidateWhenUserHasNoAccessProfilesForCase() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -231,12 +233,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(Set.of());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         assertThrows(ValidationException.class,
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -613,7 +614,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw when create case user has no roles")
+    @DisplayName("should throw when create case user has no roles before mid event")
     void shouldThrowWhenCreateCaseUserHasNoRoles() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -621,7 +622,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setData(emptyMap());
 
         when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(Set.of());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -629,11 +629,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals("Cannot find user roles for the user", exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
-    @DisplayName("should throw when create case type access is denied")
+    @DisplayName("should throw when create case type access is denied before mid event")
     void shouldThrowWhenCreateCaseTypeAccessDenied() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -642,7 +642,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_CREATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -650,11 +649,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
-    @DisplayName("should throw when create case event access is denied")
+    @DisplayName("should throw when create case event access is denied before mid event")
     void shouldThrowWhenCreateCaseEventAccessDenied() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -663,7 +662,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), eq(CAN_CREATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -671,7 +669,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_EVENT_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -758,7 +756,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw when update case is not found")
+    @DisplayName("should throw when update case is not found before mid event")
     void shouldThrowWhenUpdateCaseNotFound() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -766,7 +764,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setData(emptyMap());
 
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -774,11 +771,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals("Case not found", exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
-    @DisplayName("should throw when update case type access is denied")
+    @DisplayName("should throw when update case type access is denied before mid event")
     void shouldThrowWhenUpdateCaseTypeAccessDenied() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -787,7 +784,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), eq(CAN_UPDATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -795,11 +791,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_TYPE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
-    @DisplayName("should throw when update case state access is denied")
+    @DisplayName("should throw when update case state access is denied before mid event")
     void shouldThrowWhenUpdateCaseStateAccessDenied() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
@@ -808,7 +804,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseStateWithCriteria(anyString(), any(), any(), eq(CAN_UPDATE)))
             .thenReturn(false);
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -816,7 +811,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
         assertEquals(NO_CASE_STATE_FOUND, exception.getMessage());
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
     }
 
     @Test
@@ -860,14 +855,13 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should invoke mid event before rejecting when user lacks case event access")
-    void shouldInvokeMidEventBeforeRejectingWhenUserLacksCaseEventAccess() {
+    @DisplayName("should not invoke mid event when user lacks case event access")
+    void shouldNotInvokeMidEventWhenUserLacksCaseEventAccess() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
         content.setCaseReference(CASE_REFERENCE);
         content.setData(new HashMap<>());
 
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), any()))
             .thenReturn(false);
 
@@ -876,7 +870,33 @@ class AuthorisedValidateCaseFieldsOperationTest {
         assertThrows(ResourceNotFoundException.class,
             () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
 
-        verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+    }
+
+    @Test
+    @DisplayName("should verify event access before invoking mid event callback")
+    void shouldVerifyEventAccessBeforeInvokingMidEventCallback() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setCaseReference(CASE_REFERENCE);
+        content.setData(emptyMap());
+
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
+
+        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
+
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
+
+        InOrder inOrder = inOrder(accessControlService, midEventCallback);
+        inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(
+            eq(EVENT_ID), any(), any(), eq(CAN_CREATE));
+        inOrder.verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
     private static void attachEvent(CaseDataContent content) {

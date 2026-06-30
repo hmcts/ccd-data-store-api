@@ -84,20 +84,20 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         validateCaseFieldsOperation.validateCaseDetails(operationContext);
 
         CaseDataContent content = operationContext.content();
-        String caseTypeId = operationContext.caseTypeId();
-        String pageId = operationContext.pageId();
 
         resolveCaseReferenceFromEventToken(content);
 
+        final String caseTypeId = operationContext.caseTypeId();
+        final String pageId = operationContext.pageId();
         if (StringUtils.isNotBlank(pageId)) {
             verifyEventIsPresent(content);
         }
 
-        callMidEventCallback(caseTypeId, content, pageId);
-
         if (StringUtils.isNotBlank(pageId)) {
-            verifyEventAccessAfterMidEvent(operationContext, content);
+            verifyEventAccessBeforeMidEvent(operationContext, content);
         }
+
+        callMidEventCallback(caseTypeId, content, pageId);
 
         if (applicationParams.getExcludeVerifyAccessCaseTypesForValidate()
             .stream()
@@ -130,7 +130,7 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         }
     }
 
-    private void verifyEventAccessAfterMidEvent(OperationContext operationContext, CaseDataContent content) {
+    private void verifyEventAccessBeforeMidEvent(OperationContext operationContext, CaseDataContent content) {
         String caseTypeId = operationContext.caseTypeId();
 
         final CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(caseTypeId);
