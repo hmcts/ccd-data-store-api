@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCas
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface CaseDetailsMapper {
 
-    String EMPTY_MAP = "java(new HashMap<>())";
+    String EMPTY_MAP = "java(new java.util.HashMap<>())";
 
     @Mapping(source = "data", target = "data", defaultExpression = EMPTY_MAP)
     @Mapping(source = "dataClassification", target = "dataClassification", defaultExpression = EMPTY_MAP)

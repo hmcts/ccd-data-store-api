@@ -206,4 +206,58 @@ class CaseDocumentUtilsTest extends TestFixtures {
             Arguments.of(List.of(HASH_TOKEN_B2), List.of(HASH_TOKEN_B2))
         );
     }
+
+    @Test
+    void testShouldExtractDocumentIds() throws Exception {
+        // Given
+        final Map<String, JsonNode> caseData = fromFileAsMap("case-data.json");
+        final Set<String> expectedDocumentIds = Set.of(
+            "19de0db3-37c6-4191-a81d-c31a1379a9ca",
+            "77ad6295-59ce-4167-8f1e-4aa711ba2c00",
+            "80e9471e-0f67-42ef-8739-170aa1942363",
+            "c6924316-4146-441d-a66d-6e181c48cb09",
+            "cdab9cf7-1b38-4245-9c91-e098d28f6404",
+            "f1f9a2c2-c309-4060-8f77-1800be0c85a8",
+            "2b01ebbc-d6e5-4ee5-9a80-58b28cb623ec",
+            "7654b1e0-5df6-47c4-a5a0-3ec79fc78cfb",
+            "f8e7f506-e8bd-4886-bd08-d4f70e9c84f6",
+            "84f04693-56ae-4aad-97e8-d1fc7592acea",
+            "f6d623f2-db67-4a01-ae6e-3b6ee14a8b20",
+            "5a16b8ed-c62f-41b3-b3c9-1df20b6a9979",
+            "f51456a2-7b25-4855-844a-81c9763bc02c"
+        );
+
+        // When
+        final Set<String> actualDocumentIds = underTest.findDocumentIds(caseData);
+
+        // Then
+        assertThat(actualDocumentIds)
+                .isNotNull()
+                .hasSameElementsAs(expectedDocumentIds);
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions"})
+    void testShouldRaiseExceptionWhenCaseDataIsNullForDocumentIds() {
+        // When
+        final Throwable thrown = catchThrowable(() -> underTest.findDocumentIds(null));
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void testShouldReturnEmptySetWhenCaseDataIsEmptyForDocumentIds() {
+        // Given
+        final Map<String, JsonNode> emptyCaseData = Map.of();
+
+        // When
+        final Set<String> actualDocumentIds = underTest.findDocumentIds(emptyCaseData);
+
+        // Then
+        assertThat(actualDocumentIds)
+                .isNotNull()
+                .isEmpty();
+    }
 }

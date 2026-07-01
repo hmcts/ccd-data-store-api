@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

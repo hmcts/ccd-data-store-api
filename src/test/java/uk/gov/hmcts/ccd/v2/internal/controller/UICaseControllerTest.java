@@ -66,7 +66,7 @@ class UICaseControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseView.getCaseId()).thenReturn(CASE_REFERENCE);
         when(caseHistoryView.getCaseId()).thenReturn(CASE_REFERENCE);

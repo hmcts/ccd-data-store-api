@@ -1,9 +1,15 @@
 package uk.gov.hmcts.ccd;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.function.Resolver;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,18 +21,17 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
-    private PoolingHttpClientConnectionManager cm;
+    private final List<PoolingHttpClientConnectionManager> connectionManagers = new ArrayList<>();
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -68,9 +73,8 @@ class RestTemplateConfiguration {
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
-            new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        requestFactory.setReadTimeout(readTimeout);
-        LOG.info("readTimeout: {}", readTimeout);
+            new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
+        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
         restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
     }
@@ -81,8 +85,7 @@ class RestTemplateConfiguration {
         final RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
-        requestFactory.setReadTimeout(readTimeout);
-        LOG.info("readTimeout: {}", readTimeout);
+        LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
         restTemplate.setRequestFactory(requestFactory);
 
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
@@ -116,35 +119,29 @@ class RestTemplateConfiguration {
     @PreDestroy
     void close() {
         LOG.info("PreDestroy called");
-        if (null != cm) {
+        connectionManagers.forEach(cm -> {
             LOG.info("closing connection manager");
             cm.close();
-        }
+        });
     }
 
     private HttpClient getHttpClient() {
-        return getHttpClient(connectionTimeout);
+        return getHttpClient(connectionTimeout, readTimeout);
     }
 
-    private HttpClient getHttpClient(final int timeout) {
-        cm = new PoolingHttpClientConnectionManager();
+    private HttpClient getHttpClient(final int connectTimeout) {
+        return getHttpClient(connectTimeout, readTimeout);
+    }
 
-        LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
-        LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
-        LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
-        LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
-        LOG.info("connectionTimeout: {}", timeout);
+    private HttpClient getHttpClient(final int connectTimeout, final int readTimeout) {
+        PoolingHttpClientConnectionManager cm = buildConnectionManager(connectTimeout, readTimeout);
+        connectionManagers.add(cm);
 
-        cm.setMaxTotal(maxTotalHttpClient);
-        cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
-        cm.setDefaultMaxPerRoute(maxClientPerRoute);
-        cm.setValidateAfterInactivity(validateAfterInactivity);
-        final RequestConfig
-            config =
+        final RequestConfig config =
             RequestConfig.custom()
-                         .setConnectTimeout(timeout)
-                         .setConnectionRequestTimeout(timeout)
-                         .setSocketTimeout(timeout)
+                         .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeout))
+                         .setResponseTimeout(Timeout.ofMilliseconds(readTimeout))
+                         .setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
                          .build();
 
         return HttpClientBuilder.create()
@@ -152,5 +149,41 @@ class RestTemplateConfiguration {
                                 .setDefaultRequestConfig(config)
                                 .setConnectionManager(cm)
                                 .build();
+    }
+
+    private PoolingHttpClientConnectionManager buildConnectionManager(final int connectTimeout,
+                                                                      final int readTimeout) {
+        LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
+        LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
+        LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
+        LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
+        LOG.info("connectionTimeout: {}, readTimeout: {} ", connectTimeout, readTimeout);
+
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(maxTotalHttpClient);
+        cm.closeIdle(TimeValue.ofSeconds(maxSecondsIdleConnection));
+        cm.setDefaultMaxPerRoute(maxClientPerRoute);
+        Resolver<HttpRoute, ConnectionConfig> connectionConfigResolver = new Resolver<HttpRoute,ConnectionConfig>() {
+            @Override
+            public ConnectionConfig resolve(HttpRoute route) {
+                return ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+                        .setSocketTimeout(Timeout.ofMilliseconds(readTimeout))
+                        .setValidateAfterInactivity(TimeValue.ofMilliseconds(validateAfterInactivity))
+                        .build();
+            }
+        };
+        cm.setConnectionConfigResolver(connectionConfigResolver);
+        Resolver<HttpRoute, SocketConfig> socketConfigResolver = new Resolver<HttpRoute,SocketConfig>() {
+            @Override
+            public SocketConfig resolve(HttpRoute route) {
+                return SocketConfig.custom()
+                        .setSoTimeout(Timeout.ofMilliseconds(readTimeout))
+                        .build();
+            }
+        };
+        cm.setSocketConfigResolver(socketConfigResolver);
+
+        return cm;
     }
 }

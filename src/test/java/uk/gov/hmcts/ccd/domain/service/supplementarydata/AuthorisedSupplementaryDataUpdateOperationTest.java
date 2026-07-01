@@ -39,7 +39,7 @@ class AuthorisedSupplementaryDataUpdateOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         supplementaryDataOperation = new AuthorisedSupplementaryDataUpdateOperation(defaultSupplementaryDataOperation,
             caseDetailsRepository,

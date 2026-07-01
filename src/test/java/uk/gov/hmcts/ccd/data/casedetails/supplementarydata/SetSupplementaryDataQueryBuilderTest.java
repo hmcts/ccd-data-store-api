@@ -1,12 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 
-import org.junit.Ignore;
-import javax.persistence.Query;
-
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -98,7 +97,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
         }
     }
 
-    @Ignore("Can only be used for local testing on multithreading")
+    @Disabled("Can only be used for local testing on multithreading")
     @Test
     void shouldReturnValidRequestDataPassed() {
         Thread t1 = new Thread(() -> {
@@ -123,7 +122,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
         t2.start();
     }
 
-    @Ignore("Can only be used for local testing on multithreading")
+    @Disabled("Can only be used for local testing on multithreading")
     @Test
     void shouldReturnValidRequestDataPassed1() {
         Thread t1 = new Thread(() -> {

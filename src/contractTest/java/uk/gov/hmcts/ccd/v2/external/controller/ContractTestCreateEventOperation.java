@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateCaseEventService;
 import uk.gov.hmcts.ccd.domain.service.createevent.DefaultCreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 @Service
 @Qualifier("authorised")
@@ -23,8 +24,9 @@ public class ContractTestCreateEventOperation extends DefaultCreateEventOperatio
     public ContractTestCreateEventOperation(EventValidator eventValidator,
                                             CreateCaseEventService createEventService,
                                             CallbackInvoker callbackInvoker,
-                                            ContractTestSecurityUtils contractTestSecurityUtils) {
-        super(eventValidator, createEventService, callbackInvoker);
+                                            ContractTestSecurityUtils contractTestSecurityUtils,
+                                            IdempotencyKeyHolder keyHolder) {
+        super(eventValidator, createEventService, callbackInvoker, keyHolder);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 

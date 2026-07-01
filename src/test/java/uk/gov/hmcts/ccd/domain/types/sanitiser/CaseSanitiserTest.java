@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -46,7 +46,7 @@ public class CaseSanitiserTest {
     private CaseSanitiser caseSanitiser;
     private Sanitiser simpleSanitiser;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         simpleSanitiser = mock(Sanitiser.class);
         doReturn(TYPE_SIMPLE).when(simpleSanitiser).getType();

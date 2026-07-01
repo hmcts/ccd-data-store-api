@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-034.6",
+  "_extends_": "F-034_Test_Data_Base_3",
+  "title": "must NOT restore missing fields when conditions for restoration are not met",
+  "specs": [
+    "an active profile in CCD",
+    "omits a field with R=false and C=true that does NOT match restoration criteria",
+    "has 200 return code",
+    "does NOT include the previously omitted field"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "RestoredComplexType": {
+          "ComplexTextField3": "complex 3 text"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-data-validate.v2+json;charset=UTF-8",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "data": {
+        "RestoredComplexType": {}
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]",
+          "templated": true
+        }
+      }
+    }
+  }
+
+}

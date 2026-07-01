@@ -48,7 +48,7 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
             objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);

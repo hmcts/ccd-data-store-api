@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Configuration
 class BaseTypeConfiguration {

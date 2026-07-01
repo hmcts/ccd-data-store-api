@@ -134,4 +134,5 @@ class TestConfiguration extends ContextCleanupListener {
     UIDService uidService() {
         return Mockito.mock(UIDService.class);
     }
+
 }

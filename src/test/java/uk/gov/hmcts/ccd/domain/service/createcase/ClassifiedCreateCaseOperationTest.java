@@ -40,7 +40,7 @@ class ClassifiedCreateCaseOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         doReturn(caseDetails).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,

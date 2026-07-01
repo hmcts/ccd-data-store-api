@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -125,10 +125,13 @@ public class GlobalSearchQueryBuilder {
 
     private void addTermsQuery(BoolQueryBuilder boolQueryBuilder, String term, List<String> values) {
         if (CollectionUtils.isNotEmpty(values)) {
-            boolQueryBuilder.must(
-                // NB: switch to lower case for terms query
-                QueryBuilders.termsQuery(term, values.stream().map(String::toLowerCase).collect(Collectors.toList()))
-            );
+            // NB: switch to lower case for terms query
+            List<String> normalisedValues = values.stream()
+                .filter(StringUtils::isNotBlank)
+                .map(String::toLowerCase)
+                .distinct()
+                .collect(Collectors.toList());
+            boolQueryBuilder.must(QueryBuilders.termsQuery(term, normalisedValues));
         }
     }
 

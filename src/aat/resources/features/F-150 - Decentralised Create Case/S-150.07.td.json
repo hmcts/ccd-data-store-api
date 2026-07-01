@@ -1,0 +1,12 @@
+{
+  "_guid_": "S-150.07",
+  "_extends_": "F-150_CreateCase_Conflict",
+  "title": "must return 409 when decentralised service reports a conflict",
+  "specs": [
+    "As a prerequisite",
+    "an active profile in CCD",
+    "uses the FT_Decentralisation case type",
+    "triggers the decentralised conflict response",
+    "contains an HTTP 409 'Conflict'"
+  ]
+}

@@ -4,19 +4,21 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+
 import com.google.common.collect.Lists;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
+
 import feign.FeignException;
 import feign.Request;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,6 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
@@ -34,8 +37,9 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -62,9 +66,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+
 @DirtiesContext  // required for Jenkins agent
-@AutoConfigureWireMock(port = 0)
-public class RestExceptionHandlerTest {
+public class RestExceptionHandlerTest extends WireMockBaseTest {
 
     // url to trigger chosen test controller
     private static final String TEST_URL = "/caseworkers/123/profile";
@@ -88,9 +93,9 @@ public class RestExceptionHandlerTest {
     @Captor
     private ArgumentCaptor<Map<String, String>> customPropertiesCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         logger = (Logger) LoggerFactory.getLogger(RestExceptionHandler.class);
 
@@ -111,7 +116,7 @@ public class RestExceptionHandlerTest {
             .build();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         listAppender.stop();
         logger.detachAppender(listAppender);

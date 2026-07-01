@@ -43,7 +43,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeQueryBuilder(
             new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
             new SpecificGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),

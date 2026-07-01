@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.anyListOf;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
@@ -53,7 +53,7 @@ class ClassifiedGetEventsOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
@@ -163,14 +163,14 @@ class ClassifiedGetEventsOperationTest {
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(classifiedEvents).when(classificationService)
-            .applyClassification(eq(caseDetails), anyListOf(AuditEvent.class));
+            .applyClassification(eq(caseDetails), anyList());
 
         Optional<AuditEvent> optionalAuditEvent = classifiedOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         assertAll(
-            () -> verify(classificationService).applyClassification(eq(caseDetails), anyListOf(AuditEvent.class)),
+            () -> verify(classificationService).applyClassification(eq(caseDetails), anyList()),
             () -> assertThat(output, sameInstance(event))
         );
     }

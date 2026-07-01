@@ -23,9 +23,9 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -185,7 +185,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         testCaseTypeDefinition1 = newCaseType()
             .withId(CASE_TYPE_ID)
@@ -264,7 +264,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
 
         Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(accessProfiles);;
+            .thenReturn(accessProfiles);
 
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1,
             accessProfiles,

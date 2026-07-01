@@ -139,6 +139,24 @@ public class FieldTypeDefinition implements Serializable, Copyable<FieldTypeDefi
             || type.equalsIgnoreCase(DYNAMIC_MULTI_SELECT_LIST);
     }
 
+    /**
+     * Retrieves a complex field from the list of complex fields by its ID.
+     * This method is useful for fetching subfields in a type-safe and readable way.
+     *
+     * @param fieldName The ID of the complex field to retrieve.
+     * @return An Optional containing the matching CaseFieldDefinition if found, or empty otherwise.
+     */
+    @JsonIgnore
+    public Optional<CaseFieldDefinition> getComplexFieldById(String fieldName) {
+        if (this.getComplexFields() == null) {
+            return Optional.empty();
+        }
+        return this.getComplexFields()
+            .stream()
+            .filter(subField -> subField.getId().equals(fieldName))
+            .findFirst();
+    }
+
     public String getId() {
         return id;
     }

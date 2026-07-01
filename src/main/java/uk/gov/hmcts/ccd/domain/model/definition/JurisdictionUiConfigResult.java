@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 
 @SuppressWarnings("checkstyle:SummaryJavadoc")
-@ApiModel(description = "")
+@Schema
 public class JurisdictionUiConfigResult implements Serializable {
 
     private List<JurisdictionUiConfigDefinition> configs;
@@ -24,7 +24,7 @@ public class JurisdictionUiConfigResult implements Serializable {
     /**
      *
      **/
-    @ApiModelProperty(value = "")
+    @Schema
     @JsonProperty("configs")
     public List<JurisdictionUiConfigDefinition> getConfigs() {
         return configs;

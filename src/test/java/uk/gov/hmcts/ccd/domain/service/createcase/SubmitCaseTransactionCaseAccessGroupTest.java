@@ -37,13 +37,17 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,6 +137,18 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private DecentralisedCreateCaseEventService decentralisedSubmitCaseTransaction;
+
+    @Mock
+    private PersistenceStrategyResolver resolver;
+
+    @Mock
+    private CasePointerRepository casePointerRepository;
+
+    @Mock
+    private SynchronisedCaseProcessor synchronisedCaseProcessor;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -146,7 +162,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
 
     @BeforeEach
     void setup() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -164,7 +180,11 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             caseDocumentService,
             applicationParams,
             caseAccessGroupUtils,
-            caseDocumentTimestampService
+            caseDocumentTimestampService,
+            decentralisedSubmitCaseTransaction,
+            resolver,
+            casePointerRepository,
+            synchronisedCaseProcessor
         );
 
         idamUser = buildIdamUser();
@@ -249,7 +269,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     }
 
     private Event buildEvent() {
-        final Event event = anEvent().build();
+        Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
@@ -259,7 +279,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     private CaseTypeDefinition buildCaseType() {
         final Version version = new Version();
         version.setNumber(VERSION);
-        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
         caseTypeDefinition.setVersion(version);
         return caseTypeDefinition;
@@ -287,11 +307,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             SubmitCaseTransactionCaseAccessGroupTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
-        HashMap<String, JsonNode> result =
-            new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+        return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
             });
-
-        return result;
     }
 
     @Test

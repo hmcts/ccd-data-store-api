@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
@@ -49,26 +52,24 @@ public class UIStartTriggerController {
             V2.MediaType.CASE_TYPE_UPDATE_VIEW_EVENT
         }
     )
-    @ApiOperation(
-        value = "Retrieve a start case trigger by ID for dynamic display",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Retrieve a start case trigger by ID for dynamic display",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseUpdateViewEventResource.class
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
-                + "for case field or missing user roles"
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Trigger not found"
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseUpdateViewEventResource.class))
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
+            + "for case field or missing user roles"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Trigger not found"
+    )
     public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEventByCaseType(@PathVariable("caseTypeId")
                                                                                                 String caseTypeId,
                                                                                         @PathVariable("triggerId")
@@ -92,30 +93,28 @@ public class UIStartTriggerController {
             V2.MediaType.CASE_UPDATE_VIEW_EVENT
         }
     )
-    @ApiOperation(
-        value = "Retrieve a start event trigger by ID for dynamic display",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Retrieve a start event trigger by ID for dynamic display",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseUpdateViewEventResource.class
-            ),
-        @ApiResponse(
-            code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
-                + "for case field or missing user roles"
-            ),
-        @ApiResponse(
-            code = 400,
-            message = ERROR_CASE_ID_INVALID
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Trigger not found"
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = CaseUpdateViewEventResource.class))
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
+            + "for case field or missing user roles"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = ERROR_CASE_ID_INVALID
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Trigger not found"
+    )
     public ResponseEntity<CaseUpdateViewEventResource> getCaseUpdateViewEvent(@PathVariable("caseId") String caseId,
                                                                             @PathVariable("triggerId") String triggerId,
                                                                             @RequestParam(value = "ignore-warning",
@@ -141,24 +140,24 @@ public class UIStartTriggerController {
             V2.MediaType.UI_START_DRAFT_TRIGGER
         }
     )
-    @ApiOperation(
-        value = "Retrieve a start draft trigger by ID for dynamic display",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Retrieve a start draft trigger by ID for dynamic display",
+        description = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
         @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = CaseUpdateViewEventResource.class
+            responseCode = "200",
+            description = "Success",
+            content = @Content(schema = @Schema(implementation = CaseUpdateViewEventResource.class))
             ),
         @ApiResponse(
-            code = 422,
-            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document "
-                + "for case field or missing user roles"
+            responseCode = "422",
+            description = "One of: Case event has no pre states, callback validation errors, unable to"
+                + " sanitize document for case field or missing user roles"
             ),
         @ApiResponse(
-            code = 404,
-            message = "Trigger not found"
+            responseCode = "404",
+            description = "Trigger not found"
             )
     })
     public ResponseEntity<CaseUpdateViewEventResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,

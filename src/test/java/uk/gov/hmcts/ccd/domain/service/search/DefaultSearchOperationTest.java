@@ -39,7 +39,7 @@ class DefaultSearchOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         searchOperation = new DefaultSearchOperation(caseDetailsRepository);
 

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.refdata;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Value;
@@ -13,7 +13,7 @@ import java.util.List;
 @Value
 @Builder
 @Jacksonized
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ServiceReferenceData implements Serializable {
     long serviceId;
     String orgUnit;

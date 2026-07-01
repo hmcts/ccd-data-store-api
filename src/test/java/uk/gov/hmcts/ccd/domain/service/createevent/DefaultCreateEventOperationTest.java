@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ class DefaultCreateEventOperationTest {
     private CallbackInvoker callbackInvoker;
     @Mock
     private CreateCaseEventService createEventService;
+    @Mock
+    private IdempotencyKeyHolder keyHolder;
 
     @InjectMocks
     private DefaultCreateEventOperation createEventOperation;
@@ -91,7 +94,7 @@ class DefaultCreateEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();

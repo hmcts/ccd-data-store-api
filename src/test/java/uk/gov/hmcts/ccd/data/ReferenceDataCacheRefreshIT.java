@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data;
 
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import com.github.tomakehurst.wiremock.verification.VerificationResult;
-import org.awaitility.Duration;
+import org.awaitility.Durations;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.springframework.test.context.TestPropertySource;
@@ -36,7 +36,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         // WHEN/THEN
         await()
             .pollDelay(1500, MILLISECONDS)
-            .atMost(Duration.FIVE_SECONDS)
+            .atMost(Durations.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
                 .hasSameElementsAs(updatedBuildingLocations));
@@ -53,7 +53,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         // WHEN/THEN
         await()
             .pollDelay(1500, MILLISECONDS)
-            .atMost(Duration.FIVE_SECONDS)
+            .atMost(Durations.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
                 .hasSameElementsAs(updatedServices));
@@ -70,7 +70,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         // WHEN/THEN
         await()
             .pollDelay(1500, MILLISECONDS)
-            .atMost(Duration.FIVE_SECONDS)
+            .atMost(Durations.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
                 .hasSameElementsAs(initialBuildingLocations));
@@ -85,7 +85,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         // WHEN/THEN
         await()
             .pollDelay(1500, MILLISECONDS)
-            .atMost(Duration.FIVE_SECONDS)
+            .atMost(Durations.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
                 .hasSameElementsAs(initialServices));
@@ -95,7 +95,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
     void testThatExceptionShouldNotDisableCacheRefreshScheduler() {
         // GIVEN/WHEN
         await()
-            .atMost(Duration.TEN_SECONDS)
+            .atMost(Durations.TEN_SECONDS)
             .untilAsserted(() -> {
                 cacheContainsInitialReferenceData();
 
@@ -111,7 +111,7 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         // THEN
         await()
             .pollDelay(2, SECONDS)
-            .atMost(Duration.FIVE_SECONDS)
+            .atMost(Durations.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
                 .hasSameElementsAs(updatedBuildingLocations));

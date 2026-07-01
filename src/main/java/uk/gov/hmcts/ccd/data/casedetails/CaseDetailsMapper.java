@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +30,9 @@ public class CaseDetailsMapper {
         caseDetails.setState(caseDetailsEntity.getState());
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
         caseDetails.setVersion(caseDetailsEntity.getVersion());
+        if (caseDetailsEntity.getVersion() != null) {
+            caseDetails.setRevision(caseDetailsEntity.getVersion().longValue());
+        }
         if (caseDetailsEntity.getData() != null) {
             caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
             caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));

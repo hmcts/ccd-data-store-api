@@ -11,13 +11,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Link;
@@ -63,21 +63,10 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     protected static final ObjectMapper mapper = new ObjectMapper();
     private static String CUSTOM_CONTEXT = "";
-    public static final JSONObject responseJson1 = new JSONObject("""
-        {
-            "user_task": {
-                "task_data": {
-                    "task_id": "000001",
-                    "task_name": "Task 1 name"
-                },
-                "complete_task": "false"
-            }
-        }
-        """);
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -98,7 +87,7 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
             .perform(get(String.format("http://localhost:%s/cases/1504259907353651/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", super.wiremockPort))
                          .contentType(MediaType.APPLICATION_JSON)
                          .header("Accept", V2.MediaType.CASE_DOCUMENT)
-                         .header(CUSTOM_CONTEXT, responseJson1.toString())
+                         .header(CUSTOM_CONTEXT, new JSONObject(responseJson1).toString())
                          .header("experimental", true))
             .andExpect(status().is(200))
             .andReturn();

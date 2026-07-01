@@ -70,6 +70,8 @@ Scenario: must return 201 when start event creation process for appropriate inpu
      Then a positive response is received,
       And the response [includes the case detail for the updated case, along with a HTTP 200 OK],
       And the response has all other details as expected.
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-056_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-584
@@ -92,6 +94,8 @@ Scenario: must update successfully the respective fields with ACL permissions fo
       And the response has all other details as expected,
       And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case],
       And a call [to update the values for DocumentField4 from the same case, which the user does not have update permissions for] will get the expected response as in [S-584_Later_Case_Update_By_Citizen].
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-053_584_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

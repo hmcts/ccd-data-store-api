@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
 
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

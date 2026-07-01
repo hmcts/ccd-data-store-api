@@ -46,7 +46,9 @@ public class MockUtils {
         return Jwts.builder()
             .setSubject(serviceName)
             .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            ))
             .compact();
     }
 

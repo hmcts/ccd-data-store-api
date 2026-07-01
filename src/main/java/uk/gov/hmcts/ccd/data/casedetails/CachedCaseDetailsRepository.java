@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-
+import jakarta.inject.Inject;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 
 import java.util.List;
 import java.util.Map;
@@ -15,11 +15,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 @Service
 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -39,7 +37,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
     @Inject
-    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+    public CachedCaseDetailsRepository(final @Qualifier(DelegatingCaseDetailsRepository.QUALIFIER)
                                                CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
@@ -86,6 +84,16 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findByReference(String reference) {
         return referenceToCaseDetails.computeIfAbsent(reference, key ->
             caseDetailsRepository.findByReference(reference));
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String reference, boolean refresh) {
+        if (refresh) {
+            Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(reference);
+            referenceToCaseDetails.put(reference, caseDetails);
+            return caseDetails;
+        }
+        return findByReference(reference);
     }
 
     @Override

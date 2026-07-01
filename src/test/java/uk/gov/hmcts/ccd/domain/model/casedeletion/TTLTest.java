@@ -78,7 +78,7 @@ public class TTLTest {
 
     @DisplayName("isSuspended")
     @Nested
-    class IsSuspended {
+    public class IsSuspended {
 
         @ParameterizedTest(
             name = "isSuspended false: {0}"
@@ -102,7 +102,7 @@ public class TTLTest {
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @DisplayName("Equals")
     @Nested
-    class Equals {
+    public class Equals {
 
         @ParameterizedTest(
             name = "equals Suspended: 'Yes': {0}"
@@ -311,7 +311,7 @@ public class TTLTest {
 
     @DisplayName("hashCode")
     @Nested
-    class HashCode {
+    public class HashCode {
 
         @ParameterizedTest(
             name = "hashCode Suspended: 'Yes': {0}"

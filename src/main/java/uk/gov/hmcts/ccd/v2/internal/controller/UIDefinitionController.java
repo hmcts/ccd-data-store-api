@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -86,21 +89,19 @@ public class UIDefinitionController {
             V2.MediaType.UI_WORKBASKET_INPUT_DETAILS
         }
     )
-    @ApiOperation(
-        value = "Retrieve workbasket input details for dynamic display",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Retrieve workbasket input details for dynamic display",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = WorkbasketInputsViewResource.class
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Case type not found"
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = WorkbasketInputsViewResource.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Case type not found"
+    )
     public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId")
                                                                                            String caseTypeId) {
 
@@ -119,21 +120,19 @@ public class UIDefinitionController {
             V2.MediaType.UI_SEARCH_INPUT_DETAILS
         }
     )
-    @ApiOperation(
-        value = "Retrieve search input details for dynamic display",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Retrieve search input details for dynamic display",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = SearchInputsViewResource.class
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "Case type not found"
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = SearchInputsViewResource.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Case type not found"
+    )
     public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId")
                                                                                    String caseTypeId) {
 
@@ -152,17 +151,15 @@ public class UIDefinitionController {
             V2.MediaType.UI_BANNERS
         }
     )
-    @ApiOperation(
-        value = "Get Banner information for the jurisdictions",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Get Banner information for the jurisdictions",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = BannerViewResource.class
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = BannerViewResource.class))
+    )
     public ResponseEntity<BannerViewResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
         List<Banner> listOfBanners = idsOptional.isPresent()
             ? getBannerOperation.execute(idsOptional.get())
@@ -179,17 +176,15 @@ public class UIDefinitionController {
             V2.MediaType.UI_JURISDICTION_CONFIGS
         }
     )
-    @ApiOperation(
-        value = "Get Jurisdiction UI config information for the jurisdictions",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Get Jurisdiction UI config information for the jurisdictions",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = JurisdictionConfigViewResource.class
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = JurisdictionConfigViewResource.class))
+    )
     public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids")
                                                                                    Optional<List<String>> idsOptional) {
         List<JurisdictionUiConfigDefinition> listOfConfigs = idsOptional.isPresent()
@@ -207,25 +202,23 @@ public class UIDefinitionController {
             V2.MediaType.UI_JURISDICTIONS
         }
     )
-    @ApiOperation(
-        value = "Get Jurisdictions information for the access type passed",
-        notes = V2.EXPERIMENTAL_WARNING
+    @Operation(
+        summary = "Get Jurisdictions information for the access type passed",
+        description = V2.EXPERIMENTAL_WARNING
     )
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Success",
-            response = JurisdictionViewResource.class
-            ),
-        @ApiResponse(
-            code = 404,
-            message = "No jurisdictions found"
-            ),
-        @ApiResponse(
-            code = 400,
-            message = "Access can only be 'create', 'read' or 'update'"
-            )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success",
+        content = @Content(schema = @Schema(implementation = JurisdictionViewResource.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No jurisdictions found"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Access can only be 'create', 'read' or 'update'"
+    )
     public ResponseEntity<JurisdictionViewResource> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,17 +11,19 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -46,8 +52,9 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -58,23 +65,29 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -84,11 +97,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.caselinking.CaseLinkEntity.NON_STANDARD_LINK;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
-import static uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink.builder;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -98,14 +111,17 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.caseTypeRoleAssignment
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
-@SuppressWarnings("checkstyle:OperatorWrap")
+@SuppressWarnings({"checkstyle:OperatorWrap", "checkstyle:FileTabCharacter"})
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_FILTERED = "TestAddressBookCaseFiltered";
     private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
     private static final String CASE_TYPE_VALIDATE_MULTI_PAGE = "TestAddressBookCaseValidateMultiPage";
+    private static final String CASE_TYPE_VALIDATE_FIELD_RESTORE = "TestAddressBookCaseValidateFieldRestore";
+    private static final String CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE = "TestAddressBookCaseValidateFieldSkipRestore";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
     private static final String CASE_TYPE_NO_UPDATE_CASE_ACCESS = "TestAddressBookCaseNoUpdateCaseAccess";
     private static final String CASE_TYPE_NO_CREATE_EVENT_ACCESS = "TestAddressBookCaseNoCreateEventAccess";
@@ -143,6 +159,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
+    private static final String MID_EVENT_CALL_BACK_FIELD_RESTORE = "/event-callback/field-restore-mid-event";
     public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
     public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
 
@@ -154,19 +171,22 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_LINKS_CASE_998_TYPE = "TestAddressBookCase1";
     private static final String CASE_LINKS_CASE_999_TYPE = "TestAddressBookCase2";
 
+    private static final String DOCUMENT_COLLECTION_EVENT_ID = "DOCUMENT_COLLECTION_EVENT";
+    private static final String CREATE_DOCUMENT_EVENT_ID = "CREATE_DOCUMENT_EVENT";
+
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private static final String REFERENCE_2 = "1504259907353545";
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -179,8 +199,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCaseworker() throws Exception {
-        when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
+    void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCaseworker() throws Exception {
+        when(uidService.generateUID()).thenReturn(REFERENCE);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -210,14 +230,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCaseworker()
+    void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCaseworker()
         throws Exception {
         shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCitizen()
+    void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCitizen()
         throws Exception {
         shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("citizens");
     }
@@ -290,7 +310,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCitizen() throws Exception {
+    void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCitizen() throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
@@ -320,7 +340,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCaseworker()
+    void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCaseworker()
         throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
@@ -351,7 +371,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen()
+    void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen()
         throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
@@ -382,7 +402,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
             "{\n" +
@@ -394,7 +414,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "  \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}" +
@@ -410,7 +430,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  },\n" +
                 "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
                 "  \"D8Document\":{\n" +
-                "    \"document_url\": \"http://localhost:" + getPort()
+                "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
                 "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
@@ -436,8 +456,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -447,8 +467,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree(
             "{" +
@@ -497,25 +517,26 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getDataClassification(), caseAuditEvent.getDataClassification());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
 
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("CaseId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("CaseId").toString(),
             containsString(savedCaseDetails.getId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("UserId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("UserId").toString(),
             containsString(caseAuditEvent.getUserId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("EventId").toString(),
             containsString(caseAuditEvent.getEventId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("CaseTypeId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("CaseTypeId").toString(),
             containsString(savedCaseDetails.getCaseTypeId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("NewStateId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("NewStateId").toString(),
             containsString(savedCaseDetails.getState()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventInstanceId").toString(),
+        assertThat(messageQueueList.getFirst().getMessageInformation().findPath("EventInstanceId").toString(),
             containsString(caseAuditEvent.getId().toString()));
-        assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("PreviousStateId").toString());
-        assertThat(messageQueueList.get(0).getId(), equalTo(1L));
-        assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
+        assertEquals("null", messageQueueList.getFirst().getMessageInformation()
+            .findPath("PreviousStateId").toString());
+        assertThat(messageQueueList.getFirst().getId(), equalTo(1L));
+        assertEquals("CASE_EVENT", messageQueueList.getFirst().getMessageType());
     }
 
     @Test
-    public void shouldGenerateCaseEventMessagingDefinition() throws Exception {
+    void shouldGenerateCaseEventMessagingDefinition() throws Exception {
         String caseType = "MessagePublishing";
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
@@ -571,7 +592,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
-        assertEquals(messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Definition"),
+        assertEquals(messageQueueList.getFirst().getMessageInformation().get("AdditionalData").get("Definition"),
             mapper.readTree("{\n"
                 + "    \"OtherAlias\": {\n"
                 + "        \"type\": \"SimpleNumber\",\n"
@@ -769,7 +790,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldGenerateCaseEventDataMessagingDefinition() throws Exception {
+    void shouldGenerateCaseEventDataMessagingDefinition() throws Exception {
         String caseType = "MessagePublishing";
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
@@ -880,11 +901,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "  \"AliasForTextField\": \"text field\",\n"
                 + "  \"ComplexCollectionField\": null\n"
                 + "}"),
-            messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Data"));
+            messageQueueList.getFirst().getMessageInformation().get("AdditionalData").get("Data"));
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCitizen() throws Exception {
 
         final String URL =
             "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
@@ -897,7 +918,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -912,7 +933,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "  \"D8Document\":{\n"
-                + "    \"document_url\": \"http://localhost:" + getPort()
+                + "    \"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
                 + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
                 + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -939,19 +960,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData
-            .entrySet())));
+
+        assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
-        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        final CaseDetails savedCaseDetails = caseDetailsList.getFirst();
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
-        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(
-            sanitizedDataMap.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(is(in(
+            sanitizedDataMap.entrySet()))));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
             "  \"PersonAddress\":{" +
@@ -971,7 +992,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
+        final AuditEvent caseAuditEvent = caseAuditEventList.getFirst();
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
         assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
@@ -988,7 +1009,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCitizen() throws Exception {
+    void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCitizen() throws Exception {
 
         final String URL =
             "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/"
@@ -1018,12 +1039,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
     }
 
-    private int getPort() {
-        return super.wiremockPort;
-    }
-
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
             "{\n"
@@ -1034,7 +1051,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -1060,7 +1077,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCitizen() throws Exception {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases?ignore-warning=true";
@@ -1073,7 +1090,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine2\": \"Address Line 2\"\n"
                 + "  },\n"
                 + "\"D8Document\":{"
-                + "\"document_url\": \"http://localhost:" + getPort()
+                + "\"document_url\": \"" + hostUrl
                 + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
                 + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
                 + "}"
@@ -1101,7 +1118,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
 
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithInvalidDocumentUrlDomainForCaseworker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithInvalidDocumentUrlDomainForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
             "{\n" +
@@ -1138,7 +1155,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithInvalidDocumentUrlDomainForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithInvalidDocumentUrlDomainForCitizen() throws Exception {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases?ignore-warning=true";
@@ -1173,7 +1190,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithNoDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithNoDataForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1203,7 +1220,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
+        final AuditEvent caseAuditEvent = caseAuditEventList.getFirst();
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
         assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
@@ -1220,7 +1237,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCaseworker() throws Exception {
+    void shouldReturn201WithSearchCriteriaWhenPostCreateCaseForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
 
@@ -1241,7 +1258,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1260,7 +1277,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
-        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        final CaseDetails savedCaseDetails = caseDetailsList.getFirst();
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
             .getReference())));
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
@@ -1270,7 +1287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
+        final AuditEvent caseAuditEvent = caseAuditEventList.getFirst();
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
         assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
@@ -1287,7 +1304,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void saveCaseDetailsForCaseWorkerShouldLogAudit() throws Exception {
+    void saveCaseDetailsForCaseWorkerShouldLogAudit() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1303,7 +1320,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
 
-        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        final CaseDetails savedCaseDetails = caseDetailsList.getFirst();
         assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
             .getReference())));
 
@@ -1321,7 +1338,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void saveCaseDetailsForCitizenShouldLogAudit() throws Exception {
+    void saveCaseDetailsForCitizenShouldLogAudit() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1348,59 +1365,59 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker()
+    void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCaseworker()
         throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType("caseworkers");
     }
 
     @Test
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCitizen() throws Exception {
+    void shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseTypeForCitizen() throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseWithNoReadAccessOnCaseType("citizens");
     }
 
     @Test
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCaseworker()
+    void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCaseworker()
         throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess("caseworkers");
     }
 
     @Test
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCitizen() throws Exception {
+    void shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccessForCitizen() throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseWithNoFieldReadAccess("citizens");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateEventAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateEventAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateEventAccess("caseworkers");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateEventAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateEventAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateEventAccess("citizens");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccess("caseworkers");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccess("citizens");
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoEventForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoEventForCaseworker() throws Exception {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -1419,7 +1436,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoEventForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoEventForCitizen() throws Exception {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -1438,7 +1455,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoEventIdForCaseworker() throws Exception {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1458,7 +1475,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoEventIdForCitizen() throws Exception {
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1478,7 +1495,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCaseworker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1499,7 +1516,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1520,7 +1537,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithUnknownEventForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1541,7 +1558,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithUnknownEventForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
@@ -1563,19 +1580,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccessForCaseworker() throws Exception {
         shouldReturn404WhenGetCaseWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccessForCitizen() throws Exception {
+    void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccessForCitizen() throws Exception {
         shouldReturn404WhenGetCaseWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WhenGetValidCaseForCaseworker() throws Exception {
+    void shouldReturn200WhenGetValidCaseForCaseworker() throws Exception {
 
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
@@ -1671,7 +1688,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void findCaseDetailsForCaseworkerShouldLogAudit() throws Exception {
+    void findCaseDetailsForCaseworkerShouldLogAudit() throws Exception {
         final MvcResult result = mockMvc
             .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
                 + "/cases/1504259907353529")
@@ -1697,7 +1714,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_private_cases.sql"})
-    public void shouldReturn404WhenGetCaseClassificationTooHighForCaseworker() throws Exception {
+    void shouldReturn404WhenGetCaseClassificationTooHighForCaseworker() throws Exception {
 
         mockMvc
             .perform(
@@ -1711,7 +1728,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WhenGetValidCaseForCitizen() throws Exception {
+    void shouldReturn200WhenGetValidCaseForCitizen() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -1799,7 +1816,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void findCaseDetailsForCitizenShouldLogAudit() throws Exception {
+    void findCaseDetailsForCitizenShouldLogAudit() throws Exception {
 
         final MvcResult result = mockMvc
             .perform(get("/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -1827,19 +1844,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccessForCaseworker() throws Exception {
+    void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccessForCaseworker() throws Exception {
         shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccessForCitizen() throws Exception {
+    void shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccessForCitizen() throws Exception {
         shouldReturn200WithFieldRemovedWhenGetValidCaseWithNoFieldReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn400WhenGetValidCaseWithInvalidCaseReferenceForCaseworker() throws Exception {
+    void shouldReturn400WhenGetValidCaseWithInvalidCaseReferenceForCaseworker() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -1857,51 +1874,51 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCaseworker() throws Exception {
+    void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCaseworker() throws Exception {
         shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-judiciary");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCaseworker() throws Exception {
+    void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCaseworker() throws Exception {
         shouldReturn403ForRestrictedCaseType("caseworkers", "hmcts-legal-operations"
         );
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCaseworker() throws Exception {
+    void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCaseworker() throws Exception {
         shouldReturn404ForRestrictedCaseType("caseworkers", "[CREATOR]", GrantType.BASIC);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCaseworker() throws Exception {
+    void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCaseworker() throws Exception {
         shouldReturn404ForRestrictedCaseType("caseworkers", "hmcts-judiciary", GrantType.STANDARD);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCitizen() throws Exception {
+    void shouldReturn403ForRestrictedCaseTypeWithRA_JudiciaryForCitizen() throws Exception {
         shouldReturn403ForRestrictedCaseType("citizens", "hmcts-judiciary");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCitizen() throws Exception {
+    void shouldReturn403ForRestrictedCaseTypeWithRA_LegalOperationsForCitizen() throws Exception {
         shouldReturn403ForRestrictedCaseType("citizens", "hmcts-legal-operations"
         );
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCitizen() throws Exception {
+    void shouldReturn404ForRestrictedCaseTypeWithRA_CreatorForCitizen() throws Exception {
         shouldReturn404ForRestrictedCaseType("citizens", "[CREATOR]", GrantType.BASIC);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCitizen() throws Exception {
+    void shouldReturn404ForRestrictedCaseTypeWithGrantTypeNotBasicForCitizen() throws Exception {
         shouldReturn404ForRestrictedCaseType("citizens", "hmcts-judiciary", GrantType.STANDARD);
     }
 
@@ -1937,7 +1954,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn400WhenGetValidCaseWithInvalidCaseReferenceForCitizen() throws Exception {
+    void shouldReturn400WhenGetValidCaseWithInvalidCaseReferenceForCitizen() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -1955,7 +1972,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenGetCaseWithNonExistentCaseReferenceForCaseworker() throws Exception {
+    void shouldReturn404WhenGetCaseWithNonExistentCaseReferenceForCaseworker() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -1968,7 +1985,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenGetCaseWithNonExistentCaseReferenceForCitizen() throws Exception {
+    void shouldReturn404WhenGetCaseWithNonExistentCaseReferenceForCitizen() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
@@ -1981,7 +1998,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoDataForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2067,7 +2084,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_global_search.sql"})
-    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventCaseworker() throws Exception {
+    void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventCaseworker() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2092,7 +2109,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoDataForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2177,7 +2194,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_global_search.sql"})
-    public void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventForCitizen() throws Exception {
+    void shouldReturn201WithSearchCriteriaWhenPostCreateCaseEventForCitizen() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY
@@ -2206,7 +2223,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldUpdateLastStateModifiedTimeWhenAnEventTriggeredStateTransition() throws Exception {
+    void shouldUpdateLastStateModifiedTimeWhenAnEventTriggeredStateTransition() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2236,7 +2253,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldNotUpdateLastStateModifiedTimeWhenAnEventNotTriggeredStateTransition() throws Exception {
+    void shouldNotUpdateLastStateModifiedTimeWhenAnEventNotTriggeredStateTransition() throws Exception {
 
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
@@ -2268,32 +2285,32 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinaryForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinaryForCaseworker() throws Exception {
         shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinaryForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinaryForCitizen() throws Exception {
         shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithValidDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithValidDataForCaseworker() throws Exception {
         shouldReturn201WhenPostCreateCaseEventWithValidData("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithValidDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithValidDataForCitizen() throws Exception {
         shouldReturn201WhenPostCreateCaseEventWithValidData("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCaseworker() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
         final String caseReference = "1557850043804031";
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
@@ -2366,7 +2383,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCitizen() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
         final String caseReference = "1557850043804031";
         final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
@@ -2436,7 +2453,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCaseworker() throws Exception {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
@@ -2506,7 +2523,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCitizen() throws Exception {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
         final String caseReference = "1557845948403939";
         final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
@@ -2577,7 +2594,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("caseworkers");
     }
@@ -2585,7 +2602,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
         shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess("citizens");
     }
@@ -2593,7 +2610,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCaseworker()
+    void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCaseworker()
         throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("caseworkers");
     }
@@ -2601,7 +2618,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCitizen()
+    void shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccessForCitizen()
         throws Exception {
         shouldReturn201WithFieldRemovedWhenPostCreateCaseEventWithNoFieldReadAccess("citizens");
     }
@@ -2609,62 +2626,62 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoUpdateCaseAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoCreateEventAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoCreateFieldAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccessForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccessForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccessForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccessForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseEventWithNoUpdateFieldAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCaseWorker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2700,7 +2717,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -2736,7 +2753,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCaseWorker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = "        ";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -2783,7 +2800,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseEventWithBlankSummaryForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = "        ";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -2829,7 +2846,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCaseWorker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = new String(new char[1025]).replace("\0", "-");
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -2866,7 +2883,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithSummaryTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String summary = new String(new char[1025]).replace("\0", "-");
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
@@ -2903,7 +2920,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCaseWorker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String description = new String(new char[65666]).replace("\0", "-");
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
@@ -2940,7 +2957,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithDescriptionTooLongForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String description = new String(new char[65666]).replace("\0", "-");
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
@@ -2977,7 +2994,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCaseworker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3013,7 +3030,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoEventIdForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3049,7 +3066,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCaseWorker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoEventForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3083,7 +3100,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNoEventForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3117,7 +3134,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCaseWorker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCaseWorker() throws Exception {
         final String caseReference = "9999999999999995";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3142,7 +3159,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithNonExistentCaseIdForCitizen() throws Exception {
         final String caseReference = "9999999999999995";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3167,7 +3184,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCaseWorker() throws Exception {
+    void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCaseWorker() throws Exception {
         final String caseReference = "invalidReference";
         final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
@@ -3193,7 +3210,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCitizen() throws Exception {
+    void shouldReturn400WhenPostCreateCaseEventWithInvalidCaseIdForCitizen() throws Exception {
         final String caseReference = "invalidReference";
         final String hasPreStatesEvent = "HAS_PRE_STATES_EVENT";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
@@ -3219,7 +3236,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCaseWorker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3270,7 +3287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseEventWithUnknownFieldsForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
             + caseReference + "/events";
@@ -3321,7 +3338,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCaseWorker() throws Exception {
+    void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -3349,7 +3366,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCitizen() throws Exception {
+    void shouldReturn409WhenPostCreateCaseEventWithCaseVersionConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -3377,7 +3394,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -3406,7 +3423,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
+    void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/" + caseReference + "/events";
@@ -3435,56 +3452,56 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
         shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
         shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
         shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
         shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
         shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
         shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCaseworker()
+    void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCaseworker()
         throws Exception {
         shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCitizen()
+    void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCitizen()
         throws Exception {
         shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("citizens");
     }
@@ -3612,16 +3629,17 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
+        Map<Object,Object> expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         JsonNode caseData = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
-        Map actualData = mapper.readValue(caseData.toString(), Map.class);
-        assertAll(() -> assertThat("Incorrect Response Content",
-            actualData.entrySet(),
-            everyItem(isIn(expectedSanitizedData.entrySet()))),
-            () -> assertThat("Response contains filtered out data", caseData.has("PersonFirstName"),
-                is(false)),
+        Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
+
+        assertAll(() ->
+            assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
+                .containsAll(actualData.entrySet())),
+            () -> assertThat("Response contains filtered out data",
+                caseData.has("PersonFirstName"), is(false)),
             () -> assertThat(dataClassification.has("PersonFirstName"), CoreMatchers.is(false)),
             () -> assertThat(dataClassification.has("PersonLastName"), CoreMatchers.is(true)),
             () -> assertThat(dataClassification.has("PersonAddress"), CoreMatchers.is(true))
@@ -3673,7 +3691,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(isEmptyString()));
+        assertThat(mvcResult.getResponse().getContentAsString(), CoreMatchers.is(emptyString()));
     }
 
     private void shouldReturn201WithEmptyBodyWhenPostCreateCaseEventWithNoCaseTypeReadAccess(String userRole)
@@ -3705,7 +3723,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response, CoreMatchers.is(isEmptyString()));
+        assertThat(response, CoreMatchers.is(emptyString()));
     }
 
 
@@ -3893,7 +3911,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
+    void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
         throws Exception {
         final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
@@ -3932,19 +3950,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_02_ID)
                 .caseTypeId(CASE_02_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_03_ID) // NB: previously added in "classpath:sql/insert_cases.sql"
                 .caseTypeId(CASE_03_TYPE)
@@ -3957,7 +3975,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
+    void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
         throws Exception {
         final String reference = CASE_22_REFERENCE;
         final String URL = "/caseworkers/0/jurisdictions/"
@@ -3992,7 +4010,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = CASE_22_ID;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_01_ID)
                 .caseTypeId(CASE_01_TYPE)
@@ -4013,7 +4031,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldErrorIfTriggerStartForCaseDetectsAboutToCallStartCallbackHasModifiedTTL() throws Exception {
+    void shouldErrorIfTriggerStartForCaseDetectsAboutToCallStartCallbackHasModifiedTTL() throws Exception {
         final String reference = "9816494993793181";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
@@ -4043,7 +4061,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200WhenTriggerStartForCaseDetectsAboutToCallStartCallbackHasNotModifiedTTL()
+    void shouldReturn200WhenTriggerStartForCaseDetectsAboutToCallStartCallbackHasNotModifiedTTL()
         throws Exception {
 
         final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
@@ -4237,7 +4255,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + getPort()
+            "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
             "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
             + "/binary\","
@@ -4285,7 +4303,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
         JSONAssert.assertEquals(expectedClassificationString,
             mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
@@ -4371,11 +4389,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
         assertThat(
             "Incorrect Data content: Data should have changed",
-            savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedDataMap.entrySet())));
+            savedCaseDetails.getData().entrySet(), everyItem(is(in(sanitizedDataMap.entrySet()))));
     }
 
     @Test
-    public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4384,6 +4404,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4403,7 +4424,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4412,6 +4435,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4432,7 +4456,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCaseworker() throws Exception {
+    void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCaseworker() throws Exception {
         final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
             .withEvent(anEvent()
@@ -4462,7 +4486,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCitizen() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCitizen() throws Exception {
+        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4471,6 +4497,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4490,7 +4517,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCitizen() throws Exception {
+    void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCitizen() throws Exception {
         final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4523,7 +4550,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200_whenSearchAsSolicitor() throws Exception {
+    void shouldReturn200_whenSearchAsSolicitor() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4558,7 +4585,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200_whenSearchWithParamsAsCaseWorker() throws Exception {
+    void shouldReturn200_whenSearchWithParamsAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4587,7 +4614,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldSearchCaseDetailsByReference() throws Exception {
+    void shouldSearchCaseDetailsByReference() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4644,7 +4671,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldSearchCaseDetailsBySecurityClassification() throws Exception {
+    void shouldSearchCaseDetailsBySecurityClassification() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4720,7 +4747,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldSearchCaseDetailsByCreationDate() throws Exception {
+    void shouldSearchCaseDetailsByCreationDate() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4797,7 +4824,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldSearchCaseDetailsByLastModified() throws Exception {
+    void shouldSearchCaseDetailsByLastModified() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
@@ -4855,7 +4882,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
-    public void shouldAuditLogCaseWorkerSearch() throws Exception {
+    void shouldAuditLogCaseWorkerSearch() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
@@ -4885,7 +4912,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
-    public void shouldAuditLogCitizenSearch() throws Exception {
+    void shouldAuditLogCitizenSearch() throws Exception {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
 
@@ -4916,7 +4943,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturnEmptyResult_whenSearchWithNonMatchingCriteriaAsCaseWorker() throws Exception {
+    void shouldReturnEmptyResult_whenSearchWithNonMatchingCriteriaAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -4935,7 +4962,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturnPaginatedResults() throws Exception {
+    void shouldReturnPaginatedResults() throws Exception {
 
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
@@ -5000,7 +5027,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturnPaginatedSearchMetadata() throws Exception {
+    void shouldReturnPaginatedSearchMetadata() throws Exception {
 
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PRIVATE);
@@ -5065,7 +5092,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
+    void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(authentication, "role-citizen");
 
@@ -5084,7 +5111,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturnEmptyPaginatedSearchMetadataForCitizenWithUnassignedRole() throws Exception {
+    void shouldReturnEmptyPaginatedSearchMetadataForCitizenWithUnassignedRole() throws Exception {
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(authentication, "unassigned-role-citizen");
 
@@ -5105,7 +5132,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn400_whenSearchWithBadRequestParamAsCaseWorker() throws Exception {
+    void shouldReturn400_whenSearchWithBadRequestParamAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -5118,7 +5145,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn200_whenSearchParamsAreSanitizedAsCaseWorker() throws Exception {
+    void shouldReturn200_whenSearchParamsAreSanitizedAsCaseWorker() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -5139,7 +5166,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
             + "/cases";
 
@@ -5189,7 +5216,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
             + "/cases";
 
@@ -5239,13 +5266,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers",
             CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
+    void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens",
             CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
@@ -5274,7 +5301,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"_ Roof\","
             + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5283,6 +5310,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private String exampleData() {
         return "{"
+            + "\"PersonFirstName\":\"_ George\","
             + "\"PersonAddress\":{"
             + "\"Country\":\"_ Wales\","
             + "\"Postcode\":\"W11 5DF\","
@@ -5290,9 +5318,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
             + "\"AddressLine3\":\"_ ButtonVillie\"},"
             + "\"PersonLastName\":\"_ Roof\","
-            + "\"PersonFirstName\":\"_ George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort()
+            + "\"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "}"
@@ -5300,7 +5327,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageId() throws Exception {
+
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageId() throws Exception {
+        final String caseReference = "1504259907353545";
+
         final JsonNode data = mapper.readTree(exampleCaseData());
         final JsonNode eventData = mapper.readTree(exampleEventData());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK);
@@ -5315,6 +5346,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5340,7 +5372,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn400WhenPostValidateCaseDetailsMidEventCallbackChangesDataForCaseworker() throws Exception {
+    void shouldReturn400WhenPostValidateCaseDetailsMidEventCallbackChangesDataForCaseworker() throws Exception {
 
         final JsonNode data = mapper.readTree(exampleCaseData());
         final JsonNode eventData = mapper.readTree(exampleEventDataTTL());
@@ -5393,7 +5425,117 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldFilterRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+        final String caseReference = "1504259907353529";
+        final JsonNode data = mapper.readTree(secondPageData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
+
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseThirdPage",
+                "CaseField31",
+                "CaseField32", 3, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseFourthPage",
+                "CaseField41",
+                "CaseField42", 4, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withCaseReference(caseReference)
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_RESTORE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE_VALIDATE_FIELD_RESTORE
+            + "/validate?pageId=createCaseNextPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_FIELD_RESTORE)));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataFieldRestore() + "}");
+        final String expectedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
+        throws Exception {
+        final String caseReference = "1504259907353529";
+        final JsonNode data = mapper.readTree(secondPageData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
+
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseThirdPage",
+                "CaseField31",
+                "CaseField32", 3, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+        wizardPageCollection.getWizardPages()
+            .add(createWizardPage("createCaseFourthPage",
+                "CaseField41",
+                "CaseField42", 4, MID_EVENT_CALL_BACK_FIELD_RESTORE));
+
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withCaseReference(caseReference)
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE,
+                TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE
+            + "/validate?pageId=createCaseNextPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_FIELD_RESTORE)));
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataFieldSkipRestore() + "}");
+        final String expectedResponseValue = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseValue,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
+        final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_MULTI_PAGE);
@@ -5418,6 +5560,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
+            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_MULTI_PAGE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5447,7 +5590,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_case_links.sql"})
-    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCaseworker()
+    void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCaseworker()
         throws Exception {
 
         shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("caseworkers");
@@ -5456,7 +5599,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_case_links.sql"})
-    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCitizen()
+    void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCitizen()
         throws Exception {
 
         shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("citizens");
@@ -5499,13 +5642,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = 1L;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_999_ID)
                 .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .standardLink(NON_STANDARD_LINK)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_998_ID)
                 .caseTypeId(CASE_LINKS_CASE_998_TYPE)
@@ -5519,7 +5662,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_case_links.sql"})
-    public void shouldReturn422BadRequestWhenCaseLinksSpecifiedDoesNotExist()
+    void shouldReturn422BadRequestWhenCaseLinksSpecifiedDoesNotExist()
         throws Exception {
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_CASELINK + "/cases";
@@ -5548,12 +5691,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Long expectedCaseId = 1L;
 
         List<CaseLink> expectedCaseLinks = List.of(
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_999_ID)
                 .caseTypeId(CASE_LINKS_CASE_999_TYPE)
                 .build(),
-            builder()
+            CaseLink.builder()
                 .caseId(expectedCaseId)
                 .linkedCaseId(CASE_LINKS_CASE_998_ID)
                 .caseTypeId(CASE_LINKS_CASE_998_TYPE)
@@ -5566,7 +5709,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_case_links.sql"})
-    public void shouldReturn201CaseCreatedButNotInsertCaseLinkInDBWhenCaseLinkIsBLank()
+    void shouldReturn201CaseCreatedButNotInsertCaseLinkInDBWhenCaseLinkIsBLank()
         throws Exception {
         final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
             + CASE_TYPE_CASELINK + "/cases";
@@ -5596,6 +5739,1192 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseLinks(expectedCaseId, Collections.emptyList());
     }
 
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
+    private List<ILoggingEvent> loggingEventList;
+
+    private Logger setupLogging() {
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger = (Logger) LoggerFactory.getLogger(ConditionalFieldRestorer.class);
+        logger.detachAndStopAllAppenders();
+        if (loggingEventList != null && !loggingEventList.isEmpty()) {
+            loggingEventList.clear();
+        }
+        logger.addAppender(listAppender);
+        return logger;
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
+        final String caseReference = "1504259907353529";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+            "\"PersonAddress\":{" +
+            "\"Country\":\"_ Wales\"," +
+            "\"Postcode\":\"W11 5DF\"," +
+            "\"AddressLine1\":\"_ Flat 9\"," +
+            "\"AddressLine3\":\"_ ButtonVillie\"}," +
+            "\"PersonLastName\":\"_ Roof\"," +
+            "\"PersonFirstName\":\"_ George\"," +
+            "\"D8Document\":{" +
+            "    \"document_url\": \"http://localhost:" + super.wiremockPort
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+            + "/binary\","
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}" +
+            "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.DEBUG;
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        final String expectedLogMessage = "Missing field 'AddressLine2' under 'PersonAddress'.";
+        loggingEventList = listAppender.list;
+
+        assertTrue("Expected log message not found: " + expectedLogMessage,
+            loggingEventList.stream().anyMatch(log -> log.getLevel() == logLevel
+                    && log.getFormattedMessage().equals(expectedLogMessage)));
+        assertEqualsSanitizedData(sanitizedData, mvcResult);
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        // Assertion belows are for creation event
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Strife", caseAuditEvent.getUserLastName()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+        final String caseReference = "1202264432028419";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
+                + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+                "\"PersonAddress\":{" +
+                "\"Country\":\"_ Wales\"," +
+                "\"Postcode\":\"W11 5DF\"," +
+                "\"AddressLine1\":\"_ Flat 9\"," +
+                "\"AddressLine2\":\"Fake Street\"," +
+                "\"AddressLine3\":\"_ ButtonVillie\"}," +
+                "\"PersonLastName\":\"_ Roof\"," +
+                "\"PersonFirstName\":\"_ George\"," +
+                "\"D8Document\":{" +
+                "    \"document_url\": \"http://localhost:" + super.wiremockPort
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+                "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+                + "/binary\","
+                + "    \"document_filename\": \"Seagulls_Square.jpg\""
+                + "}" +
+                "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE_FILTERED, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.INFO;
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        assertNotNull(mvcResult);
+
+        final String expectedLogMessage = "Adding missing field 'AddressLine2' under 'PersonAddress'.";
+        loggingEventList = listAppender.list;
+
+        assertTrue("Expected log message not found: " + expectedLogMessage,
+            loggingEventList.stream().anyMatch(log -> log.getLevel() == logLevel
+                && log.getFormattedMessage().equals(expectedLogMessage)));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_FILTERED, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Strife", caseAuditEvent.getUserLastName()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+        final String caseReference = "6512245793128983";
+        final String URL =
+            "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
+                + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+
+        final JsonNode sanitizedData = mapper.readTree(
+            "{" +
+                "\"PersonAddress\":{" +
+                "\"Country\":\"_ Wales\"," +
+                "\"Postcode\":\"W11 5DF\"," +
+                "\"AddressLine1\":\"_ Flat 9\"," +
+                "\"AddressLine2\":\"Fake Street\"," +
+                "\"AddressLine3\":\"_ ButtonVillie\"}," +
+                "\"Aliases\":[" +
+                "{\"id\":\"2\",\"value\":\"Alias2\"}," +
+                "{\"id\":\"1\",\"value\":\"Alias1\"}," +
+                "{\"id\":\"3\",\"value\":\"Alias3\"}" +
+                "]," +
+                "\"PersonLastName\":\"_ Roof\"," +
+                "\"PersonFirstName\":\"_ George\"," +
+                "\"D8Document\":{" +
+                "    \"document_url\": \"http://localhost:" + super.wiremockPort
+                + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+                "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+                + "/binary\","
+                + "    \"document_filename\": \"Seagulls_Square.jpg\""
+                + "}" +
+                "}");
+
+        final JsonNode data = mapper.readTree(createExampleEventDataWithCollectionMissingItems());
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+        final String expectedClassificationString = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE_FILTERED, caseReference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Level logLevel = Level.INFO;
+
+        setupLogging().setLevel(logLevel);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        assertNotNull(mvcResult);
+
+        final List<String> expectedLogMessages = List.of(
+            "Adding missing field 'AddressLine2' under 'PersonAddress'.",
+            "Adding missing collection item with ID '\"1\"' under 'Aliases'.",
+            "Adding missing collection item with ID '\"3\"' under 'Aliases'.");
+        loggingEventList = listAppender.list;
+        List<String> actualLogMessages = loggingEventList.stream()
+            .filter(log -> log.getLevel() == logLevel)
+            .map(ILoggingEvent::getFormattedMessage)
+            .toList();
+
+        List<String> missingMessages = expectedLogMessages.stream()
+            .filter(expected -> !actualLogMessages.contains(expected))
+            .toList();
+        assertTrue(
+            "The following expected log messages were not found: " + missingMessages,
+            missingMessages.isEmpty()
+        );
+        List<String> unexpectedMessages = actualLogMessages.stream()
+            .filter(actual -> !expectedLogMessages.contains(actual))
+            .toList();
+        assertTrue(
+            "The following unexpected log messages were found: " + unexpectedMessages,
+            unexpectedMessages.isEmpty()
+        );
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_FILTERED, savedCaseDetails.getCaseTypeId());
+        Map<String, JsonNode> sanitizedDataMap = JacksonUtils.convertValue(sanitizedData);
+        assertThat(
+            "Incorrect Data content: Data should have changed",
+            savedCaseDetails.getData().entrySet(),
+            containsInAnyOrder(sanitizedDataMap.entrySet().toArray())
+        );
+        assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
+        JSONAssert.assertEquals(expectedClassificationString,
+            mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode
+                .LENIENT);
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.getLast();
+        assertAll(
+            () -> assertEquals(sanitizedDataMap, caseAuditEvent.getData()),
+            () -> assertEquals("123", caseAuditEvent.getUserId()),
+            () -> assertEquals("Cloud", caseAuditEvent.getUserFirstName()),
+            () -> assertEquals("HAS PRE STATES EVENT", caseAuditEvent.getEventName()),
+            () -> assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId()),
+            () -> assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId()),
+            () -> assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue()),
+            () -> assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId()),
+            () -> assertEquals("Case in state 4", caseAuditEvent.getStateName()),
+            () -> assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData()),
+            () -> assertEquals(SUMMARY, caseAuditEvent.getSummary()),
+            () -> assertEquals(DESCRIPTION, caseAuditEvent.getDescription()),
+            () -> JSONAssert.assertEquals(expectedClassificationString,
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT)
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        // Event payload: existing item + new item with documentFile and hash token
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        // Callback ignore D8Documents field with both documentIds
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\""
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback.*aboutToSubmit.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - both collection items including the new document are saved
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean newItemSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.get("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                newItemSaved = true;
+                break;
+            }
+        }
+        assertThat(newItemSaved, is(true));
+
+        // CDAM was called with the new document hash
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
+        throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(DOCUMENT_COLLECTION_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE,
+                caseReference, DOCUMENT_COLLECTION_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - new item is saved but without documentFile because callback stripped it
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should not exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
+        throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
+
+        final String newEventDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newEventDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String eventData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newEventDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newEventDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newEventDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-003\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "         \"document_hash\": \"" + newCallbackDocumentHash + "\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(createEvent(DOCUMENT_COLLECTION_EVENT_ID, SUMMARY, DESCRIPTION))
+            .withData(JacksonUtils.convertValue(mapper.readTree(eventData)))
+            .withToken(generateEventToken(template, UID, JURISDICTION, CASE_TYPE,
+                caseReference, DOCUMENT_COLLECTION_EVENT_ID))
+            .build();
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        // THEN - new item is saved but without documentFile because callback stripped it
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+        assertThat("Item should not exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newEventDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_document_filter.sql"})
+    public void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
+        final String caseReference = "1504259907353545";
+        final String URL = "/documentData/caseref/" + caseReference;
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final String requestBody = "{"
+            + "\"attribute_path\": \"D8Document\","
+            + "\"case_version\": 1,"
+            + "\"category_id\": \"caseDocuments\""
+            + "}";
+
+        // WHEN
+        mockMvc.perform(put(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(requestBody)
+        ).andExpect(status().is(200));
+
+        // THEN - categoryId updated on D8Document in saved case data
+        final List<CaseDetails> caseDetailsList = template.query(
+            "SELECT * FROM case_data WHERE reference = " + caseReference, this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        assertThat(savedCase.getData(), hasKey("D8Document"));
+        final JsonNode savedDocument = mapper.convertValue(
+            savedCase.getData().get("D8Document"), JsonNode.class);
+        assertThat(savedDocument.path("category_id").asText(), is("caseDocuments"));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*")));
+    }
+
+    @Test
+    public void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        // Callback retains documentFile — nothing dropped
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDataContent))
+            ).andExpect(status().is(201))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        // CDAM was called with the new document hash
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+            .withRequestBody(matchingJsonPath(
+                "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+    }
+
+    @Test
+    public void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+        // Callback strips documentFile from the collection item
+        // This is the bug scenario on case creation — callback rebuilds the collection
+        // item without carrying forward documentFile
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newCallbackDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(1));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should not exist in savedDocuments", documentSaved, is(false));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should exist in savedDocuments", newItemFound, is(true));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
+    }
+
+    @Test
+    public void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
+            + "/case-types/" + CASE_TYPE + "/cases";
+
+        final String newCaseDocumentId = "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
+        final String newEventDocumentHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        final String caseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-002\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCaseDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort
+            + "/documents/" + newCaseDocumentId + "/binary\","
+            + "        \"document_filename\": \"NewDocument.pdf\","
+            + "        \"document_hash\": \"" + newEventDocumentHash + "\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        final String newCallbackDocumentId = "e68c85df-df44-40ae-8c85-dfdf4400ae5a";
+        final String newCallbackDocumentHash = "430058e3436956981d5a29cde2cbf38faf0d1263fbf382b33a55e8477079464e";
+
+        final String callbackResponseData = "{"
+            + "\"PersonFirstName\": \"George\","
+            + "\"PersonLastName\": \"Roof\","
+            + "\"D8Documents\": ["
+            + "  {"
+            + "    \"id\": \"existing-item-id-001\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"EXISTING_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/binary\","
+            + "        \"document_filename\": \"ExistingDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  },"
+            + "  {"
+            + "    \"id\": \"new-item-id-003\","
+            + "    \"value\": {"
+            + "      \"documentType\": \"NEW_TYPE\","
+            + "      \"documentFile\": {"
+            + "        \"document_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "\","
+            + "        \"document_binary_url\": \"http://localhost:" + wiremockPort + "/documents/" + newCallbackDocumentId + "/binary\","
+            + "         \"document_hash\": \"" + newCallbackDocumentHash + "\","
+            + "        \"document_filename\": \"NewDocument.pdf\""
+            + "      }"
+            + "    }"
+            + "  }"
+            + "]"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback/aboutToSubmit"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"data\": " + callbackResponseData + "}")));
+
+        stubFor(WireMock.patch(urlMatching("/cases/documents/attachToCase.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        final CaseDataContent caseDataContent = newCaseDataContent().build();
+        caseDataContent.setEvent(createEvent(CREATE_DOCUMENT_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDataContent.setData(JacksonUtils.convertValue(mapper.readTree(caseData)));
+        caseDataContent.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_DOCUMENT_EVENT_ID));
+
+        // WHEN
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDataContent))
+        ).andExpect(status().is(201));
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertThat(caseDetailsList, hasSize(1));
+        final CaseDetails savedCase = caseDetailsList.get(0);
+
+        final JsonNode savedDocuments = mapper.convertValue(savedCase.getData().get("D8Documents"), JsonNode.class);
+        assertThat(savedDocuments.isArray(), is(true));
+        assertThat(savedDocuments.size(), is(2));
+
+        boolean documentSaved = false;
+
+        for (JsonNode item : savedDocuments) {
+            if ("existing-item-id-001".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-003".equals(item.path("id").asText())
+                && item.path("value")
+                .path("documentFile")
+                .path("document_url")
+                .asText()
+                .contains(newCallbackDocumentId)) {
+                documentSaved = true;
+                break;
+            }
+        }
+        assertThat("Item should exist in savedDocuments", documentSaved, is(true));
+
+        boolean newItemFound = false;
+        for (JsonNode item : savedDocuments) {
+            if ("new-item-id-002".equals(item.path("id").asText())) {
+                newItemFound = true;
+                break;
+            }
+        }
+
+        assertThat("Item should exist in savedDocuments", newItemFound, is(false));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(0,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCaseDocumentId + "')]")));
+
+        com.github.tomakehurst.wiremock.client.WireMock.verify(1,
+            patchRequestedFor(urlMatching("/cases/documents/attachToCase.*"))
+                .withRequestBody(matchingJsonPath(
+                    "$.documentHashTokens[?(@.id == '" + newCallbackDocumentId + "')]")));
+    }
+
+    private String createExampleEventDataWithMissingItems() {
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + super.wiremockPort
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String createExampleEventDataWithCollectionMissingItems() {
+        return "{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"W11 5DF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"Aliases\":["
+            + "{\"id\":\"2\",\"value\":\"Alias2\"}"
+            + "],"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + super.wiremockPort
+            + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
     private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
         List<CaseLink> caseLinks = template.query(
             String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
@@ -5622,7 +6951,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "      \"PersonFirstName\" : \"_ George\",\n"
             + "      \"TelephoneNumber\" : \"_ 07865645667\",\n"
             + "      \"D8Document\" : {\n"
-            + "        \"document_url\" : \"http://localhost:" + this.getPort()
+            + "        \"document_url\" : \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "        \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "      }\n"
@@ -5646,7 +6975,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"case_type_id\":\"TestAddressBookCaseValidate\",\"created_date\":null,\"last_modified\":null,"
             + "\"last_state_modified_date\":null,\"security_classification\":null,"
             + "\"case_data\":{\"PersonLastName\":\"_ Roof\",\"PersonFirstName\":\"_ George\","
-            + "\"D8Document\":{\"document_url\":\"http://localhost:" + getPort()
+            + "\"D8Document\":{\"document_url\":\"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "\"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\"}},"
             + "\"data_classification\":null,\"supplementary_data\":null,\"after_submit_callback_response\":null,"
@@ -5685,7 +7014,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .withOrder(pageOrder)
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withCallBackURLMidEvent("http://localhost:" + getPort() + eventCallBackURI)
+            .withCallBackURLMidEvent(hostUrl + eventCallBackURI)
             .build();
     }
 
@@ -5717,12 +7046,42 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private String expectedCaseDataMultiPage() {
-        return "{\n"
-            + "\t\"PersonLastName\": \"Roof\",\n"
-            + "\t\"CaseNumber\": \"1234567\",\n"
-            + "\t\"PersonFirstName\": \"George\",\n"
-            + "\t\"TelephoneNumber\": \"07865645667\"\n"
-            + "}";
+        return """
+            {
+            "CaseNumber": "1234567",
+            "PersonFirstName": "George",
+            "PersonLastName": "Roof",
+            "TelephoneNumber": "07865645667"
+            }""";
+    }
+
+    private String expectedCaseDataFieldRestore() {
+        return """
+            {
+              	"CaseNumber": "1234567",
+              	"PersonFirstName": "George",
+              	"PersonLastName": "Roof",
+              	"PersonAddress": {
+              		"AddressLine2": "Fake Street",
+              		"AddressLine3": "Hexton",
+              		"AddressLine1": "123"
+              	},
+              	"TelephoneNumber": "07865645667"
+              }""";
+    }
+
+    private String expectedCaseDataFieldSkipRestore() {
+        return """
+            {
+              	"CaseNumber": "1234567",
+              	"PersonFirstName": "George",
+              	"PersonLastName": "Roof",
+              	"PersonAddress": {
+              		"AddressLine2": "Fake Street",
+              		"AddressLine3": "Hexton"
+              	},
+              	"TelephoneNumber": "07865645667"
+              }""";
     }
 
     private String secondPageData() {
@@ -5730,7 +7089,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5746,7 +7105,28 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseField41\":\"_ Test987\","
             + "\"CaseField42\":\"_ Test567\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataFieldRestore() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"CaseField31\":\"_ Test123\","
+            + "\"CaseField32\":\"_ Test765\","
+            + "\"CaseField41\":\"_ Test987\","
+            + "\"CaseField42\":\"_ Test567\","
+            + "\"PersonAddress\":{"
+            +     "\"AddressLine1\":\"123\","
+            +     "\"AddressLine2\":\"Fake Street\","
+            +     "\"AddressLine3\":\"Hexton\""
+            + "},"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + super.wiremockPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5756,7 +7136,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"PersonLastName\":\"Roof\","
             + "\"PersonFirstName\":\"George\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5768,7 +7148,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "}"
             + "}";
     }
@@ -5780,7 +7160,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"CaseNumber\":\"_ 1234567\","
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
-            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "\"document_url\": \"" + hostUrl + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
             + "},"
             + "\"TTL\":{"
             + "\"Suspended\": \"No\","

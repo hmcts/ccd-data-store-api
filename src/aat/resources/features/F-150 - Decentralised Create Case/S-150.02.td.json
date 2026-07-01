@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-150.02",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
+  "title": "Retrieve decentralised case after creation",
+  "prerequisites": [
+    {
+      "F-150_CreateCase_Token_Creation": "F-150_CreateCase_Token_Creation"
+    },
+    {
+      "S-150.01_Prereq": "S-150.01_Prereq"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains the case reference of the case just created",
+    "contains the details of the case just created, along with an HTTP-200 OK"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_Decentralisation",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}"
+        }
+      },
+      "id": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][id]}",
+      "created_on": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][created_on]}",
+      "last_modified_on": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][last_modified_on]}",
+      "last_state_modified_on": "${[scenarioContext][childContexts][S-150.01_Prereq][testData][actualResponse][body][last_state_modified_on]}",
+      "data": {
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
+      }
+    }
+  }
+}

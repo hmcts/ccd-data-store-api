@@ -3,13 +3,13 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -25,7 +25,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -52,14 +52,14 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private MockMvc mockMvc;
 
     private JdbcTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
             MockUtils.ROLE_CASEWORKER_PUBLIC);

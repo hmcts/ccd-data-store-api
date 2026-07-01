@@ -50,7 +50,7 @@ class StartEventControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         Map<String, JsonNode> data = Maps.newHashMap();
         data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
         CASE_DETAILS.setData(data);

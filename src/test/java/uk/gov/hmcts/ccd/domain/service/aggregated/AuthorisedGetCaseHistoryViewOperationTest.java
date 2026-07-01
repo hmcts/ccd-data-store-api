@@ -133,7 +133,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         FIELD_1.setAccessControlLists(ACCESS_CONTROL_LISTS);
         FIELD_2.setAccessControlLists(ACCESS_CONTROL_LISTS);

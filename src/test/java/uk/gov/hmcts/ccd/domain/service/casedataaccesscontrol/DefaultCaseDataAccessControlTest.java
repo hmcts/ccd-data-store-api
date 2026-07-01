@@ -1158,7 +1158,7 @@ class DefaultCaseDataAccessControlTest {
 
 
     @Nested
-    class GenerateAccessMetadata {
+    public class GenerateAccessMetadata {
 
         private CaseDetails caseDetails;
 

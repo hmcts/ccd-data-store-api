@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 
@@ -57,7 +57,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 

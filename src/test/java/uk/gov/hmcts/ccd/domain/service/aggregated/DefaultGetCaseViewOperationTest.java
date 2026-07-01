@@ -56,7 +56,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -128,7 +127,7 @@ class DefaultGetCaseViewOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
@@ -146,7 +145,7 @@ class DefaultGetCaseViewOperationTest {
         auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
-        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(any());
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 

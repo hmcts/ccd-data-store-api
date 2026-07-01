@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newConcurrentMap;
 import static org.springframework.http.HttpHeaders.ETAG;
 
 @Slf4j
@@ -60,7 +60,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private final RestTemplate restTemplate;
 
     // UserId as a key, Pair<ETag, RoleAssignmentResponse> as a value
-    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newHashMap();
+    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newConcurrentMap();
 
     public DefaultRoleAssignmentRepository(final ApplicationParams applicationParams,
                                            final SecurityUtils securityUtils,
@@ -123,7 +123,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         } catch (Exception e) {
             log.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+                && ((HttpClientErrorException) e).getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
                                                                   userId, e.getMessage()));
             } else {
@@ -255,7 +255,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private RuntimeException mapException(Exception exception, ResourceNotFoundException resourceNotFoundException) {
 
         if (exception instanceof HttpClientErrorException
-            && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+            && ((HttpClientErrorException) exception).getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
             return resourceNotFoundException;
         } else {
             return mapException(exception, "getting");
@@ -265,7 +265,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private RuntimeException mapException(Exception exception, String processDescription) {
 
         if (exception instanceof HttpClientErrorException
-            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
+            && HttpStatus.valueOf(((HttpClientErrorException) exception).getStatusCode().value()).is4xxClientError()) {
             return new BadRequestException(
                 String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
         } else {

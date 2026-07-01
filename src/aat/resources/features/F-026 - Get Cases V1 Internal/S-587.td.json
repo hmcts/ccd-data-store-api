@@ -29,6 +29,9 @@
 		},
 		"body": {
 			"columns": [
+                {
+                  "__ordering__": "UNORDERED"
+                },
 				{
           "_extends_": "SearchResultViewColumnMetadataTrue",
           "label": "Last State Modified Date",

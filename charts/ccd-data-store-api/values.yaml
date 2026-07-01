@@ -1,8 +1,10 @@
 elastic:
   enabled: false
+ccd:
+  enabled: false
 
 java:
-  image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest'
+  image: 'hmctsprod.azurecr.io/ccd/data-store-api:latest'
   ingressHost: ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4452
   aadIdentityName: ccd
@@ -61,7 +63,7 @@ java:
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
     ELASTIC_SEARCH_REQUEST_TIMEOUT: 6000
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: 'true'
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS: '5000'
     ELASTIC_SEARCH_NODES_DISCOVERY_FILTER: '_all'
     ENABLE_CASE_GROUP_ACCESS_FILTERING: true

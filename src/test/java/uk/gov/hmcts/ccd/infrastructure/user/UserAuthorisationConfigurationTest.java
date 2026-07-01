@@ -39,7 +39,7 @@ class UserAuthorisationConfigurationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         userInfo = UserInfo.builder()
             .uid(USER_ID)

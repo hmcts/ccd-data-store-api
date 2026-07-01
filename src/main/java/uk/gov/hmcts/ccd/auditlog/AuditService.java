@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.service.lau.AuditCaseRemoteOperation;
+import uk.gov.hmcts.ccd.domain.service.lau.AuditRemoteOperation;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -26,13 +26,13 @@ public class AuditService {
     private final UserRepository userRepository;
     private final AuditRepository auditRepository;
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
-    private final AuditCaseRemoteOperation auditCaseRemoteOperation;
+    private final AuditRemoteOperation auditCaseRemoteOperation;
 
     public AuditService(@Qualifier("utcClock") final Clock clock,
                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                         @Lazy final SecurityUtils securityUtils, final AuditRepository auditRepository,
                         final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration,
-                        final AuditCaseRemoteOperation auditCaseRemoteOperation) {
+                        final AuditRemoteOperation auditCaseRemoteOperation) {
         this.clock = clock;
         this.userRepository = userRepository;
         this.securityUtils = securityUtils;

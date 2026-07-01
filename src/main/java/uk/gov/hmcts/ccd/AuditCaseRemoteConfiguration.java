@@ -1,10 +1,7 @@
 package uk.gov.hmcts.ccd;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.net.http.HttpClient;
 
 @Configuration
 public class AuditCaseRemoteConfiguration {
@@ -31,13 +28,6 @@ public class AuditCaseRemoteConfiguration {
 
     public String getCaseSearchAuditUrl() {
         return this.lauRemoteCaseAuditUrl + this.lauRemoteCaseAuditSearchPath;
-    }
-
-    @Bean(name = "httpClientAudit")
-    public HttpClient httpClientAudit() {
-        return HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .build();
     }
 
 }

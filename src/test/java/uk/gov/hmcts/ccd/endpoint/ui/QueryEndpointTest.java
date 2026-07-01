@@ -73,7 +73,7 @@ class QueryEndpointTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         queryEndpoint = new QueryEndpoint(getCaseViewOperation,
                                           getCaseHistoryViewOperation,
                                           getEventTriggerOperation,

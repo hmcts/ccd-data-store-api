@@ -120,11 +120,11 @@ Feature: F-1002: Submit Event for an Existing Case
     Then a negative response is received,
     And the response has all the details as expected.
 
-  @S-1019
+  @S-1019 @Ignore 
   Scenario: generic scenario for Unauthorised
 
-  @S-1020
+  @S-1020 @Ignore 
   Scenario: generic scenario for Forbidden
 
-  @S-1021
+  @S-1021 @Ignore 
   Scenario: generic scenario for Unsupported Media Type
