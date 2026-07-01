@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-110.2",
-	"_extends_": "F-109_Test_Data_Base",
+	"_extends_": "F-110_Test_Data_Base",
 
 	"title": "must return an error for date value with invalid format",
 
@@ -83,7 +83,6 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-103_GetToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },

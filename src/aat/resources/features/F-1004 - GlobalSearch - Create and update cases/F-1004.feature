@@ -23,6 +23,8 @@ Feature: F-1004: Global Search - Create and update cases
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.3
   Scenario:  Update the Data Store for "case create" using V2: /case-types/{caseTypeId}/cases endpoint
@@ -55,6 +57,8 @@ Feature: F-1004: Global Search - Create and update cases
     And it is submitted to call the [Submit case update event creation as a Citizen (V1)] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.6
   Scenario:  Update the Data Store for "case update" using V2: /cases/{caseId}/events endpoint
@@ -88,6 +92,8 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received
     And the response [contains a SearchCriteria with SearchParty excluding the Dates]
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.9
   Scenario:  "Successfully creates a case with wrong data type for Date fields using V2: /case-types/{caseTypeId}/cases endpoint",
@@ -123,6 +129,8 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received
     And the response [contains a SearchCriteria with SearchParty excluding the Dates]
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.12
   Scenario:  Successfully updates a case with wrong data type for Date fields using V2: /cases/{caseId}/events
@@ -178,6 +186,8 @@ Feature: F-1004: Global Search - Create and update cases
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.17
   Scenario:  Update the Data Store for "case create" when valid data has been entered correctly in the CollectionFieldName using V2: /case-types/{caseTypeId}/cases endpoint
@@ -212,6 +222,8 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received,
     And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
     And the response has all other details as expected
+        # Clean up role assignment made above
+    And a successful call [is made to remove Case Role] as in [F-1004_Remove_Case_Assigned_User_role_for_Case].
 
   @S-1004.20
   Scenario:  Update the Data Store for "case update" when valid data has been entered correctly in the CollectionFieldName using V2: /cases/{caseId}/events endpoint

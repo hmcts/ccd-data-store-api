@@ -1,0 +1,13 @@
+{
+  "_guid_": "S-1019.25",
+  "_extends_": "F-1019_Update_Case_Link_TO_LINK_TO_CreateAnotherCasePreRequisiteCaseworkerBase",
+
+  "title": "Standard CaseLinks field should generate caseLink records with StandardLink set to true when Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "create case to case link",
+    "contains the standard CaseLinks field with Case Reference values",
+    "As a prerequisite"
+  ]
+}
