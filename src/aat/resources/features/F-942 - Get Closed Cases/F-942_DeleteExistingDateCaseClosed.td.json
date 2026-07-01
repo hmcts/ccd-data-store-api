@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-942.1_DeleteExistingDateCaseClosed",
+  "_guid_": "F-942_DeleteExistingDateCaseClosed",
   "title": "Delete existing date case closed records for get closed cases",
   "specs": [
     "to delete existing date case closed records"
@@ -22,9 +22,6 @@
       "_extends_": "Common_Request_Headers"
     },
     "queryParams": {
-      "caseTypeId": "AAT_AUTH_15",
-      "state": "Closed",
-      "stateCategory": "Closed",
       "stateChangedDate": "${[scenarioContext][customValues][today]}"
     }
   },

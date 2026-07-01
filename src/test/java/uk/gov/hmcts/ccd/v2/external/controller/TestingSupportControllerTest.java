@@ -120,26 +120,13 @@ class TestingSupportControllerTest {
         when(session.getTransaction())
             .thenReturn(transaction);
 
-        ResponseEntity<Void> response = testingSupportController.dateCaseClosedDelete(
-            "AAT_AUTH_15",
-            "Closed",
-            "Closed",
-            LocalDate.of(2025, 1, 1)
-        );
+        ResponseEntity<Void> response = testingSupportController.dateCaseClosedDelete(LocalDate.of(2025, 1, 1));
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(session).createNativeQuery(
             "DELETE FROM date_case_closed "
-                + "WHERE ccd_case_number IN ("
-                + "SELECT reference FROM case_data WHERE case_type_id = :caseTypeId"
-                + ") "
-                + "AND state = :state "
-                + "AND state_category = :stateCategory "
-                + "AND state_changed_date < :stateChangedDateEnd"
+                + "WHERE state_changed_date < :stateChangedDateEnd"
         );
-        verify(nativeQuery).setParameter("caseTypeId", "AAT_AUTH_15");
-        verify(nativeQuery).setParameter("state", "Closed");
-        verify(nativeQuery).setParameter("stateCategory", "Closed");
         verify(nativeQuery).setParameter("stateChangedDateEnd", Timestamp.valueOf("2025-01-02 00:00:00"));
     }
 }

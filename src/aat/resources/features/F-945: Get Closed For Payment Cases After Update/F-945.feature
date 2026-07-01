@@ -3,8 +3,7 @@ Feature: F-945: Update closed for payment cases
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a call [to delete existing date case closed records for state category closed for payment] will get the expected response as in [F-944_DeleteExistingDateCaseClosed],
-    And a call [to delete existing date case closed records] will get the expected response as in [S-942.1_DeleteExistingDateCaseClosed],
+    And a call [to delete existing date case closed records] will get the expected response as in [F-942_DeleteExistingDateCaseClosed],
 
   @S-945.1
   Scenario: Return updated case when update event post state is closed for payment
