@@ -960,10 +960,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-<<<<<<< combined_ccd_6395_ccd_4311
-=======
-
->>>>>>> master
         assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -1263,7 +1259,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-<<<<<<< combined_ccd_6395_ccd_4311
     public void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -3697,10 +3692,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
         Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
-<<<<<<< combined_ccd_6395_ccd_4311
-=======
-
->>>>>>> master
         assertAll(() ->
             assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
                 .containsAll(actualData.entrySet())),
