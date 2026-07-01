@@ -112,14 +112,9 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
-<<<<<<< combined_ccd_6395_ccd_4311
-// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
-env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
-env.TOKEN_CLAIM_VALIDATION_ENABLED="true"
-=======
 // Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctsprod ACR
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
->>>>>>> master
+env.TOKEN_CLAIM_VALIDATION_ENABLED="true"
 
 withPipeline(type, product, component) {
     onMaster {
