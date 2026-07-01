@@ -1322,9 +1322,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
-=======
-    void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
->>>>>>> master
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
