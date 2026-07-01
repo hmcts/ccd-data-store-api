@@ -151,7 +151,7 @@ class CaseSearchResultViewGeneratorTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseSearchesViewAccessControl = new CaseSearchesViewAccessControl(caseTypeService,
             searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
 
@@ -321,8 +321,6 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any()))
             .thenReturn(caseType1SearchResult, caseType2SearchResult);
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
-            .thenReturn(true);
 
         classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService,
             dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl, applicationParams);
@@ -647,7 +645,7 @@ class CaseSearchResultViewGeneratorTest {
             () -> verify(caseDataAccessControl, never()).generateAccessMetadata(anyString())
         );
     }
-    
+
     @Test
     void shouldBuildResultsWithCaseAccessMetadataWhenEnabled() {
         when(applicationParams.getInternalSearchCaseAccessMetadataEnabled()).thenReturn(true);

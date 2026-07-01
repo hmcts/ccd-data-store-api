@@ -1,0 +1,899 @@
+{
+  "id": "CaseID",
+  "case_fields": [
+    {
+      "id": "applicant1Flags",
+      "label": "Applicant/Applicant1 Flags",
+      "hidden": null,
+      "order": null,
+      "metadata": false,
+      "case_type_id": "CaseID",
+      "hint_text": null,
+      "field_type": {
+        "id": "Flags",
+        "type": "Complex",
+        "min": null,
+        "max": null,
+        "regular_expression": null,
+        "fixed_list_items": [],
+        "complex_fields": [
+          {
+            "id": "roleOnCase",
+            "label": "Role On Case",
+            "hidden": null,
+            "order": null,
+            "metadata": false,
+            "case_type_id": null,
+            "hint_text": null,
+            "field_type": {
+              "id": "Text",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "show_condition": null,
+            "acls": [
+              {
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true,
+                "role": "caseworker-probate-loa1"
+              }
+            ],
+            "complexACLs": [],
+            "display_context": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": true,
+            "formatted_value": null,
+            "category_id": null
+          },
+          {
+            "id": "partyName",
+            "label": "Party Name",
+            "hidden": null,
+            "order": null,
+            "metadata": false,
+            "case_type_id": null,
+            "hint_text": null,
+            "field_type": {
+              "id": "Text",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "show_condition": null,
+            "acls": [
+              {
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true,
+                "role": "caseworker-probate-loa1"
+              }
+            ],
+            "complexACLs": [],
+            "display_context": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": true,
+            "formatted_value": null,
+            "category_id": null
+          },
+          {
+            "id": "details",
+            "label": "Flag Details",
+            "hidden": null,
+            "order": null,
+            "metadata": false,
+            "case_type_id": null,
+            "hint_text": null,
+            "field_type": {
+              "id": "FlagDetailsCollection",
+              "type": "Collection",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": {
+                "id": "FlagDetails",
+                "type": "Complex",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [
+                  {
+                    "id": "name",
+                    "label": "Name",
+                    "hidden": null,
+                    "order": 1,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "name_cy",
+                    "label": "Name in Welsh",
+                    "hidden": null,
+                    "order": 2,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "subTypeValue",
+                    "label": "Value",
+                    "hidden": null,
+                    "order": 3,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "subTypeValue_cy",
+                    "label": "Value in Welsh",
+                    "hidden": null,
+                    "order": 4,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "subTypeKey",
+                    "label": "Key",
+                    "hidden": null,
+                    "order": 5,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "otherDescription",
+                    "label": "Other Description",
+                    "hidden": null,
+                    "order": 6,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "otherDescription_cy",
+                    "label": "Other Description in Welsh",
+                    "hidden": null,
+                    "order": 7,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "flagComment",
+                    "label": "Comments",
+                    "hidden": null,
+                    "order": 8,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "flagComment_cy",
+                    "label": "Comments in Welsh",
+                    "hidden": null,
+                    "order": 9,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "flagUpdateComment",
+                    "label": "Update Comments",
+                    "hidden": null,
+                    "order": 10,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "dateTimeModified",
+                    "label": "Modified Date",
+                    "hidden": null,
+                    "order": 11,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "DateTime",
+                      "type": "DateTime",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "dateTimeCreated",
+                    "label": "Created Date",
+                    "hidden": null,
+                    "order": 12,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "DateTime",
+                      "type": "DateTime",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "path",
+                    "label": "Path",
+                    "hidden": null,
+                    "order": 13,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "PathCollection",
+                      "type": "Collection",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": {
+                        "id": "Text",
+                        "type": "Text",
+                        "min": null,
+                        "max": null,
+                        "regular_expression": null,
+                        "fixed_list_items": [],
+                        "complex_fields": [],
+                        "collection_field_type": null
+                      }
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "hearingRelevant",
+                    "label": "Requires Hearing",
+                    "hidden": null,
+                    "order": 14,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "YesOrNo",
+                      "type": "YesOrNo",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "flagCode",
+                    "label": "Reference Code",
+                    "hidden": null,
+                    "order": 15,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "status",
+                    "label": "Status",
+                    "hidden": null,
+                    "order": 16,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "Text",
+                      "type": "Text",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  },
+                  {
+                    "id": "availableExternally",
+                    "label": "Availability to Non Staff",
+                    "hidden": null,
+                    "order": 17,
+                    "metadata": false,
+                    "case_type_id": null,
+                    "hint_text": null,
+                    "field_type": {
+                      "id": "YesOrNo",
+                      "type": "YesOrNo",
+                      "min": null,
+                      "max": null,
+                      "regular_expression": null,
+                      "fixed_list_items": [],
+                      "complex_fields": [],
+                      "collection_field_type": null
+                    },
+                    "security_classification": "PUBLIC",
+                    "live_from": null,
+                    "live_until": null,
+                    "show_condition": null,
+                    "acls": [
+                      {
+                        "create": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true,
+                        "role": "caseworker-probate-loa1"
+                      }
+                    ],
+                    "complexACLs": [],
+                    "display_context": null,
+                    "display_context_parameter": null,
+                    "retain_hidden_value": true,
+                    "formatted_value": null,
+                    "category_id": null
+                  }
+                ],
+                "collection_field_type": null
+              }
+            },
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "show_condition": null,
+            "acls": [
+              {
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true,
+                "role": "caseworker-probate-loa1"
+              }
+            ],
+            "complexACLs": [],
+            "display_context": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": true,
+            "formatted_value": null,
+            "category_id": null
+          },
+          {
+            "id": "groupId",
+            "label": "A GUID. To be set by the service when creating the 2 collections",
+            "hidden": null,
+            "order": null,
+            "metadata": false,
+            "case_type_id": null,
+            "hint_text": null,
+            "field_type": {
+              "id": "Text",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "show_condition": null,
+            "acls": [
+              {
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true,
+                "role": "caseworker-probate-loa1"
+              }
+            ],
+            "complexACLs": [],
+            "display_context": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null,
+            "formatted_value": null,
+            "category_id": null
+          },
+          {
+            "id": "visibility",
+            "label": "\tVisibility should be one of 2 values: Internal or External",
+            "hidden": null,
+            "order": null,
+            "metadata": false,
+            "case_type_id": null,
+            "hint_text": null,
+            "field_type": {
+              "id": "Text",
+              "type": "Text",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [],
+              "collection_field_type": null
+            },
+            "security_classification": "PUBLIC",
+            "live_from": null,
+            "live_until": null,
+            "show_condition": null,
+            "acls": [
+              {
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true,
+                "role": "caseworker-probate-loa1"
+              }
+            ],
+            "complexACLs": [],
+            "display_context": null,
+            "display_context_parameter": null,
+            "retain_hidden_value": null,
+            "formatted_value": null,
+            "category_id": null
+          }
+        ],
+        "collection_field_type": null
+      },
+      "security_classification": "PUBLIC",
+      "live_from": "2017-01-01",
+      "live_until": null,
+      "show_condition": null,
+      "acls": [
+        {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true,
+          "role": "caseworker-probate-loa1"
+        }
+      ],
+      "complexACLs": [],
+      "display_context": null,
+      "display_context_parameter": null,
+      "retain_hidden_value": null,
+      "formatted_value": null,
+      "category_id": null
+    }
+  ]
+}

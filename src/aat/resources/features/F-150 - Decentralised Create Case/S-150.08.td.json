@@ -1,0 +1,13 @@
+{
+  "_guid_": "S-150.08",
+  "_extends_": "F-150_CreateCase_ValidationError",
+  "title": "must surface validation errors returned by decentralised service during create",
+  "specs": [
+    "As a prerequisite",
+    "an active profile in CCD",
+    "uses the FT_Decentralisation case type",
+    "triggers decentralised validation errors",
+    "contains an HTTP 422 'Unprocessable Entity'",
+    "propagates callbackErrors and callbackWarnings"
+  ]
+}

@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.model.std.validator.globalsearch;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class SearchCriteriaValidator implements ConstraintValidator<ValidSearchCriteria, SearchCriteria> {
 

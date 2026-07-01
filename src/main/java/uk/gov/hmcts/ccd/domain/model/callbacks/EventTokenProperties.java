@@ -9,6 +9,11 @@ public final class EventTokenProperties {
     public static final String CASE_VERSION = "case-version";
     public static final String CASE_STATE = "case-state";
     public static final String ENTITY_VERSION = "entity-version";
+    /**
+     * Snapshot of {@link uk.gov.hmcts.ccd.domain.model.definition.CaseDetails#getRevision()} captured when
+     * an event is started. Enables submit-time optimistic concurrency checks.
+     */
+    public static final String CASE_REVISION = "case-revision";
 
     private final String uid;
     private final String caseId;
@@ -18,6 +23,7 @@ public final class EventTokenProperties {
     private final String version;
     private final String caseState;
     private final String entityVersion;
+    private final String caseRevision;
 
     public EventTokenProperties(final String uid,
                                 final String caseId,
@@ -26,7 +32,8 @@ public final class EventTokenProperties {
                                 final String caseTypeId,
                                 final String version,
                                 final String caseState,
-                                final String entityVersion) {
+                                final String entityVersion,
+                                final String caseRevision) {
         this.uid = uid;
         this.caseId = caseId;
         this.jurisdictionId = jurisdictionId;
@@ -35,6 +42,7 @@ public final class EventTokenProperties {
         this.version = version;
         this.caseState = caseState;
         this.entityVersion = entityVersion;
+        this.caseRevision = caseRevision;
     }
 
     public String getCaseId() {
@@ -67,5 +75,9 @@ public final class EventTokenProperties {
 
     public String getEntityVersion() {
         return entityVersion;
+    }
+
+    public String getCaseRevision() {
+        return caseRevision;
     }
 }

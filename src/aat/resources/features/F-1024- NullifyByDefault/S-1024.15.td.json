@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-1024.15",
+  "_extends_": "MidEvent_v2Ext__Base",
+
+  "title": "During validation, Mid-event callback updates TTL value for v2_external#/case-data-validator-controller/validateUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is not null",
+    "has the 400 OK code"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEventUpdate"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+    "pathVariables": {
+      "ctid": "FT_MasterCaseType"
+    },
+    "queryParams": {
+      "pageId": "createCaseTTLMENotNullSingleFormPage"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLMENotNull"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "400_TTL_Modified"
+  }
+}

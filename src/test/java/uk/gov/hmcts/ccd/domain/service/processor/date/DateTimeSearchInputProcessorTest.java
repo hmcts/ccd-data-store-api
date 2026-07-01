@@ -22,8 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParser;
-import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +62,7 @@ class DateTimeSearchInputProcessorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         CriteriaInput criteriaInput1 = new CriteriaInput();
         CriteriaInput criteriaInput2 = new CriteriaInput();

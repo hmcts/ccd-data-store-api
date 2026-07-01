@@ -41,7 +41,7 @@ class ClassifiedCaseSearchOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         case1 = new CaseDetails();
         case2 = new CaseDetails();

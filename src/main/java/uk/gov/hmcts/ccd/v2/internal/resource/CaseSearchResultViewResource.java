@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,14 +15,14 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@ApiModel(description = "")
+@Schema
 public class CaseSearchResultViewResource extends RepresentationModel {
 
-    @ApiModelProperty(value = "Headers for each case type")
+    @Schema(description = "Headers for each case type")
     private List<SearchResultViewHeaderGroup> headers;
-    @ApiModelProperty(value = "All cases across case types")
+    @Schema(description = "All cases across case types")
     private List<SearchResultViewItem> cases;
-    @ApiModelProperty(value = "Total number of search results (including results not returned due to pagination)")
+    @Schema(description = "Total number of search results (including results not returned due to pagination)")
     private Long total;
 
     public CaseSearchResultViewResource(@NonNull CaseSearchResultView caseSearchResultView) {

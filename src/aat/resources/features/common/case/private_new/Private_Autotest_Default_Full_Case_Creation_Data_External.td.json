@@ -1,0 +1,40 @@
+{
+	"_guid_": "Private_Autotest_Default_Full_Case_Creation_Data_External",
+	"_extends_": "Private_Autotest_Case_Creation_Base_Data",
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "ExternalCaseworkerSolicitor"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_PRIVATE"
+		},
+    "body": {
+      "data": {
+        "_extends_": "Private_Autotest_Default_Full_Case_Data_External"
+      }
+    }
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "AUTOTEST1",
+			"case_type_id": "AAT_PRIVATE",
+			"case_data": {
+				"_extends_": "Private_Autotest_Default_Full_Case_Data_External"
+			},
+			"data_classification": {
+				"MoneyGBPField": "PRIVATE",
+				"PhoneUKField": "PRIVATE",
+				"NumberField": "PRIVATE",
+				"YesOrNoField": "PRIVATE",
+				"TextField": "PRIVATE"
+			},
+			"supplementary_data": null
+		}
+	}
+}

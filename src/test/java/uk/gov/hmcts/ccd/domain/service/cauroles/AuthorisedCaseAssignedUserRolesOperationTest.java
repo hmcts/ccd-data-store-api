@@ -29,7 +29,7 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         authorisedCaseAssignedUserRolesOperation = new AuthorisedCaseAssignedUserRolesOperation(
             defaultCaseAssignedUserRolesOperation,
             caseAssignedUserRoleValidator);

@@ -12,6 +12,8 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -74,7 +76,9 @@ public class CaseService {
      * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
-        content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        if (content.getEventData() != null) {
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        }
         return caseDetails;
     }
 
@@ -143,6 +147,31 @@ public class CaseService {
                 }
             });
 
+        return data;
+    }
+
+
+    public Map<String, JsonNode> buildJsonFromCaseFieldsWithNullifyByDefault(CaseTypeDefinition caseTypeDefinition,
+        List<CaseEventFieldDefinition> caseEventDefinition) {
+        Map<String, JsonNode> data = new HashMap<>();
+
+        caseEventDefinition.forEach(
+            caseField -> {
+                Boolean nullifyByDefault = caseField.getNullifyByDefault();
+                if (Boolean.TRUE.equals(nullifyByDefault)) {
+                    Optional<CaseFieldDefinition> caseFieldDefinition = caseTypeDefinition
+                        .getCaseField(caseField.getCaseFieldId());
+                    if (caseFieldDefinition.isPresent()) {
+                        if (caseFieldDefinition.get().isCollectionFieldType()) {
+                            data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().arrayNode());
+                        } else if (caseFieldDefinition.get().isComplexFieldType()) {
+                            data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().objectNode());
+                        } else {
+                            data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().nullNode());
+                        }
+                    }
+                }
+            });
         return data;
     }
 }

@@ -66,7 +66,7 @@ class AuditServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository,
             auditCaseRemoteConfiguration, auditCaseRemoteOperation);
         IdamUser user = new IdamUser();

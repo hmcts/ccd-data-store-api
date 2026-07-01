@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-1024.11",
+  "_extends_": "MidEvent_v1Ext_Citizen__PositiveResponse_Base",
+
+  "title": "During validation, adjust any validation on TTL for v1_external#/case-details-endpoint/validateCaseDetailsUsingPOST_1",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "C1, which has been",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEvent"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "queryParams": {
+      "pageId": "createCaseTTLMidEventToUpperSingleFormPage"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLMidEvent"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

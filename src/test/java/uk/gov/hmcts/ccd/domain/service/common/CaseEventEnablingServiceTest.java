@@ -25,7 +25,7 @@ class CaseEventEnablingServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.caseEventEnablingService = new CaseEventEnablingService(this.enablingConditionParser);
     }
 

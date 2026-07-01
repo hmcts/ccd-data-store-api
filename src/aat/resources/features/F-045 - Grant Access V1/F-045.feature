@@ -23,6 +23,8 @@ Scenario: must return 201 if the grant is successful for a user to a valid case 
       And the response [has the 201 return code],
       And the response has all other details as expected,
       And a call [to verify testUser has been granted a case role for the case] will get the expected response as in [F-045_Verify_Granted_Case_Role_for_Case].
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-045_S-151_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-152
@@ -117,5 +119,7 @@ Scenario: must grant without removing other case roles
       And the response [has the 201 return code],
       And the response has all other details as expected,
       And a call [to verify testUser has been granted multiple case roles for the case] will get the expected response as in [F-045_Verify_Granted_Multiple_Case_Roles_for_Case].
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-045_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

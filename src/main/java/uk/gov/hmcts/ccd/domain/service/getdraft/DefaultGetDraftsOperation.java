@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getdraft;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 

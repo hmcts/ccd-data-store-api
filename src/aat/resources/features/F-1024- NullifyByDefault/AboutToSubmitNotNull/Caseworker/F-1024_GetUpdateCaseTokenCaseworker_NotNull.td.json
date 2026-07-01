@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-1024_GetUpdateCaseTokenCaseworker_NotNull",
+  "_extends_": "F-1024_GetEventTokenBase_NotNull",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1024_CreateCasePreRequisiteCaseworker_AboutToSubmit_NotNull][testData][actualResponse][body][id]}"
+    }
+  }
+}

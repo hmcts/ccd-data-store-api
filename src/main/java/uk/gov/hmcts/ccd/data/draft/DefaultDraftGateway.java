@@ -13,7 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -97,7 +97,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 HttpMethod.PUT, requestEntity, HttpEntity.class);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
-            if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
+            if (e.getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
             throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
@@ -122,7 +122,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId={}", draftId, e);
-            if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
+            if (e.getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
             throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
@@ -150,7 +150,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 requestEntity, Draft.class);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while deleting draftId=" + draftId, e);
-            if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
+            if (e.getStatusCode().value() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
             throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);

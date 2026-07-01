@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 class JacksonUtilsTest {
@@ -404,5 +406,21 @@ class JacksonUtilsTest {
         Map<String, JsonNode> result = new HashMap<>();
         result.put("OrganisationPolicyField", data);
         return result;
+    }
+
+    @Test
+    void testConvertValueInDataFieldFromMap() {
+        Map<String, JsonNode> inputMap = new HashMap<>();
+        inputMap.put("data1", MAPPER.getNodeFactory().textNode("Name_1"));
+        inputMap.put("data2", MAPPER.getNodeFactory().numberNode(42));
+
+        Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey(DATA));
+
+        JsonNode dataNode = result.get(DATA);
+        assertEquals("Name_1", dataNode.get("data1").asText());
+        assertEquals(42, dataNode.get("data2").asInt());
     }
 }

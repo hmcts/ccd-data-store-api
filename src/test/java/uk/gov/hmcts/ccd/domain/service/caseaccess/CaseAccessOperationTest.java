@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -28,6 +29,8 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -55,6 +58,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -106,6 +110,9 @@ class CaseAccessOperationTest {
     @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
+    @Mock
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
 
@@ -113,6 +120,16 @@ class CaseAccessOperationTest {
     void setUp() {
         configureCaseRepository(JURISDICTION);
         when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(true);
+
+        doAnswer(invocation -> {
+            String caseReference = invocation.getArgument(0);
+            var updateRequest = invocation.getArgument(1,
+                uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest.class);
+            updateRequest.getOperationProperties(SupplementaryDataOperation.INC).forEach((path, value) ->
+                supplementaryDataRepository.incrementSupplementaryData(caseReference, path, value)
+            );
+            return null;
+        }).when(supplementaryDataUpdateOperation).updateSupplementaryData(anyString(), any());
     }
 
 
@@ -1408,6 +1425,59 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("should clear organisation user new_case for single new case-user relationship")
+        void shouldClearNewCaseOrganisationForSingleNewRelationship() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .setSupplementaryData(CASE_REFERENCE.toString(), getOrgUserNewCaseSupDataKey(ORGANISATION), false);
+
+            verifyNoInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("should clear organisation new user for multiple new case-user relationship")
+        void shouldClearNewCaseOrganisationForMultipleNewRelationships() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = getCaseAssignedUserRoleWithOrganisations();
+
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
+                // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
+                // (i.e. to check adjusting count still works in multiple)
+                createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
+                .findSupplementaryData(
+                    CASE_REFERENCE_OTHER.toString(),
+                    Collections.singleton(getOrgUserNewCaseSupDataKey(ORGANISATION_OTHER))
+                );
+
+            verifyNoInteractions(roleAssignmentService);
+        }
+
+        @Test
         @DisplayName("should increment organisation user count for multiple new case-user relationship")
         void shouldIncrementOrganisationUserCountForMultipleNewRelationships() {
 
@@ -2551,6 +2621,10 @@ class CaseAccessOperationTest {
         return "orgs_assigned_users." + organisationId;
     }
 
+    private String getOrgUserNewCaseSupDataKey(String organisationId) {
+        return NewCaseUtils.SUPPLEMENTRY_DATA_NEW_CASE + "." + organisationId;
+    }
+
     @SuppressWarnings("SameParameterValue")
     private void assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
         final String expectedCaseId,
@@ -2601,4 +2675,30 @@ class CaseAccessOperationTest {
             .thenReturn(secondCallCaseUserRoles);
     }
 
+    private List<CaseAssignedUserRoleWithOrganisation> getCaseAssignedUserRoleWithOrganisations() {
+        return Lists.newArrayList(
+            // CASE_REFERENCE/CASE_ID
+            // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
+                ORGANISATION_OTHER),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER,
+                ORGANISATION_OTHER),
+
+            // CASE_REFERENCE_OTHER/CASE_ID_OTHER
+            // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
+            // (however 2nd org count will not be required as existing relationship added below **)
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
+                ORGANISATION),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
+                ORGANISATION_OTHER),
+            new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER,
+                CASE_ROLE_OTHER, ORGANISATION_OTHER)
+        );
+
+    }
 }

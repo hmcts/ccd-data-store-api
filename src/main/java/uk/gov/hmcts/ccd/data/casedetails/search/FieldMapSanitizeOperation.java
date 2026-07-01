@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Map.Entry;

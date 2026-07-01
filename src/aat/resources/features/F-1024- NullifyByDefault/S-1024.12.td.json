@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-1024.12",
+  "_extends_": "MidEvent_v2Ext__PositiveResponse_Base",
+
+  "title": "During validation, adjust any validation on TTL for v2_external#/case-data-validator-controller/validateUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details for case C1",
+    "is configured to trigger an Mid event callback that has changed the value of TTL and it is still null",
+    "has the 200 OK code",
+    "contains the TTL set to null"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEvent"
+  } ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json"
+    },
+    "pathVariables": {
+      "ctid": "FT_MasterCaseType"
+    },
+    "queryParams": {
+      "pageId": "createCaseTTLMidEventToUpperSingleFormPage"
+    },
+    "body": {
+      "event": {
+        "id": "createCaseTTLMidEvent"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

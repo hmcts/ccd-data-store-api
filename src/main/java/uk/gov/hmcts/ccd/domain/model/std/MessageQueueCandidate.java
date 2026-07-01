@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
 @Data

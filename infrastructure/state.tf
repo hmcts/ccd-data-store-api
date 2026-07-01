@@ -1,4 +1,4 @@
- provider "azurerm" {
+provider "azurerm" {
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -8,14 +8,14 @@
   alias                      = "postgres_network"
   subscription_id            = var.aks_subscription_id
 }
- 
- terraform {
+
+terraform {
   backend "azurerm" {}
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 4.0"
     }
     random = {
       source = "hashicorp/random"

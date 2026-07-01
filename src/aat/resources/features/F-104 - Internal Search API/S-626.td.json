@@ -36,6 +36,23 @@
           },
           "fields": [
             {
+              "label" : "`Email` workbasket",
+              "order" : 2,
+              "metadata" : false,
+              "case_field_id" : "EmailField",
+              "case_field_type" : {
+                "id" : "Email",
+                "type" : "Email",
+                "min" : null,
+                "max" : null,
+                "regular_expression" : null,
+                "fixed_list_items" : [ ],
+                "complex_fields" : [ ],
+                "collection_field_type" : null
+              },
+              "display_context_parameter" : null
+            },
+            {
               "label": "`Text` workbasket",
               "order": 1,
               "metadata": false,
@@ -60,10 +77,12 @@
         {
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
-            "TextField": "text"
+            "TextField": "text",
+            "EmailField" : "fuctional@test.com"
           },
           "fields_formatted": {
-            "TextField": "text"
+            "TextField": "text",
+            "EmailField" : "fuctional@test.com"
           }
         }
       ],

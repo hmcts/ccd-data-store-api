@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
@@ -18,6 +19,12 @@ public class CaseAccessMetadata {
 
     private List<GrantType> accessGrants;
     private AccessProcess accessProcess;
+
+    @JsonIgnore
+    private String accessGrantsString;
+
+    @JsonIgnore
+    private String accessProcessString;
 
     public String getAccessGrantsString() {
         if (accessGrants == null) {

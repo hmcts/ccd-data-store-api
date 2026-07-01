@@ -92,6 +92,10 @@ public class RoleAssignmentsHelper {
         return userRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC);
     }
 
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId, String caseType) {
+        return userRoleAssignmentJson(actorId, roleName, caseId, caseType, Classification.PUBLIC);
+    }
+
     public static String userRoleAssignmentJson(String actorId, String roleName, String caseId,
                                                 Classification classification) {
         return "        {"
@@ -114,6 +118,30 @@ public class RoleAssignmentsHelper {
                + "          },"
                + "          \"authorisations\": []"
                + "        }";
+    }
+
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId,
+                                                String caseType, Classification classification) {
+        return "        {"
+            + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
+            + "          \"actorIdType\": \"IDAM\","
+            + "          \"actorId\": \"" + actorId + "\","
+            + "          \"roleType\": \"CASE\","
+            + "          \"roleName\": \"" + roleName + "\","
+            + "          \"classification\": \"" + classification.name() + "\","
+            + "          \"grantType\": \"STANDARD\","
+            + "          \"roleCategory\": \"JUDICIAL\","
+            + "          \"readOnly\": false,"
+            + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
+            + "          \"endTime\": \"2122-01-01T00:00:00Z\","
+            + "          \"created\": \"2020-12-23T06:37:58.096065Z\","
+            + "          \"attributes\": {"
+            + "            \"jurisdiction\": \"PROBATE\","
+            + "            \"caseType\": \"" + caseType + "\","
+            + "            \"caseId\": \"" + caseId + "\""
+            + "          },"
+            + "          \"authorisations\": []"
+            + "        }";
     }
 
     public static String caseTypeRoleAssignmentJson(String actorId, String roleName, String caseId, String jurisdiction,

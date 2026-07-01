@@ -17,11 +17,13 @@ locals {
 
   sharedASPResourceGroup = "${var.raw_product}-shared-${var.env}"
 
+  db_name = "${local.app_full_name}-postgres-db-v15"
+
 }
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
-  name                = "${local.vaultName}"
-  resource_group_name = "${local.sharedResourceGroup}"
+  name                = local.vaultName
+  resource_group_name = local.sharedResourceGroup
 }
 
 data "azurerm_key_vault" "s2s_vault" {
@@ -31,7 +33,7 @@ data "azurerm_key_vault" "s2s_vault" {
 
 data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   name         = "microservicekey-ccd-data"
-  key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
+  key_vault_id = data.azurerm_key_vault.s2s_vault.id
 }
 
 resource "azurerm_key_vault_secret" "ccd_data_s2s_secret" {
@@ -73,25 +75,34 @@ module "postgresql_v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-  
+
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
   common_tags          = var.common_tags
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
-  # Setup Access Reader db user
-  force_user_permissions_trigger = "2"
+
+  # Setup Access for reporting and JiT perms.
+  force_user_permissions_trigger     = "2"
+  enable_db_report_privileges        = true
+  kv_subscription                    = var.kv_subscription
+  kv_name                            = data.azurerm_key_vault.ccd_shared_key_vault.name
+  user_secret_name                   = azurerm_key_vault_secret.POSTGRES-USER-V15.name
+  pass_secret_name                   = azurerm_key_vault_secret.POSTGRES-PASS-V15.name
+  force_db_report_privileges_trigger = "2"
 
   pgsql_databases = [
     {
       name = var.database_name
+      report_privilege_schema : "public"
+      report_privilege_tables : ["case_data", "case_event"]
     }
   ]
   pgsql_server_configuration = [
     {
       name  = "azure.extensions"
-      value = "plpgsql,pg_stat_statements,pg_buffercache,hypopg"
+      value = "pg_stat_statements,pg_buffercache,hypopg"
     },
     {
       name  = "logfiles.download_enable"
@@ -102,7 +113,7 @@ module "postgresql_v15" {
       value = "7"
     },
     {
-      name = "pg_qs.query_capture_mode"
+      name  = "pg_qs.query_capture_mode"
       value = "ALL"
     },
     {
@@ -115,12 +126,15 @@ module "postgresql_v15" {
     }
 
   ]
-  pgsql_version    = "15"
-  product          = var.product
-  name             = "${local.app_full_name}-postgres-db-v15"
-  pgsql_sku        = var.pgsql_sku
-  pgsql_storage_mb = var.pgsql_storage_mb
-  auto_grow_enabled = var.auto_grow_enabled
+  pgsql_version              = "15"
+  product                    = var.product
+  name                       = local.db_name
+  pgsql_sku                  = var.pgsql_sku
+  pgsql_storage_mb           = var.pgsql_storage_mb
+  auto_grow_enabled          = var.auto_grow_enabled
+  action_group_name          = join("-", [var.action_group_name, local.db_name, var.env])
+  email_address_key          = var.email_address_key
+  email_address_key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 ////////////////////////////////////

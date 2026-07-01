@@ -52,7 +52,7 @@ class AttributeBasedJurisdictionsResolverTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         jurisdictionsResolver = new AttributeBasedJurisdictionsResolver(userRepository,
             roleAssignmentService,
             caseDefinitionRepository);

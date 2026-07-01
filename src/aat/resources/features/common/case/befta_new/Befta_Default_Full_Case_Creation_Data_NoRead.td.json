@@ -1,0 +1,32 @@
+{
+	"_guid_": "Befta_Default_Full_Case_Creation_Data_NoRead",
+	"_extends_": "Befta_Case_Creation_Base_Data",
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_NO_READ"
+		},
+		"body": {
+			"data": {
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "BEFTA_JURISDICTION_1",
+			"case_type_id": "BEFTA_CASETYPE_NO_READ",
+			"case_data": {
+			},
+			"data_classification": {},
+			"supplementary_data": null
+		}
+	}
+}

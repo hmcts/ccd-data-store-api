@@ -50,6 +50,7 @@
         "security_classification": "PRIVATE",
         "case_data": {
           "FixedListField": "VALUE1",
+          "EmailField" : "fuctional@test.com",
           "MoneyGBPField": "1000",
           "AddressUKField": {
             "PostCode": "SW1H 9AJ",
@@ -99,6 +100,7 @@
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,
+        "callback_error_message": null,
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null
       }],

@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.std.validator;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataOperation;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;

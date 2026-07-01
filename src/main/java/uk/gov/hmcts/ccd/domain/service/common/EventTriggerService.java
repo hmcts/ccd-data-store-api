@@ -5,8 +5,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidDefinitionException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition.ANY;
 
 @Named

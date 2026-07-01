@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +48,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
@@ -190,7 +190,7 @@ public class CallbackTest extends WireMockBaseTest {
     public CallbackTest() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
 
         DATA = mapper.readTree(DATA_JSON_STRING);
@@ -209,7 +209,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
@@ -222,7 +222,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -239,7 +239,7 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
             + "    \"document_binary_url\": \"http://localhost:[port]/documents/"
             + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
@@ -255,13 +255,13 @@ public class CallbackTest extends WireMockBaseTest {
             + "    \"AddressLine2\": \"Address Line 12\"\n"
             + "  },\n"
             + "  \"D8Document\":{"
-            + "    \"document_url\": \"http://localhost:" + getPort()
+            + "    \"document_url\": \"" + hostUrl
             + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\",\n"
             + "    \"upload_timestamp\": \"" + UPLOAD_TIMESTAMP + "\""
             + "  }\n"
             + "}\n";
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -554,7 +554,8 @@ public class CallbackTest extends WireMockBaseTest {
         Map actualData =
             mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")
             .toString(), Map.class);
-        assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(0));
+        // This user can access 3 fields; they only have CU on the user first name.
+        assertThat("Incorrect Response Data Content", actualData.entrySet().size(), equalTo(3));
         String actualDataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification").toString();
         JSONAssert.assertEquals(EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING, actualDataClassification,

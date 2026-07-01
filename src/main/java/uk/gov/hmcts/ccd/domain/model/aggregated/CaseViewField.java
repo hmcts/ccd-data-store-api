@@ -231,7 +231,9 @@ public class CaseViewField implements CommonField {
         caseViewField.setSecurityLabel(caseFieldDefinition.getSecurityLabel());
         caseViewField.setValidationExpression(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression());
         caseViewField.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
-        caseViewField.setValue(data.get(caseFieldDefinition.getId()));
+        if (data != null) {
+            caseViewField.setValue(data.get(caseFieldDefinition.getId()));
+        }
         caseViewField.setMetadata(caseFieldDefinition.isMetadata());
         caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 

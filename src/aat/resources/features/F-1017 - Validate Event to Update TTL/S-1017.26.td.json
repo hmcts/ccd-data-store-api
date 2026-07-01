@@ -36,7 +36,11 @@
     "body": {
       "data": {
         "TextField": "Updated mid-event",
-        "TTL": {}
+        "TTL": {
+          "Suspended": "Yes",
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
+        }
       },
       "event": {
         "id": "updateWithMidEventTTLNull"

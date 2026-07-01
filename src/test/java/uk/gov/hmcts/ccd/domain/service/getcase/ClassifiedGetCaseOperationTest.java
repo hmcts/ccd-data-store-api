@@ -28,7 +28,6 @@ class ClassifiedGetCaseOperationTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
-
     @Mock
     private SecurityClassificationServiceImpl classificationService;
 
@@ -38,7 +37,7 @@ class ClassifiedGetCaseOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = Optional.of(new CaseDetails());
         doReturn(caseDetails).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);

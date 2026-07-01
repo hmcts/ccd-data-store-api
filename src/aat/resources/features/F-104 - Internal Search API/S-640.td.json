@@ -108,25 +108,28 @@
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "FixedListField": "VALUE1",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
+            "EmailField" : "fuctional@test.com"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
-
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination2]}",
+            "EmailField" : "fuctional@test.com"
           }
         },
         {
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "FixedListField": "VALUE1",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
+            "EmailField" : "fuctional@test.com"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Pagination1]}",
+            "EmailField" : "fuctional@test.com"
           }
         }
       ],

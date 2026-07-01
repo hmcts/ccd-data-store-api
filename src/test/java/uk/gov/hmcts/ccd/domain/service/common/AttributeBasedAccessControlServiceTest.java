@@ -109,6 +109,23 @@ class AttributeBasedAccessControlServiceTest {
         assertTrue(hasAccess);
     }
 
+    @Test
+    void shouldReturnTrueWhenAccessProfilesAreNotReadOnlyWithReadFalseAndPredicateIsCreate() {
+        Set<AccessProfile> accessProfiles = createAccessProfiles(false,
+            ACCESS_PROFILE_1,
+            ACCESS_PROFILE_2,
+            ACCESS_PROFILE_3,
+            ACCESS_PROFILE_4);
+        List<AccessControlList> accessControlLists = createAccessControlListWithReadFalse(ACCESS_PROFILE_1,
+            ACCESS_PROFILE_2,
+            ACCESS_PROFILE_3,
+            ACCESS_PROFILE_4);
+        boolean hasAccess = attributeBasedAccessControlService
+            .hasAccessControlList(accessProfiles, CAN_CREATE, accessControlLists);
+
+        assertTrue(hasAccess);
+    }
+
     private Set<AccessProfile> createAccessProfiles(boolean readOnly, String... accessProfiles) {
         return Arrays.stream(accessProfiles)
             .map(accessProfile -> AccessProfile.builder()
@@ -126,6 +143,20 @@ class AttributeBasedAccessControlServiceTest {
                 accessControlList.setCreate(true);
                 accessControlList.setDelete(true);
                 accessControlList.setRead(true);
+                accessControlList.setUpdate(true);
+                return accessControlList;
+            })
+            .collect(Collectors.toList());
+    }
+
+    private List<AccessControlList> createAccessControlListWithReadFalse(String... accessProfiles) {
+        return Arrays.stream(accessProfiles)
+            .map(accessProfile -> {
+                AccessControlList accessControlList = new AccessControlList();
+                accessControlList.setAccessProfile(accessProfile);
+                accessControlList.setCreate(true);
+                accessControlList.setDelete(true);
+                accessControlList.setRead(false);
                 accessControlList.setUpdate(true);
                 return accessControlList;
             })

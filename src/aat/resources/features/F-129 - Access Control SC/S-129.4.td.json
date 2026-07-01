@@ -18,7 +18,9 @@
     "_extends_": "Common_200_Response",
     "body" : {
       "data": {
-        "PublicTextField" : "public text"
+        "PublicTextField" : "public text",
+        "PrivateTextField" : "private text",
+        "RestrictedTextField" : "restricted text"
       },
       "data_classification" : {
         "PublicTextField" : "PUBLIC",

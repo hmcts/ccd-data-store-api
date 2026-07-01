@@ -26,6 +26,7 @@
         "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
         "case_data": {
           "FixedListField": "VALUE1",
+          "EmailField" : "fuctional@test.com",
           "MoneyGBPField": "1000",
           "AddressUKField": {
             "PostCode": "SW1H 9AJ",

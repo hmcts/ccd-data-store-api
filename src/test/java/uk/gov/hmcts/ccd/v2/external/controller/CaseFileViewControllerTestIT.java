@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -20,7 +22,7 @@ import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.UUID;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +45,7 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    @SpyBean
+    @MockitoSpyBean
     private AuditRepository auditRepository;
 
     private static final String REQUEST_ID = "request-id";
@@ -74,7 +76,7 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
-                .header(CUSTOM_CONTEXT, responseJson1.toString())
+                .header(CUSTOM_CONTEXT, new JSONObject(responseJson1).toString())
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);

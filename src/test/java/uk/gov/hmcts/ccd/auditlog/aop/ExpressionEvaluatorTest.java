@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.auditlog.aop;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -17,7 +17,7 @@ public class ExpressionEvaluatorTest {
 
     private ExpressionEvaluator evaluator;
 
-    @Before
+    @BeforeEach
     public void setup() {
         evaluator = new ExpressionEvaluator();
     }

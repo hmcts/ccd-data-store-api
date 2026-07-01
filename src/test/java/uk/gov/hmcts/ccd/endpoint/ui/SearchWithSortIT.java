@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
     private ApplicationParams applicationParams;
     private MockMvc mockMvc;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, ROLE_CASEWORKER_PUBLIC, ROLE_CASEWORKER_PRIVATE);
 

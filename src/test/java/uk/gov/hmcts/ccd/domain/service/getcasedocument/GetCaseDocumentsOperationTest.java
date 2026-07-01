@@ -58,7 +58,7 @@ public class GetCaseDocumentsOperationTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation, documentIdValidationService);
 
         caseDetails = prepareCaseDetails();

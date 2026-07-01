@@ -13,7 +13,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "body": {
-      "exception": "javax.validation.ConstraintViolationException",
+      "exception": "jakarta.validation.ConstraintViolationException",
       "message": "createCase.caseTypeId: Case Type Id is invalid",
       "path" : "/case-types/BEFTA_%2526%255E%2524%25C2%25A3CASETYPE_2_1/cases",
       "details": null,

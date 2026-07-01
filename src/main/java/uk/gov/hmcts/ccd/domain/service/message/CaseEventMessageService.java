@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlockGenerator;
 import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DataBlockGenerator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Service
 @Qualifier("caseEventMessageService")

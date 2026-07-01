@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.domain.types.BaseType;
 
 import java.util.List;
 import java.util.Map;
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 

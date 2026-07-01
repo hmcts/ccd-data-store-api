@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +44,7 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         query.setParameter("json_value", jsonValue);
         String parentKeyJsonValue = requestedDataJsonForPath(fieldPath, fieldValue, parentKey);
         query.setParameter("json_value_insert", parentKeyJsonValue);
-        query.setParameter("parent_path", Arrays.asList(parentKey));
+        query.setParameter("parent_path", parentKey);
         query.setParameter("parent_key", "{" + parentKey + "}");
         return query;
     }

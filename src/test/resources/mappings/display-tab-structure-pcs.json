@@ -1,0 +1,44 @@
+{
+  "request" : {
+    "method" : "GET",
+    "urlPattern" : "/api/display/tab-structure/PCS\\?version=.*"
+  },
+  "response" : {
+    "status" : 200,
+    "headers" : {
+      "Content-Type" : "application/json"
+    },
+    "jsonBody" : {
+      "case_type_id" : "PCS",
+      "tabs" : [
+        {
+          "id" : "SummaryTab",
+          "label" : "Summary",
+          "order" : 1,
+          "tab_fields" : [
+            {
+              "case_field" : {
+                "id" : "PersonFirstName",
+                "case_type_id" : "PCS",
+                "label" : "First Name",
+                "field_type" : {
+                  "type" : "Text"
+                },
+                "acls" : [
+                  {
+                    "role" : "caseworker-probate-public",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
+                  }
+                ]
+              },
+              "order" : 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

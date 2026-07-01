@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.data.user;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
@@ -19,7 +19,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -46,9 +46,9 @@ public class UserServiceTest {
     private JurisdictionDefinition unknownJurisdictionDefinition;
     private uk.gov.hmcts.ccd.data.user.UserService userService;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         userService = new uk.gov.hmcts.ccd.data.user.UserService(userRepoMock, caseDefinitionRepoMock,
                 jurisdictionMapperMock,jurisdictionsResolver);
         when(mockIdamProps.getEmail()).thenReturn("email");

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -45,24 +46,29 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     private static final String WILDCARD = "*";
     public static final String CLIENT_CONTEXT = "Client-Context";
+    private static final String DEFAULT_CALLBACK_ERROR_MESSAGE
+        = "Unable to proceed because there are one or more callback Errors or Warnings";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final AppInsights appinsights;
     private final HttpServletRequest request;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            @Qualifier("restTemplate") final RestTemplate restTemplate,
                            final ApplicationParams applicationParams,
                            AppInsights appinsights,
-                           HttpServletRequest request) {
+                           HttpServletRequest request,
+                           @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.appinsights = appinsights;
         this.request = request;
+        this.objectMapper = objectMapper;
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -146,23 +152,24 @@ public class CallbackService {
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
             if (logCallbackDetails(url)) {
-                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType, requestEntity);
+                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType,
+                    printCallbackDetails(requestEntity));
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (logCallbackDetails(url)) {
-                LOG.info("Callback {} response received: {}", url, responseEntity);
+                LOG.info("Callback {} response received: {}", url, printCallbackDetails(responseEntity));
             }
 
             storePassThroughHeadersAsRequestAttributes(responseEntity, requestEntity, request);
             responseEntity = replaceResponseEntityWithUpdatedHeaders(responseEntity, CLIENT_CONTEXT);
-            httpStatus = responseEntity.getStatusCodeValue();
+            httpStatus = responseEntity.getStatusCode().value();
             return Optional.of(responseEntity);
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}",
                 url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             if (e instanceof HttpStatusCodeException) {
-                httpStatus = ((HttpStatusCodeException) e).getRawStatusCode();
+                httpStatus = ((HttpStatusCodeException) e).getStatusCode().value();
             }
             return Optional.empty();
         } finally {
@@ -171,11 +178,27 @@ public class CallbackService {
         }
     }
 
+    private String printCallbackDetails(HttpEntity<?> callbackHttpEntity) {
+        try {
+            return objectMapper.writeValueAsString(callbackHttpEntity);
+        } catch (Exception ex) {
+            LOG.warn("Unexpected error while logging callback: {}", ex.getMessage());
+        }
+
+        return null;
+    }
+
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
                                                   final Boolean ignoreWarning) {
-        if (!isEmpty(callbackResponse.getErrors())
+
+        if (!ObjectUtils.isEmpty(callbackResponse.getErrorMessageOverride())
+            || !isEmpty(callbackResponse.getErrors())
             || (!isEmpty(callbackResponse.getWarnings()) && (ignoreWarning == null || !ignoreWarning))) {
-            throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
+
+            String errorMessage = Optional.ofNullable(callbackResponse.getErrorMessageOverride())
+                .orElse(DEFAULT_CALLBACK_ERROR_MESSAGE);
+
+            throw new ApiException(errorMessage)
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }
@@ -238,7 +261,7 @@ public class CallbackService {
 
     private boolean logCallbackDetails(final String url) {
         return (!applicationParams.getCcdCallbackLogControl().isEmpty()
-            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
+            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().getFirst())
             || applicationParams.getCcdCallbackLogControl().stream()
             .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
     }

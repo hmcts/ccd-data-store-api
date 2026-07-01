@@ -1,3 +1,5 @@
+DROP TRIGGER IF EXISTS trg_case_data_updated ON public.case_data;
+
 DROP FUNCTION IF exists insert_update_logstash_queue;
 
 CREATE OR REPLACE FUNCTION public.insert_update_logstash_queue () RETURNS TRIGGER

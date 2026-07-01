@@ -24,10 +24,20 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_Response",
+
+    "responseCode": 404,
+    "responseMessage": "Not Found",
+    "headers": {
+      "_extends_": "Common_404_Response_Headers"
+    },
     "body": {
-      "message": "No message available",
-      "path": "/getLinkedCases/"
+      "status": 404,
+      "type": "[[ANYTHING_PRESENT]]",
+      "title": "Not Found",
+      "detail": "[[ANYTHING_PRESENT]]",
+      "instance": "[[ANYTHING_PRESENT]]",
+      "properties": "[[ANY_STRING_NULLABLE]]"
     }
   }
 }

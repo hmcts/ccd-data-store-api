@@ -1,18 +1,22 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -35,11 +39,16 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CaseDocumentService caseDocumentService,
                                              ApplicationParams applicationParams,
                                              CaseAccessGroupUtils caseAccessGroupUtils,
-                                             CaseDocumentTimestampService caseDocumentTimestampService) {
+                                             CaseDocumentTimestampService caseDocumentTimestampService,
+                                             DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
+                                             PersistenceStrategyResolver resolver,
+                                             CasePointerRepository creator,
+                                             SynchronisedCaseProcessor synchronisedCaseProcessor) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
-            caseAccessGroupUtils, caseDocumentTimestampService);
+            caseAccessGroupUtils, caseDocumentTimestampService, decentralisedCreateCaseEventService, resolver, creator,
+            synchronisedCaseProcessor);
 
     }
 }

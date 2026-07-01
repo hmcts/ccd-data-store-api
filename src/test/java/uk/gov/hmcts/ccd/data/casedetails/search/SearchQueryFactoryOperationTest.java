@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -62,7 +62,7 @@ class SearchQueryFactoryOperationTest {
 
     @BeforeEach
     public void initMock() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
         when(caseTypeService.getCaseTypeForJurisdiction(anyString(), anyString())).thenReturn(caseTypeDefinition);
         classUnderTest = new SearchQueryFactoryOperation(criterionFactory,

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.helpers.MessageFormatter;
-
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -94,6 +93,11 @@ public class TestBuildersUtil {
 
         public CallbackResponseBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
             callbackResponse.setDataClassification(dataClassification);
+            return this;
+        }
+
+        public CallbackResponseBuilder withData(Map<String, JsonNode> data) {
+            callbackResponse.setData(data);
             return this;
         }
 
@@ -894,6 +898,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventFieldDefinitionBuilder withNullifyByDefault(Boolean nullifyByDefault) {
+            caseField.setNullifyByDefault(nullifyByDefault);
+            return this;
+        }
+
         public CaseEventFieldDefinition build() {
             caseField.setCaseEventFieldComplexDefinitions(complexFieldDefinitions);
             return caseField;
@@ -1425,6 +1434,11 @@ public class TestBuildersUtil {
             return new WorkbasketInputBuilder();
         }
 
+        public WorkbasketInputBuilder withField(Field field) {
+            this.workbasketInput.setField(field);
+            return this;
+        }
+
         public WorkbasketInputBuilder withFieldId(String fieldId) {
             field.setId(fieldId);
             this.workbasketInput.setField(field);
@@ -1474,6 +1488,11 @@ public class TestBuildersUtil {
 
         public SearchInputBuilder withUserRole(String role) {
             this.searchInput.setRole(role);
+            return this;
+        }
+
+        public SearchInputBuilder withField(Field field) {
+            this.searchInput.setField(field);
             return this;
         }
 

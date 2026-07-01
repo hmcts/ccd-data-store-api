@@ -111,7 +111,7 @@ class AuthorisedStartEventOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         classifiedCaseDetailsNode = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedCaseDetailsNode).put("dataTestField", "dataTestValue");

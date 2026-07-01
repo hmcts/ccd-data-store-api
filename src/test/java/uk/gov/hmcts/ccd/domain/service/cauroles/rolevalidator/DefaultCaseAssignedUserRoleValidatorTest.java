@@ -39,7 +39,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseAssignedUserRoleValidator = new DefaultCaseAssignedUserRoleValidator(userRepository, applicationParams);
     }

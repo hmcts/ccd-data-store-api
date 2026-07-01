@@ -6,7 +6,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,4 +127,9 @@ public class CaseDocumentUtils {
             .collect(Collectors.toUnmodifiableList());
     }
 
+    public Set<String> findDocumentIds(final Map<String, JsonNode> data) {
+        return findDocumentNodes(data).stream()
+            .map(this::getDocumentId)
+            .collect(Collectors.toSet());
+    }
 }

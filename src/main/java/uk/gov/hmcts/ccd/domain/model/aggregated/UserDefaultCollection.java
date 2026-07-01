@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@ApiModel
+@Schema
 public class UserDefaultCollection {
 
     private List<UserDefault> userDefaults;
@@ -18,7 +18,7 @@ public class UserDefaultCollection {
         this.userDefaults = userDefaults;
     }
 
-    @ApiModelProperty
+    @Schema
     @JsonProperty("user_profiles")
     public List<UserDefault> getUserDefaults() {
         return userDefaults;

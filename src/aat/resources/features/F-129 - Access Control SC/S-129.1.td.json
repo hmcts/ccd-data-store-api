@@ -4,7 +4,7 @@
 
   "specs": [
     "idam roles which only have a max Security Classification of PUBLIC",
-    "does not return any fields with a SC of PRIVATE or RESTRICTED"
+    "contains all fields regardless of classification"
   ],
 
   "users" : {
@@ -17,7 +17,9 @@
     "_extends_": "Common_200_Response",
     "body" : {
       "data": {
-        "PublicTextField" : "public text"
+        "PublicTextField" : "public text",
+        "PrivateTextField": "private text",
+        "RestrictedTextField": "restricted text"
       },
       "data_classification" : {
         "PublicTextField" : "PUBLIC",

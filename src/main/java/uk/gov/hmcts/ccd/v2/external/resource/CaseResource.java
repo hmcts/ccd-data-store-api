@@ -8,7 +8,7 @@ import org.springframework.hateoas.RepresentationModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -70,6 +70,10 @@ public class CaseResource extends RepresentationModel<RepresentationModel<?>> {
     @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private String callbackResponseStatus;
 
+    @JsonProperty("callback_error_message")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private String callbackErrorMessage;
+
     @JsonProperty("delete_draft_response_status_code")
     @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private Integer deleteDraftResponseStatusCode;
@@ -118,6 +122,7 @@ public class CaseResource extends RepresentationModel<RepresentationModel<?>> {
         this.afterSubmitCallbackResponse = caseDetails.getAfterSubmitCallbackResponse();
         this.callbackResponseStatusCode = caseDetails.getCallbackResponseStatusCode();
         this.callbackResponseStatus = caseDetails.getCallbackResponseStatus();
+        this.callbackErrorMessage = caseDetails.getCallbackErrorMessage();
         this.deleteDraftResponseStatusCode = caseDetails.getDeleteDraftResponseStatusCode();
         this.deleteDraftResponseStatus = caseDetails.getDeleteDraftResponseStatus();
     }

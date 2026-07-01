@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.ADD_SUCCESS_MESSAGE;
 import static uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController.REMOVE_SUCCESS_MESSAGE;
 
+@SuppressWarnings("removal")
 class CaseAssignedUserRolesControllerTest {
 
     private static final String CASE_ID_GOOD = "4444333322221111";
@@ -78,7 +79,7 @@ class CaseAssignedUserRolesControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseReferenceService.validateUID(CASE_ID_GOOD)).thenReturn(true);
         when(caseReferenceService.validateUID(CASE_ID_BAD)).thenReturn(false);

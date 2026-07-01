@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.NonNull;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
 
 import java.util.Arrays;
@@ -26,6 +26,8 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 public final class JacksonUtils {
+
+    public static final String DATA = "data";
 
     private JacksonUtils() {
     }
@@ -197,5 +199,11 @@ public final class JacksonUtils {
             return jsonNode.iterator().hasNext() ? jsonNode.iterator().next().textValue() : jsonNode.textValue();
         }
         return returnValue;
+    }
+
+    public static Map<String, JsonNode> convertValueInDataField(Map<String, JsonNode> from) {
+        Map<String, JsonNode> dataNode = new HashMap<>();
+        dataNode.put(DATA, MAPPER.valueToTree(from));
+        return dataNode;
     }
 }
