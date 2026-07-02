@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -102,6 +103,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
+    private DateCaseClosedRepository dateCaseClosedRepository;
+    @Mock
     private CaseTypeService caseTypeService;
     @Mock
     private CallbackInvoker callbackInvoker;
@@ -183,7 +186,8 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             decentralisedSubmitCaseTransaction,
             resolver,
             casePointerRepository,
-            synchronisedCaseProcessor
+            synchronisedCaseProcessor,
+            dateCaseClosedRepository
         );
 
         idamUser = buildIdamUser();

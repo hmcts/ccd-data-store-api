@@ -1,0 +1,17 @@
+{
+  "_guid_": "S-944.2_GetToken_CaseCreate_NotClosed",
+  "_extends_": "S-944.1_GetToken_CaseCreate",
+  "title": "Create event token for state category not closed for payment case creation",
+
+  "request": {
+    "pathVariables": {
+      "etid": "createNotClosedForPaymentCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "createNotClosedForPaymentCase"
+    }
+  }
+}

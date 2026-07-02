@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-944_Get_Closed_For_Payment_Cases_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "get closed cases",
+
+  "method": "GET",
+  "uri": "/internal/searchCases/getClosedCases/{date}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "date": "${[scenarioContext][customValues][today]}"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 200
+  }
+}
