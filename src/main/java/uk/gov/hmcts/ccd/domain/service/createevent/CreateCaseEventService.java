@@ -35,7 +35,6 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -45,6 +44,8 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -275,6 +276,11 @@ public class CreateCaseEventService {
                 caseTypeDefinition);
         }
 
+        // Identify organizations with newCase set to true
+        // Update case supplementary data
+        // Clear newCase attributes
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
+
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
         var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
@@ -282,12 +288,16 @@ public class CreateCaseEventService {
         if (isDecentralisedCase) {
             // Documents must be attached before the event is committed.
             // When decentralised we must do the attach before the event is submitted to the decentralised service.
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, caseDetailsAfterCallbackWithoutHashes.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
+
             var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(
                 content.getEvent(), caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
@@ -304,6 +314,10 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
                 caseEventDefinition, newState, timeNow);
+
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, finalCaseDetails.getData());
+
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -313,8 +327,7 @@ public class CreateCaseEventService {
                 timeNow,
                 oldState,
                 onBehalfOfUser,
-                securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                    caseEventDefinition)
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition)
             );
 
             caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
@@ -325,9 +338,8 @@ public class CreateCaseEventService {
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
-
         }
 
         updateDateCaseClosed(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
@@ -402,11 +414,14 @@ public class CreateCaseEventService {
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
             // Documents must be attached before event is committed.
             // When decentralised we must do the attach before the event is submitted.
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, caseDetailsAfterCallbackWithoutHashes.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
 
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
@@ -416,6 +431,10 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase,
                 caseDetailsAfterCallbackWithoutHashes, caseEventDefinition, newState, timeNow);
+
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, finalCaseDetails.getData());
+
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 event,
@@ -434,7 +453,7 @@ public class CreateCaseEventService {
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
         }
 
