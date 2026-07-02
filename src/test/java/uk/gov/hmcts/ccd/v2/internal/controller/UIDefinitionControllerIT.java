@@ -66,7 +66,7 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql" })
-    public void shouldReturnWorkSearchInputDefinitions() throws Exception {
+    public void shouldReturnSearchInputDefinitions() throws Exception {
 
         final MvcResult result =
             mockMvc.perform(get("/internal/case-types/TestAddressBookCase/search-inputs")

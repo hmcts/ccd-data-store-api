@@ -21,6 +21,8 @@ Scenario: must return 200 and a list of case ids a user has access to
      Then a positive response is received,
       And the response [contains a list of case ids, along with an HTTP-200 OK],
       And the response has all other details as expected.
+        # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-047_Remove_Case_Assigned_User_role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-098

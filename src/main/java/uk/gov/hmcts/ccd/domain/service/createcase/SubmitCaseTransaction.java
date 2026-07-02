@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
@@ -135,7 +136,7 @@ public class SubmitCaseTransaction implements AccessControl {
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from
             collisions.
          */
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             null,
             caseDetailsWithoutHashes,
@@ -143,7 +144,7 @@ public class SubmitCaseTransaction implements AccessControl {
             ignoreWarning
         );
 
-        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null);
+        caseDocumentTimestampService.addUploadTimestamps(caseDetailsWithoutHashes, null, caseTypeDefinition);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
@@ -161,6 +162,8 @@ public class SubmitCaseTransaction implements AccessControl {
             caseAccessGroupUtils.updateCaseAccessGroupsInCaseDetails(caseDetailsAfterCallbackWithoutHashes,
                 caseTypeDefinition);
         }
+
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
 
         CaseDetails savedCaseDetails;
         if (resolver.isDecentralised(caseDetailsAfterCallbackWithoutHashes)) {
@@ -180,11 +183,14 @@ public class SubmitCaseTransaction implements AccessControl {
             );
             caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, savedCaseDetails.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
         }
 
@@ -200,11 +206,14 @@ public class SubmitCaseTransaction implements AccessControl {
 
         caseDataAccessControl.grantAccess(newCaseDetails, idamUser.getId());
 
+        final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+            .filterDocumentHashesAgainstSavedData(documentHashes, newCaseDetails.getData());
+
         caseDocumentService.attachCaseDocuments(
             newCaseDetails.getReferenceAsString(),
             newCaseDetails.getCaseTypeId(),
             newCaseDetails.getJurisdiction(),
-            documentHashes
+            verifiedDocumentHashes
         );
 
         try {

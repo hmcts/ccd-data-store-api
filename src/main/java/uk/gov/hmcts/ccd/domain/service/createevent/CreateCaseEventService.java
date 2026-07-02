@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,16 +33,17 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
-import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -61,7 +63,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -194,7 +195,7 @@ public class CreateCaseEventService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference, false);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
             caseTypeDefinition,
@@ -243,10 +244,12 @@ public class CreateCaseEventService {
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
         // add upload timestamp
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase,
+            caseTypeDefinition);
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        // Fetch updated case details after call and update SupplementaryData
+        final CaseDetails caseDetailsAfterCallback = mergeSupplementaryData(caseReference,
+            updatedCaseDetailsWithoutHashes);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
@@ -266,6 +269,11 @@ public class CreateCaseEventService {
                 caseTypeDefinition);
         }
 
+        // Identify organizations with newCase set to true
+        // Update case supplementary data
+        // Clear newCase attributes
+        NewCaseUtils.setupSupplementryDataWithNewCase(caseDetailsAfterCallbackWithoutHashes);
+
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
         var onBehalfOfUser = getOnBehalfOfUser(content.getOnBehalfOfId(), content.getOnBehalfOfUserToken());
@@ -273,12 +281,16 @@ public class CreateCaseEventService {
         if (isDecentralisedCase) {
             // Documents must be attached before the event is committed.
             // When decentralised we must do the attach before the event is submitted to the decentralised service.
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, caseDetailsAfterCallbackWithoutHashes.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
+
             var decentralisedCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(
                 content.getEvent(), caseEventDefinition, caseTypeDefinition, caseDetailsAfterCallbackWithoutHashes,
                 Optional.of(caseDetailsInDatabase), onBehalfOfUser);
@@ -295,6 +307,10 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase, caseDetailsAfterCallbackWithoutHashes,
                 caseEventDefinition, newState, timeNow);
+
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, finalCaseDetails.getData());
+
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 content.getEvent(),
@@ -304,8 +320,7 @@ public class CreateCaseEventService {
                 timeNow,
                 oldState,
                 onBehalfOfUser,
-                securityClassificationService.getClassificationForEvent(caseTypeDefinition,
-                    caseEventDefinition)
+                securityClassificationService.getClassificationForEvent(caseTypeDefinition, caseEventDefinition)
             );
 
             caseLinkService.updateCaseLinks(finalCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
@@ -316,9 +331,8 @@ public class CreateCaseEventService {
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
-
         }
 
         return CreateCaseEventResult.caseEventWith()
@@ -328,13 +342,20 @@ public class CreateCaseEventService {
             .build();
     }
 
+    private CaseDetails mergeSupplementaryData(String caseReference, CaseDetails updatedCaseDetailsWithoutHashes) {
+        final CaseDetails updatedCaseDetailsInDatabase = getCaseDetails(caseReference, true);
+        updatedCaseDetailsWithoutHashes.setSupplementaryData(updatedCaseDetailsInDatabase.getSupplementaryData());
+
+        return updatedCaseDetailsWithoutHashes;
+    }
+
     public CreateCaseEventResult createCaseSystemEvent(final String caseReference,
                                                        final String attributePath,
                                                        final String categoryId,
                                                        Event event) {
         final CaseDetails caseDetails = delegatingCaseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() ->
-            new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
+                new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");
@@ -361,7 +382,8 @@ public class CreateCaseEventService {
 
         final Optional<String> newState = Optional.ofNullable(oldState);
 
-        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase);
+        caseDocumentTimestampService.addUploadTimestamps(updatedCaseDetailsWithoutHashes, caseDetailsInDatabase,
+            caseTypeDefinition);
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
@@ -383,11 +405,14 @@ public class CreateCaseEventService {
         if (resolver.isDecentralised(caseDetailsInDatabase)) {
             // Documents must be attached before event is committed.
             // When decentralised we must do the attach before the event is submitted.
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, caseDetailsAfterCallbackWithoutHashes.getData());
+
             caseDocumentService.attachCaseDocuments(
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
 
             finalCaseDetails = decentralisedCreateCaseEventService.submitDecentralisedEvent(event, caseEventDefinition,
@@ -397,6 +422,10 @@ public class CreateCaseEventService {
         } else {
             finalCaseDetails = saveCaseDetails(caseDetailsInDatabase,
                 caseDetailsAfterCallbackWithoutHashes, caseEventDefinition, newState, timeNow);
+
+            final List<DocumentHashToken> verifiedDocumentHashes = caseDocumentService
+                .filterDocumentHashesAgainstSavedData(documentHashes, finalCaseDetails.getData());
+
             saveAuditEventForCaseDetails(
                 aboutToSubmitCallbackResponse,
                 event,
@@ -415,7 +444,7 @@ public class CreateCaseEventService {
                 caseDetails.getReferenceAsString(),
                 caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(),
-                documentHashes
+                verifiedDocumentHashes
             );
         }
 
@@ -451,11 +480,11 @@ public class CreateCaseEventService {
         }
     }
 
-    private CaseDetails getCaseDetails(final String caseReference) {
+    private CaseDetails getCaseDetails(final String caseReference, boolean refresh) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        return caseDetailsRepository.findByReference(caseReference)
+        return caseDetailsRepository.findByReference(caseReference, refresh)
             .orElseThrow(() ->
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }

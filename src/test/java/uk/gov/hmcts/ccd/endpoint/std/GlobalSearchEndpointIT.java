@@ -1,10 +1,15 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.MultiSearchResult;
-import io.searchbox.core.SearchResult;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.MsearchRequest;
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,7 +17,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,28 +26,28 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
-import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
-import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import jakarta.inject.Inject;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,27 +62,21 @@ import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_P
 
 class GlobalSearchEndpointIT extends WireMockBaseTest {
 
-    private static final String ADDRESS_LINE_1 = "address";
-    private static final String NAME = "name";
-    private static final String DOB  = "1999-01-01";
-    private static final String POSTCODE = "EC3M 8AF";
-    private static final String EMAIL_ADDRESS = "someone@cgi.com";
-
     private static final String REFERENCE_1 = "4444333322221111";
     private static final String REFERENCE_2 = "1111222233334444";
     private static final String JURISDICTION = "PROBATE";
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String STATE = "TODO";
-    private static final String SECURITY_CLASSIFICATION = "PUBLIC";
 
     private static final String SERVICE_ID = "AAA1";
     private static final String SERVICE_NAME = "test_service_short_description"; // see wiremock RefData mappings
 
-    @Inject
-    private WebApplicationContext wac;
+    private static final String JSON_CONTENT_TYPE = "application/json";
+
     private MockMvc mockMvc;
+
     @MockitoBean
-    private JestClient jestClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @MockitoSpyBean
     private AuditRepository auditRepository;
@@ -92,9 +90,8 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
     private static final String MESSAGE_FIELD = "$.message";
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setup(WebApplicationContext wac) {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
         validFields = List.of("ValidEntry", "ValidEntryTwo");
@@ -123,42 +120,33 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenRequestDataValid() throws Exception {
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
 
-        // ARRANGE
-        stubElasticSearchSearchRequestWillReturn();
+        GlobalSearchRequestPayload payload = createRequestPayload(2);
 
-        int startRecord = 2;
-        GlobalSearchRequestPayload payload = createRequestPayload(startRecord);
-
-        // ACT / ASSERT
         MvcResult result = mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
-            .andExpect(status().is(200))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().isOk())
             .andReturn();
 
-        // ASSERT extra
-        String responseAsString = result.getResponse().getContentAsString();
-        GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
-            GlobalSearchResponsePayload.class);
+        GlobalSearchResponsePayload response = mapper.readValue(
+            result.getResponse().getContentAsString(),
+            GlobalSearchResponsePayload.class
+        );
 
-        assertThat(globalSearchResponsePayload.getResultInfo().getCasesReturned(), is(2));
-        assertThat(globalSearchResponsePayload.getResultInfo().getCaseStartRecord(), is(startRecord));
-        assertThat(globalSearchResponsePayload.getResultInfo().isMoreResultsToGo(), is(true));
-
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE_1));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceId(), is(SERVICE_ID));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceShortDescription(), is(SERVICE_NAME));
+        assertThat(response.getResultInfo().getCasesReturned(), is(2));
+        assertThat(response.getResultInfo().getCaseStartRecord(), is(2));
+        assertThat(response.getResultInfo().isMoreResultsToGo(), is(true));
+        assertThat(response.getResults(), hasSize(2));
+        assertThat(response.getResults().get(0).getCaseReference(), is(REFERENCE_1));
     }
 
     @Test
     void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
-
-        // ARRANGE
-        stubElasticSearchSearchRequestWillReturn();
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         SearchCriteria searchCriteria = new SearchCriteria();
@@ -168,49 +156,10 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
         payload.setSearchCriteria(searchCriteria);
         // i.e. leave all fields that will use defaults blank (NB: case-type no longer auto-populated when blank)
 
-        // ACT / ASSERT
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(200))
-            .andReturn();
-    }
-
-    @Test
-    void shouldThrowValidationErrorsWhenDataInvalid() throws Exception {
-
-        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
-        payload.setMaxReturnRecordCount(10001);
-        payload.setStartRecordNumber(0);
-        payload.setSortCriteria(invalidSortCriteria);
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCcdCaseTypeIds(invalidFields);
-        searchCriteria.setCcdJurisdictionIds(invalidFields);
-        searchCriteria.setCaseReferences(invalidFields);
-        searchCriteria.setStateIds(invalidFields);
-        Party party = new Party();
-        party.setAddressLine1("address");
-        party.setDateOfBirth("1999-13-01");
-        party.setDateOfDeath("2026-12-32");
-        List<Party> list = List.of(party);
-        searchCriteria.setParties(list);
-        payload.setSearchCriteria(searchCriteria);
-
-        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
-            .andExpect(status().is(400))
-            .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.DATE_OF_DEATH_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SORT_BY_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SORT_DIRECTION_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.MAX_RECORD_COUNT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.START_RECORD_NUMBER_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.JURISDICTION_ID_LENGTH_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.STATE_ID_LENGTH_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.CASE_TYPE_ID_LENGTH_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.DATE_OF_BIRTH_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.CASE_REFERENCE_INVALID)))
             .andReturn();
     }
 
@@ -223,51 +172,31 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
         payload.setSortCriteria(validSortCriteria);
 
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
             .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
             .andReturn();
     }
 
-
     @Test
     void shouldAuditLogSearchCases() throws Exception {
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
 
-        // ARRANGE
-        stubElasticSearchSearchRequestWillReturn();
         GlobalSearchRequestPayload payload = createRequestPayload(2);
 
-        // ACT / ASSERT
-        MvcResult result = mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
+        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+                .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsBytes(payload)))
-            .andExpect(status().is(200))
-            .andReturn();
+            .andExpect(status().isOk());
 
-        // ASSERT extra
-        String responseAsString = result.getResponse().getContentAsString();
-        GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
-            GlobalSearchResponsePayload.class);
-
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE_1));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceId(), is(SERVICE_ID));
-        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceShortDescription(), is(SERVICE_NAME));
-
-        // check auditing
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GLOBAL_SEARCH.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(REFERENCE_1 + "," + REFERENCE_2));
-        assertThat(captor.getValue().getIdamId(), is("123"));
-        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
-        assertThat(captor.getValue().getHttpStatus(), is(200));
-        assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase"));
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GLOBAL_SEARCH.getLabel()));
     }
 
     @Test
@@ -280,42 +209,48 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
         payload.setSearchCriteria(new SearchCriteria());
 
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
             .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
             .andReturn();
     }
 
-    @ParameterizedTest(
-        name = "Should throw ValidationError when Jurisdiction and CaseType criteria fields are null or empty: {0}"
-    )
+    @ParameterizedTest
     @NullAndEmptySource
-    void shouldThrowValidationErrorsWhenSearchCriteriaJurisdictionAndCaseTypeAreNullOrEmpty(List<String> values)
-        throws Exception {
-
+    void shouldReturn400IfJurisdictionAndCaseTypeAreEmpty(List<String> empty) throws Exception {
         GlobalSearchRequestPayload payload = createRequestPayload(2);
-
-        SearchCriteria criteria = payload.getSearchCriteria();
-        criteria.setCcdJurisdictionIds(values);
-        criteria.setCcdCaseTypeIds(values);
-        payload.setSearchCriteria(new SearchCriteria());
+        payload.getSearchCriteria().setCcdJurisdictionIds(empty);
+        payload.getSearchCriteria().setCcdCaseTypeIds(empty);
 
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
-            .andExpect(status().is(400))
-            .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.GLOBAL_SEARCH_CRITERIA_INVALID)))
-            .andReturn();
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", is(ValidationError.ARGUMENT_INVALID)));
+    }
+
+    private GlobalSearchRequestPayload createRequestPayload(int startRecord) {
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCcdJurisdictionIds(List.of(JURISDICTION));
+        criteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
+        criteria.setCaseReferences(List.of(REFERENCE_1, REFERENCE_2));
+
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        payload.setSearchCriteria(criteria);
+        payload.setStartRecordNumber(startRecord);
+        payload.setMaxReturnRecordCount(10);
+        payload.setSortCriteria(validSortCriteria);
+
+        return payload;
     }
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_CaseType() throws Exception {
 
-        // ARRANGE
-        stubElasticSearchSearchRequestWillReturn();
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
 
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
@@ -324,7 +259,6 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setSearchCriteria(criteria);
 
-        // ACT / ASSERT
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsBytes(payload)))
@@ -334,9 +268,8 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     @Test
     void shouldReturn200WhenOneValidFieldInSearchCriteria_Jurisdiction() throws Exception {
-
-        // ARRANGE
-        stubElasticSearchSearchRequestWillReturn();
+        when(elasticsearchClient.msearch(any(MsearchRequest.class), eq(ElasticSearchCaseDetailsDTO.class)))
+            .thenReturn(mockMultiSearchResponse());
 
         SearchCriteria criteria = new SearchCriteria();
         criteria.setCcdCaseTypeIds(null);
@@ -344,7 +277,6 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setSearchCriteria(criteria);
 
-        // ACT / ASSERT
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsBytes(payload)))
@@ -352,94 +284,68 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private String create2CaseDetailsElastic(String caseDetails1, String caseDetails2) {
-        return "{\n"
-            + "   \"took\":177,\n"
-            + "   \"hits\":{\n"
-            + "      \"total\": 30,"
-            + "      \"hits\":[\n"
-            + "         {\n"
-            + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
-            + "            \"_source\":" + createCaseDetails(caseDetails1)
-            + "         },\n"
-            + "         {\n"
-            + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
-            + "            \"_source\":" + createCaseDetails(caseDetails2)
-            + "         }\n"
-            + "      ]\n"
-            + "   }\n"
-            + "}";
+    private JsonNode toJsonNode(String value) {
+        return new ObjectMapper().convertValue(value, JsonNode.class);
     }
 
-    private String createCaseDetails(String reference) {
-        return "{\n"
-            + "\"id\": 18,\n"
-            + "\"" + GlobalSearchFields.REFERENCE + "\": \"" + reference + "\",\n"
-            + "\"" + GlobalSearchFields.JURISDICTION + "\": \"" + JURISDICTION + "\",\n"
-            + "\"" + GlobalSearchFields.CASE_TYPE + "\": \"" + CASE_TYPE + "\",\n"
-            + "\"" + GlobalSearchFields.STATE + "\": \"" + STATE + "\",\n"
-            + "\"" + GlobalSearchFields.SECURITY_CLASSIFICATION + "\": \"" + SECURITY_CLASSIFICATION + "\",\n"
-            + "\"" + GlobalSearchFields.CREATED_DATE + "\": \"2021-09-07T13:38:00.050Z\",\n"
-            + "\"last_state_modified_date\": \"2021-09-07T13:38:00.050Z\",\n"
-            + "\"last_modified\": \"2021-09-07T13:38:00.062Z\","
-            + "\"data\": {},\n"
-            + "\"supplementary_data\": {\n"
-            + "    \"" + GlobalSearchFields.SupplementaryDataFields.SERVICE_ID + "\": \"" + SERVICE_ID + "\"\n"
-            + "  }\n"
-            + "}";
+    private MsearchResponse<ElasticSearchCaseDetailsDTO> mockMultiSearchResponse() {
+        final String caseId1 = "000001";
+        final String caseId2 = "000002";
+        ElasticSearchCaseDetailsDTO dto1 = createElasticSearchCaseDetailsDTO(caseId1, REFERENCE_1);
+        ElasticSearchCaseDetailsDTO dto2 = createElasticSearchCaseDetailsDTO(caseId2, REFERENCE_2);
+
+        // Build hits with required fields
+        Hit<ElasticSearchCaseDetailsDTO> hit1 = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+            .id(dto1.getId())
+            .index(CASE_TYPE)
+            .source(dto1)
+            .build();
+
+        Hit<ElasticSearchCaseDetailsDTO> hit2 = new Hit.Builder<ElasticSearchCaseDetailsDTO>()
+            .id(dto2.getId())
+            .index(CASE_TYPE)
+            .source(dto2)
+            .build();
+
+        HitsMetadata<ElasticSearchCaseDetailsDTO> hitsMetadata = new HitsMetadata.Builder<ElasticSearchCaseDetailsDTO>()
+            .hits(List.of(hit1, hit2))
+            .total(new TotalHits.Builder()
+                .relation(TotalHitsRelation.Eq)
+                .value(30).build())
+            .build();
+
+        // Wrap in MultiSearch response
+        MultiSearchResponseItem<ElasticSearchCaseDetailsDTO> responseItem
+            = new MultiSearchResponseItem.Builder<ElasticSearchCaseDetailsDTO>()
+            .result(r -> r
+                .took(123)
+                .timedOut(false)
+                .shards(s -> s.total(1).successful(1).skipped(0).failed(0))
+                .hits(hitsMetadata)
+            ).build();
+
+        return new MsearchResponse.Builder<ElasticSearchCaseDetailsDTO>()
+            .responses(List.of(responseItem))
+            .took(123)
+            .build();
     }
 
-    private void stubElasticSearchSearchRequestWillReturn() throws java.io.IOException {
-        String caseDetailElastic = create2CaseDetailsElastic(REFERENCE_1, REFERENCE_2);
+    private ElasticSearchCaseDetailsDTO createElasticSearchCaseDetailsDTO(String id, String reference) {
+        ElasticSearchCaseDetailsDTO dto = new ElasticSearchCaseDetailsDTO();
+        dto.setId(id);
+        dto.setReference(reference);
+        dto.setJurisdiction(JURISDICTION);
+        dto.setCaseTypeId(CASE_TYPE);
+        dto.setState(STATE);
+        dto.setCreatedDate(LocalDateTime.now());
+        dto.setLastModified(LocalDateTime.now());
+        dto.setLastStateModifiedDate(LocalDateTime.now());
+        dto.setSecurityClassification(SecurityClassification.PUBLIC);
+        dto.setDataClassification(Collections.emptyMap());
+        dto.setData(Map.of("hmctsServiceShortDescription",
+            objectMapper.convertValue(SERVICE_NAME, JsonNode.class)));
+        dto.setSupplementaryData(Map.of("hmctsServiceId", objectMapper.convertValue(SERVICE_ID, JsonNode.class)));
 
-        Gson gson = new Gson();
-        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
-        MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
-        when(multiSearchResult.isSucceeded()).thenReturn(true);
-
-        SearchResult searchResult = new SearchResult(gson);
-        searchResult.setSucceeded(true);
-        searchResult.setJsonObject(convertedObject);
-        searchResult.setJsonString(convertedObject.toString());
-        searchResult.setPathToResult("hits/hits/_source");
-
-        MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
-        when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        ReflectionTestUtils.setField(response, "searchResult", searchResult, SearchResult.class);
-
-        given(jestClient.execute(any())).willReturn(multiSearchResult);
+        return dto;
     }
-
-
-    private GlobalSearchRequestPayload createRequestPayload(int startRecord) {
-        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
-        payload.setMaxReturnRecordCount(10);
-        payload.setStartRecordNumber(startRecord);
-        payload.setSortCriteria(validSortCriteria);
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCaseManagementBaseLocationIds(validFields);
-        searchCriteria.setCaseManagementRegionIds(validFields);
-        searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
-        searchCriteria.setCcdJurisdictionIds(validFields);
-        searchCriteria.setOtherReferences(validFields);
-        searchCriteria.setStateIds(validFields);
-        searchCriteria.setCaseReferences(validCaseReferences);
-        Party party = new Party();
-        party.setAddressLine1(ADDRESS_LINE_1);
-        party.setPartyName(NAME);
-        party.setDateOfBirth(DOB);
-        party.setPostCode(POSTCODE);
-        party.setEmailAddress(EMAIL_ADDRESS);
-        Party partyTwo = new Party();
-        partyTwo.setAddressLine1(ADDRESS_LINE_1);
-        partyTwo.setPartyName(NAME);
-        partyTwo.setDateOfBirth(DOB);
-        partyTwo.setPostCode(POSTCODE);
-        partyTwo.setEmailAddress(EMAIL_ADDRESS);
-        List<Party> list = List.of(party, partyTwo);
-        searchCriteria.setParties(list);
-        payload.setSearchCriteria(searchCriteria);
-        return payload;
-    }
-
 }

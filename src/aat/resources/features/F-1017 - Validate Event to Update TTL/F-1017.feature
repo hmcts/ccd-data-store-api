@@ -68,6 +68,8 @@ Feature: F-1017: Validate Event to Update TTL
 
      Then a negative response is received
       And the response has all other details as expected
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1017_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.5 #AC-5
     Scenario: TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
@@ -82,6 +84,8 @@ Feature: F-1017: Validate Event to Update TTL
 
      Then a negative response is received
       And the response has all other details as expected
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1017_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.6 #AC-6
     Scenario: TTL.OverrideTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
@@ -96,6 +100,8 @@ Feature: F-1017: Validate Event to Update TTL
 
      Then a negative response is received
       And the response has all other details as expected
+      # Clean up role assignment made above
+      And a successful call [is made to remove Case Role] as in [F-1017_Remove_Case_Assigned_User_role_for_Case].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -169,6 +175,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [contains the TTL.OverrideTTL from the previouse data]
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.12 #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -191,6 +199,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
         And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.13 #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -213,7 +223,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
         And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
-
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.15 #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST
@@ -352,6 +363,8 @@ Feature: F-1017: Validate Event to Update TTL
        Then a negative response is received
         And the response has all other details as expected
         And the response [contains the error message indicating unauthorised change to the TTL values]
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_26_Remove_Case_Assigned_User_role_for_Case].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -378,6 +391,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [contains the TTL.OverrideTTL from the previouse data]
         And the response [does not contain the TTL.Suspended as removed by callback (null -> missing)]
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.32 #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (No -> NO). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
@@ -400,6 +415,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
         And the response [contains the adjusted TTL.Suspended from the callback (No -> NO)]
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.33 #CCD-3535
     Scenario: Trigger a mid event callback that changes TTL.Suspended (Yes -> YES). Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST
@@ -422,7 +439,8 @@ Feature: F-1017: Validate Event to Update TTL
         And the response [contains the TTL.SystemTTL for the case, that has been set to 20 days from today]
         And the response [does not contain the TTL.OverrideTTL as removed by callback (null -> missing)]
         And the response [contains the adjusted TTL.Suspended from the callback (Yes -> YES)]
-
+        # Clean up role assignment made above
+        And a successful call [is made to remove Case Role] as in [F-1017_11_Remove_Case_Assigned_User_role_for_Case].
 
     @S-1017.35 #CCD-3562
     Scenario: Trigger a mid event callback that has TTL missing. Mid Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST

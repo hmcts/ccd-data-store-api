@@ -11,12 +11,15 @@ properties(
     ]
 )
 
-@Library("Infrastructure@DO-NOT-MERGE-FT-TIMEOUT-EXTENSION")
+@Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
+
+GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
     'ccd-${env}': [
@@ -109,29 +112,31 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
-// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
-env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctsprod ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 env.TOKEN_CLAIM_VALIDATION_ENABLED="true"
 
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
+
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-//        enablePactAs([
-//            AppPipelineDsl.PactRoles.PROVIDER
-//        ])
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
-    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+    if  (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
@@ -150,40 +155,46 @@ withPipeline(type, product, component) {
 
     afterAlways('test') {
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+
+    builder.gradle('integration')
+
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+      copyIgnore('./build/reports/tests/integration', './Integration Tests/')
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+
+      copyIgnore('./build/reports/tests/test', './Unit Tests/')
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
 
       publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
           keepAll              : true,
-          reportDir            : 'build/reports/jacoco/html',
+          reportDir            : "Unit Tests",
           reportFiles          : "index.html",
           reportName           : "Unit Test Report"
         ]
 
       publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'build/reports/tests/integration',
-      reportFiles          : "index.html",
-      reportName           : "Integration Test Report"
-      ]
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : "Integration Tests",
+          reportFiles          : "index.html",
+          reportName           : "Integration Test Report"
+        ]
     }
 
     afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'BEFTA Report for Smoke Tests',
-      reportFiles          : "overview-features.html",
-      reportName           : "Smoke Test Report"
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Smoke Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Smoke Test Report"
       ]
     }
 
@@ -234,4 +245,11 @@ withPipeline(type, product, component) {
             reportName           : "Contract Tests Report"
         ]
     }
+}
+
+/**
+ * Forces a recursive copy by always returning 0 regardless of errors
+ */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }
