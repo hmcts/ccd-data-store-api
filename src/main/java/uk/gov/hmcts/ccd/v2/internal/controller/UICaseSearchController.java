@@ -75,7 +75,7 @@ public class UICaseSearchController {
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
         ElasticsearchSortService elasticsearchSortService,
-        @Qualifier("authorised") ClosedCaseSearchOperation closedCaseSearchOperation) {
+        @Qualifier("authorised") ClosedCaseSearchOperation closedCaseSearchOperation,
         CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
