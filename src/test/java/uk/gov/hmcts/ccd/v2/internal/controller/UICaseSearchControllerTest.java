@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
@@ -67,10 +66,10 @@ class UICaseSearchControllerTest {
     @Mock
     private ClosedCaseSearchOperation closedCaseSearchOperation;
 
-    private CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
-
-    @InjectMocks
+    @Mock
     private ApplicationParams applicationParams;
+
+    private CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
 
     private UICaseSearchController controller;
 
