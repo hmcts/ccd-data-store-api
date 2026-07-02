@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-944.1",
+  "_guid_": "S-945.1",
   "_extends_": "F-944_Get_Closed_For_Payment_Cases_Base",
-  "title": "Return created case when state category is closed for payment",
+  "title": "Return updated case when update event post state is closed for payment",
 
   "specs": [
     "an active profile in CCD",
@@ -11,7 +11,7 @@
   "expectedResponse": {
     "body": {
       "caseReferences": [
-        "${}${[scenarioContext][childContexts][S-944.1_Create_Case][testData][actualResponse][body][id]}"
+        "${}${[scenarioContext][childContexts][S-944.2_Create_Case_NotClosed][testData][actualResponse][body][id]}"
       ]
     }
   }

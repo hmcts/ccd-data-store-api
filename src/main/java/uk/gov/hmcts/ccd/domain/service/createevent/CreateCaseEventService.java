@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -64,6 +66,7 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +115,8 @@ public class CreateCaseEventService {
     private final CasePointerRepository pointerRepository;
     private final ConditionalFieldRestorer conditionalFieldRestorer;
     private final CaseAccessService caseAccessService;
+    private final DateCaseClosedRepository dateCaseClosedRepository;
+    private static final String CLOSED_FOR_PAYMENT = "CLOSED FOR PAYMENT";
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -152,7 +157,8 @@ public class CreateCaseEventService {
                                   final CasePointerRepository pointerRepository,
                                   final SynchronisedCaseProcessor synchronisedCaseProcessor,
                                   final ConditionalFieldRestorer conditionalFieldRestorer,
-                                  final CaseAccessService caseAccessService) {
+                                  final CaseAccessService caseAccessService,
+                                  final DateCaseClosedRepository dateCaseClosedRepository) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -189,6 +195,7 @@ public class CreateCaseEventService {
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
         this.conditionalFieldRestorer = conditionalFieldRestorer;
         this.caseAccessService = caseAccessService;
+        this.dateCaseClosedRepository = dateCaseClosedRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -322,6 +329,8 @@ public class CreateCaseEventService {
             );
 
         }
+
+        updateDateCaseClosed(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
@@ -494,6 +503,34 @@ public class CreateCaseEventService {
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         return caseDetailsRepository.set(caseDetails);
+    }
+
+    private void updateDateCaseClosed(CaseDetails caseDetails,
+                                      CaseDetails caseDetailsBefore,
+                                      CaseTypeDefinition caseTypeDefinition) {
+        String stateCategory = caseTypeService.findState(caseTypeDefinition,
+            caseDetails.getState()).getStateCategory();
+        String previousStateCategory = caseTypeService.findState(caseTypeDefinition,
+            caseDetailsBefore.getState()).getStateCategory();
+
+        if (hasClosedForPaymentCategory(stateCategory)) {
+            DateCaseClosedEntity dateCaseClosedEntity = new DateCaseClosedEntity();
+            dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
+            dateCaseClosedEntity.setState(caseDetails.getState());
+            dateCaseClosedEntity.setStateCategory(stateCategory);
+            dateCaseClosedEntity.setStateChangedDate(caseDetails.getLastStateModifiedDate());
+
+            dateCaseClosedRepository.save(dateCaseClosedEntity);
+        } else if (hasClosedForPaymentCategory(previousStateCategory)) {
+            dateCaseClosedRepository.deleteByCcdCaseNumber(caseDetails.getReference());
+        }
+    }
+
+    private boolean hasClosedForPaymentCategory(String stateCategory) {
+        return stateCategory != null
+               && Arrays.stream(stateCategory.split(","))
+                   .map(String::trim)
+                   .anyMatch(CLOSED_FOR_PAYMENT::equalsIgnoreCase);
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
