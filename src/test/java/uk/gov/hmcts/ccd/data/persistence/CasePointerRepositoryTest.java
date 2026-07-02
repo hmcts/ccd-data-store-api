@@ -1,13 +1,10 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -45,10 +42,8 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private CaseDetails originalCaseDetails;
     private Long currentCaseReference;
-    @Inject
-    private PlatformTransactionManager transactionManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         originalCaseDetails = createOriginalCaseDetails();
     }
@@ -132,59 +127,31 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    public void persistCasePointer_shouldKeepMarkedByLogstashFlagTrue() {
+    public void persistCasePointer_shouldNotQueueCasePointerForLogstash() {
         casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        Boolean markedByLogstash = jdbcTemplate.queryForObject(
-            "SELECT marked_by_logstash FROM case_data WHERE reference = ?",
-            Boolean.class,
-            currentCaseReference
+        Integer queueEntries = jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Integer.class,
+            Long.valueOf(originalCaseDetails.getId())
         );
 
-        assertThat(markedByLogstash, is(true));
+        assertThat(queueEntries, is(0));
     }
 
     @Test
-    public void persistRegularCase_shouldUnsetMarkedByLogstashFlag() {
+    public void persistRegularCase_shouldQueueForLogstash() {
         // Simulate a standard case creation by reusing the original details directly
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         var persisted = caseDetailsRepository.set(originalCaseDetails);
 
-        Boolean markedByLogstash = jdbcTemplate.queryForObject(
-            "SELECT marked_by_logstash FROM case_data WHERE id = ?",
-            Boolean.class,
+        Integer queueEntries = jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Integer.class,
             persisted.getId()
         );
 
-        assertThat(markedByLogstash, is(false));
-    }
-
-    @Test
-    public void constraintShouldPreventUnmarkingCasePointer() {
-        casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
-
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        Long pointerId = Long.valueOf(originalCaseDetails.getId());
-
-        // Run the raw update in its own transaction so an expected constraint failure does not poison
-        // the outer test transaction that the tests run in.
-        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-
-        boolean constraintViolated = false;
-        try {
-            transactionTemplate.execute(status -> {
-                jdbcTemplate.update(
-                    "UPDATE case_data SET marked_by_logstash = false WHERE id = ?",
-                    pointerId
-                );
-                return null;
-            });
-        } catch (RuntimeException expected) {
-            constraintViolated = true;
-        }
-
-        assertThat("Constraint should prevent unmarking a case pointer", constraintViolated, is(true));
+        assertThat(queueEntries, is(1));
     }
 }

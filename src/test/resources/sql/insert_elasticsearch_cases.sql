@@ -6,14 +6,14 @@ DELETE FROM case_data;
 -- elasticsearch/data/restricted_security_cases
 -- elasticsearch/data/security_cases
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, marked_by_logstash)
-VALUES (1, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1588870649839697', true);
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (1, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1588870649839697');
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, marked_by_logstash)
-VALUES (2, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1589460125872336', true);
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (2, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1589460125872336');
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, marked_by_logstash)
-VALUES (3, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1589460099608690', true);
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (3, 'SECURITY', 'AUTOTEST1', '', 'PUBLIC', '{}', '{}', '1589460099608690');
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
 VALUES (4, 'SECURITY', 'AUTOTEST1', 'PENDING', 'PUBLIC', '{}', '{}', '1589460099608691');
