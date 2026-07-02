@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-942_DeleteExistingDateCaseClosed",
+  "title": "Delete existing date case closed records for get closed cases",
+  "specs": [
+    "to delete existing date case closed records"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "delete existing date case closed records",
+
+  "method": "DELETE",
+  "uri": "/testing-support/date-case-closed",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "queryParams": {
+      "stateChangedDate": "${[scenarioContext][customValues][today]}"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 204
+  }
+}

@@ -11,6 +11,8 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
@@ -47,6 +49,7 @@ import feign.FeignException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +112,8 @@ class SubmitCaseTransactionTest {
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
+    @Mock
+    private DateCaseClosedRepository dateCaseClosedRepository;
     @Mock
     private CaseTypeService caseTypeService;
     @Mock
@@ -186,7 +191,8 @@ class SubmitCaseTransactionTest {
             decentralisedSubmitCaseTransaction,
             resolver,
             casePointerRepository,
-            synchronisedCaseProcessor
+            synchronisedCaseProcessor,
+            dateCaseClosedRepository
         );
 
         idamUser = buildIdamUser();
@@ -473,6 +479,67 @@ class SubmitCaseTransactionTest {
         verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID);
         verify(caseDocumentService).attachCaseDocuments(
             eq("12345"), eq("TestType"), eq("TestJurisdiction"), anyList());
+    }
+
+    @Test
+    @DisplayName("should save date case closed when state category contains closed for payment")
+    void shouldSaveDateCaseClosedWhenStateCategoryContainsClosedForPayment() {
+        LocalDateTime stateChangedDate = LocalDateTime.of(2026, 6, 16, 10, 30);
+        state.setStateCategory("CLOSED FOR PAYMENT, End");
+        doReturn(stateChangedDate).when(savedCaseDetails).getLastStateModifiedDate();
+
+        ArgumentCaptor<DateCaseClosedEntity> dateCaseClosedEntityCaptor =
+            ArgumentCaptor.forClass(DateCaseClosedEntity.class);
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(dateCaseClosedRepository).save(dateCaseClosedEntityCaptor.capture());
+        DateCaseClosedEntity dateCaseClosedEntity = dateCaseClosedEntityCaptor.getValue();
+
+        assertAll(
+            () -> assertThat(dateCaseClosedEntity.getCcdCaseNumber(), is(1234567890L)),
+            () -> assertThat(dateCaseClosedEntity.getState(), is(STATE_ID)),
+            () -> assertThat(dateCaseClosedEntity.getStateCategory(), is("CLOSED FOR PAYMENT, End")),
+            () -> assertThat(dateCaseClosedEntity.getStateChangedDate(), is(stateChangedDate))
+        );
+    }
+
+    @Test
+    @DisplayName("should not save date case closed when state category does not contain closed for payment")
+    void shouldNotSaveDateCaseClosedWhenStateCategoryDoesNotContainsClosedForPayment() {
+        state.setStateCategory("End");
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
+    }
+
+    @Test
+    @DisplayName("should not save date case closed when state category only partially matches closed for payment")
+    void shouldNotSaveDateCaseClosedWhenStateCategoryOnlyPartiallyMatchesClosedForPayment() {
+        state.setStateCategory("CLOSED FOR PAYMENT EXAMPLE, End");
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {

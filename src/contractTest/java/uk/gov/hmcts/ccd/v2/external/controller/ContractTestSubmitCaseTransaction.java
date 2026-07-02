@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
@@ -43,12 +44,13 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                              PersistenceStrategyResolver resolver,
                                              CasePointerRepository creator,
-                                             SynchronisedCaseProcessor synchronisedCaseProcessor) {
+                                             SynchronisedCaseProcessor synchronisedCaseProcessor,
+                                             DateCaseClosedRepository dateCaseClosedRepository) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
             caseAccessGroupUtils, caseDocumentTimestampService, decentralisedCreateCaseEventService, resolver, creator,
-            synchronisedCaseProcessor);
+            synchronisedCaseProcessor, dateCaseClosedRepository);
 
     }
 }
