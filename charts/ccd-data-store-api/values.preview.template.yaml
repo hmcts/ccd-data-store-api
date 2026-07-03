@@ -222,7 +222,7 @@ logstash:
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
           jdbc_default_timezone => "UTC"
-          statement => "DELETE FROM case_data_logstash_queue USING case_data WHERE case_data_logstash_queue.case_data_id = case_data.id RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version"
+          statement => "DELETE FROM case_data_logstash_queue USING case_data WHERE case_data_logstash_queue.case_data_id = case_data.id RETURNING case_data_logstash_queue.id AS logstash_queue_id, case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version"
           clean_run => false
           schedule => "* * * * * *"
         }
@@ -243,6 +243,10 @@ logstash:
                 source => "json_data_classification"
                 target => "data_classification"
                 remove_field => ["json_data_classification"]
+            }
+            mutate {
+                add_field => { "[@metadata][version]" => "%{logstash_queue_id}" }
+                remove_field => ["logstash_queue_id"]
             }
             if [data][SearchCriteria] {
                 clone {
@@ -336,7 +340,7 @@ logstash:
               document_id => "%{id}"
               timeout => 60
               # External versioning configuration
-              version => "%{version}"
+              version => "%{[@metadata][version]}"
               version_type => "external"
               # Handle version conflicts gracefully
               retry_on_conflict => 0
