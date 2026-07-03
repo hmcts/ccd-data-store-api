@@ -46,17 +46,10 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
                                                                 List<AccessControlList> accessControlLists) {
         return accessControlLists
             .stream()
-            .filter(acls -> accessProfile.getAccessProfile().equals(acls.getAccessProfile()))
-            .map(acls -> {
-                AccessControlList accessControl = acls;
-                if (accessProfile.getReadOnly()) {
-                    accessControl = acls.createCopy();
-                    accessControl.setCreate(false);
-                    accessControl.setDelete(false);
-                    accessControl.setUpdate(false);
-                    accessControl.setRead(true);
-                }
-                return accessControl;
-            }).collect(Collectors.toList());
+            .filter(acl -> accessProfile.getAccessProfile().equals(acl.getAccessProfile()))
+            .map(acl -> accessProfile.getReadOnly()
+                ? new AccessControlList(acl.getAccessProfile(), false, true, false, false)
+                : acl)
+            .collect(Collectors.toList());
     }
 }
