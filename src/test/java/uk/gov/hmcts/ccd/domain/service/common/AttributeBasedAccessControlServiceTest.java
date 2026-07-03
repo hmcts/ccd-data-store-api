@@ -137,29 +137,25 @@ class AttributeBasedAccessControlServiceTest {
 
     private List<AccessControlList> createAccessControlList(String... accessProfiles) {
         return Arrays.stream(accessProfiles)
-            .map(accessProfile -> {
-                AccessControlList accessControlList = new AccessControlList();
-                accessControlList.setAccessProfile(accessProfile);
-                accessControlList.setCreate(true);
-                accessControlList.setDelete(true);
-                accessControlList.setRead(true);
-                accessControlList.setUpdate(true);
-                return accessControlList;
-            })
+            .map(accessProfile -> AccessControlList.builder()
+                .accessProfile(accessProfile)
+                .create(true)
+                .read(true)
+                .update(true)
+                .delete(true)
+                .build())
             .collect(Collectors.toList());
     }
 
     private List<AccessControlList> createAccessControlListWithReadFalse(String... accessProfiles) {
         return Arrays.stream(accessProfiles)
-            .map(accessProfile -> {
-                AccessControlList accessControlList = new AccessControlList();
-                accessControlList.setAccessProfile(accessProfile);
-                accessControlList.setCreate(true);
-                accessControlList.setDelete(true);
-                accessControlList.setRead(false);
-                accessControlList.setUpdate(true);
-                return accessControlList;
-            })
+            .map(accessProfile -> AccessControlList.builder()
+                .accessProfile(accessProfile)
+                .create(true)
+                .delete(true)
+                .read(false)
+                .update(true)
+                .build())
             .collect(Collectors.toList());
     }
 }
