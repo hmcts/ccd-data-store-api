@@ -335,6 +335,10 @@ logstash:
               document_type => "_doc"
               document_id => "%{id}"
               timeout => 60
+              # External versioning configuration
+              version => "%{version}"
+              version_type => "external"
+              # Handle version conflicts gracefully
               retry_on_conflict => 0
           }
       }
