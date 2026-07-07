@@ -50,7 +50,7 @@ ext {
             'line'       : 90,
             'complexity' : 88,
             'method'     : 90,
-            'class'      : 98
+            'class'      : 97
     ]
 }
 
@@ -235,6 +235,33 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'                   // java-property-to-json
+    implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'                  // java-property-to-json
+    implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.7'                  // spring-security-oauth2-jose
+    runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.17'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
+    implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
+    implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'          // spring-cloud-starter-openfeign
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.6'             // service-auth-provider-java-client
+    implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
+    implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
+    implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
+    implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.42.Final'       // spring-boot-starter-data-jpa
+
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
+    testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'                // spring-cloud-starter-contract-stub-runner
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockito        // spring-boot-starter-test
     // put CVE Vulnerability (sub)dependency overrides here e.g.
     // implementation group: 'com.example', name: 'example-lib', version: '1.0.0' //  parent dependency name
 
@@ -318,9 +345,9 @@ dependencies {
     testImplementation libraries.junit5
     testImplementation libs.mockito
     mockitoAgent(libs.mockito) {
-        transitive = false;
+        transitive = false
     }
-    testImplementation group: 'com.opentable.components', name: 'otj-pg-embedded', version: '1.1.1'
+
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.0'
@@ -331,7 +358,9 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
-    testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
+    testImplementation(group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion) {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
     testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:4.3.3'
 
@@ -832,14 +861,14 @@ task functional(type: JavaExec) {
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
     args = [
-        '--threads', '1',
-        '--plugin', "json:${rootDir}/target/cucumber.json",
-        '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-        '--plugin',  "pretty",
-        '--tags',"${tags}",
-        '--glue', 'uk.gov.hmcts.befta.player',
-        '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
-        'src/aat/resources/features'
+            '--threads', '1',
+            '--plugin', "json:${rootDir}/target/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+            '--plugin', "pretty",
+            '--tags', "${tags}",
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', 'uk.gov.hmcts.ccd.datastore.befta',
+            'src/aat/resources/features'
     ]
     // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
     jvmArgs '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
