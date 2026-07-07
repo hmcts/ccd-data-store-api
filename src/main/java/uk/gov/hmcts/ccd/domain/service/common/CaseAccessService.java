@@ -51,7 +51,7 @@ public class CaseAccessService {
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
             = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
-            + "+-localAuthority$");
+            + "+-localAuthority$|^solicitor$|^pui-case-manager$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
