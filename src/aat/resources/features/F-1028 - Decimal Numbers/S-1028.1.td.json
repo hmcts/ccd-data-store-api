@@ -1,10 +1,10 @@
 {
   "title": "must successfully create case with number field displaying as expected",
-  "_guid_": "S-1027.1",
-  "_extends_": "F-1027_Test_Data_Base",
+  "_guid_": "S-1028.1",
+  "_extends_": "F-1028_Test_Data_Base",
   "prerequisites": [
     {
-      "Token_Creation": "F-1027_Case_Data_Create_Token_Creation"
+      "Token_Creation": "F-1028_Case_Data_Create_Token_Creation"
     }
   ],
   "specs": [
