@@ -49,9 +49,14 @@ public class CaseAccessService {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDataAccessControl caseDataAccessControl;
 
+    /* TO DO Uncomment after testing
+    private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
+        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
+        + "+-localAuthority");*/
+
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
             = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
-            + "+-localAuthority$|^solicitor$|^pui-case-manager$");
+            + "+-localAuthority|^solicitor$|^pui-case-manager$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
