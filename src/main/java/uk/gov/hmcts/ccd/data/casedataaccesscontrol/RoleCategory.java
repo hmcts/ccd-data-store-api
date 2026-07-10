@@ -4,5 +4,6 @@ public enum RoleCategory {
     PROFESSIONAL,
     CITIZEN,
     JUDICIAL,
+    ENFORCEMENT,
     LEGAL_OPERATIONS;
 }
