@@ -108,7 +108,7 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
-env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
+env.OAUTH2_SCOPE_VARIABLES = "profile%20openid%20roles%20manage-user%20create-user"
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
