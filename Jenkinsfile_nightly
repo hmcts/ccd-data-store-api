@@ -98,7 +98,7 @@ env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
-env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user"
+env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
