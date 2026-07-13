@@ -82,6 +82,10 @@ public class AppInsights {
         telemetry.trackEvent(name, properties, null);
     }
 
+    public void trackTrace(String message, Map<String, String> customProperties, SeverityLevel severityLevel) {
+        telemetry.trackTrace(message, severityLevel, customProperties);
+    }
+
     public void trackCallbackEvent(
         CallbackType callbackType, String url, String httpStatus, java.time.Duration duration) {
         String safeUrl = nullSafe(url);
