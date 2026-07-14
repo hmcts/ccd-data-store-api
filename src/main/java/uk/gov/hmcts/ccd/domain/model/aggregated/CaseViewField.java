@@ -54,8 +54,8 @@ public class CaseViewField implements CommonField {
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty("listElementCode")
-    private String listElementCode;
+    @JsonProperty("caseFieldSubfieldCode")
+    private String caseFieldSubfieldCode;
 
     public String getId() {
         return id;
@@ -217,12 +217,12 @@ public class CaseViewField implements CommonField {
         this.metadata = metadata;
     }
 
-    public String getListElementCode() {
-        return listElementCode;
+    public String getCaseFieldSubfieldCode() {
+        return caseFieldSubfieldCode;
     }
 
-    public void setListElementCode(String listElementCode) {
-        this.listElementCode = listElementCode;
+    public void setCaseFieldSubfieldCode(String caseFieldSubfieldCode) {
+        this.caseFieldSubfieldCode = caseFieldSubfieldCode;
     }
 
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
@@ -230,7 +230,7 @@ public class CaseViewField implements CommonField {
         caseViewField.setOrder(field.getDisplayOrder());
         caseViewField.setShowCondition(field.getShowCondition());
         caseViewField.setDisplayContextParameter(field.getDisplayContextParameter());
-        caseViewField.setListElementCode(field.getListElementCode());
+        caseViewField.setCaseFieldSubfieldCode(field.getCaseFieldSubfieldCode());
         return caseViewField;
     }
 

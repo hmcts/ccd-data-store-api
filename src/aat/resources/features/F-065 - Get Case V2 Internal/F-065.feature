@@ -7,19 +7,19 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-166 # enable when CCD Definition Store emits CaseTypeTab listElementCode
-Scenario: must return case view with CaseTypeTab listElementCode
+@S-166 # enable when CCD Definition Store emits CaseTypeTab ListElementCode
+Scenario: must return case view with CaseTypeTab ListElementCode as caseFieldSubfieldCode
 
-    Given a successful call [to create a token for case creation with CaseTypeTab listElementCode] as in [S-166-Prerequisite],
+    Given a successful call [to create a token for case creation with CaseTypeTab ListElementCode] as in [S-166-Prerequisite],
       And a case that has just been created as in [S-166-Prerequisite_Case_Creation],
       And a user with [an active BEFTA Master caseworker profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request [contains a case with CaseTypeTab listElementCode configured],
+      And the request [contains a case with CaseTypeTab ListElementCode configured],
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
 
      Then a positive response is received,
-      And the response [contains listElementCode for the MySchool tab field],
+      And the response [contains caseFieldSubfieldCode for the MySchool tab field],
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,4 +150,3 @@ Scenario: must return the case view having only the respective fields with READ 
       And a call [to get the same case by Solicitor 3] will get the expected response as in [F-065_Later_Case_Read_By_Solicitor_3_Generated_By_Solicitor_1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-

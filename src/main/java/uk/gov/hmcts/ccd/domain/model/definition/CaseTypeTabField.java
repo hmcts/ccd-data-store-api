@@ -14,7 +14,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
     private Integer displayOrder = null;
     private String showCondition = null;
     private String displayContextParameter;
-    private String listElementCode;
+    private String caseFieldSubfieldCode;
 
     @Schema
     @JsonProperty("case_field")
@@ -58,12 +58,12 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
 
     @Schema
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty("listElementCode")
-    public String getListElementCode() {
-        return listElementCode;
+    @JsonProperty("caseFieldSubfieldCode")
+    public String getCaseFieldSubfieldCode() {
+        return caseFieldSubfieldCode;
     }
 
-    public void setListElementCode(String listElementCode) {
-        this.listElementCode = listElementCode;
+    public void setCaseFieldSubfieldCode(String caseFieldSubfieldCode) {
+        this.caseFieldSubfieldCode = caseFieldSubfieldCode;
     }
 }

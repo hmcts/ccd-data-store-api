@@ -1601,8 +1601,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseTypeTabFieldBuilder withListElementCode(final String listElementCode) {
-            caseTypeTabField.setListElementCode(listElementCode);
+        public CaseTypeTabFieldBuilder withCaseFieldSubfieldCode(final String caseFieldSubfieldCode) {
+            caseTypeTabField.setCaseFieldSubfieldCode(caseFieldSubfieldCode);
             return this;
         }
 

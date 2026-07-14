@@ -12,29 +12,31 @@ class CaseViewFieldTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    void shouldSerializeListElementCodeWhenPresent() throws Exception {
+    void shouldSerializeCaseFieldSubfieldCodeWhenPresent() throws Exception {
         CaseViewField caseViewField = new CaseViewField();
-        caseViewField.setListElementCode("Name");
+        caseViewField.setId("CaseFieldID");
+        caseViewField.setCaseFieldSubfieldCode("CaseFieldID.Name");
 
         JsonNode json = MAPPER.readTree(MAPPER.writeValueAsString(caseViewField));
 
-        assertThat(json.get("listElementCode").asText(), is("Name"));
+        assertThat(json.get("id").asText(), is("CaseFieldID"));
+        assertThat(json.get("caseFieldSubfieldCode").asText(), is("CaseFieldID.Name"));
     }
 
     @Test
-    void shouldOmitListElementCodeWhenAbsent() throws Exception {
+    void shouldOmitCaseFieldSubfieldCodeWhenAbsent() throws Exception {
         JsonNode json = MAPPER.readTree(MAPPER.writeValueAsString(new CaseViewField()));
 
-        assertThat(json.has("listElementCode"), is(false));
+        assertThat(json.has("caseFieldSubfieldCode"), is(false));
     }
 
     @Test
-    void shouldOmitListElementCodeWhenBlank() throws Exception {
+    void shouldOmitCaseFieldSubfieldCodeWhenBlank() throws Exception {
         CaseViewField caseViewField = new CaseViewField();
-        caseViewField.setListElementCode("");
+        caseViewField.setCaseFieldSubfieldCode("");
 
         JsonNode json = MAPPER.readTree(MAPPER.writeValueAsString(caseViewField));
 
-        assertThat(json.has("listElementCode"), is(false));
+        assertThat(json.has("caseFieldSubfieldCode"), is(false));
     }
 }

@@ -12,17 +12,17 @@ class CaseTypeTabFieldTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    void shouldSerializeAndDeserializeListElementCode() throws Exception {
+    void shouldSerializeAndDeserializeCaseFieldSubfieldCode() throws Exception {
         CaseTypeTabField tabField = new CaseTypeTabField();
-        tabField.setListElementCode("FamilyAddress.Country");
+        tabField.setCaseFieldSubfieldCode("CaseFieldID.FamilyAddress.Country");
 
         JsonNode json = MAPPER.readTree(MAPPER.writeValueAsString(tabField));
         CaseTypeTabField deserialized = MAPPER.readValue(
-            "{\"listElementCode\":\"FamilyAddress.Country\"}",
+            "{\"caseFieldSubfieldCode\":\"CaseFieldID.FamilyAddress.Country\"}",
             CaseTypeTabField.class
         );
 
-        assertThat(json.get("listElementCode").asText(), is("FamilyAddress.Country"));
-        assertThat(deserialized.getListElementCode(), is("FamilyAddress.Country"));
+        assertThat(json.get("caseFieldSubfieldCode").asText(), is("CaseFieldID.FamilyAddress.Country"));
+        assertThat(deserialized.getCaseFieldSubfieldCode(), is("CaseFieldID.FamilyAddress.Country"));
     }
 }

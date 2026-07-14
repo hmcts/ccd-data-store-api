@@ -1,12 +1,12 @@
 {
   "_guid_": "S-166",
   "_extends_": "F-065_Test_Data_Base",
-  "title": "must return case view with CaseTypeTab listElementCode",
+  "title": "must return case view with CaseTypeTab ListElementCode as caseFieldSubfieldCode",
 
   "specs": [
     "an active BEFTA Master caseworker profile in CCD",
-    "contains a case with CaseTypeTab listElementCode configured",
-    "contains listElementCode for the MySchool tab field"
+    "contains a case with CaseTypeTab ListElementCode configured",
+    "contains caseFieldSubfieldCode for the MySchool tab field"
   ],
 
   "users": {
@@ -83,7 +83,7 @@
               "publish": null,
               "publish_as": null,
               "acls": "[[ANYTHING_PRESENT]]",
-              "listElementCode": "Name"
+              "caseFieldSubfieldCode": "MySchool.Name"
             }
           ],
           "show_condition": null,

@@ -335,8 +335,8 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
-    @DisplayName("should return CaseTypeTab ListElementCode in case view tab fields")
-    void shouldReturnListElementCodeInCaseViewTabFields() {
+    @DisplayName("should return CaseTypeTab CaseFieldSubfieldCode in case view tab fields")
+    void shouldReturnCaseFieldSubfieldCodeInCaseViewTabFields() {
         caseTypeTabsDefinition = newCaseTabCollection()
             .withTab(newCaseTab()
                 .withTabField(newCaseTabField()
@@ -346,7 +346,7 @@ class DefaultGetCaseViewOperationTest {
                             .withType("Complex")
                             .build())
                         .build())
-                    .withListElementCode("FamilyAddress.Country")
+                    .withCaseFieldSubfieldCode("dataTestField1.FamilyAddress.Country")
                     .build())
                 .build())
             .build();
@@ -359,7 +359,7 @@ class DefaultGetCaseViewOperationTest {
             () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
             () -> assertThat(caseView.getTabs()[0].getFields()[0],
                 allOf(hasProperty("id", equalTo("dataTestField1")),
-                    hasProperty("listElementCode", equalTo("FamilyAddress.Country"))))
+                    hasProperty("caseFieldSubfieldCode", equalTo("dataTestField1.FamilyAddress.Country"))))
         );
     }
 

@@ -192,7 +192,7 @@ definitions:
       order:
         type: integer
         format: int32
-      listElementCode:
+      caseFieldSubfieldCode:
         type: string
 
   WorkBasketResult:
