@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -52,6 +53,9 @@ public class CaseViewField implements CommonField {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("listElementCode")
+    private String listElementCode;
 
     public String getId() {
         return id;
@@ -213,11 +217,20 @@ public class CaseViewField implements CommonField {
         this.metadata = metadata;
     }
 
+    public String getListElementCode() {
+        return listElementCode;
+    }
+
+    public void setListElementCode(String listElementCode) {
+        this.listElementCode = listElementCode;
+    }
+
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
         CaseViewField caseViewField = createFrom(field.getCaseFieldDefinition(), data);
         caseViewField.setOrder(field.getDisplayOrder());
         caseViewField.setShowCondition(field.getShowCondition());
         caseViewField.setDisplayContextParameter(field.getDisplayContextParameter());
+        caseViewField.setListElementCode(field.getListElementCode());
         return caseViewField;
     }
 

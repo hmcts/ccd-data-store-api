@@ -457,6 +457,9 @@ definitions:
         type: object
         description: |
           Value of the field, type and structure depends on the field type
+      listElementCode:
+        type: string
+        description: The optional CaseTypeTab subfield path under the case field
     required:
       - id
       - label

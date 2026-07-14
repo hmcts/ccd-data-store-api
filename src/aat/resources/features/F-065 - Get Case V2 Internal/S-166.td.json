@@ -1,0 +1,99 @@
+{
+  "_guid_": "S-166",
+  "_extends_": "F-065_Test_Data_Base",
+  "title": "must return case view with CaseTypeTab listElementCode",
+
+  "specs": [
+    "an active BEFTA Master caseworker profile in CCD",
+    "contains a case with CaseTypeTab listElementCode configured",
+    "contains listElementCode for the MySchool tab field"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-166-Prerequisite_Case_Creation][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "${[scenarioContext][childContexts][S-166-Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
+      "case_type": {
+        "id": "FT_CTT_Subfield_Valid",
+        "name": "FT_CTT_Subfield_Valid",
+        "description": "CaseTypeTab valid direct complex subfield",
+        "jurisdiction": {
+          "id": "BEFTA_MASTER",
+          "name": "BEFTA Master",
+          "description": "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "tabs": [
+        {
+          "__operator__": "superset",
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        },
+        {
+          "id": "MySchoolDetails",
+          "label": "My School Details",
+          "order": 3,
+          "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "id"
+            },
+            {
+              "id": "MySchool",
+              "label": "My School",
+              "hidden": false,
+              "value": {
+                "Name": "Springfield Elementary"
+              },
+              "metadata": false,
+              "hint_text": null,
+              "field_type": "[[ANYTHING_PRESENT]]",
+              "validation_expr": null,
+              "security_label": "PUBLIC",
+              "order": 1,
+              "formatted_value": null,
+              "display_context": null,
+              "display_context_parameter": null,
+              "show_condition": null,
+              "show_summary_change_option": null,
+              "show_summary_content_option": null,
+              "retain_hidden_value": null,
+              "publish": null,
+              "publish_as": null,
+              "acls": "[[ANYTHING_PRESENT]]",
+              "listElementCode": "Name"
+            }
+          ],
+          "show_condition": null,
+          "role": null
+        }
+      ],
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

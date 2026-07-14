@@ -335,6 +335,35 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should return CaseTypeTab ListElementCode in case view tab fields")
+    void shouldReturnListElementCodeInCaseViewTabFields() {
+        caseTypeTabsDefinition = newCaseTabCollection()
+            .withTab(newCaseTab()
+                .withTabField(newCaseTabField()
+                    .withCaseField(newCaseField()
+                        .withId("dataTestField1")
+                        .withFieldType(aFieldType()
+                            .withType("Complex")
+                            .build())
+                        .build())
+                    .withListElementCode("FamilyAddress.Country")
+                    .build())
+                .build())
+            .build();
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields()[0],
+                allOf(hasProperty("id", equalTo("dataTestField1")),
+                    hasProperty("listElementCode", equalTo("FamilyAddress.Country"))))
+        );
+    }
+
+    @Test
     @DisplayName("should add metadata fields from the get case callback")
     void shouldAddMetadataFieldsFromTheGetCaseCallback() {
         caseTypeDefinition.setCallbackGetCaseUrl("/callback/getCase");

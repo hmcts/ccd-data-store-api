@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-166-Prerequisite_Case_Creation",
+  "_extends_": "Case_Creation_Data_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CTT_Subfield_Valid"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-166-Prerequisite][testData][actualResponse][body][token]}",
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "data": {
+        "MySchool": {
+          "Name": "Springfield Elementary"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "state": "CaseCreated",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_CTT_Subfield_Valid",
+      "case_data": {
+        "MySchool": {
+          "Name": "Springfield Elementary"
+        }
+      }
+    }
+  }
+}
