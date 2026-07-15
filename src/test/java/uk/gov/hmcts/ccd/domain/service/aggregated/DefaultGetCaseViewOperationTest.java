@@ -364,6 +364,35 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should return fully qualified CaseFieldSubfieldCode when CaseTypeTab uses relative subfield code")
+    void shouldReturnFullyQualifiedCaseFieldSubfieldCodeFromRelativeSubfieldCode() {
+        caseTypeTabsDefinition = newCaseTabCollection()
+            .withTab(newCaseTab()
+                .withTabField(newCaseTabField()
+                    .withCaseField(newCaseField()
+                        .withId("dataTestField1")
+                        .withFieldType(aFieldType()
+                            .withType("Complex")
+                            .build())
+                        .build())
+                    .withCaseFieldSubfieldCode("FamilyAddress.Country")
+                    .build())
+                .build())
+            .build();
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields()[0],
+                allOf(hasProperty("id", equalTo("dataTestField1")),
+                    hasProperty("caseFieldSubfieldCode", equalTo("dataTestField1.FamilyAddress.Country"))))
+        );
+    }
+
+    @Test
     @DisplayName("should add metadata fields from the get case callback")
     void shouldAddMetadataFieldsFromTheGetCaseCallback() {
         caseTypeDefinition.setCallbackGetCaseUrl("/callback/getCase");

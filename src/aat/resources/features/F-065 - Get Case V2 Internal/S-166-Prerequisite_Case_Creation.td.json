@@ -1,11 +1,9 @@
 {
   "_guid_": "S-166-Prerequisite_Case_Creation",
-  "_extends_": "Case_Creation_Data_Base",
+  "_extends_": "Case_Creation_Base",
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
   },
 
   "request": {
@@ -30,9 +28,16 @@
   },
 
   "expectedResponse": {
+    "_extends_": "Common_201_Response",
     "body": {
+      "id": "[[ANYTHING_PRESENT]]",
       "state": "CaseCreated",
+      "version": 0,
       "jurisdiction": "BEFTA_MASTER",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
       "case_type_id": "FT_CTT_Subfield_Valid",
       "case_data": {
         "MySchool": {
@@ -40,7 +45,13 @@
         }
       },
       "data_classification": {},
-      "supplementary_data": null
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "callback_error_message": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
     }
   }
 }

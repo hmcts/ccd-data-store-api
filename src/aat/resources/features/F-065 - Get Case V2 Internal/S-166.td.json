@@ -9,10 +9,8 @@
     "contains caseFieldSubfieldCode for the MySchool tab field"
   ],
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
   },
 
   "request": {
@@ -32,7 +30,7 @@
           "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id": "${[scenarioContext][childContexts][S-166-Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][S-166-Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
       "case_type": {
         "id": "FT_CTT_Subfield_Valid",
         "name": "FT_CTT_Subfield_Valid",
@@ -73,7 +71,9 @@
               "validation_expr": null,
               "security_label": "PUBLIC",
               "order": 1,
-              "formatted_value": null,
+              "formatted_value": {
+                "Name": "Springfield Elementary"
+              },
               "display_context": null,
               "display_context_parameter": null,
               "show_condition": null,
