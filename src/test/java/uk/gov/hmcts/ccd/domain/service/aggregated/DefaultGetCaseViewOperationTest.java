@@ -393,6 +393,43 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should return fully qualified CaseFieldSubfieldCode for multiple relative subfield codes")
+    void shouldReturnFullyQualifiedCaseFieldSubfieldCodeForMultipleRelativeSubfieldCodes() {
+        CaseFieldDefinition dataTestField1 = newCaseField()
+            .withId("dataTestField1")
+            .withFieldType(aFieldType()
+                .withType("Complex")
+                .build())
+            .build();
+        caseTypeTabsDefinition = newCaseTabCollection()
+            .withTab(newCaseTab()
+                .withTabField(newCaseTabField()
+                    .withCaseField(dataTestField1)
+                    .withCaseFieldSubfieldCode("FamilyAddress.Country")
+                    .build())
+                .withTabField(newCaseTabField()
+                    .withCaseField(dataTestField1)
+                    .withCaseFieldSubfieldCode("FamilyAddress.PostCode")
+                    .build())
+                .build())
+            .build();
+        doReturn(caseTypeTabsDefinition).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                hasItemInArray(hasProperty("caseFieldSubfieldCode",
+                    equalTo("dataTestField1.FamilyAddress.Country")))),
+            () -> assertThat(caseView.getTabs()[0].getFields(),
+                hasItemInArray(hasProperty("caseFieldSubfieldCode",
+                    equalTo("dataTestField1.FamilyAddress.PostCode"))))
+        );
+    }
+
+    @Test
     @DisplayName("should add metadata fields from the get case callback")
     void shouldAddMetadataFieldsFromTheGetCaseCallback() {
         caseTypeDefinition.setCallbackGetCaseUrl("/callback/getCase");

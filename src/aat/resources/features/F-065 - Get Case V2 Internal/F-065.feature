@@ -23,6 +23,22 @@ Scenario: must return case view with CaseTypeTab ListElementCode as caseFieldSub
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-167
+Scenario: must return case view with multiple CaseTypeTab ListElementCode values as caseFieldSubfieldCode
+
+    Given a successful call [to create a token for case creation with multiple CaseTypeTab ListElementCode values] as in [S-167-Prerequisite],
+      And a case that has just been created as in [S-167-Prerequisite_Case_Creation],
+      And a user with [an active BEFTA Master caseworker profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [contains a case with multiple CaseTypeTab ListElementCode values configured],
+      And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
+
+     Then a positive response is received,
+      And the response [contains caseFieldSubfieldCode for both MySchool tab fields],
+      And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-165 @Ignore
 Scenario: must return case view when the case reference exists
 
