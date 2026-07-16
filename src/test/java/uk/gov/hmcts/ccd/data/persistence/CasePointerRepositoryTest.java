@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.Optional;
@@ -31,6 +32,13 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
     private static final String CASE_STATE = "CaseCreated";
+    private static final String LOGSTASH_POLL_STATEMENT =
+        "DELETE FROM case_data_logstash_queue USING case_data "
+            + "WHERE case_data_logstash_queue.case_data_id = case_data.id "
+            + "RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, "
+            + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
+            + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
+            + "as json_supplementary_data, version";
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -153,5 +161,38 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         );
 
         assertThat(queueEntries, is(1));
+    }
+
+    @Test
+    public void logstashPollingShouldDeleteQueuedRowsAndReturnLatestLiveCaseVersion() {
+        // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+
+        persisted.setData(Map.of("foo", mapper.valueToTree("baz")));
+        CaseDetails updated = caseDetailsRepository.set(persisted);
+
+        assertThat(countQueuedRows(jdbcTemplate, updated.getId()), is(2));
+
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+
+        assertAll(
+            () -> assertThat(polledRows.size(), is(2)),
+            () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())),
+                is(true)),
+            () -> assertThat(polledRows.stream().allMatch(row -> ((Number) row.get("version")).intValue()
+                == updated.getVersion()), is(true)),
+            () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")),
+                is(true)),
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId()), is(0))
+        );
+    }
+
+    private Integer countQueuedRows(JdbcTemplate jdbcTemplate, String caseDataId) {
+        return jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Integer.class,
+            Long.valueOf(caseDataId)
+        );
     }
 }
