@@ -235,7 +235,7 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
@@ -247,8 +247,8 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'          // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.6'             // service-auth-provider-java-client
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.12'         // spring-cloud-starter-openfeign
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.12'            // service-auth-provider-java-client
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
