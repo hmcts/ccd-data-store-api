@@ -296,7 +296,8 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
         copy.setStates(createDeepCopyList(this.getStates()));
         copy.setCaseFieldDefinitions(createDeepCopyList(this.getCaseFieldDefinitions()));
         copy.setPrintableDocumentsUrl(this.getPrintableDocumentsUrl());
-        copy.setAccessControlLists(createShallowCopyList(this.getAccessControlLists()));
+        copy.setAccessControlLists(this.getAccessControlLists() == null
+            ? null : createShallowCopyList(this.getAccessControlLists()));
         copy.setCallbackGetCaseUrl(this.getCallbackGetCaseUrl());
         copy.setRetriesGetCaseUrl(this.getRetriesGetCaseUrl() != null
             ? new ArrayList<>(this.getRetriesGetCaseUrl()) : null);

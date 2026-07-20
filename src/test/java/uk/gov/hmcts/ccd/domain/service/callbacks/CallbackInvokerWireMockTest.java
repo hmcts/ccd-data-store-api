@@ -19,6 +19,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import jakarta.inject.Inject;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -125,8 +127,9 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldFailFastOnConnectTimeout() {
-        String unreachableUrl = "http://10.255.255.1:9/unreachable-callback";
+    public void aboutToSubmitShouldFailFastWhenCallbackConnectionFails() throws IOException {
+        int unusedPort = findUnusedLocalPort();
+        String unreachableUrl = "http://127.0.0.1:" + unusedPort + "/unreachable-callback";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
 
@@ -136,10 +139,16 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
                 caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
         Duration duration = Duration.between(start, Instant.now());
 
-        MatcherAssert.assertThat("connect timeout should not wait for default 30s",
+        MatcherAssert.assertThat("connection failure should not wait for default 30s",
             duration.toMillis() < 2_000L);
         MatcherAssert.assertThat("exception should mention unsuccessful callback",
             ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
+    }
+
+    private int findUnusedLocalPort() throws IOException {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            return serverSocket.getLocalPort();
+        }
     }
 
 }

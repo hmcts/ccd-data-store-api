@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
@@ -39,7 +38,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             .map(accessProfile ->  updateAccessControlCRUD(accessProfile,
                 accessControlLists == null ? Collections.emptyList() : accessControlLists))
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<AccessControlList> updateAccessControlCRUD(AccessProfile accessProfile,
@@ -47,9 +46,9 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
         return accessControlLists
             .stream()
             .filter(acl -> accessProfile.getAccessProfile().equals(acl.getAccessProfile()))
-            .map(acl -> accessProfile.getReadOnly()
+            .map(acl -> Boolean.TRUE.equals(accessProfile.getReadOnly())
                 ? new AccessControlList(acl.getAccessProfile(), false, true, false, false)
                 : acl)
-            .collect(Collectors.toList());
+            .toList();
     }
 }

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -150,7 +150,7 @@ class EventTokenServiceTest {
         when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
         when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
 
-        EventTokenProperties eventTokenProperties = new EventTokenProperties(
+        EventTokenProperties tokenProperties = new EventTokenProperties(
             uid,
             "caseId",
             "jurisdictionId",
@@ -162,11 +162,11 @@ class EventTokenServiceTest {
             "1"
         );
 
-        doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
+        doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
         spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
 
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
     }
 
     @Test
@@ -178,7 +178,7 @@ class EventTokenServiceTest {
         when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
         when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
 
-        EventTokenProperties eventTokenProperties = new EventTokenProperties(
+        EventTokenProperties tokenProperties = new EventTokenProperties(
             uid,
             null,
             "jurisdictionId",
@@ -190,11 +190,11 @@ class EventTokenServiceTest {
             "1"
         );
 
-        doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
+        doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
         spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
 
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
     }
 
     @Test
@@ -206,7 +206,7 @@ class EventTokenServiceTest {
         when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
         when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
 
-        EventTokenProperties eventTokenProperties = new EventTokenProperties(
+        EventTokenProperties tokenProperties = new EventTokenProperties(
             uid,
             "caseId",
             null,
@@ -218,11 +218,11 @@ class EventTokenServiceTest {
             "1"
         );
 
-        doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
+        doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
         spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
 
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
     }
 
     @Test
@@ -234,7 +234,7 @@ class EventTokenServiceTest {
         when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
         when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
 
-        EventTokenProperties eventTokenProperties = new EventTokenProperties(
+        EventTokenProperties tokenProperties = new EventTokenProperties(
             uid,
             "caseId",
             "jurisdictionId",
@@ -246,11 +246,11 @@ class EventTokenServiceTest {
             "1"
         );
 
-        doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
+        doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
         spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
 
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
     }
 
     @Test
@@ -262,7 +262,7 @@ class EventTokenServiceTest {
         when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
         when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
 
-        EventTokenProperties eventTokenProperties = new EventTokenProperties(
+        EventTokenProperties tokenProperties = new EventTokenProperties(
             null,
             "caseId",
             "jurisdictionId",
@@ -274,11 +274,11 @@ class EventTokenServiceTest {
             "1"
         );
 
-        doReturn(eventTokenProperties).when(spyEventTokenService).parseToken(token);
+        doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
         spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
 
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
     }
 
     @Test
