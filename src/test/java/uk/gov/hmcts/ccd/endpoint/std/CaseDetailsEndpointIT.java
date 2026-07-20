@@ -5540,7 +5540,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
+    void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
         throws Exception {
         final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
@@ -5821,7 +5821,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
+    void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -5931,7 +5931,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+    void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
         final String caseReference = "1202264432028419";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
@@ -6042,7 +6042,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+    void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
         final String caseReference = "6512245793128983";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
@@ -6177,7 +6177,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
+    void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
@@ -6285,7 +6285,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
+    void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
         throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
@@ -6402,7 +6402,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
+    void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
         throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
@@ -6536,7 +6536,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
+    void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/documentData/caseref/" + caseReference;
 
@@ -6574,7 +6574,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
+    void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -6678,7 +6678,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
+    void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -6800,7 +6800,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
+    void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 

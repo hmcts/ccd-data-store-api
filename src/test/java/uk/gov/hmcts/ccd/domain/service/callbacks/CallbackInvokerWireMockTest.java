@@ -54,7 +54,7 @@ class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         // IDAM
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
