@@ -112,7 +112,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponse
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings({"checkstyle:OperatorWrap", "checkstyle:FileTabCharacter"})
-public class CaseDetailsEndpointIT extends WireMockBaseTest {
+class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -794,7 +794,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
-        final JsonNode DATA = mapper.readTree("""
+        final JsonNode dataNode = mapper.readTree("""
             {
               "MoneyGBPField": "1000",
               "FixedListField": "VALUE3",
@@ -849,7 +849,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             }""");
 
 
-        Map data = JacksonUtils.convertValue(DATA);
+        Map data = JacksonUtils.convertValue(dataNode);
         CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withEvent(anEvent().withEventId(eventId).build())
             .withData(data)
@@ -1259,7 +1259,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
+    void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1273,12 +1273,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertTrue("The response should contain 'Missing start trigger token'",
-            content.contains("Missing start trigger token"));
+        assertThat(content, containsString("Missing start trigger token"));
     }
 
     @Test
-    public void shouldReturnBadRequestWhenTokenIsEmpty() throws Exception {
+    void shouldReturnBadRequestWhenTokenIsEmpty() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1292,12 +1291,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertTrue("The response should contain 'Missing start trigger token'",
-            content.contains("Missing start trigger token"));
+        assertThat(content, containsString("Missing start trigger token"));
     }
 
     @Test
-    public void shouldReturnForbiddenWhenTokenIsInvalid() throws Exception {
+    void shouldReturnForbiddenWhenTokenIsInvalid() throws Exception {
         final String invalidToken = "eyJhbGciOiJIUzI1NiJ9.e0.KUFDva2DpGi-zmDrHrcMOPMC1DlaKodGHKHIsib3gTA";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -1312,11 +1310,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertTrue("The response should contain 'Token is not valid'", content.contains("Token is not valid"));
+        assertThat(content, containsString("Token is not valid"));
     }
 
     @Test
-    public void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
+    void shouldReturn201WhenPostCreateCaseWithNoDataForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
@@ -1329,35 +1327,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertThat("Expected empty case data", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText(), is(""));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+        assertThat("Incorrect number of cases", caseDetailsList.size(), is(1));
 
         final CaseDetails savedCaseDetails = caseDetailsList.getFirst();
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
-            .getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
-        assertEquals("state3", savedCaseDetails.getState());
+        assertThat("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())), is(true));
+        assertThat("Incorrect Case Type", savedCaseDetails.getCaseTypeId(), is(CASE_TYPE));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().toString(), is("{}"));
+        assertThat(savedCaseDetails.getState(), is("state3"));
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+        assertThat("Incorrect number of case events", caseAuditEventList.size(), is(1));
 
         final AuditEvent caseAuditEvent = caseAuditEventList.getFirst();
-        assertEquals("123", caseAuditEvent.getUserId());
-        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
-        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
-        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
-        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
-        assertEquals("Case in state 3", caseAuditEvent.getStateName());
-        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
-        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", LONG_COMMENT, caseAuditEvent.getDescription());
-        assertEquals("Summary", SHORT_COMMENT, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
+        assertThat(caseAuditEvent.getUserId(), is("123"));
+        assertThat(caseAuditEvent.getCaseDataId(), is(savedCaseDetails.getId()));
+        assertThat(caseAuditEvent.getCaseTypeId(), is(savedCaseDetails.getCaseTypeId()));
+        assertThat(caseAuditEvent.getCaseTypeVersion(), is(Integer.valueOf(1)));
+        assertThat(caseAuditEvent.getStateId(), is(savedCaseDetails.getState()));
+        assertThat(caseAuditEvent.getStateName(), is("Case in state 3"));
+        assertThat(caseAuditEvent.getCreatedDate(), is(savedCaseDetails.getCreatedDate()));
+        assertThat(caseAuditEvent.getData(), is(savedCaseDetails.getData()));
+        assertThat("Event ID", caseAuditEvent.getEventId(), is(TEST_EVENT_ID));
+        assertThat("Description", caseAuditEvent.getDescription(), is(LONG_COMMENT));
+        assertThat("Summary", caseAuditEvent.getSummary(), is(SHORT_COMMENT));
+        assertThat(caseAuditEvent.getDataClassification().isEmpty(), is(true));
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 

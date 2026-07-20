@@ -21,7 +21,7 @@ public interface Copyable<T>  {
 
     default <S> List<S> createShallowCopyList(List<S> originalList) {
         if (originalList == null) {
-            return null;
+            return new ArrayList<>();
         }
         return new ArrayList<>(originalList);
     }

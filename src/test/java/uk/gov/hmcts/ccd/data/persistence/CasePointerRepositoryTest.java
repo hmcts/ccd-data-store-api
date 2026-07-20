@@ -20,14 +20,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
-public class CasePointerRepositoryTest extends WireMockBaseTest {
+class CasePointerRepositoryTest extends WireMockBaseTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
@@ -52,7 +49,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     private Long currentCaseReference;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         originalCaseDetails = createOriginalCaseDetails();
     }
 
@@ -76,50 +73,50 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    public void persistCasePointer_shouldCreateCasePointerWithEmptyData() {
+    void persistCasePointer_shouldCreateCasePointerWithEmptyData() {
         // When: Creating a case pointer
         casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
 
         // Original case details should not be modified
-        assertThat(originalCaseDetails.getData().size(), is(1));
-        assertThat(originalCaseDetails.getState(), is(CASE_STATE));
-        assertThat(originalCaseDetails.getLastModified(), is(notNullValue()));
-        assertThat(originalCaseDetails.getSecurityClassification(), is(SecurityClassification.PUBLIC));
-        assertThat(originalCaseDetails.getDataClassification(), is(notNullValue()));
-        assertThat(originalCaseDetails.getLastStateModifiedDate(), is(notNullValue()));
-        assertThat(originalCaseDetails.getId(), is(notNullValue()));
-        assertThat(originalCaseDetails.getResolvedTTL(), is(nullValue()));
+        assertThat(originalCaseDetails.getData()).hasSize(1);
+        assertThat(originalCaseDetails.getState()).isEqualTo(CASE_STATE);
+        assertThat(originalCaseDetails.getLastModified()).isNotNull();
+        assertThat(originalCaseDetails.getSecurityClassification()).isEqualTo(SecurityClassification.PUBLIC);
+        assertThat(originalCaseDetails.getDataClassification()).isNotNull();
+        assertThat(originalCaseDetails.getLastStateModifiedDate()).isNotNull();
+        assertThat(originalCaseDetails.getId()).isNotNull();
+        assertThat(originalCaseDetails.getResolvedTTL()).isNull();
 
         // And: The case pointer should be persisted in the database
         Optional<CaseDetails> pointerOptional = caseDetailsRepository.findById(
             JURISDICTION,
             Long.valueOf(originalCaseDetails.getId())
         );
-        assertThat("Case pointer should exist in database", pointerOptional.isPresent(), is(true));
+        assertThat(pointerOptional).as("Case pointer should exist in database").isPresent();
         CaseDetails pointer = pointerOptional.orElseThrow();
         LocalDate expectedDanglingPointerExpiry = LocalDate.now().plusYears(1);
         assertAll("Case pointer should have expected properties",
-            () -> assertThat(pointer.getId(), is(originalCaseDetails.getId())),
-            () -> assertThat(pointer.getReference(), is(currentCaseReference)),
-            () -> assertThat(pointer.getJurisdiction(), is(JURISDICTION)),
-            () -> assertThat(pointer.getCaseTypeId(), is(CASE_TYPE_DECENTRALIZED)),
+            () -> assertThat(pointer.getId()).isEqualTo(originalCaseDetails.getId()),
+            () -> assertThat(pointer.getReference()).isEqualTo(currentCaseReference),
+            () -> assertThat(pointer.getJurisdiction()).isEqualTo(JURISDICTION),
+            () -> assertThat(pointer.getCaseTypeId()).isEqualTo(CASE_TYPE_DECENTRALIZED),
 
             // Pointer-specific properties: should be cleared/reset
-            () -> assertThat(pointer.getData().isEmpty(), is(true)),
-            () -> assertThat(pointer.getState(), is("")),
-            () -> assertThat(pointer.getSecurityClassification(), is(SecurityClassification.RESTRICTED)),
-            () -> assertThat(pointer.getDataClassification().isEmpty(), is(true)),
-            () -> assertThat(pointer.getLastStateModifiedDate(), is(nullValue())),
-            () -> assertThat(pointer.getResolvedTTL(), is(expectedDanglingPointerExpiry)),
+            () -> assertThat(pointer.getData()).isEmpty(),
+            () -> assertThat(pointer.getState()).isEmpty(),
+            () -> assertThat(pointer.getSecurityClassification()).isEqualTo(SecurityClassification.RESTRICTED),
+            () -> assertThat(pointer.getDataClassification()).isEmpty(),
+            () -> assertThat(pointer.getLastStateModifiedDate()).isNull(),
+            () -> assertThat(pointer.getResolvedTTL()).isEqualTo(expectedDanglingPointerExpiry),
 
             // Database-managed fields: version is set by DB, lastModified is updated on save
-            () -> assertThat(pointer.getVersion(), is(notNullValue())),
-            () -> assertThat(pointer.getLastModified(), is(notNullValue()))
+            () -> assertThat(pointer.getVersion()).isNotNull(),
+            () -> assertThat(pointer.getLastModified()).isNotNull()
         );
     }
 
     @Test
-    public void persistCasePointer_shouldRespectExistingResolvedTtl() {
+    void persistCasePointer_shouldRespectExistingResolvedTtl() {
         LocalDate existingTtl = LocalDate.now().plusMonths(3);
         originalCaseDetails.setResolvedTTL(existingTtl);
 
@@ -130,12 +127,12 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             Long.valueOf(originalCaseDetails.getId())
         ).orElse(null);
 
-        assertThat(pointer, is(notNullValue()));
-        assertThat(pointer.getResolvedTTL(), is(existingTtl));
+        assertThat(pointer).isNotNull();
+        assertThat(pointer.getResolvedTTL()).isEqualTo(existingTtl);
     }
 
     @Test
-    public void persistCasePointer_shouldNotQueueCasePointerForLogstash() {
+    void persistCasePointer_shouldNotQueueCasePointerForLogstash() {
         casePointerRepository.persistCasePointerAndInitId(originalCaseDetails);
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
@@ -145,11 +142,11 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             Long.valueOf(originalCaseDetails.getId())
         );
 
-        assertThat(queueEntries, is(0));
+        assertThat(queueEntries).isZero();
     }
 
     @Test
-    public void persistRegularCase_shouldQueueForLogstash() {
+    void persistRegularCase_shouldQueueForLogstash() {
         // Simulate a standard case creation by reusing the original details directly
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         var persisted = caseDetailsRepository.set(originalCaseDetails);
@@ -160,11 +157,11 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
             persisted.getId()
         );
 
-        assertThat(queueEntries, is(1));
+        assertThat(queueEntries).isOne();
     }
 
     @Test
-    public void logstashPollingShouldDeleteQueuedRowsAndReturnLatestLiveCaseVersion() {
+    void logstashPollingShouldDeleteQueuedRowsAndReturnLatestLiveCaseVersion() {
         // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
@@ -172,19 +169,19 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
         persisted.setData(Map.of("foo", mapper.valueToTree("baz")));
         CaseDetails updated = caseDetailsRepository.set(persisted);
 
-        assertThat(countQueuedRows(jdbcTemplate, updated.getId()), is(2));
+        assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2);
 
         List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
 
         assertAll(
-            () -> assertThat(polledRows.size(), is(2)),
-            () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())),
-                is(true)),
+            () -> assertThat(polledRows).hasSize(2),
+            () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())))
+                .isTrue(),
             () -> assertThat(polledRows.stream().allMatch(row -> ((Number) row.get("version")).intValue()
-                == updated.getVersion()), is(true)),
-            () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")),
-                is(true)),
-            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId()), is(0))
+                == updated.getVersion())).isTrue(),
+            () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
+                .isTrue(),
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
         );
     }
 

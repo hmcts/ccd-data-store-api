@@ -255,7 +255,8 @@ public class CaseEventDefinition implements Serializable, Copyable<CaseEventDefi
             ? new ArrayList<>(this.getRetriesTimeoutURLAboutToSubmitEvent()) : null);
         copy.setRetriesTimeoutURLSubmittedEvent(this.getRetriesTimeoutURLSubmittedEvent() != null
             ? new ArrayList<>(this.getRetriesTimeoutURLSubmittedEvent()) : null);
-        copy.setAccessControlLists(createShallowCopyList(this.getAccessControlLists()));
+        copy.setAccessControlLists(this.getAccessControlLists() == null
+            ? null : createShallowCopyList(this.getAccessControlLists()));
         copy.setCallBackURLAboutToStartEvent(this.getCallBackURLAboutToStartEvent());
         copy.setCallBackURLAboutToSubmitEvent(this.getCallBackURLAboutToSubmitEvent());
         copy.setCallBackURLSubmittedEvent(this.getCallBackURLSubmittedEvent());

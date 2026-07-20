@@ -1378,7 +1378,7 @@ public class CallbackTest extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
 
-        assertEquals("Did not catch invalid token", 403, mvcResult.getResponse().getStatus());
+        assertThat("Did not catch invalid token", mvcResult.getResponse().getStatus(), equalTo(403));
     }
 
     @Test
@@ -1404,7 +1404,7 @@ public class CallbackTest extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
 
-        assertEquals("Did not catch invalid token", 403, mvcResult.getResponse().getStatus());
+        assertThat("Did not catch invalid token", mvcResult.getResponse().getStatus(), equalTo(403));
     }
 
     @Test

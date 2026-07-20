@@ -231,7 +231,7 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(nestedField -> {
                 final List<AccessControlList> cloneACLs =
-                    acls.stream().map(AccessControlList::duplicate).collect(toList());
+                    new ArrayList<>(acls.stream().map(AccessControlList::duplicate).toList());
                 nestedField.setAccessControlLists(cloneACLs);
                 propagateACLsToNestedFields(nestedField, acls);
             });
@@ -407,8 +407,9 @@ public class CaseFieldDefinition implements Serializable, CommonField, Copyable<
         copy.setLiveUntil(this.getLiveUntil());
         copy.setOrder(this.getOrder());
         copy.setShowCondition(this.getShowCondition());
-        copy.setAccessControlLists(createShallowCopyList(this.getAccessControlLists()));
-        copy.setComplexACLs(createShallowCopyList(this.getComplexACLs()));
+        copy.setAccessControlLists(this.getAccessControlLists() == null
+            ? null : createShallowCopyList(this.getAccessControlLists()));
+        copy.setComplexACLs(this.getComplexACLs() == null ? null : createShallowCopyList(this.getComplexACLs()));
         copy.setMetadata(this.isMetadata());
         copy.setDisplayContext(this.getDisplayContext());
         copy.setDisplayContextParameter(this.getDisplayContextParameter());
