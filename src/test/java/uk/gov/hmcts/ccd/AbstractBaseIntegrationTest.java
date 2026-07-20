@@ -222,14 +222,18 @@ public abstract class AbstractBaseIntegrationTest {
             recreateTableFKConstraintString = getFKConstraintToRecreate(tableName);
             String truncateTablesQuery =
                 String.format(
-                    "START TRANSACTION;\n%s"
-                        + "\nCOMMIT;\n"
-                        + "TRUNCATE TABLE %s CASCADE;\n"
-                        + "ALTER TABLE %s DISABLE TRIGGER ALL;\n"
-                        + "COMMIT;\n%s"
-                        + "\nCOMMIT;\n "
-                        + "ALTER TABLE %s ENABLE TRIGGER ALL;\n"
-                        + "END TRANSACTION;\n",
+                    """
+                        START TRANSACTION;
+                        %s
+                        COMMIT;
+                        TRUNCATE TABLE %s CASCADE;
+                        ALTER TABLE %s DISABLE TRIGGER ALL;
+                        COMMIT;
+                        %s
+                        COMMIT;
+                        ALTER TABLE %s ENABLE TRIGGER ALL;
+                        END TRANSACTION;
+                        """,
                     dropTableFKConstraintString, tableName, tableName, recreateTableFKConstraintString, tableName);
 
             LOG.info("Executing :{}\n", truncateTablesQuery);

@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
     "http.client.read.timeout=500",
     "http.client.connection.timeout=200"
     })
-public class CallbackInvokerWireMockTest extends WireMockBaseTest {
+class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
     private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
@@ -54,7 +54,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         // IDAM
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
@@ -66,7 +66,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
+    void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
@@ -89,7 +89,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
+    void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
@@ -107,7 +107,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldRespectReadTimeout() throws Exception {
+    void aboutToSubmitShouldRespectReadTimeout() throws Exception {
         String submitUrl = hostUrl + "/about-to-submit-timeout";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(submitUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
@@ -127,7 +127,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldFailFastWhenCallbackConnectionFails() throws IOException {
+    void aboutToSubmitShouldFailFastWhenCallbackConnectionFails() throws IOException {
         int unusedPort = findUnusedLocalPort();
         String unreachableUrl = "http://127.0.0.1:" + unusedPort + "/unreachable-callback";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);

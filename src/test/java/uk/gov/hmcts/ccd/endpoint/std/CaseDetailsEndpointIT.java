@@ -1347,7 +1347,7 @@ class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseAuditEvent.getUserId(), is("123"));
         assertThat(caseAuditEvent.getCaseDataId(), is(savedCaseDetails.getId()));
         assertThat(caseAuditEvent.getCaseTypeId(), is(savedCaseDetails.getCaseTypeId()));
-        assertThat(caseAuditEvent.getCaseTypeVersion().intValue(), is(1));
+        assertThat(caseAuditEvent.getCaseTypeVersion(), is(Integer.valueOf(1)));
         assertThat(caseAuditEvent.getStateId(), is(savedCaseDetails.getState()));
         assertThat(caseAuditEvent.getStateName(), is("Case in state 3"));
         assertThat(caseAuditEvent.getCreatedDate(), is(savedCaseDetails.getCreatedDate()));
