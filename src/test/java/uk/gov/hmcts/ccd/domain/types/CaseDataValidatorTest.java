@@ -32,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,7 +46,6 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final String CASE_FIELD_DYNAMIC_JSON = "tests/CaseDataValidator_DynamicLists.json";
     private static final String RICH_TEXT_AREA_FIELD = "RichTextAreaField";
     private static final String RICH_TEXT_AREA = "RichTextArea";
-    private static final String RICH_TEXT_VALUE = "<p><strong>Order</strong></p>";
 
     @Inject
     private CaseDataValidator caseDataValidator;
@@ -418,8 +418,12 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     @Test
-    public void validRichTextAreaValue() {
-        final Map<String, JsonNode> values = Map.of(RICH_TEXT_AREA_FIELD, mapper.valueToTree(RICH_TEXT_VALUE));
+    public void validRichTextAreaValue() throws Exception {
+        final String data = """
+            {
+              "RichTextAreaField": "<p><strong>Order</strong></p>"
+            }""";
+        final Map<String, JsonNode> values = caseDataFromJsonString(data);
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(List.of(
             new CaseFieldDefinitionBuilder(RICH_TEXT_AREA_FIELD)
@@ -431,7 +435,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
 
-        assertEquals(result.toString(), 0, result.size());
+        assertTrue(result.isEmpty(), result.toString());
     }
 
     @Test

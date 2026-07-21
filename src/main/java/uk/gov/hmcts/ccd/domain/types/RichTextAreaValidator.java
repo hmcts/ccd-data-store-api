@@ -24,7 +24,7 @@ public class RichTextAreaValidator implements BaseTypeValidator {
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
-        if (isNullOrEmpty(dataValue)) {
+        if (Boolean.TRUE.equals(isNullOrEmpty(dataValue))) {
             return Collections.emptyList();
         }
 
