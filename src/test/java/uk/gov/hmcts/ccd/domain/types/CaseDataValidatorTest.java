@@ -43,6 +43,9 @@ import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final String CASE_FIELD_JSON = "tests/CaseDataValidator_CaseField.json";
     private static final String CASE_FIELD_DYNAMIC_JSON = "tests/CaseDataValidator_DynamicLists.json";
+    private static final String RICH_TEXT_AREA_FIELD = "RichTextAreaField";
+    private static final String RICH_TEXT_AREA = "RichTextArea";
+    private static final String RICH_TEXT_VALUE = "<p><strong>Order</strong></p>";
 
     @Inject
     private CaseDataValidator caseDataValidator;
@@ -415,16 +418,12 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     }
 
     @Test
-    public void validRichTextAreaValue() throws Exception {
-        final String data = "{\n"
-            + "  \"RichTextAreaField\": \"<p><strong>Order</strong></p>\"\n"
-            + "}";
-        final Map<String, JsonNode> values = caseDataFromJsonString(data);
-
+    public void validRichTextAreaValue() {
+        final Map<String, JsonNode> values = Map.of(RICH_TEXT_AREA_FIELD, mapper.valueToTree(RICH_TEXT_VALUE));
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(List.of(
-            new CaseFieldDefinitionBuilder("RichTextAreaField")
-                .withType("RichTextArea")
+            new CaseFieldDefinitionBuilder(RICH_TEXT_AREA_FIELD)
+                .withType(RICH_TEXT_AREA)
                 .withMin(10)
                 .build()
         ));

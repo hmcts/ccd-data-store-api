@@ -5,8 +5,10 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Named
 @Singleton
@@ -27,16 +29,17 @@ public class RichTextAreaValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isTextual()) {
-            final String nodeType = dataValue.getNodeType().toString().toLowerCase();
+            final String nodeType = dataValue.getNodeType().toString().toLowerCase(Locale.ROOT);
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string", dataFieldId));
         }
 
         final String value = dataValue.textValue();
 
-        if (!TextValidator.checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
+        final BigDecimal minLength = caseFieldDefinition.getFieldTypeDefinition().getMin();
+
+        if (!TextValidator.checkMin(minLength, value)) {
             return Collections.singletonList(
-                new ValidationResult("requires a minimum length of "
-                    + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                new ValidationResult("requires a minimum length of " + minLength, dataFieldId)
             );
         }
 
