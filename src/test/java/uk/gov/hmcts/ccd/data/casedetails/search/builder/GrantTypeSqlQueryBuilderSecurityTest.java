@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
 /**
  * Security regression tests for {@link GrantTypeSqlQueryBuilder} (exercised through the concrete
  * {@link BasicGrantTypeQueryBuilder}, which inherits {@code createQuery} unchanged).
- * <p>
  * These tests pin the FIXED behaviour: the previously concatenated attribute values are now
  * bound as named parameters, and the caseAccessCategory LIKE pattern escapes its wildcards. Each
  * test asserts the exact SQL fragment shape the builder now emits AND the value that travels in

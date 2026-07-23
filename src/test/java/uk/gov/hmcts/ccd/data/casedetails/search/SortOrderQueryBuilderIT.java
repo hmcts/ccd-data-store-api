@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Executes the clause produced by {@link SortOrderQueryBuilder} against the Testcontainers
  * Postgres instance already used by the integration tests.
- * <p>
  * Scope of what this proves: a quote-bearing case field id is now rejected by
  * CASE_FIELD_ID_PATTERN at build/validation time, so it never reaches the database. The
  * well-formed control case still executes cleanly end to end, proving the happy path works.

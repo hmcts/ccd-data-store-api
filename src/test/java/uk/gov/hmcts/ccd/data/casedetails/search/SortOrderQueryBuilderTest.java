@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * strict identifier allow-list: only letters, digits, underscore, dot and square brackets are
  * permitted. Single quotes, whitespace and hyphens - which could otherwise reach a JSONB path
  * literal that cannot be parameterised - are rejected with a BadRequestException.
- * <p>
  * The rejection cases below guard the tightened allow-list: they must keep failing closed. Do
  * not relax them to make a change pass.
  */

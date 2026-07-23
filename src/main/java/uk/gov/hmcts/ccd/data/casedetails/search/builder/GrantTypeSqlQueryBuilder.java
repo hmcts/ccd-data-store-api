@@ -218,7 +218,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
             .collect(Collectors.joining(" OR "));
     }
 
-    private String escapeLikeWildcards(String value) {
+    private static String escapeLikeWildcards(String value) {
         return value.replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_");

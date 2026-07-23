@@ -44,7 +44,6 @@ import static org.mockito.Mockito.when;
  * {@link BasicGrantTypeQueryBuilder}) against the Testcontainers Postgres instance already used by
  * the integration tests, binding the params map exactly as production does through a
  * {@link NamedParameterJdbcTemplate}.
- * <p>
  * Each test seeds its own rows (the base class truncates {@code case_data} after every test) and
  * asserts on the exact set of returned case references, so an accidental match cannot pass as a
  * count coincidence.
