@@ -83,8 +83,9 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), caseTypeDefinition);
 
         assertNotNull(query);
-        String expectedValue =  "( data->'CaseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": "
-            + "\"caseAccessGroupId\"}}]' AND state in (:states_1_basic) "
+        String expectedValue =  "( data->'CaseAccessGroups' @> jsonb_build_array(jsonb_build_object('value', "
+            + "jsonb_build_object('caseAccessGroupId', CAST(:case_access_group_id_1_basic AS text)))) "
+            + "AND state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) )";
         assertEquals(expectedValue, query);
     }
@@ -201,7 +202,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         assertNotNull(query);
         String expectedValue =  "( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) "
-            + "AND ( data #>> '{CaseAccessCategory}' LIKE 'Civil/Standard%' ) )";
+            + "AND ( data #>> '{CaseAccessCategory}' LIKE :case_access_category_1_1_basic ESCAPE '\\' ) )";
 
 
         assertEquals(expectedValue, query);
@@ -248,8 +249,8 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         assertNotNull(query);
         String expectedValue =  "( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) "
-            + "AND ( data #>> '{CaseAccessCategory}' LIKE 'Civil/Standard%' "
-            + "OR data #>> '{CaseAccessCategory}' LIKE 'Crime/Standard%' ) ) "
+            + "AND ( data #>> '{CaseAccessCategory}' LIKE :case_access_category_1_1_basic ESCAPE '\\' "
+            + "OR data #>> '{CaseAccessCategory}' LIKE :case_access_category_1_2_basic ESCAPE '\\' ) ) "
             + "OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) )";
 
 

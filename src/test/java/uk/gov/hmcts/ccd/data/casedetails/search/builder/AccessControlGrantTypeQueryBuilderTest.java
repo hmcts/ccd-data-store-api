@@ -91,7 +91,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
                 Maps.newHashMap(),
                 caseTypeDefinition);
         String expectedValue = " AND ( ( ( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction='Test' "
+            + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction = :jurisdiction_1_specific "
             + "AND reference in (:references_1_specific) AND state in (:states_1_specific) "
             + "AND security_classification in (:classifications_1_specific) ) ) )";
         assertNotNull(query);
@@ -116,13 +116,15 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             Maps.newHashMap(), caseTypeDefinition);
 
         String expectedValue =  " AND ( ( ( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction='Test' "
+            + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction = :jurisdiction_1_specific "
             + "AND reference in (:references_1_specific) AND state in (:states_1_specific) "
-            + "AND security_classification in (:classifications_1_specific) ) ) OR ( ( jurisdiction='Test' "
-            + "AND data #>> '{caseManagementLocation,region}'='reg1' "
-            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' "
+            + "AND security_classification in (:classifications_1_specific) ) ) OR ( ( "
+            + "jurisdiction = :jurisdiction_1_standard "
+            + "AND data #>> '{caseManagementLocation,region}' = :region_1_standard "
+            + "AND data #>> '{caseManagementLocation,baseLocation}' = :location_1_standard "
             + "AND reference in (:references_1_standard) AND state in (:states_1_standard) "
-            + "AND security_classification in (:classifications_1_standard) ) OR ( jurisdiction='Test' "
+            + "AND security_classification in (:classifications_1_standard) ) OR ( "
+            + "jurisdiction = :jurisdiction_1_challenged "
             + "AND reference in (:references_1_challenged) AND state in (:states_1_challenged) "
             + "AND security_classification in (:classifications_1_challenged) ) ) )";
 
@@ -155,12 +157,14 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String expectedValue =  " AND ( ( ( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) ) "
-            + "OR ( jurisdiction='Test' AND reference in (:references_1_specific) "
+            + "OR ( jurisdiction = :jurisdiction_1_specific AND reference in (:references_1_specific) "
             + "AND state in (:states_1_specific) AND security_classification in (:classifications_1_specific) ) ) "
-            + "OR ( ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,region}'='reg1' "
-            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' AND reference in (:references_1_standard) "
+            + "OR ( ( ( jurisdiction = :jurisdiction_1_standard "
+            + "AND data #>> '{caseManagementLocation,region}' = :region_1_standard "
+            + "AND data #>> '{caseManagementLocation,baseLocation}' = :location_1_standard "
+            + "AND reference in (:references_1_standard) "
             + "AND state in (:states_1_standard) AND security_classification in (:classifications_1_standard) ) "
-            + "OR ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+            + "OR ( jurisdiction = :jurisdiction_1_challenged AND reference in (:references_1_challenged) "
             + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
             + "AND NOT reference in (:case_ids_excluded) ) )";
 
@@ -183,7 +187,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
                 Maps.newHashMap(),
                 caseTypeDefinition);
 
-        String expectedValue =  " AND ( ( ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+        String expectedValue =  " AND ( ( ( jurisdiction = :jurisdiction_1_challenged "
+            + "AND reference in (:references_1_challenged) "
             + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
             + "AND NOT reference in (:case_ids_excluded) )";
 
@@ -223,7 +228,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
                 Maps.newHashMap(),
                 caseTypeDefinition);
 
-        String expectedValue = " AND ( ( ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+        String expectedValue = " AND ( ( ( jurisdiction = :jurisdiction_1_challenged "
+            + "AND reference in (:references_1_challenged) "
             + "AND state in (:states_1_challenged) "
             + "AND security_classification in (:classifications_1_challenged) ) ) )";
         assertNotNull(query);
