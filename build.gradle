@@ -30,7 +30,8 @@ ext {
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
     set('jacksonVersion', '2.19.2')
-    // REST Assured 6 requires Groovy 5; override Spring Boot 3.5's Groovy 4 dependency management.
+    // REST Assured 6 requires its full module family and Groovy 5 to remain version-aligned.
+    set('rest-assured.version', '6.0.1')
     set('groovy.version', '5.0.3')
     set('snakeyaml.version', '2.2')
     junit = '5.14.4'
