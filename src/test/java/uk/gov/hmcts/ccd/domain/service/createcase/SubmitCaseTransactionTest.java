@@ -11,8 +11,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -49,7 +48,6 @@ import feign.FeignException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -113,7 +111,7 @@ class SubmitCaseTransactionTest {
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
-    private DateCaseClosedRepository dateCaseClosedRepository;
+    private DateCaseClosedService dateCaseClosedService;
     @Mock
     private CaseTypeService caseTypeService;
     @Mock
@@ -192,7 +190,7 @@ class SubmitCaseTransactionTest {
             resolver,
             casePointerRepository,
             synchronisedCaseProcessor,
-            dateCaseClosedRepository
+            dateCaseClosedService
         );
 
         idamUser = buildIdamUser();
@@ -482,15 +480,8 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should save date case closed when state category contains closed for payment")
-    void shouldSaveDateCaseClosedWhenStateCategoryContainsClosedForPayment() {
-        LocalDateTime stateChangedDate = LocalDateTime.of(2026, 6, 16, 10, 30);
-        state.setStateCategory("CLOSED FOR PAYMENT, End");
-        doReturn(stateChangedDate).when(savedCaseDetails).getLastStateModifiedDate();
-
-        ArgumentCaptor<DateCaseClosedEntity> dateCaseClosedEntityCaptor =
-            ArgumentCaptor.forClass(DateCaseClosedEntity.class);
-
+    @DisplayName("should update date case closed after case is submitted")
+    void shouldUpdateDateCaseClosedAfterCaseIsSubmitted() {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,
@@ -499,47 +490,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING,
             null);
 
-        verify(dateCaseClosedRepository).save(dateCaseClosedEntityCaptor.capture());
-        DateCaseClosedEntity dateCaseClosedEntity = dateCaseClosedEntityCaptor.getValue();
-
-        assertAll(
-            () -> assertThat(dateCaseClosedEntity.getCcdCaseNumber(), is(1234567890L)),
-            () -> assertThat(dateCaseClosedEntity.getState(), is(STATE_ID)),
-            () -> assertThat(dateCaseClosedEntity.getStateCategory(), is("CLOSED FOR PAYMENT, End")),
-            () -> assertThat(dateCaseClosedEntity.getStateChangedDate(), is(stateChangedDate))
-        );
-    }
-
-    @Test
-    @DisplayName("should not save date case closed when state category does not contain closed for payment")
-    void shouldNotSaveDateCaseClosedWhenStateCategoryDoesNotContainsClosedForPayment() {
-        state.setStateCategory("End");
-
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            this.caseDetails,
-            IGNORE_WARNING,
-            null);
-
-        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
-    }
-
-    @Test
-    @DisplayName("should not save date case closed when state category only partially matches closed for payment")
-    void shouldNotSaveDateCaseClosedWhenStateCategoryOnlyPartiallyMatchesClosedForPayment() {
-        state.setStateCategory("CLOSED FOR PAYMENT EXAMPLE, End");
-
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            this.caseDetails,
-            IGNORE_WARNING,
-            null);
-
-        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
+        verify(dateCaseClosedService).updateForNewCase(savedCaseDetails, caseTypeDefinition);
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {

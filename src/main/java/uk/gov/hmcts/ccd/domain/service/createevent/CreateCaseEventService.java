@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -32,20 +30,21 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -67,7 +66,6 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,8 +114,7 @@ public class CreateCaseEventService {
     private final CasePointerRepository pointerRepository;
     private final ConditionalFieldRestorer conditionalFieldRestorer;
     private final CaseAccessService caseAccessService;
-    private final DateCaseClosedRepository dateCaseClosedRepository;
-    private static final String CLOSED_FOR_PAYMENT = "CLOSED FOR PAYMENT";
+    private final DateCaseClosedService dateCaseClosedService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -159,7 +156,7 @@ public class CreateCaseEventService {
                                   final SynchronisedCaseProcessor synchronisedCaseProcessor,
                                   final ConditionalFieldRestorer conditionalFieldRestorer,
                                   final CaseAccessService caseAccessService,
-                                  final DateCaseClosedRepository dateCaseClosedRepository) {
+                                  final DateCaseClosedService dateCaseClosedService) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -196,7 +193,7 @@ public class CreateCaseEventService {
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
         this.conditionalFieldRestorer = conditionalFieldRestorer;
         this.caseAccessService = caseAccessService;
-        this.dateCaseClosedRepository = dateCaseClosedRepository;
+        this.dateCaseClosedService = dateCaseClosedService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -342,7 +339,7 @@ public class CreateCaseEventService {
             );
         }
 
-        updateDateCaseClosed(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
+        dateCaseClosedService.updateForCaseEvent(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
@@ -522,34 +519,6 @@ public class CreateCaseEventService {
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         return caseDetailsRepository.set(caseDetails);
-    }
-
-    private void updateDateCaseClosed(CaseDetails caseDetails,
-                                      CaseDetails caseDetailsBefore,
-                                      CaseTypeDefinition caseTypeDefinition) {
-        String stateCategory = caseTypeService.findState(caseTypeDefinition,
-            caseDetails.getState()).getStateCategory();
-        String previousStateCategory = caseTypeService.findState(caseTypeDefinition,
-            caseDetailsBefore.getState()).getStateCategory();
-
-        if (hasClosedForPaymentCategory(stateCategory)) {
-            DateCaseClosedEntity dateCaseClosedEntity = new DateCaseClosedEntity();
-            dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
-            dateCaseClosedEntity.setState(caseDetails.getState());
-            dateCaseClosedEntity.setStateCategory(stateCategory);
-            dateCaseClosedEntity.setStateChangedDate(caseDetails.getLastStateModifiedDate());
-
-            dateCaseClosedRepository.save(dateCaseClosedEntity);
-        } else if (hasClosedForPaymentCategory(previousStateCategory)) {
-            dateCaseClosedRepository.deleteByCcdCaseNumber(caseDetails.getReference());
-        }
-    }
-
-    private boolean hasClosedForPaymentCategory(String stateCategory) {
-        return stateCategory != null
-               && Arrays.stream(stateCategory.split(","))
-                   .map(String::trim)
-                   .anyMatch(CLOSED_FOR_PAYMENT::equalsIgnoreCase);
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {

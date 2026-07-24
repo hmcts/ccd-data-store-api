@@ -188,6 +188,7 @@ public class UICaseSearchController {
         return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
     }
 
+    @LogAudit(operationType = AuditOperationType.GET_CLOSED_CASES)
     @GetMapping(path = "/getClosedCases/{date}")
     @Operation(description = "Retrieve closed cases from date_case_closed by state changed date.")
     @ApiResponse(
@@ -200,10 +201,13 @@ public class UICaseSearchController {
     )
     @ApiResponse(
         responseCode = "404",
-        description = V2.Error.CASE_DATA_NOT_FOUND
+        description = V2.Error.CASE_DATA_NOT_FOUND + ": no closed cases are accessible to the user for the given date."
     )
     public ResponseEntity<DateCaseClosedResponse> getClosedCases(
-        @Parameter(name = "date", required = true)
+        @Parameter(
+            name = "date", description = "UTC calendar date in ISO format to avoid BST edge-case misses.",
+            required = true
+        )
         @PathVariable("date")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate closedCasesDate) {
         if (closedCasesDate.isAfter(LocalDate.now(ZoneOffset.UTC))) {

@@ -1,55 +1,52 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import feign.FeignException;
+import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import feign.FeignException;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
-import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
-import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
-import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
-import uk.gov.hmcts.ccd.ApplicationParams;
 
-import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -71,8 +68,7 @@ public class SubmitCaseTransaction implements AccessControl {
     private final PersistenceStrategyResolver resolver;
     private final CasePointerRepository casePointerRepository;
     private final SynchronisedCaseProcessor synchronisedCaseProcessor;
-    private final DateCaseClosedRepository dateCaseClosedRepository;
-    private static final String CLOSED_FOR_PAYMENT = "CLOSED FOR PAYMENT";
+    private final DateCaseClosedService dateCaseClosedService;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -92,7 +88,7 @@ public class SubmitCaseTransaction implements AccessControl {
                                  final PersistenceStrategyResolver resolver,
                                  final CasePointerRepository casePointerRepository,
                                  final SynchronisedCaseProcessor synchronisedCaseProcessor,
-                                 final DateCaseClosedRepository dateCaseClosedRepository
+                                 final DateCaseClosedService dateCaseClosedService
     ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -110,7 +106,7 @@ public class SubmitCaseTransaction implements AccessControl {
         this.resolver = resolver;
         this.casePointerRepository = casePointerRepository;
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
-        this.dateCaseClosedRepository = dateCaseClosedRepository;
+        this.dateCaseClosedService = dateCaseClosedService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -200,32 +196,8 @@ public class SubmitCaseTransaction implements AccessControl {
                 verifiedDocumentHashes
             );
         }
-
-        updateDateCaseClosed(savedCaseDetails, caseTypeDefinition);
-
+        dateCaseClosedService.updateForNewCase(savedCaseDetails, caseTypeDefinition);
         return savedCaseDetails;
-    }
-
-    private void updateDateCaseClosed(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
-        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
-        String stateCategory = caseStateDefinition.getStateCategory();
-
-        if (hasClosedForPaymentCategory(stateCategory)) {
-            DateCaseClosedEntity dateCaseClosedEntity = new DateCaseClosedEntity();
-            dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
-            dateCaseClosedEntity.setState(caseDetails.getState());
-            dateCaseClosedEntity.setStateCategory(stateCategory);
-            dateCaseClosedEntity.setStateChangedDate(caseDetails.getLastStateModifiedDate());
-
-            dateCaseClosedRepository.save(dateCaseClosedEntity);
-        }
-    }
-
-    private boolean hasClosedForPaymentCategory(String stateCategory) {
-        return stateCategory != null
-               && Arrays.stream(stateCategory.split(","))
-                   .map(String::trim)
-                   .anyMatch(CLOSED_FOR_PAYMENT::equalsIgnoreCase);
     }
 
     private CaseDetails submitDecentralisedCase(Event event, CaseTypeDefinition caseTypeDefinition, IdamUser idamUser,

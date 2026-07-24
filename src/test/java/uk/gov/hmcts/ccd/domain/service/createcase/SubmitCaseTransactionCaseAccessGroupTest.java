@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupWithId;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -103,7 +103,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
-    private DateCaseClosedRepository dateCaseClosedRepository;
+    private DateCaseClosedService dateCaseClosedService;
     @Mock
     private CaseTypeService caseTypeService;
     @Mock
@@ -188,7 +188,7 @@ class SubmitCaseTransactionCaseAccessGroupTest {
             resolver,
             casePointerRepository,
             synchronisedCaseProcessor,
-            dateCaseClosedRepository
+            dateCaseClosedService
         );
 
         idamUser = buildIdamUser();

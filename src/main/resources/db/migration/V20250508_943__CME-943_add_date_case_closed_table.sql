@@ -20,8 +20,11 @@ ALTER TABLE ONLY public.date_case_closed
     ALTER COLUMN id SET DEFAULT nextval('public.date_case_closed_id_seq'::regclass);
 
 ALTER TABLE public.date_case_closed
+    ADD CONSTRAINT uq_date_case_closed_ccd_case_number UNIQUE (ccd_case_number);
+
+ALTER TABLE public.date_case_closed
     ADD CONSTRAINT fk_date_case_closed_ccd_case_number_case_data
-    FOREIGN KEY (ccd_case_number) REFERENCES public.case_data(reference);
+    FOREIGN KEY (ccd_case_number) REFERENCES public.case_data(reference) ON DELETE CASCADE;
 
 CREATE INDEX idx_date_case_closed_state_changed_date
     ON public.date_case_closed (state_changed_date);

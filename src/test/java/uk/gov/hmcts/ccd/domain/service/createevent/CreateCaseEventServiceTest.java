@@ -18,8 +18,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
-import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -42,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -94,6 +93,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
@@ -193,7 +193,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private CaseAccessService caseAccessService;
     @Mock
-    private DateCaseClosedRepository dateCaseClosedRepository;
+    private DateCaseClosedService dateCaseClosedService;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
@@ -401,18 +401,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
 
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
-        ArgumentCaptor<DateCaseClosedEntity> dateCaseClosedEntityCaptor =
-            ArgumentCaptor.forClass(DateCaseClosedEntity.class);
-
-        verify(dateCaseClosedRepository).save(dateCaseClosedEntityCaptor.capture());
-        verify(dateCaseClosedRepository, never()).deleteByCcdCaseNumber(anyLong());
-        DateCaseClosedEntity dateCaseClosedEntity = dateCaseClosedEntityCaptor.getValue();
-        assertAll(
-            () -> assertThat(dateCaseClosedEntity.getCcdCaseNumber()).isEqualTo(Long.parseLong(CASE_REFERENCE)),
-            () -> assertThat(dateCaseClosedEntity.getState()).isEqualTo(POST_STATE),
-            () -> assertThat(dateCaseClosedEntity.getStateCategory()).isEqualTo("CLOSED FOR PAYMENT,End"),
-            () -> assertThat(dateCaseClosedEntity.getStateChangedDate()).isEqualTo(lastModifiedTimestamp)
-        );
+        verify(dateCaseClosedService).updateForCaseEvent(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
     }
 
     @Test
@@ -438,7 +427,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
-        verify(dateCaseClosedRepository).deleteByCcdCaseNumber(Long.parseLong(CASE_REFERENCE));
+        verify(dateCaseClosedService).updateForCaseEvent(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
     }
 
     @Test
@@ -475,8 +464,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(callbackStateDefinition).when(caseTypeService).findState(caseTypeDefinition, callbackState);
 
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
-        ArgumentCaptor<DateCaseClosedEntity> dateCaseClosedEntityCaptor =
-            ArgumentCaptor.forClass(DateCaseClosedEntity.class);
+        ArgumentCaptor<CaseDetails> finalCaseDetailsCaptor =
+            ArgumentCaptor.forClass(CaseDetails.class);
 
         InOrder inOrder = inOrder(casePostStateService, callbackInvoker);
         inOrder.verify(casePostStateService).evaluateCaseState(caseEventDefinition, updatedCaseDetails);
@@ -485,12 +474,10 @@ class CreateCaseEventServiceTest extends TestFixtures {
             updatedCaseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
-        verify(dateCaseClosedRepository).save(dateCaseClosedEntityCaptor.capture());
-        DateCaseClosedEntity dateCaseClosedEntity = dateCaseClosedEntityCaptor.getValue();
-        assertAll(
-            () -> assertThat(dateCaseClosedEntity.getState()).isEqualTo(callbackState),
-            () -> assertThat(dateCaseClosedEntity.getStateCategory()).isEqualTo("CLOSED FOR PAYMENT,End")
-        );
+        verify(dateCaseClosedService).updateForCaseEvent(finalCaseDetailsCaptor.capture(),
+            eq(caseDetailsBefore),
+            eq(caseTypeDefinition));
+        assertThat(finalCaseDetailsCaptor.getValue().getState()).isEqualTo(callbackState);
     }
 
     @Test
