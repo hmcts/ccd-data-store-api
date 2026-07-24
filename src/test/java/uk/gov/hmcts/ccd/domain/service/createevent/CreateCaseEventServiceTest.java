@@ -401,7 +401,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
 
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
-        verify(dateCaseClosedService).updateForCaseEvent(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
+        verify(dateCaseClosedService).updateForExistingCase(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
     }
 
     @Test
@@ -427,7 +427,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
-        verify(dateCaseClosedService).updateForCaseEvent(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
+        verify(dateCaseClosedService).updateForExistingCase(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
     }
 
     @Test
@@ -474,7 +474,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
             updatedCaseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
-        verify(dateCaseClosedService).updateForCaseEvent(finalCaseDetailsCaptor.capture(),
+        verify(dateCaseClosedService).updateForExistingCase(finalCaseDetailsCaptor.capture(),
             eq(caseDetailsBefore),
             eq(caseTypeDefinition));
         assertThat(finalCaseDetailsCaptor.getValue().getState()).isEqualTo(callbackState);

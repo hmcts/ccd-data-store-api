@@ -89,7 +89,7 @@ class DateCaseClosedServiceTest {
     }
 
     @Test
-    void shouldSaveDateCaseClosedWhenCaseEventCurrentStateCategoryContainsClosedForPayment() {
+    void shouldSaveDateCaseClosedWhenExistingCaseCurrentStateCategoryContainsClosedForPayment() {
         CaseDetails caseDetails = caseDetails(CLOSED_STATE);
         final CaseDetails caseDetailsBefore = caseDetails(OPEN_STATE);
         when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
@@ -97,7 +97,7 @@ class DateCaseClosedServiceTest {
         when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE)).thenReturn(Optional.empty());
 
-        dateCaseClosedService.updateForCaseEvent(caseDetails, caseDetailsBefore, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
 
         verify(dateCaseClosedRepository).save(any(DateCaseClosedEntity.class));
         verify(dateCaseClosedRepository, never()).deleteByCcdCaseNumber(any());
@@ -119,7 +119,7 @@ class DateCaseClosedServiceTest {
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE))
             .thenReturn(Optional.of(existingDateCaseClosedEntity));
 
-        dateCaseClosedService.updateForCaseEvent(caseDetails, caseDetailsBefore, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
 
         ArgumentCaptor<DateCaseClosedEntity> captor = ArgumentCaptor.forClass(DateCaseClosedEntity.class);
         verify(dateCaseClosedRepository).save(captor.capture());
@@ -134,14 +134,14 @@ class DateCaseClosedServiceTest {
     }
 
     @Test
-    void shouldDeleteDateCaseClosedWhenCaseEventMovesOutOfClosedForPaymentStateCategory() {
+    void shouldDeleteDateCaseClosedWhenExistingCaseMovesOutOfClosedForPaymentStateCategory() {
         CaseDetails caseDetails = caseDetails(OPEN_STATE);
         CaseDetails caseDetailsBefore = caseDetails(CLOSED_STATE);
         when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
         when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
             .thenReturn(state("CLOSED FOR PAYMENT, End"));
 
-        dateCaseClosedService.updateForCaseEvent(caseDetails, caseDetailsBefore, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
 
         verify(dateCaseClosedRepository).deleteByCcdCaseNumber(CASE_REFERENCE);
         verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
@@ -156,8 +156,8 @@ class DateCaseClosedServiceTest {
         when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE)).thenReturn(Optional.empty());
 
-        dateCaseClosedService.updateForCaseEvent(openCaseDetails, closedCaseDetails, caseTypeDefinition);
-        dateCaseClosedService.updateForCaseEvent(closedCaseDetails, openCaseDetails, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(openCaseDetails, closedCaseDetails, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(closedCaseDetails, openCaseDetails, caseTypeDefinition);
 
         ArgumentCaptor<DateCaseClosedEntity> captor = ArgumentCaptor.forClass(DateCaseClosedEntity.class);
         verify(dateCaseClosedRepository).deleteByCcdCaseNumber(CASE_REFERENCE);

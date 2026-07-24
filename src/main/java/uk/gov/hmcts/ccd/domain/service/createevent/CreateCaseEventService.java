@@ -339,7 +339,7 @@ public class CreateCaseEventService {
             );
         }
 
-        dateCaseClosedService.updateForCaseEvent(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
+        dateCaseClosedService.updateForExistingCase(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)

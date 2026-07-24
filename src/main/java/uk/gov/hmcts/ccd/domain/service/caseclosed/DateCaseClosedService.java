@@ -31,9 +31,9 @@ public class DateCaseClosedService {
         }
     }
 
-    public void updateForCaseEvent(CaseDetails caseDetails,
-                                   CaseDetails caseDetailsBefore,
-                                   CaseTypeDefinition caseTypeDefinition) {
+    public void updateForExistingCase(CaseDetails caseDetails,
+                                      CaseDetails caseDetailsBefore,
+                                      CaseTypeDefinition caseTypeDefinition) {
         String stateCategory = getStateCategory(caseDetails, caseTypeDefinition);
         String previousStateCategory = getStateCategory(caseDetailsBefore, caseTypeDefinition);
 
