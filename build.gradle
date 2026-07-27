@@ -39,10 +39,10 @@ ext {
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
-    elasticVersion = '9.2.4'
+    elasticVersion = '9.4.4'
     testContainersVersion = '2.0.5'
-    cucumber = '7.34.3'
-    beftaFwVersion = '9.2.6'
+    cucumber = '7.34.5'
+    beftaFwVersion = '9.2.7'
     ccdTestDefinitionVersion = '7.26.7'
     limits = [
             'instruction': 90,
@@ -67,7 +67,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.8'
+        force 'net.bytebuddy:byte-buddy:1.18.11-jdk5'
     }
 }
 
