@@ -12,6 +12,7 @@
     <logger name="httpclient" level="ERROR"/>
 
     <logger name="uk.gov.hmcts" level="DEBUG"/>
+    <logger name="uk.gov.hmcts.befta.util.DynamicValueInjector" level="INFO"/>
 
     <!-- LOG everything at INFO level -->
     <root level="info">

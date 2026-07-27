@@ -30,6 +30,9 @@ ext {
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
     set('jacksonVersion', '2.19.2')
+    // REST Assured 6 requires its full module family and Groovy 5 to remain version-aligned.
+    set('rest-assured.version', '6.0.1')
+    set('groovy.version', '5.0.3')
     set('snakeyaml.version', '2.2')
     junit = '5.14.4'
     junitPlatform = '1.14.4'
@@ -257,7 +260,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.42.Final'       // spring-boot-starter-data-jpa
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '6.0.1'             // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
@@ -350,7 +353,7 @@ dependencies {
     }
 
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '6.0.1'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.0'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
