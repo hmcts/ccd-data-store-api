@@ -10,6 +10,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.io.Serializable;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +35,7 @@ import java.util.Map;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
+    private static final URI ABOUT_BLANK = URI.create("about:blank");
 
     private final AppInsights appInsights;
 
@@ -150,6 +153,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
+    }
+
+    @Override
+    protected ResponseEntity<Object> createResponseEntity(Object body,
+                                                          HttpHeaders headers,
+                                                          HttpStatusCode statusCode,
+                                                          WebRequest request) {
+        // Spring Framework 7 no longer supplies this default; retain the existing API error contract.
+        if (body instanceof ProblemDetail problemDetail && problemDetail.getType() == null) {
+            problemDetail.setType(ABOUT_BLANK);
+        }
+        return super.createResponseEntity(body, headers, statusCode, request);
     }
 
     private HttpStatus getHttpStatus(final Throwable causeOfException) {

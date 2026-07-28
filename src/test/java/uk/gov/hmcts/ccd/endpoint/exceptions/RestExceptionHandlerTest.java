@@ -20,7 +20,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,6 +32,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
@@ -756,6 +761,37 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         final ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
 
         assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void handleHttpMessageNotReadable_shouldRetainAboutBlankProblemDetailType() throws Exception {
+        HttpMessageNotReadableException expectedException = new HttpMessageNotReadableException(
+            "Unreadable request",
+            new MockHttpInputMessage(new byte[0])
+        );
+        setupMockServiceToThrowException(expectedException);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("about:blank"));
+    }
+
+    @Test
+    public void createResponseEntity_shouldRetainAboutBlankProblemDetailTypeForNoResourceFound() {
+        NoResourceFoundException expectedException = new NoResourceFoundException(
+            HttpMethod.GET,
+            "static resource",
+            "getLinkedCases."
+        );
+
+        new RestExceptionHandler(appInsights).createResponseEntity(
+            expectedException.getBody(),
+            HttpHeaders.EMPTY,
+            expectedException.getStatusCode(),
+            mock(WebRequest.class)
+        );
+
+        assertThat(expectedException.getBody().getType().toString(), is("about:blank"));
     }
 
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
