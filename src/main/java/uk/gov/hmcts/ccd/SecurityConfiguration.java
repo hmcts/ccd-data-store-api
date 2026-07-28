@@ -67,7 +67,9 @@ public class SecurityConfiguration {
         "/webjars/**",
         "/v2/api-docs",
         "/v2/api-docs/**",
-        "/testing-support/cleanup-case-type/**"
+        "/testing-support/cleanup-case-type/**",
+        "/metrics",
+        "/metrics/**"
     };
 
     @Inject
@@ -106,7 +108,7 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
             .formLogin(fl -> fl.disable())
             .logout(logout -> logout.disable())
-            .authorizeHttpRequests(auth -> 
+            .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/error")
                 .permitAll()
                 .anyRequest()
