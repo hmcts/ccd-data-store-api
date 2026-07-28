@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.processor.date;
 
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +17,6 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -321,58 +320,58 @@ class DateTimeFormatParserTest {
 
     @Test
     void shouldCreateTextNodeForDate_ToIso() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATE), "FieldId", "yyyy", true);
+        JsonNode result = dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATE), "FieldId", "yyyy", true);
 
         assertAll(
-            () -> assertThat(result.asText(), is("2010-01-01"))
+            () -> assertThat(result.asString(), is("2010-01-01"))
         );
     }
 
     @Test
     void shouldCreateTextNodeForDateTime_ToIso() {
-        TextNode result =
+        JsonNode result =
             dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATETIME), "FieldId", "yyyy", true);
 
         assertAll(
-            () -> assertThat(result.asText(), is("2010-01-01T00:00:00.000"))
+            () -> assertThat(result.asString(), is("2010-01-01T00:00:00.000"))
         );
     }
 
     @Test
     void shouldCreateTextNodeForDate_FromIso() {
-        TextNode result =
+        JsonNode result =
             dateTimeFormatParser.valueToTextNode("2010-01-01", BaseType.get(DATE), "FieldId", "yyyy", false);
 
         assertAll(
-            () -> assertThat(result.asText(), is("2010"))
+            () -> assertThat(result.asString(), is("2010"))
         );
     }
 
     @Test
     void shouldCreateTextNodeForDateTime_FromIso() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01T00:00:00.000", BaseType.get(DATETIME),
+        JsonNode result = dateTimeFormatParser.valueToTextNode("2010-01-01T00:00:00.000", BaseType.get(DATETIME),
             "FieldId", "yyyy", false);
 
         assertAll(
-            () -> assertThat(result.asText(), is("2010"))
+            () -> assertThat(result.asString(), is("2010"))
         );
     }
 
     @Test
     void shouldCreateTextNodeForNullValue() {
-        TextNode result = dateTimeFormatParser.valueToTextNode(null, BaseType.get(DATE), "FieldId", "yyyy", true);
+        JsonNode result = dateTimeFormatParser.valueToTextNode(null, BaseType.get(DATE), "FieldId", "yyyy", true);
 
         assertAll(
-            () -> assertThat(result.asText(), is(nullValue()))
+            () -> assertThat(result.isNull(), is(true))
         );
     }
 
     @Test
     void shouldCreateTextNodeForEmptyValue() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("", BaseType.get(DATE), "FieldId", "yyyy", true);
+        JsonNode result = dateTimeFormatParser.valueToTextNode("", BaseType.get(DATE), "FieldId", "yyyy", true);
 
         assertAll(
-            () -> assertThat(result.asText(), is(""))
+            () -> assertThat(result.asString(), is(""))
         );
     }
 

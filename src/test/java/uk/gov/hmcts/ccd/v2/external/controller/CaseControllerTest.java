@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -286,7 +287,9 @@ class CaseControllerTest {
     @DisplayName("POST /cases/{caseId}/supplementary-data")
     class UpdateSupplementaryData {
 
-        private final ObjectMapper mapper = new ObjectMapper();
+        private final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults()
+            .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            .build();
 
         @Test
         @DisplayName("should return 200 when supplementary data updated")
@@ -372,7 +375,7 @@ class CaseControllerTest {
             Map<String, Object> requestData;
             try {
                 requestData = mapper.readValue(jsonRequest, Map.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 requestData = new HashMap<>();
             }
             return requestData;
@@ -400,7 +403,7 @@ class CaseControllerTest {
             Map<String, Map<String, Object>> requestData;
             try {
                 requestData = mapper.readValue(jsonRequest, Map.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 requestData = new HashMap<>();
             }
             return requestData;
@@ -632,7 +635,7 @@ class CaseControllerTest {
     @DisplayName("POST /cases/supplementary-data")
     class UpdateCasesSupplementaryData {
 
-        private final ObjectMapper mapper = new ObjectMapper();
+        private final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
         @Test
         @DisplayName("should return 200 when supplementary data updated")
@@ -754,9 +757,8 @@ class CaseControllerTest {
             SupplementaryCasesDataResource responseData;
 
             try {
-                mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
                 responseData = mapper.readValue(jsonResponse, SupplementaryCasesDataResource.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 LOG.info(e.getStackTrace().toString());
                 responseData = new SupplementaryCasesDataResource();
             }
@@ -810,7 +812,7 @@ class CaseControllerTest {
             SupplementaryDataCasesUpdateRequest requestData;
             try {
                 requestData = mapper.readValue(jsonRequest, SupplementaryDataCasesUpdateRequest.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 LOG.info(e.getStackTrace().toString());
                 requestData = new SupplementaryDataCasesUpdateRequest();
             }

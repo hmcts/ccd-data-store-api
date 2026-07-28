@@ -1,13 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,15 +41,14 @@ class CaseTypeDefinitionTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+        objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+            .build();
     }
 
     @Test
-    public void ftMasterCaseTypeHashStringComparison() throws JsonProcessingException {
+    public void ftMasterCaseTypeHashStringComparison() throws JacksonException {
         String fileContent = fromFileAsString("tests/FT-MasterCaseType-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
@@ -70,7 +66,7 @@ class CaseTypeDefinitionTest {
     }
 
     @Test
-    public void beftaCaseType31HashStringComparison() throws JsonProcessingException {
+    public void beftaCaseType31HashStringComparison() throws JacksonException {
         String fileContent = fromFileAsString("tests/BEFTA-CASETYPE-3-1-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);
@@ -88,7 +84,7 @@ class CaseTypeDefinitionTest {
     }
 
     @Test
-    public void ftComplexCrudHashStringComparison() throws JsonProcessingException {
+    public void ftComplexCrudHashStringComparison() throws JacksonException {
         String fileContent = fromFileAsString("tests/FT-ComplexCRUD-payload.json");
 
         CaseTypeDefinition caseTypeDefinition = objectMapper.readValue(fileContent, CaseTypeDefinition.class);

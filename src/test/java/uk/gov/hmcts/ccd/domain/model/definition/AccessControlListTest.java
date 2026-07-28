@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class AccessControlListTest {
 
     @Test
-    void shouldValidateAccessControlListParsing() throws JsonProcessingException {
+    void shouldValidateAccessControlListParsing() throws JacksonException {
         AccessControlList accessControlList = new AccessControlList();
 
         accessControlList.setUpdate(false);
@@ -19,14 +20,14 @@ class AccessControlListTest {
         accessControlList.setCreate(true);
         accessControlList.setAccessProfile("test");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
         String value = objectMapper.writeValueAsString(accessControlList);
 
         assertEquals("{\"create\":true,\"read\":false,\"update\":false,\"delete\":false,\"role\":\"test\"}", value);
     }
 
     @Test
-    void shouldValidateAccessControlListSerializationWithRole() throws JsonProcessingException {
+    void shouldValidateAccessControlListSerializationWithRole() throws JacksonException {
         String accessControlJson = "{\n"
             + "\t\"role\": \"caseworker-probate-public\",\n"
             + "\t\"create\": true,\n"
@@ -35,13 +36,13 @@ class AccessControlListTest {
             + "\t\"delete\": false\n"
             + "}";
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
         assertEquals("caseworker-probate-public", value.getAccessProfile());
     }
 
     @Test
-    void shouldValidateAccessControlListSerializationWithAccessProfile() throws JsonProcessingException {
+    void shouldValidateAccessControlListSerializationWithAccessProfile() throws JacksonException {
         String accessControlJson = "{\n"
             + "\t\"accessProfile\": \"caseworker-probate-public\",\n"
             + "\t\"create\": true,\n"
@@ -50,7 +51,7 @@ class AccessControlListTest {
             + "\t\"delete\": false\n"
             + "}";
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
         assertEquals("caseworker-probate-public", value.getAccessProfile());
     }

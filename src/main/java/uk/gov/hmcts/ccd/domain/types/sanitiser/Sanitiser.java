@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.Typed;
 

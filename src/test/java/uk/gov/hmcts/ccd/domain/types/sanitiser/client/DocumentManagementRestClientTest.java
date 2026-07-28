@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import com.xebialabs.restito.semantics.Action;
 import com.xebialabs.restito.server.StubServer;
 import org.glassfish.grizzly.http.Method;
@@ -16,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -43,14 +44,14 @@ import static com.xebialabs.restito.semantics.Condition.uri;
 import static com.xebialabs.restito.semantics.Condition.withHeader;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DocumentManagementRestClientTest extends StubServerDependent {
 
-    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory();
     private static final String RESOURCE_URI = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String DOCUMENT_URL = "http://localhost:%s" + RESOURCE_URI;
     private static final String BINARY_URL = "http://localhost:%s/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
@@ -65,7 +66,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final String BEARER_TEST_JWT = "Bearer testJwt";
     private static final String SERVICE_JWT = "ey373478378347847834783784";
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
     private RestTemplate restTemplate = new RestTemplate();
 
     @Mock
@@ -105,7 +106,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         document.setOriginalDocumentName(FILENAME);
         subject = new DocumentManagementRestClient(securityUtils, restTemplate);
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        JacksonJsonHttpMessageConverter converter = new JacksonJsonHttpMessageConverter();
         converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
         messageConverters.add(converter);
         restTemplate.setMessageConverters(messageConverters);
@@ -200,7 +201,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         return format(url, server.getPort());
     }
 
-    private Action jsonContent(Object object) throws JsonProcessingException {
+    private Action jsonContent(Object object) throws JacksonException {
         return stringContent(objectMapper.writeValueAsString(object));
     }
 

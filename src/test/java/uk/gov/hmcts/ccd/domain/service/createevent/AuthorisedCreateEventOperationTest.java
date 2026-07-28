@@ -4,11 +4,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.assertj.core.util.Lists;
@@ -85,8 +86,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class AuthorisedCreateEventOperationTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
@@ -222,7 +223,7 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ))).thenReturn(true);
         authorisedCaseNode = MAPPER.createObjectNode();
-        ((ObjectNode) authorisedCaseNode).set("testField", JSON_NODE_FACTORY.textNode("testValue"));
+        ((ObjectNode) authorisedCaseNode).set("testField", JSON_NODE_FACTORY.stringNode("testValue"));
         when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class),
             eq(caseFieldDefinitions),
             eq(USER_ROLES),
@@ -769,14 +770,14 @@ class AuthorisedCreateEventOperationTest {
     }
 
     private Map<String, JsonNode> getCaseAccessCategoriesData(String caseAccessCategoryValue) {
-        JsonNode caseAccessCategory = new TextNode(caseAccessCategoryValue);
+        JsonNode caseAccessCategory = new StringNode(caseAccessCategoryValue);
         Map<String, JsonNode> data = new HashMap<>();
         data.put("CaseAccessCategory", caseAccessCategory);
         return data;
     }
 
     private CaseDataContent createNewCaseDataContent(String caseAccessCategoryValue) {
-        JsonNode caseAccessCategory = new TextNode(caseAccessCategoryValue);
+        JsonNode caseAccessCategory = new StringNode(caseAccessCategoryValue);
         Map<String, JsonNode> data = new HashMap<>();
         data.put("CaseAccessCategory", caseAccessCategory);
 

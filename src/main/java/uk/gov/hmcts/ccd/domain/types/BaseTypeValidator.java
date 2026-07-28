@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import java.util.List;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 public interface BaseTypeValidator extends FieldValidator {
 
@@ -15,7 +17,7 @@ public interface BaseTypeValidator extends FieldValidator {
     default Boolean isNullOrEmpty(final JsonNode dataValue) {
         return dataValue == null
             || dataValue.isNull()
-            || (dataValue.isTextual() && (null == dataValue.asText() || dataValue.asText().trim().length() == 0))
+            || (dataValue.isString() && (null == asText(dataValue) || asText(dataValue).trim().length() == 0))
             || (dataValue.isObject() && dataValue.toString().equals("{}"));
     }
 

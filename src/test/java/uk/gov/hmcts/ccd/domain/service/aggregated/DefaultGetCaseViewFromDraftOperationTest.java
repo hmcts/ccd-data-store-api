@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 
 class DefaultGetCaseViewFromDraftOperationTest {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String DRAFT_ID_FORMAT = "DRAFT%s";
@@ -107,8 +107,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = LocalDateTime.now();
         data = newCaseData()
-            .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
-            .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
+            .withPair("dataTestField1", JSON_NODE_FACTORY.stringNode("dataTestField1"))
+            .withPair("dataTestField2", JSON_NODE_FACTORY.stringNode("dataTestField2"))
             .build();
         draftResponse = newDraftResponse()
             .withId(DRAFT_ID)

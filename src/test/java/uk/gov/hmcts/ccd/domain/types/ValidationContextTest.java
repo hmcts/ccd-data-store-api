@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -9,8 +9,8 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 class ValidationContextTest {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd;
 
+import tools.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -17,6 +18,7 @@ class RestTemplateConfigurationIT {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withUserConfiguration(RestTemplateConfiguration.class)
+        .withBean(ObjectMapper.class, ObjectMapper::new)
         .withPropertyValues(
             "http.client.max.total=50",
             "http.client.seconds.idle.connection=30",

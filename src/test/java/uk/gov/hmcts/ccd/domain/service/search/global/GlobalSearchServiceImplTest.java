@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -70,7 +71,8 @@ class GlobalSearchServiceImplTest extends TestFixtures {
 
     @Spy
     @SuppressWarnings("unused") // needed to set up GlobalSearchServiceImpl
-    private ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+    private ObjectMapperService objectMapperService =
+        new DefaultObjectMapperService(JsonMapper.builderWithJackson2Defaults().build());
 
     @Mock
     private ReferenceDataRepository referenceDataRepository;
@@ -195,7 +197,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         QueryBuilder expectedBuilder;
         ElasticsearchRequest expectedElasticsearchRequest;
 
-        private final ObjectMapper mapper = new ObjectMapper();
+        private final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
         @DisplayName("Null Check: should return null if supplied with null request or query")
         @Test
@@ -349,10 +351,10 @@ class GlobalSearchServiceImplTest extends TestFixtures {
             assertNotNull(output.getElasticSearchRequest());
             assertNotNull(output.getElasticSearchRequest().getRequestedSupplementaryData());
             ArrayNode supplementaryData = output.getElasticSearchRequest().getRequestedSupplementaryData();
-            assertEquals(supplementaryDataField1, supplementaryData.get(0).asText());
+            assertEquals(supplementaryDataField1, supplementaryData.get(0).asString());
             assertAll(
                 () -> assertEquals(1, supplementaryData.size()),
-                () -> assertEquals(supplementaryDataField1, supplementaryData.get(0).asText())
+                () -> assertEquals(supplementaryDataField1, supplementaryData.get(0).asString())
             );
         }
 
@@ -559,12 +561,12 @@ class GlobalSearchServiceImplTest extends TestFixtures {
                 .fieldSort(fieldName);
         }
 
-        private ElasticsearchRequest createSimpleElasticsearchRequest() throws JsonProcessingException {
+        private ElasticsearchRequest createSimpleElasticsearchRequest() throws JacksonException {
             JsonNode queryNode = mapper.readTree("{\"query\":" + createSimpleQueryBuilder() + "}");
             return new ElasticsearchRequest(queryNode);
         }
 
-        private void mockInternalCalls() throws JsonProcessingException {
+        private void mockInternalCalls() throws JacksonException {
 
             request = new GlobalSearchRequestPayload();
             request.setSearchCriteria(new SearchCriteria()); // NB: must not be empty

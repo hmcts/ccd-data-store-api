@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
@@ -14,7 +15,7 @@ public class ClientContextUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientContextUtil.class);
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final Pattern BASE64_PATTERN = Pattern.compile("^[A-Za-z0-9+/]*={0,2}$");
 
@@ -96,7 +97,7 @@ public class ClientContextUtil {
 
         try {
             return (ObjectNode) objectMapper.readTree(json);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             LOG.error("Problem deserialising JSON: {}", json, e);
         } catch (Exception e) {
             LOG.error("Problem with JSON: {}", json, e);
@@ -106,7 +107,7 @@ public class ClientContextUtil {
     }
 
     private static void mergeObjectNodes(ObjectNode originalJsonNode, ObjectNode toBeMergedJsonNode) {
-        toBeMergedJsonNode.fields().forEachRemaining(entry ->
+        toBeMergedJsonNode.properties().forEach(entry ->
             originalJsonNode.set(entry.getKey(), entry.getValue())
         );
     }

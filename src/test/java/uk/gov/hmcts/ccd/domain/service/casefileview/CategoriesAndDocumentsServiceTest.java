@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import io.vavr.Tuple2;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;

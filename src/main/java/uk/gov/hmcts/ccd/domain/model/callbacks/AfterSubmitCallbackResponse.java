@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class AfterSubmitCallbackResponse {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
 
     @JsonProperty("confirmation_header")
     private String confirmationHeader;
@@ -33,7 +34,7 @@ public class AfterSubmitCallbackResponse {
     public String toJson() {
         try {
             return MAPPER.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return toString();
         }
     }

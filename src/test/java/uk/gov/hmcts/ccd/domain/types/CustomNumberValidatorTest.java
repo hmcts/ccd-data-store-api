@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +53,7 @@ class CustomNumberValidatorTest {
 
     @Test
     void shouldFailOnInvalidApprovalStatus() {
-        final JsonNode data = NODE_FACTORY.textNode("5");
+        final JsonNode data = NODE_FACTORY.stringNode("5");
         List<ValidationResult> validationResults =
             this.validator.validate("ApprovalStatus", data, caseFieldDefinition);
         assertNotNull(validationResults);
@@ -65,7 +65,7 @@ class CustomNumberValidatorTest {
 
     @Test
     void shouldValidateOnValidApprovalStatus() {
-        final JsonNode data = NODE_FACTORY.textNode("0");
+        final JsonNode data = NODE_FACTORY.stringNode("0");
         List<ValidationResult> validationResults =
             this.validator.validate("ApprovalStatus", data, caseFieldDefinition);
         assertNotNull(validationResults);
@@ -75,7 +75,7 @@ class CustomNumberValidatorTest {
     @Test
     void shouldReturnEmptyErrorListValidateForOtherFieldId() {
         caseFieldDefinition = caseField(ORGANISATION_TO_ADD).build();
-        final JsonNode data = NODE_FACTORY.textNode("0");
+        final JsonNode data = NODE_FACTORY.stringNode("0");
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
         assertNotNull(validationResults);
@@ -84,7 +84,7 @@ class CustomNumberValidatorTest {
 
     @Test
     void shouldReturnEmptyErrorListValidateForEmptyDataForOtherFieldId() {
-        final JsonNode data = NODE_FACTORY.textNode("");
+        final JsonNode data = NODE_FACTORY.stringNode("");
         List<ValidationResult> validationResults =
             this.validator.validate("OrganisationToAdd", data, caseFieldDefinition);
         assertNotNull(validationResults);

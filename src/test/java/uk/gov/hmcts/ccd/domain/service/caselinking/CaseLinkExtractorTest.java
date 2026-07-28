@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +67,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
     @DisplayName("Should extract a simple CaseLink value")
     @Test
-    void shouldExtractSimpleCaseLinkValue() throws JsonProcessingException {
+    void shouldExtractSimpleCaseLinkValue() throws JacksonException {
 
         // ARRANGE
         CaseDetails caseDetails = createCaseDetailsAndMockCaseDetailsExtractor(true, false, false);
@@ -83,7 +83,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
     @DisplayName("Should extract CaseLink values from a collection")
     @Test
-    void shouldExtractCollectionCaseLinkValues() throws JsonProcessingException {
+    void shouldExtractCollectionCaseLinkValues() throws JacksonException {
 
         // ARRANGE
         CaseDetails caseDetails = createCaseDetailsAndMockCaseDetailsExtractor(false, true, false);
@@ -100,7 +100,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
     @DisplayName("Should extract CaseLink values from the standard `caseLinks` field: and set the StandardLink flag")
     @Test
-    void shouldExtractStandardCaseLinkValuesAndSetTheFlag() throws JsonProcessingException {
+    void shouldExtractStandardCaseLinkValuesAndSetTheFlag() throws JacksonException {
 
         // ARRANGE
         CaseDetails caseDetails = createCaseDetailsAndMockCaseDetailsExtractor(false, false, true);
@@ -121,7 +121,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     )
     @Test
     void shouldExtractWithCorrectStandardCaseLinkFlagsWhenLinksDuplicatedInsideAndOutsideOfSCLField()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         // ARRANGE
         CaseDetails caseDetails = createCaseDetailsAndMockCaseDetailsExtractor(false, true, true);
@@ -140,7 +140,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
         "Should extract CaseLink values even if some of the values are empty or null"
     )
     @Test
-    void shouldExtractEvenIfSomeCaseLinkFieldsAreNullOrEmpty() throws JsonProcessingException {
+    void shouldExtractEvenIfSomeCaseLinkFieldsAreNullOrEmpty() throws JacksonException {
 
         // ARRANGE
         List<String> dataValues = List.of(
@@ -190,7 +190,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     @DisplayName("Should extract when Standard CaseLink field not in use")
     @Test
     void shouldExtractWhenStandardCaseLinkFieldNotConfigured()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         // ARRANGE
         removeCaseFieldDefinition(STANDARD_CASE_LINK_FIELD);
@@ -214,7 +214,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     )
     @Test
     void shouldExtractWithoutSettingStandardLinkFlagWhenSCLFieldMisConfigured_NotACollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         // ARRANGE
         // remove and replace the SCL field
@@ -242,7 +242,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     )
     @Test
     void shouldExtractWithoutSettingStandardLinkFlagWhenSCLFieldMisConfigured_WrongCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         // ARRANGE
         // find and adjust the SCL field (wrong collection type)
@@ -268,7 +268,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     )
     @Test
     void shouldExtractWithoutSettingStandardLinkFlagWhenSCLFieldMisConfigured_BadCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         // ARRANGE
         // find and adjust the SCL field (delete collection field type config)
@@ -293,7 +293,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
 
     private Map<String, JsonNode> createCaseData(boolean includeSimpleCaseLink,
                                                  boolean includeCollectionOfCaseLinks,
-                                                 boolean includeStandardCaseLinksField) throws JsonProcessingException {
+                                                 boolean includeStandardCaseLinksField) throws JacksonException {
 
         List<String> dataValues = new ArrayList<>();
         if (includeSimpleCaseLink) {
@@ -312,7 +312,7 @@ class CaseLinkExtractorTest extends CaseLinkTestFixtures {
     private CaseDetails createCaseDetailsAndMockCaseDetailsExtractor(boolean includeSimpleCaseLink,
                                                                      boolean includeCollectionOfCaseLinks,
                                                                      boolean includeStandardCaseLinksField)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         mockCaseDetailsExtractor(includeSimpleCaseLink, includeCollectionOfCaseLinks, includeStandardCaseLinksField);
 

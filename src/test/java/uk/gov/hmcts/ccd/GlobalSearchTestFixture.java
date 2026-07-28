@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import org.junit.Assert;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
@@ -42,7 +42,7 @@ public class GlobalSearchTestFixture {
                 + "      \"Country\": \"" + COUNTRY + "\",\n"
                 + "      \"AddressLine2\": \"" + ADDRESS_LINE_2 + "\"\n"
                 + "}"));
-        } catch (JsonProcessingException jpe) {
+        } catch (JacksonException jpe) {
             fail("Failed to create test case data", jpe);
         }
 
@@ -56,7 +56,7 @@ public class GlobalSearchTestFixture {
             searchCriteriaJsonNode.get("OtherCaseReferences").size(),
             "Saved case data should contain two SearchCriteria with OtherCaseReferences");
 
-        assertTrue(searchCriteriaJsonNode.get("OtherCaseReferences").findValuesAsText("value")
+        assertTrue(searchCriteriaJsonNode.get("OtherCaseReferences").findValuesAsString("value")
                 .containsAll(List.of(TEST_FIELD_VALUE, ADDRESS_LINE_1)),
             "Saved case data should contain SearchCriteria with OtherCaseReferences");
 
@@ -95,7 +95,7 @@ public class GlobalSearchTestFixture {
         List<SearchPartyValue> searchPartyList = searchParties.findValues("value").stream().map(jsonNode -> {
             try {
                 return JacksonUtils.MAPPER.treeToValue(jsonNode, SearchPartyValue.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 e.printStackTrace();
             }
             return null;

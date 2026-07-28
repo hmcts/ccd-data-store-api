@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 public class SupplementaryData {
 
     @JsonIgnore
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private Map<String, Object> response;
 
@@ -54,7 +55,7 @@ public class SupplementaryData {
     private String jsonNodeToString(JsonNode data) {
         try {
             return objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ServiceException("Unable to map object to JSON string", e);
         }
     }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.DATA;
 
 class AuthorisedValidateCaseFieldsOperationTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String PAGE_ID = "1";
     private static final String USER_ROLE_1 = "user-role-1";
@@ -90,11 +90,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         CaseDataContent content = new CaseDataContent();
         content.setCaseReference(CASE_REFERENCE);
         Map<String, JsonNode> inputData = new HashMap<>();
-        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        inputData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         content.setData(inputData);
 
         Map<String, JsonNode> midEventData = new HashMap<>();
-        midEventData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        midEventData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID)))
             .thenReturn(midEventData);
 
@@ -110,7 +110,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> assertNotNull(result),
             () -> assertNotEquals(inputData, result),
             () -> assertTrue(result.containsKey("data")),
-            () -> assertEquals("value1", result.get("data").get("field1").asText()),
+            () -> assertEquals("value1", result.get("data").get("field1").asString()),
             () -> verify(caseAccessService, never()).getAccessProfilesByCaseReference(anyString()),
             () -> verify(caseDefinitionRepository, never()).getCaseType(anyString())
         );
@@ -156,7 +156,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> assertNotNull(result),
-            () -> assertEquals("filtered_value1", result.get(DATA).get("filtered_field1").asText())
+            () -> assertEquals("filtered_value1", result.get(DATA).get("filtered_field1").asString())
         );
     }
 
@@ -259,7 +259,7 @@ class AuthorisedValidateCaseFieldsOperationTest {
             () -> assertNotNull(result),
             () -> assertTrue(result.containsKey(DATA)),
             () -> assertEquals(3, result.get(DATA).size()),
-            () -> assertEquals("restored_value", result.get(DATA).get("restored_field").asText())
+            () -> assertEquals("restored_value", result.get(DATA).get("restored_field").asString())
         );
     }
 
@@ -312,12 +312,12 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setCaseReference(CASE_REFERENCE);
 
         Map<String, JsonNode> inputData = new HashMap<>();
-        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        inputData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         content.setData(inputData);
 
         Map<String, JsonNode> callbackResponseData = new HashMap<>();
-        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("updatedValue1"));
-        callbackResponseData.put("field2", JSON_NODE_FACTORY.textNode("value2"));
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.stringNode("updatedValue1"));
+        callbackResponseData.put("field2", JSON_NODE_FACTORY.stringNode("value2"));
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
@@ -344,11 +344,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setCaseReference(CASE_REFERENCE);
 
         Map<String, JsonNode> inputData = new HashMap<>();
-        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        inputData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         content.setData(inputData);
 
         Map<String, JsonNode> callbackResponseData = new HashMap<>();
-        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, "");
 
@@ -369,11 +369,11 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setCaseReference(CASE_REFERENCE);
 
         Map<String, JsonNode> inputData = new HashMap<>();
-        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        inputData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         content.setData(inputData);
 
         Map<String, JsonNode> callbackResponseData = new HashMap<>();
-        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, null);
 
@@ -394,12 +394,12 @@ class AuthorisedValidateCaseFieldsOperationTest {
         content.setCaseReference(CASE_REFERENCE);
 
         Map<String, JsonNode> inputData = new HashMap<>();
-        inputData.put("field1", JSON_NODE_FACTORY.textNode("value1"));
+        inputData.put("field1", JSON_NODE_FACTORY.stringNode("value1"));
         content.setData(inputData);
 
         Map<String, JsonNode> callbackResponseData = new HashMap<>();
-        callbackResponseData.put("field1", JSON_NODE_FACTORY.textNode("callbackValue1"));
-        callbackResponseData.put("field2", JSON_NODE_FACTORY.textNode("callbackValue2"));
+        callbackResponseData.put("field1", JSON_NODE_FACTORY.stringNode("callbackValue1"));
+        callbackResponseData.put("field2", JSON_NODE_FACTORY.stringNode("callbackValue2"));
 
         when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate())
             .thenReturn(List.of("SomeOtherType"));

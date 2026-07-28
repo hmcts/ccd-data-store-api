@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.type.TypeFactory;
 import lombok.SneakyThrows;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.params.provider.Arguments;
@@ -131,8 +131,7 @@ public abstract class TestFixtures {
     protected final List<BuildingLocation> locationsRefData = List.of(location1, location2);
     protected final List<ServiceReferenceData> servicesRefData = List.of(service1, service2);
 
-    protected static final ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule());
+    protected static final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @SuppressWarnings("unused")
     protected static Stream<Arguments> provideNullListParameters() {
@@ -257,7 +256,7 @@ public abstract class TestFixtures {
 
     public static List<CaseFieldDefinition> getCaseFieldsFromJson(final String filePath) throws IOException {
         final InputStream inputStream = getInputStream(filePath);
-        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+        return mapper.readValue(inputStream, TypeFactory.createDefaultInstance()
             .constructCollectionType(List.class, CaseFieldDefinition.class));
     }
 
@@ -288,18 +287,18 @@ public abstract class TestFixtures {
 
     public static List<FieldTypeDefinition> getFieldTypesFromJson(final String filePath) throws IOException {
         final InputStream inputStream = getInputStream(filePath);
-        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+        return mapper.readValue(inputStream, TypeFactory.createDefaultInstance()
             .constructCollectionType(List.class, FieldTypeDefinition.class));
     }
 
     public static Map<String, JsonNode> loadCaseDataFromJson(final String filePath) throws IOException {
         final InputStream inputStream = getInputStream(filePath);
-        return mapper.readValue(inputStream, TypeFactory.defaultInstance()
+        return mapper.readValue(inputStream, TypeFactory.createDefaultInstance()
             .constructMapType(Map.class, String.class, JsonNode.class));
     }
 
     public static Map<String, JsonNode> caseDataFromJsonString(final String filePath) throws IOException {
-        return mapper.readValue(filePath, TypeFactory.defaultInstance()
+        return mapper.readValue(filePath, TypeFactory.createDefaultInstance()
             .constructMapType(Map.class, String.class, JsonNode.class));
     }
 }

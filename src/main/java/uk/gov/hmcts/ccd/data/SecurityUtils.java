@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.data;
 
-import com.auth0.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.text.ParseException;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,7 +112,13 @@ public class SecurityUtils {
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
         // NB: this grabs the servce name straight from the token under the assumption
         // that the S2S token has already been verified elsewhere
-        return JWT.decode(removeBearerFromToken(serviceAuthenticationToken)).getSubject();
+        try {
+            return JWTParser.parse(removeBearerFromToken(serviceAuthenticationToken))
+                .getJWTClaimsSet()
+                .getSubject();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid service authentication token", e);
+        }
     }
 
     private String removeBearerFromToken(String token) {

@@ -1,13 +1,10 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Test;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -75,7 +72,6 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
-@ExtendWith(MockitoExtension.class)
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases";
@@ -144,7 +140,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES_DCP =
         "/aggregated/caseworkers/0/jurisdictions/DCPTest1/case-types/DCP/cases";
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
 
@@ -986,7 +982,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertNotNull("Triggers are null", actionableEvents);
-        assertEquals("Should only get valid triggers", 1, actionableEvents.length);
+        assertEquals("Should only get valid triggers", 2, actionableEvents.length);
 
         // checks Trigger 1 content
         assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", actionableEvents[0].getId());
@@ -994,6 +990,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0]
             .getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
+
+        // checks Trigger 2 content
+        assertEquals("Trigger ID", "DOCUMENT_COLLECTION_EVENT", actionableEvents[1].getId());
+        assertEquals("Trigger Name", "DOCUMENT COLLECTION EVENT", actionableEvents[1].getName());
+        assertEquals("Trigger Description", "Test event for document collection callback filter",
+            actionableEvents[1].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(2), actionableEvents[1].getOrder());
 
         // audit-log assertions
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
@@ -1764,7 +1767,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final SearchResultView searchResultView = mapper.readValue(result.getResponse().getContentAsString(),
             SearchResultView.class);
 

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -27,8 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class DefaultCreateEventOperation implements CreateEventOperation {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCreateEventOperation.class);
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private final EventValidator eventValidator;
     private final CreateCaseEventService createEventService;
     private final CallbackInvoker callbackInvoker;
@@ -43,7 +39,6 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         this.eventValidator = eventValidator;
         this.callbackInvoker = callbackInvoker;
         this.keyHolder = keyHolder;
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     @Transactional

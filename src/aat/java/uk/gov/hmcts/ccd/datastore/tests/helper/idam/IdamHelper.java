@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import feign.Feign;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 
 public class IdamHelper {
 
@@ -21,8 +21,8 @@ public class IdamHelper {
 
     public IdamHelper(String idamBaseUrl, OAuth2 oauth2) {
         idamApi = Feign.builder()
-                       .encoder(new JacksonEncoder())
-                       .decoder(new JacksonDecoder())
+                       .encoder(new GsonEncoder())
+                       .decoder(new GsonDecoder())
                        .target(IdamApi.class, idamBaseUrl);
         this.oauth2 = oauth2;
     }

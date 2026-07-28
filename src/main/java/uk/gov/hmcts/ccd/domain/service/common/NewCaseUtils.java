@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @UtilityClass
 public class NewCaseUtils {
@@ -55,7 +56,7 @@ public class NewCaseUtils {
             .stream()
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_NEW_CASE) != null
-                && node.get(ORG_POLICY_NEW_CASE).asText().toUpperCase().equals(newCaseValue))
+                && asText(node.get(ORG_POLICY_NEW_CASE)).toUpperCase().equals(newCaseValue))
             .toList();
 
         LOG.debug("Organisation found for  caseType={} version={} ORGANISATION={},"
@@ -68,10 +69,10 @@ public class NewCaseUtils {
     private static void updateCaseNewCaseSupplementaryData(CaseDetails caseDetails,
                                                            List<JsonNode> organizationProfiles) {
 
-        ObjectNode orgNode = new ObjectMapper().createObjectNode();
+        ObjectNode orgNode = JsonNodeFactory.instance.objectNode();
         for (JsonNode orgProfile : organizationProfiles) {
             String orgIdentifier = orgProfile.get(ORGANISATION)
-                .get(ORGANISATIONID).textValue();
+                .get(ORGANISATIONID).stringValue(null);
             if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
                 orgNode.put(orgIdentifier, Boolean.TRUE);
             }

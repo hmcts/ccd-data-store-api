@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -69,8 +70,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -124,8 +125,8 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());

@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.base.Strings;
+import tools.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
@@ -24,6 +23,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.stringOrNullNode;
 
 @Component
 @Slf4j
@@ -51,18 +51,18 @@ public class DateTimeFormatParser {
         return date.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
-    public TextNode valueToTextNode(String valueToConvert, BaseType baseType, String fieldPath,
+    public JsonNode valueToTextNode(String valueToConvert, BaseType baseType, String fieldPath,
                                     String format, boolean toIso) {
-        if (Strings.isNullOrEmpty(valueToConvert)) {
-            return new TextNode(valueToConvert);
+        if (valueToConvert == null || valueToConvert.isEmpty()) {
+            return stringOrNullNode(valueToConvert);
         }
 
         try {
             if (baseType == BaseType.get(DATETIME)) {
-                return new TextNode(toIso ? convertDateTimeToIso8601(format, valueToConvert) :
+                return stringOrNullNode(toIso ? convertDateTimeToIso8601(format, valueToConvert) :
                     convertIso8601ToDateTime(format, valueToConvert));
             } else if (baseType == BaseType.get(DATE)) {
-                return new TextNode(toIso ? convertDateToIso8601(format, valueToConvert) :
+                return stringOrNullNode(toIso ? convertDateToIso8601(format, valueToConvert) :
                     convertIso8601ToDate(format, valueToConvert));
             } else {
                 throw new DataProcessingException().withDetails(

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -119,7 +119,8 @@ class CaseSearchesViewAccessControlTest {
         MockitoAnnotations.openMocks(this);
 
         dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
-        ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
+        ObjectNode familyDetails = (ObjectNode) JsonMapper.builderWithJackson2Defaults()
+            .build().readTree(FAMILY_DETAILS_VALUE);
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
         jurisdiction = new JurisdictionDefinition();

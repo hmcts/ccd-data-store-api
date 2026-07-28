@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +59,6 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         headers.add(AUTHORIZATION, "Bearer " + UID_WITH_EVENT_ACCESS);
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final String jsonString = TestFixtures
             .fromFileAsString("__files/test-addressbook-get-case-callback.json")

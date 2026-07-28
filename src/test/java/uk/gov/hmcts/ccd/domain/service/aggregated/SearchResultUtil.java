@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
@@ -16,7 +16,7 @@ public class SearchResultUtil {
         // (squid:S1118)
     }
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     public static class SearchResultBuilder {
         private final SearchResultDefinition searchResult;
@@ -60,7 +60,7 @@ public class SearchResultUtil {
     static Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = Maps.newHashMap();
         Lists.newArrayList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+            dataMap.put(dataFieldId, JSON_NODE_FACTORY.stringNode(dataFieldId));
         });
         return dataMap;
     }

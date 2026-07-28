@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,7 @@ public class NumberValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        final String value = dataValue.textValue();
+        final String value = dataValue.stringValue(null);
         final BigDecimal numberValue;
 
         try {

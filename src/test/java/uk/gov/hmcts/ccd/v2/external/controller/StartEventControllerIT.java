@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,7 +73,6 @@ public class StartEventControllerIT extends WireMockBaseTest {
         responseJsonObject2 = new JSONObject(responseJsonString2);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Test

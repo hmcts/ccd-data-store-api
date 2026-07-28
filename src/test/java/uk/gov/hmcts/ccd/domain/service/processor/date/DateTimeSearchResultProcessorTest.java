@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.processor.date;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MULTI
 
 class DateTimeSearchResultProcessorTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String DATE_FIELD = "DateField";
     private static final String DATETIME_FIELD = "DateTimeField";
     private static final String TEXT_FIELD = "TextField";
@@ -76,9 +77,9 @@ class DateTimeSearchResultProcessorTest {
             "#DATETIMEDISPLAY(ddMMyyyy)");
         viewColumns.addAll(Arrays.asList(column1, column2));
 
-        caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
-        caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
-        caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
+        caseFields.put(DATE_FIELD, new StringNode("2020-10-01"));
+        caseFields.put(DATETIME_FIELD, new StringNode("1985-12-30"));
+        caseFields.put(TEXT_FIELD, new StringNode("Text Value"));
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, new HashMap<>(caseFields));
         viewItems.add(item);
     }
@@ -96,12 +97,15 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(3)),
-            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(DATE_FIELD)).asText(), is("01/10/2020")),
-            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(DATETIME_FIELD)).asText(), is("30121985")),
-            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(TEXT_FIELD)).asText(), is("Text Value")),
-            () -> assertThat(((TextNode)itemResult.getFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
-            () -> assertThat(((TextNode)itemResult.getFields().get(DATETIME_FIELD)).asText(), is("1985-12-30")),
-            () -> assertThat(((TextNode)itemResult.getFields().get(TEXT_FIELD)).asText(), is("Text Value"))
+            () -> assertThat(((StringNode)itemResult.getFieldsFormatted().get(DATE_FIELD)).asString(),
+                is("01/10/2020")),
+            () -> assertThat(((StringNode)itemResult.getFieldsFormatted().get(DATETIME_FIELD)).asString(),
+                is("30121985")),
+            () -> assertThat(((StringNode)itemResult.getFieldsFormatted().get(TEXT_FIELD)).asString(),
+                is("Text Value")),
+            () -> assertThat(((StringNode)itemResult.getFields().get(DATE_FIELD)).asString(), is("2020-10-01")),
+            () -> assertThat(((StringNode)itemResult.getFields().get(DATETIME_FIELD)).asString(), is("1985-12-30")),
+            () -> assertThat(((StringNode)itemResult.getFields().get(TEXT_FIELD)).asString(), is("Text Value"))
         );
     }
 
@@ -125,7 +129,7 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
-            () -> assertThat(((TextNode)itemResult.getFieldsFormatted().get(metadataField)).asText(),
+            () -> assertThat(((StringNode)itemResult.getFieldsFormatted().get(metadataField)).asString(),
                 is("01/10/2020")),
             () -> assertThat(itemResult.getFields().get(metadataField), is(localDateTime))
         );
@@ -153,8 +157,8 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(((ObjectNode)itemResult.getFieldsFormatted().get(COMPLEX_FIELD)).get("ComplexDateField")
-                .asText(), is("10-2020")),
-            () -> assertThat(((ObjectNode)itemResult.getFields().get(COMPLEX_FIELD)).get("ComplexDateField").asText(),
+                .asString(), is("10-2020")),
+            () -> assertThat(((ObjectNode)itemResult.getFields().get(COMPLEX_FIELD)).get("ComplexDateField").asString(),
                 is("2020-10-05"))
         );
     }
@@ -184,18 +188,18 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0)
-                    .get(CollectionValidator.VALUE).asText(),
+                    .get(CollectionValidator.VALUE).asString(),
                 is("10-2020")
             ),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1)
-                    .get(CollectionValidator.VALUE).asText(),
+                    .get(CollectionValidator.VALUE).asString(),
                 is("12-1999")
             ),
             () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0)
-                .get(CollectionValidator.VALUE).asText(), is("2020-10-05")),
+                .get(CollectionValidator.VALUE).asString(), is("2020-10-05")),
             () -> assertThat(((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1)
-                .get(CollectionValidator.VALUE).asText(), is("1999-12-01"))
+                .get(CollectionValidator.VALUE).asString(), is("1999-12-01"))
         );
     }
 
@@ -228,22 +232,22 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(0)
-                    .get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                    .get(CollectionValidator.VALUE).get("NestedDate").asString(),
                 is("10-2020")
             ),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFieldsFormatted().get(COLLECTION_FIELD)).get(1)
-                    .get(CollectionValidator.VALUE).get("NestedDate").asText(),
+                    .get(CollectionValidator.VALUE).get("NestedDate").asString(),
                 is("07-1992")
             ),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(0).get(CollectionValidator.VALUE)
-                    .get("NestedDate").asText(),
+                    .get("NestedDate").asString(),
                 is("2020-10-05")
             ),
             () -> assertThat(
                 ((ArrayNode)itemResult.getFields().get(COLLECTION_FIELD)).get(1).get(CollectionValidator.VALUE)
-                    .get("NestedDate").asText(),
+                    .get("NestedDate").asString(),
                 is("1992-07-30")
             )
         );
@@ -264,13 +268,13 @@ class DateTimeSearchResultProcessorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(3)),
-            () -> assertThat(((TextNode)itemResult.getFields().get(DATE_FIELD)).asText(), is("2020-10-01")),
-            () -> assertThat(((TextNode)itemResult.getFields().get(DATETIME_FIELD)).asText(), is("1985-12-30"))
+            () -> assertThat(((StringNode)itemResult.getFields().get(DATE_FIELD)).asString(), is("2020-10-01")),
+            () -> assertThat(((StringNode)itemResult.getFields().get(DATETIME_FIELD)).asString(), is("1985-12-30"))
         );
     }
 
     @Test
-    void shouldUseOriginalValueForMultiSelectListField() throws JsonProcessingException {
+    void shouldUseOriginalValueForMultiSelectListField() throws JacksonException {
         final String multiSelectField = "MultiSelectField";
         caseFields.put(multiSelectField,
             MAPPER.readTree("[\"Value1\", \"Value2\"]"));
@@ -291,11 +295,11 @@ class DateTimeSearchResultProcessorTest {
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(itemResult.getFields().size(), is(4)),
             () -> assertThat(multiSelectResult.size(), is(2)),
-            () -> assertThat(multiSelectResult.get(0).asText(), is("Value1")),
-            () -> assertThat(multiSelectResult.get(1).asText(), is("Value2")),
+            () -> assertThat(multiSelectResult.get(0).asString(), is("Value1")),
+            () -> assertThat(multiSelectResult.get(1).asString(), is("Value2")),
             () -> assertThat(multiSelectResultFormatted.size(), is(2)),
-            () -> assertThat(multiSelectResultFormatted.get(0).asText(), is("Value1")),
-            () -> assertThat(multiSelectResultFormatted.get(1).asText(), is("Value2"))
+            () -> assertThat(multiSelectResultFormatted.get(0).asString(), is("Value1")),
+            () -> assertThat(multiSelectResultFormatted.get(1).asString(), is("Value2"))
         );
     }
 

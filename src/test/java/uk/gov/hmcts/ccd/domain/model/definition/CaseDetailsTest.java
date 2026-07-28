@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 class CaseDetailsTest {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String CASE_DETAIL_FIELD = "dataTestField1";
 
     private uk.gov.hmcts.ccd.domain.model.definition.CaseDetails caseDetails;
@@ -106,7 +106,7 @@ class CaseDetailsTest {
 
         Map<String, Object> allData = caseDetails.getCaseDataAndMetadata();
 
-        assertThat(((JsonNode) allData.get(CASE_DETAIL_FIELD)).asText(), equalTo(CASE_DETAIL_FIELD));
+        assertThat(((JsonNode) allData.get(CASE_DETAIL_FIELD)).asString(), equalTo(CASE_DETAIL_FIELD));
         assertThat(allData.get(JURISDICTION.getReference()), equalTo(caseDetails.getJurisdiction()));
         assertThat(allData.get(CASE_TYPE.getReference()), equalTo(caseDetails.getCaseTypeId()));
         assertThat(allData.get(STATE.getReference()), equalTo(caseDetails.getState()));
@@ -122,7 +122,7 @@ class CaseDetailsTest {
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = Maps.newHashMap();
         Lists.newArrayList(dataFieldIds)
-            .forEach(dataFieldId -> dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId)));
+            .forEach(dataFieldId -> dataMap.put(dataFieldId, JSON_NODE_FACTORY.stringNode(dataFieldId)));
         return dataMap;
     }
 

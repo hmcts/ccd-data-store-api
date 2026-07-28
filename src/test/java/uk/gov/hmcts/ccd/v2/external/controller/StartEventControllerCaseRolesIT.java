@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -75,7 +74,6 @@ public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
 
     @Test
     public void externalGetStartCaseTrigger_200_shouldAddFieldsWithCreatorCaseRole() throws Exception {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");

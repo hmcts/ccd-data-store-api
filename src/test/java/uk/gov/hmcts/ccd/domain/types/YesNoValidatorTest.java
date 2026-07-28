@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,10 +55,10 @@ class YesNoValidatorTest {
 
     @Test
     void correctValue() {
-        final JsonNode upperYes = NODE_FACTORY.textNode("YES");
-        final JsonNode lowerYes = NODE_FACTORY.textNode("yes");
-        final JsonNode upperNo = NODE_FACTORY.textNode("NO");
-        final JsonNode lowerNo = NODE_FACTORY.textNode("no");
+        final JsonNode upperYes = NODE_FACTORY.stringNode("YES");
+        final JsonNode lowerYes = NODE_FACTORY.stringNode("yes");
+        final JsonNode upperNo = NODE_FACTORY.stringNode("NO");
+        final JsonNode lowerNo = NODE_FACTORY.stringNode("no");
 
         assertAll(
             () -> assertEquals(0, validator.validate(FIELD_ID, upperYes, caseFieldDefinition).size(),
@@ -74,7 +74,7 @@ class YesNoValidatorTest {
 
     @Test
     void incorrectValue() {
-        final JsonNode anything = NODE_FACTORY.textNode("dasdahsaAAA");
+        final JsonNode anything = NODE_FACTORY.stringNode("dasdahsaAAA");
         assertEquals(1, validator.validate(FIELD_ID, anything, caseFieldDefinition).size(),
             "Did not catch non YES/NO");
     }
@@ -156,7 +156,7 @@ class YesNoValidatorTest {
     void shouldPass_whenValidatingNullValue() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.textNode(null), caseFieldDefinition);
+            validator.validate(FIELD_ID, NODE_FACTORY.stringNode(null), caseFieldDefinition);
         assertThat(result, empty());
     }
 

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Sets;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -289,7 +290,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @Test
         @DisplayName("should return Case Access metadata")
-        void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
+        void shouldReturnCaseAccessMetadata() throws JacksonException {
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD));
@@ -307,8 +308,8 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         private boolean isCaseAccessMetadataPresentInJson(CaseUpdateViewEvent caseUpdateViewEvent)
-            throws JsonProcessingException {
-            ObjectMapper objMapper = new ObjectMapper();
+            throws JacksonException {
+            ObjectMapper objMapper = JsonMapper.builderWithJackson2Defaults().build();
             String jsonString = objMapper.writeValueAsString(caseUpdateViewEvent);
             return jsonString.contains("access_granted") || jsonString.contains("access_process");
         }
@@ -405,7 +406,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @Test
         @DisplayName("should return Case Access metadata")
-        void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
+        void shouldReturnCaseAccessMetadata() throws JacksonException {
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
@@ -423,7 +424,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @Test
         @DisplayName("should not set CaseUpdateViewEvent json fields if there is no Case Access metadata")
-        void shouldNotSetCaseAccessMetadataJson() throws JsonProcessingException {
+        void shouldNotSetCaseAccessMetadataJson() throws JacksonException {
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE);
@@ -434,8 +435,8 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         private boolean isCaseAccessMetadataPresentInJson(CaseUpdateViewEvent caseUpdateViewEvent)
-            throws JsonProcessingException {
-            ObjectMapper objMapper = new ObjectMapper();
+            throws JacksonException {
+            ObjectMapper objMapper = JsonMapper.builderWithJackson2Defaults().build();
             String jsonString = objMapper.writeValueAsString(caseUpdateViewEvent);
             return jsonString.contains("access_granted") || jsonString.contains("access_process");
         }

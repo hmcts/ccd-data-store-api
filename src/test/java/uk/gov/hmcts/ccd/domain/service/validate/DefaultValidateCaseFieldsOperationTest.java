@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,10 +160,10 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData =
             buildJsonNodeDataWithTwoOrganisationPolicyRole("[default_role1]", "[default_role2]");
 
-        ObjectNode classNode = new ObjectMapper().createObjectNode();
+        ObjectNode classNode = JsonMapper.builderWithJackson2Defaults().build().createObjectNode();
         organisationPolicyData.keySet().forEach(key -> classNode.set(key, organisationPolicyData.get(key)));
 
-        ObjectNode parentNode = new ObjectMapper().createObjectNode();
+        ObjectNode parentNode = JsonMapper.builderWithJackson2Defaults().build().createObjectNode();
         parentNode.set("Class", classNode);
         Map<String, JsonNode> parentData = new HashMap<>();
         parentData.put("ParentNode", parentNode);
@@ -188,10 +188,10 @@ class DefaultValidateCaseFieldsOperationTest {
         final Map<String, JsonNode> organisationPolicyData =
             buildJsonNodeDataWithTwoOrganisationPolicyRole("[default_role1]", "[default_role2]");
 
-        ObjectNode classNode = new ObjectMapper().createObjectNode();
+        ObjectNode classNode = JsonMapper.builderWithJackson2Defaults().build().createObjectNode();
         organisationPolicyData.keySet().forEach(key -> classNode.set(key, organisationPolicyData.get(key)));
 
-        ObjectNode parentNode = new ObjectMapper().createObjectNode();
+        ObjectNode parentNode = JsonMapper.builderWithJackson2Defaults().build().createObjectNode();
         parentNode.set("Class", classNode);
         Map<String, JsonNode> parentData = new HashMap<>();
         parentData.put("ParentNode", parentNode);
@@ -407,7 +407,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
     private Map<String, JsonNode> buildJsonNodeDataWithOrganisationPolicyRole(String organisationPolicyRole)
         throws IOException {
-        final JsonNode node = new ObjectMapper().readTree("{\n"
+        final JsonNode node = JsonMapper.builderWithJackson2Defaults().build().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole + "\",\n"
             + "  \"Organisation\": {\n"
@@ -525,7 +525,7 @@ class DefaultValidateCaseFieldsOperationTest {
     private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,
                                                                                  String organisationPolicyRole2)
         throws IOException {
-        final JsonNode node = new ObjectMapper().readTree("{\n"
+        final JsonNode node = JsonMapper.builderWithJackson2Defaults().build().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole1 + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole1 + "\",\n"
             + "  \"Organisation\": {\n"
@@ -534,7 +534,7 @@ class DefaultValidateCaseFieldsOperationTest {
             + "  }\n"
             + "}\n");
 
-        final JsonNode node1 = new ObjectMapper().readTree("{\n"
+        final JsonNode node1 = JsonMapper.builderWithJackson2Defaults().build().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole2 + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole2 + "\",\n"
             + "  \"Organisation\": {\n"

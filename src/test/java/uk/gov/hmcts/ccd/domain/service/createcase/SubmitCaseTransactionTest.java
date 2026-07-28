@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -168,7 +169,7 @@ class SubmitCaseTransactionTest {
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
-        objectMapper = new ObjectMapper();
+        objectMapper = JsonMapper.builderWithJackson2Defaults().build();
         caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
@@ -583,8 +584,9 @@ class SubmitCaseTransactionTest {
             SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
 
         HashMap<String, JsonNode> result =
-            new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
-            });
+            JsonMapper.builderWithJackson2Defaults().build()
+                .readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
+                });
 
         return result;
     }

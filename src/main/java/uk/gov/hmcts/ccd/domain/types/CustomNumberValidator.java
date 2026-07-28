@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,7 @@ public class CustomNumberValidator extends NumberValidator {
         List<ValidationResult> validationResults = super.validate(dataFieldId, dataValue, caseFieldDefinition);
 
         if (validationResults.isEmpty() && FIELD_TO_VALIDATE.equalsIgnoreCase(caseFieldDefinition.getId())) {
-            final String value = dataValue.textValue();
+            final String value = dataValue.stringValue(null);
             final int numberValue = new BigDecimal(value).intValue();
             if (numberValue < 0 || numberValue > 2) {
                 return Collections.singletonList(

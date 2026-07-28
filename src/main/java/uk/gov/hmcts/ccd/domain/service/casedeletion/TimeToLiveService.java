@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -202,7 +202,7 @@ public class TimeToLiveService {
         if (ttlJsonNode != null) {
             try {
                 return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
             }
         }

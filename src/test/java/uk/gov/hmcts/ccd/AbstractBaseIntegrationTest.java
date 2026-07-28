@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +20,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -80,7 +83,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
 public abstract class AbstractBaseIntegrationTest {
-    protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
+    protected static final ObjectMapper mapper = JacksonUtils.MAPPER.rebuild()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .changeDefaultPropertyInclusion(inclusion ->
+            inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+        .build();
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
@@ -139,6 +146,10 @@ public abstract class AbstractBaseIntegrationTest {
     @Mock
     protected HttpServletRequest request;
 
+    // Avoid remote OIDC discovery while application contexts are starting.
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
+
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.openMocks(this);
@@ -174,9 +185,6 @@ public abstract class AbstractBaseIntegrationTest {
 
     @BeforeAll
     public static void init() {
-        mapper.registerModule(new JavaTimeModule());
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
         // Force re-initialisation of base types for each test suite
         ReflectionTestUtils.setField(BaseType.class, "initialised", false);
     }
@@ -244,14 +252,14 @@ public abstract class AbstractBaseIntegrationTest {
         }
         try {
             caseDetails.setData(JacksonUtils.convertValue(mapper.readTree(resultSet.getString("data"))));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("data"));
         }
         final String dataClassification = resultSet.getString("data_classification");
         if (null != dataClassification) {
             try {
                 caseDetails.setDataClassification(JacksonUtils.convertValue(mapper.readTree(dataClassification)));
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 fail("Incorrect JSON structure: " + dataClassification);
             }
         }
@@ -282,7 +290,7 @@ public abstract class AbstractBaseIntegrationTest {
         }
         try {
             messageQueueCandidate.setMessageInformation(mapper.readTree(resultSet.getString("message_information")));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
         }
 
@@ -314,7 +322,7 @@ public abstract class AbstractBaseIntegrationTest {
 
         try {
             auditEvent.setData(JacksonUtils.convertValue(mapper.readTree(resultSet.getString("data"))));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
         }
 
@@ -322,7 +330,7 @@ public abstract class AbstractBaseIntegrationTest {
         if (null != dataClassification) {
             try {
                 auditEvent.setDataClassification(JacksonUtils.convertValue(mapper.readTree(dataClassification)));
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 fail("Incorrect JSON structure: " + dataClassification);
             }
         }

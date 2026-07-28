@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.supplementarydata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 class DefaultSupplementaryDataUpdateOperationTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final String CASE_REFERENCE = "12345677";
 
@@ -108,7 +109,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
         Map<String, Map<String, Object>> requestData;
         try {
             requestData = mapper.readValue(jsonRquest, Map.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             requestData = new HashMap<>();
         }
         return requestData;

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class FixedListValidatorTest {
     @Test
     void validValue() {
         final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-                                                                   NODE_FACTORY.textNode("AAAAAA"),
+                                                                   NODE_FACTORY.stringNode("AAAAAA"),
             caseFieldDefinition);
         assertEquals(0, result01.size());
     }
@@ -59,7 +59,7 @@ class FixedListValidatorTest {
     @Test
     void invalidValue() {
         final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-                                                                   NODE_FACTORY.textNode("DDDD"),
+                                                                   NODE_FACTORY.stringNode("DDDD"),
             caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
     }
@@ -77,11 +77,11 @@ class FixedListValidatorTest {
     @Test
     void fieldTypeRegEx() {
         final CaseFieldDefinition caseFieldDefinitionWithRegEx = caseField().withRegExp("AAAAAA").build();
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("AAAAAA"),
+        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("AAAAAA"),
             caseFieldDefinitionWithRegEx);
         assertEquals(0, result01.size());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("BBBBBB"),
+        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("BBBBBB"),
             caseFieldDefinitionWithRegEx);
         assertEquals(1, result02.size(), "BBBBBB failed regular expression check");
         assertEquals(REGEX_GUIDANCE, result02.get(0).getErrorMessage());
@@ -92,7 +92,7 @@ class FixedListValidatorTest {
     void baseTypeRegEx() {
         when(fixedListBaseType.getRegularExpression()).thenReturn("InvalidRegEx");
         final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-                                                                 NODE_FACTORY.textNode("AA"), caseFieldDefinition);
+                                                                 NODE_FACTORY.stringNode("AA"), caseFieldDefinition);
         assertEquals(1, result.size(), "RegEx validation failed");
         assertEquals("'AA' failed FixedList Type Regex check: InvalidRegEx", result.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());

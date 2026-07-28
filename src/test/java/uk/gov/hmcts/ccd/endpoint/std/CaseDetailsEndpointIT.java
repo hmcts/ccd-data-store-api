@@ -4,10 +4,11 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
@@ -113,9 +114,9 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponse
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings({"checkstyle:OperatorWrap", "checkstyle:FileTabCharacter"})
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String CASE_TYPE_FILTERED = "TestAddressBookCaseFiltered";
     private static final String CASE_TYPE_VALIDATE = "TestAddressBookCaseValidate";
@@ -1203,8 +1204,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -1271,8 +1272,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -1613,35 +1614,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PROBATE", caseDetails.getJurisdiction());
             assertEquals("CaseCreated", caseDetails.getState());
 
-            assertEquals("Janet", caseDetails.getData().get("PersonFirstName").asText());
-            assertEquals("Parker", caseDetails.getData().get("PersonLastName").asText());
-            assertEquals("123", caseDetails.getData().get("PersonAddress").get("AddressLine1").asText());
-            assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
-            assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
-            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("Janet", caseDetails.getData().get("PersonFirstName").asString());
+            assertEquals("Parker", caseDetails.getData().get("PersonLastName").asString());
+            assertEquals("123", caseDetails.getData().get("PersonAddress").get("AddressLine1").asString());
+            assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asString());
+            assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asString());
+            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asString());
+            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asString());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-                caseDetails.getData().get("D8Document").get("document_url").asText());
+                caseDetails.getData().get("D8Document").get("document_url").asString());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
-                caseDetails.getData().get("D8Document").get("document_binary_url").asText());
+                caseDetails.getData().get("D8Document").get("document_binary_url").asString());
             assertEquals("Seagulls_Square.jpg",
-                caseDetails.getData().get("D8Document").get("document_filename").asText());
+                caseDetails.getData().get("D8Document").get("document_filename").asString());
             assertEquals(4, caseDetails.getDataClassification().size());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
-                .asText());
+                .asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine1").asText());
+                .get("AddressLine1").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine2").asText());
+                .get("AddressLine2").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine3").asText());
+                .get("AddressLine3").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Country").asText());
+                .get("Country").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Postcode").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
+                .get("Postcode").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asString());
         }
 
         {
@@ -1661,28 +1662,28 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PROBATE", caseDetails.getJurisdiction());
             assertEquals("CaseCreated", caseDetails.getState());
 
-            assertEquals("Peter", caseDetails.getData().get("PersonFirstName").asText());
-            assertEquals("Pullen", caseDetails.getData().get("PersonLastName").asText());
-            assertEquals("Governer House", caseDetails.getData().get("PersonAddress").get("AddressLine1").asText());
-            assertEquals("1 Puddle Lane", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
-            assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
-            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("Peter", caseDetails.getData().get("PersonFirstName").asString());
+            assertEquals("Pullen", caseDetails.getData().get("PersonLastName").asString());
+            assertEquals("Governer House", caseDetails.getData().get("PersonAddress").get("AddressLine1").asString());
+            assertEquals("1 Puddle Lane", caseDetails.getData().get("PersonAddress").get("AddressLine2").asString());
+            assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asString());
+            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asString());
+            assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asString());
             assertEquals(3, caseDetails.getDataClassification().size());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
-                .asText());
+                .asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine1").asText());
+                .get("AddressLine1").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine2").asText());
+                .get("AddressLine2").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine3").asText());
+                .get("AddressLine3").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Country").asText());
+                .get("Country").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Postcode").asText());
+                .get("Postcode").asString());
         }
     }
 
@@ -1749,29 +1750,29 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PROBATE", caseDetails.getJurisdiction());
             assertEquals("CaseCreated", caseDetails.getState());
 
-            assertEquals("Janet", caseDetails.getData().get("PersonFirstName").asText());
-            assertEquals("Parker", caseDetails.getData().get("PersonLastName").asText());
-            assertEquals("123", caseDetails.getData().get("PersonAddress").get("AddressLine1").asText());
-            assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
-            assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
-            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("Janet", caseDetails.getData().get("PersonFirstName").asString());
+            assertEquals("Parker", caseDetails.getData().get("PersonLastName").asString());
+            assertEquals("123", caseDetails.getData().get("PersonAddress").get("AddressLine1").asString());
+            assertEquals("Fake Street", caseDetails.getData().get("PersonAddress").get("AddressLine2").asString());
+            assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asString());
+            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asString());
+            assertEquals("HX08 5TG", caseDetails.getData().get("PersonAddress").get("Postcode").asString());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-                caseDetails.getData().get("D8Document").get("document_url").asText());
+                caseDetails.getData().get("D8Document").get("document_url").asString());
             assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
-                caseDetails.getData().get("D8Document").get("document_binary_url").asText());
+                caseDetails.getData().get("D8Document").get("document_binary_url").asString());
             assertEquals("Seagulls_Square.jpg",
-                caseDetails.getData().get("D8Document").get("document_filename").asText());
+                caseDetails.getData().get("D8Document").get("document_filename").asString());
             assertEquals(4, caseDetails.getDataClassification().size());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("classification")
-                .asText());
+                .asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine1").asText());
+                .get("AddressLine1").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress")
-                .get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
+                .get("classification").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asString());
         }
 
         {
@@ -1791,26 +1792,26 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PROBATE", caseDetails.getJurisdiction());
             assertEquals("CaseCreated", caseDetails.getState());
 
-            assertEquals("Peter", caseDetails.getData().get("PersonFirstName").asText());
-            assertEquals("Pullen", caseDetails.getData().get("PersonLastName").asText());
-            assertEquals("Governer House", caseDetails.getData().get("PersonAddress").get("AddressLine1").asText());
-            assertEquals("1 Puddle Lane", caseDetails.getData().get("PersonAddress").get("AddressLine2").asText());
-            assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
-            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
-            assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
+            assertEquals("Peter", caseDetails.getData().get("PersonFirstName").asString());
+            assertEquals("Pullen", caseDetails.getData().get("PersonLastName").asString());
+            assertEquals("Governer House", caseDetails.getData().get("PersonAddress").get("AddressLine1").asString());
+            assertEquals("1 Puddle Lane", caseDetails.getData().get("PersonAddress").get("AddressLine2").asString());
+            assertEquals("London", caseDetails.getData().get("PersonAddress").get("AddressLine3").asString());
+            assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asString());
+            assertEquals("SE1 4EE", caseDetails.getData().get("PersonAddress").get("Postcode").asString());
             assertEquals(3, caseDetails.getDataClassification().size());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asString());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine1").asText());
+                .get("AddressLine1").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine2").asText());
+                .get("AddressLine2").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("AddressLine3").asText());
+                .get("AddressLine3").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Country").asText());
+                .get("Country").asString());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
-                .get("Postcode").asText());
+                .get("Postcode").asString());
         }
     }
 
@@ -3904,7 +3905,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         CaseDetails caseDetails = actualStartEventResult.getCaseDetails();
         String expectedSystemTTL = LocalDate.now().plusDays(20).toString();
         assertAll(
-            () -> assertThat(caseDetails.getData().get(TTL_CASE_FIELD_ID).get("SystemTTL").textValue(),
+            () -> assertThat(caseDetails.getData().get(TTL_CASE_FIELD_ID).get("SystemTTL").stringValue(),
                 is(expectedSystemTTL))
         );
     }
@@ -5183,8 +5184,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -5233,8 +5234,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertEquals("Expected empty case data", "", JacksonUtils.asText(
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data")));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -5287,7 +5288,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private JsonNode getTextNode(String value) {
-        return JSON_NODE_FACTORY.textNode(value);
+        return JSON_NODE_FACTORY.stringNode(value);
     }
 
     private String exampleDataWithInvalidPostcode() {
@@ -6199,11 +6200,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         boolean newItemSaved = false;
 
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-002".equals(item.get("id").asText())
+            if ("new-item-id-002".equals(item.get("id").asString())
                 && item.path("value")
                 .path("documentFile")
                 .path("document_url")
-                .asText()
+                .asString()
                 .contains(newDocumentId)) {
                 newItemSaved = true;
                 break;
@@ -6321,7 +6322,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         boolean newItemFound = false;
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-002".equals(item.path("id").asText())) {
+            if ("new-item-id-002".equals(item.path("id").asString())) {
                 newItemFound = true;
                 break;
             }
@@ -6451,7 +6452,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         boolean newItemFound = false;
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-002".equals(item.path("id").asText())) {
+            if ("new-item-id-002".equals(item.path("id").asString())) {
                 newItemFound = true;
                 break;
             }
@@ -6503,7 +6504,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(savedCase.getData(), hasKey("D8Document"));
         final JsonNode savedDocument = mapper.convertValue(
             savedCase.getData().get("D8Document"), JsonNode.class);
-        assertThat(savedDocument.path("category_id").asText(), is("caseDocuments"));
+        assertThat(savedDocument.path("category_id").asString(), is("caseDocuments"));
 
         com.github.tomakehurst.wiremock.client.WireMock.verify(0,
             patchRequestedFor(urlMatching("/cases/documents/attachToCase.*")));
@@ -6594,11 +6595,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         boolean documentSaved = false;
 
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-001".equals(item.path("id").asText())
+            if ("new-item-id-001".equals(item.path("id").asString())
                 && item.path("value")
                 .path("documentFile")
                 .path("document_url")
-                .asText()
+                .asString()
                 .contains(newDocumentId)) {
                 documentSaved = true;
                 break;
@@ -6702,11 +6703,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         boolean documentSaved = false;
 
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-001".equals(item.path("id").asText())
+            if ("new-item-id-001".equals(item.path("id").asString())
                 && item.path("value")
                 .path("documentFile")
                 .path("document_url")
-                .asText()
+                .asString()
                 .contains(newDocumentId)) {
                 documentSaved = true;
                 break;
@@ -6716,7 +6717,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         boolean newItemFound = false;
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-002".equals(item.path("id").asText())) {
+            if ("new-item-id-002".equals(item.path("id").asString())) {
                 newItemFound = true;
                 break;
             }
@@ -6844,11 +6845,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         boolean documentSaved = false;
 
         for (JsonNode item : savedDocuments) {
-            if ("existing-item-id-001".equals(item.path("id").asText())
+            if ("existing-item-id-001".equals(item.path("id").asString())
                 && item.path("value")
                 .path("documentFile")
                 .path("document_url")
-                .asText()
+                .asString()
                 .contains("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")) {
                 documentSaved = true;
                 break;
@@ -6857,11 +6858,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat("Item should exist in savedDocuments", documentSaved, is(true));
 
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-003".equals(item.path("id").asText())
+            if ("new-item-id-003".equals(item.path("id").asString())
                 && item.path("value")
                 .path("documentFile")
                 .path("document_url")
-                .asText()
+                .asString()
                 .contains(newCallbackDocumentId)) {
                 documentSaved = true;
                 break;
@@ -6871,7 +6872,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         boolean newItemFound = false;
         for (JsonNode item : savedDocuments) {
-            if ("new-item-id-002".equals(item.path("id").asText())) {
+            if ("new-item-id-002".equals(item.path("id").asString())) {
                 newItemFound = true;
                 break;
             }

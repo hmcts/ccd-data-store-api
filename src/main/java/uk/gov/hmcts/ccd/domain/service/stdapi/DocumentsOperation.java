@@ -47,6 +47,7 @@ public class DocumentsOperation {
     private final UIDService uidService;
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
+    private final RestTemplate restTemplate;
 
     @Inject
     public DocumentsOperation(final SecurityUtils securityUtils,
@@ -55,13 +56,15 @@ public class DocumentsOperation {
                               final CaseDetailsRepository caseDetailsRepository,
                               final AccessControlService accessControlService,
                               final CaseAccessService caseAccessService,
-                              final UIDService uidService) {
+                              final UIDService uidService,
+                              @Qualifier("printableDocumentsRestTemplate") final RestTemplate restTemplate) {
         this.securityUtils = securityUtils;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
+        this.restTemplate = restTemplate;
     }
 
     public List<Document> getPrintableDocumentsForCase(final String caseReference) {
@@ -100,7 +103,6 @@ public class DocumentsOperation {
         try {
             String documentListUrl = caseTypeDefinition.getPrintableDocumentsUrl();
 
-            RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);

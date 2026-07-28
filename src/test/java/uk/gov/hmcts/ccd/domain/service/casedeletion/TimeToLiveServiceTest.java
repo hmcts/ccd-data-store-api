@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -80,7 +80,7 @@ class TimeToLiveServiceTest {
     private CaseDataService caseDataService;
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() throws JacksonException {
         caseData.put("key", objectMapper.readTree("{\"Value\": \"value\"}"));
     }
 
@@ -178,7 +178,7 @@ class TimeToLiveServiceTest {
         private final JsonNode ttlDataClassification = objectMapper.valueToTree("{\"Ttl_Field\": \"PUBLIC\"}");
 
         @BeforeEach
-        void setUp() throws JsonProcessingException {
+        void setUp() throws JacksonException {
             caseDataClassification.put("key", objectMapper.readTree("{\"Value\": \"PUBLIC\"}"));
         }
 
@@ -473,7 +473,7 @@ class TimeToLiveServiceTest {
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
             caseEventDefinition.setTtlIncrement(TTL_INCREMENT);
 
-            doThrow(JsonProcessingException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
+            doThrow(JacksonException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
 
             // WHEN / THEN
             Exception exception = assertThrows(ValidationException.class, () ->
@@ -595,7 +595,7 @@ class TimeToLiveServiceTest {
 
             caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
 
-            doThrow(JsonProcessingException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
+            doThrow(JacksonException.class).when(objectMapper).readValue(ttlNodeAsString, TTL.class);
 
             Exception exception = assertThrows(ValidationException.class, () ->
                 timeToLiveService.verifyTTLContentNotChangedByCallback(caseData, caseData)

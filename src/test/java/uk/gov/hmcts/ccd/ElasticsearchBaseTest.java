@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import lombok.Builder;
 import lombok.Singular;
 import org.elasticsearch.common.Strings;
@@ -54,14 +55,14 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
         @JsonIgnore
         private List<String> supplementaryData;
 
-        private final ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
         @JsonRawValue
         public String getQuery() {
             return query == null ? null : Strings.toString(query);
         }
 
-        public String toJsonString() throws JsonProcessingException {
+        public String toJsonString() throws JacksonException {
             if (supplementaryData == null) {
                 return objectMapper.writeValueAsString(this);
             }
@@ -69,9 +70,9 @@ public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
             return toJsonStringWithSupplementaryData();
         }
 
-        private String toJsonStringWithSupplementaryData() throws JsonProcessingException {
+        private String toJsonStringWithSupplementaryData() throws JacksonException {
             ArrayNode supplementaryDataNode = objectMapper.createArrayNode();
-            supplementaryData.forEach(sd -> supplementaryDataNode.add(new TextNode(sd)));
+            supplementaryData.forEach(sd -> supplementaryDataNode.add(new StringNode(sd)));
             ObjectNode request = objectMapper.createObjectNode();
             request.set("native_es_query", objectMapper.readTree(objectMapper.writeValueAsString(this)));
             request.set("supplementary_data", supplementaryDataNode);

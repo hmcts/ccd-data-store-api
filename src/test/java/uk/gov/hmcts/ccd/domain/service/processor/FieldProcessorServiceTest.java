@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 class FieldProcessorServiceTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP =
         new TypeReference<HashMap<String, JsonNode>>() {};
     private static final String CASE_TYPE_ID = "CaseType";
@@ -200,8 +201,8 @@ class FieldProcessorServiceTest {
             verifyNoMoreInteractions(caseDataFieldProcessor1, caseDataFieldProcessor2);
             assertAll(
                 () -> assertThat(result.size(), is(2)),
-                () -> assertThat(result.get(ID1).asText(), is("Value 1")),
-                () -> assertThat(result.get(ID2).asText(), is("Value 2"))
+                () -> assertThat(result.get(ID1).asString(), is("Value 1")),
+                () -> assertThat(result.get(ID2).asString(), is("Value 2"))
             );
         }
 

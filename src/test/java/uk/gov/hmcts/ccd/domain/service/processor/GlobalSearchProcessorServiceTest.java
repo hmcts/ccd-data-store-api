@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,10 +65,11 @@ class GlobalSearchProcessorServiceTest {
     private static final String SEARCH_PARTY_POSTCODE_2 = "EF3 4GH";
     private static final String SEARCH_PARTY_EMAIL_2 = "c@d.com";
 
-    private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+    private final ObjectMapperService objectMapperService =
+        new DefaultObjectMapperService(JsonMapper.builderWithJackson2Defaults().build());
 
     @BeforeEach
-    void setup() throws JsonProcessingException {
+    void setup() throws JacksonException {
 
         globalSearchProcessorService = new GlobalSearchProcessorService(objectMapperService);
         caseTypeDefinition = new CaseTypeDefinition();
@@ -170,7 +171,7 @@ class GlobalSearchProcessorServiceTest {
             + "]"
     })
     void searchCriteriaStillCreatedEvenIfCollectionIsNullEmptyOrBad(String collectionAsString)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String collectionName = "myCollection";
         final String firstName = "FirstName";
@@ -198,7 +199,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkOtherReferenceFieldPopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkOtherReferenceFieldPopulatedInSearchCriteria() throws JacksonException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setOtherCaseReference("TextField1");
 
@@ -212,16 +213,16 @@ class GlobalSearchProcessorServiceTest {
 
 
         JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
-        assertEquals(lastName, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+        assertEquals(lastName, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asString());
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue(ID).asText()));
+            searchCriteriaNode.findValue(ID).asString()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asString()));
         assertFalse(searchCriteriaNode.has(SEARCH_PARTIES));
     }
 
     @Test
-    void checkOtherReferenceFieldPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkOtherReferenceFieldPopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setOtherCaseReference("PersonAddress.AddressLine1");
@@ -237,15 +238,15 @@ class GlobalSearchProcessorServiceTest {
         JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
 
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue(ID).asText()));
+            searchCriteriaNode.findValue(ID).asString()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
-        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asString()));
+        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asString());
         assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
     @Test
-    void checkOtherReferenceFieldPopulatedComplexTypeInSearchCriteriaWithNullValues() throws JsonProcessingException {
+    void checkOtherReferenceFieldPopulatedComplexTypeInSearchCriteriaWithNullValues() throws JacksonException {
 
         SearchCriteria searchCriteria1 = new SearchCriteria();
         searchCriteria1.setOtherCaseReference("PersonAddress.AddressLine1");
@@ -265,15 +266,15 @@ class GlobalSearchProcessorServiceTest {
 
         assertEquals(1, searchCriteriaNode.size());
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue(ID).asText()));
+            searchCriteriaNode.findValue(ID).asString()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
-        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asString()));
+        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asString());
         assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
     @Test
-    void checkOtherReferenceFieldPopulatedSimpleFieldInSearchCriteriaWithNullValues() throws JsonProcessingException {
+    void checkOtherReferenceFieldPopulatedSimpleFieldInSearchCriteriaWithNullValues() throws JacksonException {
 
         SearchCriteria searchCriteria1 = new SearchCriteria();
         searchCriteria1.setOtherCaseReference("caseReference");
@@ -293,15 +294,15 @@ class GlobalSearchProcessorServiceTest {
 
         assertEquals(1, searchCriteriaNode.size());
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue(ID).asText()));
+            searchCriteriaNode.findValue(ID).asString()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
-        assertEquals(caseReference, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asString()));
+        assertEquals(caseReference, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asString());
         assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
     @Test
-    void checkSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyNamePopulatedInSearchCriteria() throws JacksonException {
 
         searchParty.setSearchPartyName("SearchPartyFirstName");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -312,7 +313,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyNamePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyNamePopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyName("SearchParty.FirstName");
 
@@ -325,7 +326,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkCommaSeparatedValuesSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkCommaSeparatedValuesSearchPartyNamePopulatedInSearchCriteria() throws JacksonException {
         final String searchPartyNameFirstName = "John";
         final String searchPartyNameMiddleName = "Johnny";
         final String searchPartyNameLastName = "Johnson";
@@ -353,7 +354,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkCommaSeparatedValuesSearchPartyNameWithNullAndMissingValuesPopulatedInSearchCriteria()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String searchPartyNameFirstName = "John";
         final String searchPartyNameLastName = "Johnson";
@@ -380,7 +381,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkCommaSeparatedComplexValuesSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkCommaSeparatedComplexValuesSearchPartyNamePopulatedInSearchCriteria() throws JacksonException {
 
         final String firstName = "MyPerson.Person.FirstName";
         final String middleName = "MyPerson.Person.MiddleName";
@@ -409,7 +410,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyValuesPopulatedInSearchCriteriaFromCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String collectionName = "myCollection";
         final String firstName = "FirstName";
@@ -459,7 +460,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkComplexSearchPartyValuesPopulatedInSearchCriteriaFromCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String collectionName = "myCollection";
         final String firstName = "Person.FirstName";
@@ -513,7 +514,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkComplexSearchPartyValuesPopulatedInSearchCriteriaFromComplexCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String collectionName = "myComplex.myCollection";
         final String firstName = "Person.FirstName";
@@ -569,7 +570,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchPartyValuesPopulatedInSearchCriteriaFromComplexCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String collectionName = "myComplex.myCollection";
         final String firstName = "FirstName";
@@ -623,7 +624,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkCommaSeparatedComplexValuesSearchPartyNameWithNullAndMissingValuesPopulatedInSearchCriteria()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         final String firstName = "MyPerson.Person.FirstName";
         final String middleName = "MyPerson.Person.MiddleName"; // test will set this field to null in case data
@@ -655,7 +656,7 @@ class GlobalSearchProcessorServiceTest {
 
 
     @Test
-    void checkSearchPartyAddressLinePopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyAddressLinePopulatedInSearchCriteria() throws JacksonException {
         searchParty.setSearchPartyAddressLine1("SearchPartyAddress");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
@@ -665,7 +666,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyAddressLinePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyAddressLinePopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyAddressLine1("SearchParty.Address");
 
@@ -677,7 +678,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyEMailAddressPopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyEMailAddressPopulatedInSearchCriteria() throws JacksonException {
 
         searchParty.setSearchPartyEmailAddress("SearchPartyEmailAddress");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -688,7 +689,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyEMailAddressPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyEMailAddressPopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyEmailAddress("SearchParty.EmailAddress");
 
@@ -701,7 +702,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyPostCodePopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyPostCodePopulatedInSearchCriteria() throws JacksonException {
 
         searchParty.setSearchPartyPostCode("SearchPartyPostCode");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -712,7 +713,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyPostCodePopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyPostCodePopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyPostCode("MySearchParty.SearchParty.PostCode.name");
 
@@ -730,7 +731,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfDeathPopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyDateOfDeathPopulatedInSearchCriteria() throws JacksonException {
 
         searchParty.setSearchPartyDod("SearchPartyDod");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -741,7 +742,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfDeathEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
+    void checkSearchPartyDateOfDeathEmptyInSearchCriteriaWhenBadDateValue() throws JacksonException {
 
         searchParty.setSearchPartyDod("SearchPartyDod");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -753,7 +754,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfDeathPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyDateOfDeathPopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyDod("SearchParty.PostCode.name");
 
@@ -769,7 +770,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfBirthPopulatedInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyDateOfBirthPopulatedInSearchCriteria() throws JacksonException {
 
         searchParty.setSearchPartyDob("SearchPartyDoB");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -780,7 +781,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfBirthPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
+    void checkSearchPartyDateOfBirthPopulatedInSearchCriteriaWithComplexField() throws JacksonException {
 
         searchParty.setSearchPartyDob("SearchParty.PostCode.name");
 
@@ -796,7 +797,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfBirthEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
+    void checkSearchPartyDateOfBirthEmptyInSearchCriteriaWhenBadDateValue() throws JacksonException {
 
         searchParty.setSearchPartyDob("SearchPartyDob");
 
@@ -810,7 +811,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchCriteriaExistsButSearchPartyNodeIsNullWhenTwoBadDateValues()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         searchParty.setSearchPartyDob("spDob");
         searchParty.setSearchPartyDod("spDod");
@@ -827,7 +828,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingAllFields() throws JsonProcessingException {
+    void checkSearchCriteriaContainingASearchPartyContainingAllFields() throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -858,7 +859,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsFromCollection() throws JsonProcessingException {
+    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsFromCollection() throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -897,7 +898,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchCriteriaContainingASearchPartyContainingAllFieldsTwoDateFieldsAreWrong()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -934,7 +935,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingMultipleSearchPartiesContainingAllFields() throws JsonProcessingException {
+    void checkSearchCriteriaContainingMultipleSearchPartiesContainingAllFields() throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -989,7 +990,7 @@ class GlobalSearchProcessorServiceTest {
 
     @Test
     void checkSearchCriteriaContainsMultipleSearchPartiesFromCollection()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -1041,7 +1042,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingSingleMatchingSearchPartyContainingAllFields() throws JsonProcessingException {
+    void checkSearchCriteriaContainingSingleMatchingSearchPartyContainingAllFields() throws JacksonException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -1107,7 +1108,7 @@ class GlobalSearchProcessorServiceTest {
         JsonNode searchPartyNode = searchPartyNodes.get(0);
 
         expectedFieldValues.forEach((key, value) ->
-            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asText()));
+            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asString()));
     }
 
     private void assertSearchCriteriaField(String fieldName, Object expectedValue) {
@@ -1116,8 +1117,8 @@ class GlobalSearchProcessorServiceTest {
 
         JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
-        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
-        assertEquals(expectedValue, searchPartyNode.findValue(VALUE).findValue(fieldName).asText());
+        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asString()));
+        assertEquals(expectedValue, searchPartyNode.findValue(VALUE).findValue(fieldName).asString());
 
         searchPartyPropertyNames.stream()
             .filter(propertyName -> !propertyName.equals(fieldName))
@@ -1130,10 +1131,10 @@ class GlobalSearchProcessorServiceTest {
 
         JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
-        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
+        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asString()));
 
         expectedValues.forEach((key, value) ->
-            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asText())
+            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asString())
         );
 
     }

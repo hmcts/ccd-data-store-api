@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ccd.domain.types.sanitiser.DocumentSanitiser.DOCUMENT
 @DisplayName("DocumentSanitiser")
 class DocumentSanitiserTest {
 
-    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory();
 
     private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
@@ -196,10 +196,10 @@ class DocumentSanitiserTest {
     @DisplayName("should not sanitise already sane document")
     void shouldNotSanitizeIfDocumentSanitizedAlready() {
         final JsonNode documentValue = JSON_FACTORY.objectNode();
-        ((ObjectNode)documentValue).set(DOCUMENT_URL, JSON_FACTORY.textNode("testUrl"));
-        ((ObjectNode)documentValue).set(DOCUMENT_BINARY_URL, JSON_FACTORY.textNode("testBinaryUrl"));
-        ((ObjectNode)documentValue).set(DOCUMENT_FILENAME, JSON_FACTORY.textNode("testFilename"));
-        ((ObjectNode)documentValue).set(DOCUMENT_HASH, JSON_FACTORY.textNode("testHash"));
+        ((ObjectNode)documentValue).set(DOCUMENT_URL, JSON_FACTORY.stringNode("testUrl"));
+        ((ObjectNode)documentValue).set(DOCUMENT_BINARY_URL, JSON_FACTORY.stringNode("testBinaryUrl"));
+        ((ObjectNode)documentValue).set(DOCUMENT_FILENAME, JSON_FACTORY.stringNode("testFilename"));
+        ((ObjectNode)documentValue).set(DOCUMENT_HASH, JSON_FACTORY.stringNode("testHash"));
 
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValue);
 

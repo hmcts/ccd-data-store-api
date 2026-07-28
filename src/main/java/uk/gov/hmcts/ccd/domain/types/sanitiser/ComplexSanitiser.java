@@ -10,9 +10,9 @@ import java.util.Map;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 @Singleton
 public class ComplexSanitiser implements Sanitiser {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     private Map<String, Sanitiser> sanitisers;
 
@@ -48,7 +48,7 @@ public class ComplexSanitiser implements Sanitiser {
             fieldsMap.put(field.getId(), field);
         });
 
-        final Iterator<Map.Entry<String, JsonNode>> fields = fieldData.fields();
+        final Iterator<Map.Entry<String, JsonNode>> fields = fieldData.properties().iterator();
 
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> field = fields.next();

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,11 +13,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class JsonDataConverterTest {
-    private static ObjectMapper mapper = new ObjectMapper();
-
-    static {
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
+    private static final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults()
+        .changeDefaultPropertyInclusion(inclusion ->
+            inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+        .build();
 
     private JsonDataConverter jsonbConverter;
 
@@ -40,7 +40,7 @@ public class JsonDataConverterTest {
 
         // Teasing valid non null
         final JsonNode converted = jsonbConverter.convertToEntityAttribute("{\"key\":\"value\"}");
-        assertEquals("value", converted.get("key").asText());
+        assertEquals("value", converted.get("key").asString());
 
         try {
             jsonbConverter.convertToEntityAttribute("hjkdash\"");

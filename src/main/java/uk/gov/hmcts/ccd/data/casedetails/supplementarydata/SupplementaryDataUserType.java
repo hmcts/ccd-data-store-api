@@ -12,12 +12,13 @@ import org.hibernate.type.SqlTypes;
 import org.hibernate.type.spi.TypeConfiguration;
 import org.hibernate.usertype.UserType;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class SupplementaryDataUserType implements UserType<JsonNode> {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     public static CustomType<JsonNode> CUSTOM_TYPE = new CustomType<JsonNode>(
         new SupplementaryDataUserType(), new TypeConfiguration()

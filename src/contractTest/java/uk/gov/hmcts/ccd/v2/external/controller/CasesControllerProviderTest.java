@@ -8,9 +8,10 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +87,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -204,8 +204,9 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     @Qualifier("authorised")
     CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
 
-    private final ObjectMapper mapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build();
 
 
     @TestTemplate
@@ -217,7 +218,7 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     }
 
     @BeforeEach
-    void before(PactVerificationContext context) throws JsonProcessingException {
+    void before(PactVerificationContext context) throws JacksonException {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }

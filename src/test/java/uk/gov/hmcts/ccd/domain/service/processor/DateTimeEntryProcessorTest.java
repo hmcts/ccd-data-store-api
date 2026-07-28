@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.StringNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,7 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 
 class DateTimeEntryProcessorTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String ID = "FieldId";
 
     private static final String DATETIME_FIELD_TYPE = "DateTime";
@@ -81,7 +82,7 @@ class DateTimeEntryProcessorTest {
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
         when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(),
             eq("dd/MM/yyyy"), eq(true)))
-            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
+            .thenReturn(new StringNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
@@ -89,8 +90,8 @@ class DateTimeEntryProcessorTest {
             wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
-            () -> assertThat(result.isTextual(), is(true)),
-            () -> assertThat(result.asText(), is("2020-03-13T00:00:00.000"))
+            () -> assertThat(result.isString(), is(true)),
+            () -> assertThat(result.asString(), is("2020-03-13T00:00:00.000"))
         );
     }
 
@@ -102,7 +103,7 @@ class DateTimeEntryProcessorTest {
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
         when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(),
             eq(null), eq(false)))
-            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
+            .thenReturn(new StringNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
@@ -110,8 +111,8 @@ class DateTimeEntryProcessorTest {
             wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
-            () -> assertThat(result.isTextual(), is(true)),
-            () -> assertThat(result.asText(), is("2020-03-13T00:00:00.000"))
+            () -> assertThat(result.isString(), is(true)),
+            () -> assertThat(result.asString(), is("2020-03-13T00:00:00.000"))
         );
     }
 
@@ -124,7 +125,7 @@ class DateTimeEntryProcessorTest {
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
         when(dateTimeFormatParser.valueToTextNode(eq("2020-03-13T00:00:00.000"), eq(BaseType.get(DATETIME)), any(),
             eq("dd/MM/yyyy"), eq(true)))
-            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
+            .thenReturn(new StringNode("2020-03-13T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
@@ -132,8 +133,8 @@ class DateTimeEntryProcessorTest {
             wizardPageField(ID, Collections.emptyList()));
 
         assertAll(
-            () -> assertThat(result.isTextual(), is(true)),
-            () -> assertThat(result.asText(), is("2020-03-13T00:00:00.000"))
+            () -> assertThat(result.isString(), is(true)),
+            () -> assertThat(result.asString(), is("2020-03-13T00:00:00.000"))
         );
     }
 
@@ -150,10 +151,10 @@ class DateTimeEntryProcessorTest {
         when(caseViewFieldBuilder.build(any(), any())).thenReturn(caseViewField);
         when(dateTimeFormatParser.valueToTextNode(eq("13/03/2020"), eq(BaseType.get(DATETIME)), any(),
             eq("dd/MM/yyyy"), eq(true)))
-            .thenReturn(new TextNode("2020-03-13T00:00:00.000"));
+            .thenReturn(new StringNode("2020-03-13T00:00:00.000"));
         when(dateTimeFormatParser.valueToTextNode(eq("25/12/1995"), eq(BaseType.get(DATETIME)), any(),
             eq("dd/MM/yyyy"), eq(true)))
-            .thenReturn(new TextNode("1995-12-25T00:00:00.000"));
+            .thenReturn(new StringNode("1995-12-25T00:00:00.000"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node,
             new CaseFieldDefinition(),
@@ -163,10 +164,10 @@ class DateTimeEntryProcessorTest {
         assertAll(
             () -> assertThat(result.isArray(), is(true)),
             () -> assertThat(result.size(), is(2)),
-            () -> assertThat(result.get(0).get(CollectionValidator.VALUE).asText(), is("2020-03-13T00:00:00.000")),
-            () -> assertThat(result.get(0).get("id").asText(), is("id1")),
-            () -> assertThat(result.get(1).get(CollectionValidator.VALUE).asText(), is("1995-12-25T00:00:00.000")),
-            () -> assertThat(result.get(1).get("id").asText(), is("id2"))
+            () -> assertThat(result.get(0).get(CollectionValidator.VALUE).asString(), is("2020-03-13T00:00:00.000")),
+            () -> assertThat(result.get(0).get("id").asString(), is("id1")),
+            () -> assertThat(result.get(1).get(CollectionValidator.VALUE).asString(), is("1995-12-25T00:00:00.000")),
+            () -> assertThat(result.get(1).get("id").asString(), is("id2"))
         );
     }
 
@@ -203,9 +204,9 @@ class DateTimeEntryProcessorTest {
 
         when(caseViewFieldBuilder.build(Mockito.any(), Mockito.any())).thenReturn(caseViewField);
         when(dateTimeFormatParser.valueToTextNode(eq("2001"), eq(BaseType.get(DATETIME)), any(), eq("yyyy"), eq(true)))
-            .thenReturn(new TextNode("2001-01-01T00:00:00.000"));
+            .thenReturn(new StringNode("2001-01-01T00:00:00.000"));
         when(dateTimeFormatParser.valueToTextNode(eq("12"), eq(BaseType.get(DATE)), any(), eq("MM"), eq(true)))
-            .thenReturn(new TextNode("1970-12-01"));
+            .thenReturn(new StringNode("1970-12-01"));
 
         JsonNode result = dateTimeEntryProcessor.execute(node, caseField6, new CaseEventFieldDefinition(),
             wizardPageField(ID, Collections.emptyList()));
@@ -213,8 +214,8 @@ class DateTimeEntryProcessorTest {
         assertAll(
             () -> assertThat(result.isObject(), is(true)),
             () -> assertThat(result.size(), is(2)),
-            () -> assertThat(result.get("ComplexDateTimeField").asText(), is("2001-01-01T00:00:00.000")),
-            () -> assertThat(result.get("ComplexNestedField").get("NestedDateField").asText(), is("1970-12-01")),
+            () -> assertThat(result.get("ComplexDateTimeField").asString(), is("2001-01-01T00:00:00.000")),
+            () -> assertThat(result.get("ComplexNestedField").get("NestedDateField").asString(), is("1970-12-01")),
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").isArray(), is(true)),
             () -> assertThat(result.get("ComplexNestedField").get("NestedCollectionTextField").size(), is(0))
         );

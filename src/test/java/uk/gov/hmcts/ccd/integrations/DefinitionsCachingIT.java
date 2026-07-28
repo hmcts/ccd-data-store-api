@@ -1,18 +1,20 @@
 package uk.gov.hmcts.ccd.integrations;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.wiremock.spring.EnableWireMock;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedUIDefinitionGateway;
@@ -49,7 +51,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@AutoConfigureWireMock(port = 0)
+@EnableWireMock
 @TestPropertySource(locations = "classpath:test.properties")
 public class DefinitionsCachingIT {
 
@@ -70,6 +72,8 @@ public class DefinitionsCachingIT {
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_1 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_2 = new JurisdictionDefinition();
     private static final JurisdictionDefinition JURISDICTION_DEFINITION_3 = new JurisdictionDefinition();
+
+    private AutoCloseable mocks;
 
     @MockitoSpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
@@ -109,6 +113,7 @@ public class DefinitionsCachingIT {
 
     @BeforeEach
     public void setup() {
+        mocks = MockitoAnnotations.openMocks(this);
         initiateWizardPageList(wizardPageList);
 
         doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository)
@@ -127,6 +132,11 @@ public class DefinitionsCachingIT {
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
 
         doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
+    }
+
+    @AfterEach
+    void closeMocks() throws Exception {
+        mocks.close();
     }
 
     private void initiateWizardPageList(List<WizardPage> wizardPageList) {

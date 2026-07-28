@@ -4,11 +4,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.MissingNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,13 +92,13 @@ public class AccessControlServiceTest {
     @Mock
     private ApplicationParams applicationParams;
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String EVENT_ID_WITH_ACCESS = "EVENT_ID_WITH_ACCESS";
     private static final String EVENT_ID_WITHOUT_ACCESS = "EVENT_ID_WITHOUT_ACCESS";
     private static final String EVENT_ID_WITHOUT_ACCESS_2 = "EVENT_ID_WITHOUT_ACCESS_2";
     private static final String EVENT_ID_WITH_ACCESS_2 = "EVENT_ID_WITH_ACCESS_2";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     static final String ROLE_IN_USER_ROLES_3 = "caseworker-probate-loa3";
@@ -1955,17 +1956,18 @@ public class AccessControlServiceTest {
                 false);
 
             assertAll(
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").stringValue(),
+                    is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
-                    .get("Name").textValue(), is("home")),
+                    .get("Name").stringValue(), is("home")),
                 () -> assertThat(
                     jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(1).get("value").get("Address")
-                        .get(LINE1).textValue(),
+                        .get(LINE1).stringValue(),
                     is("41 Kings Road")
                 ),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt")
-                    .textValue(), is("someNote11")),
+                    .stringValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(3))
             );
         }
@@ -2049,25 +2051,26 @@ public class AccessControlServiceTest {
                 false);
 
             assertAll(
-                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").stringValue(),
+                    is("Fatih")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCity")
-                    .textValue(), is("Salihli")),
+                    .stringValue(), is("Salihli")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCountry"),
                     is(nullValue())),
                 () -> assertThat(
                     jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address")
-                        .get(LINE1).textValue(),
+                        .get(LINE1).stringValue(),
                     is("23 Lampton Road")
                 ),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
-                    .get("Name").textValue(), is("home")),
+                    .get("Name").stringValue(), is("home")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get(ADDRESSES).get(0).get("value")
                     .get("Address"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value")
                     .get("Note"), is(nullValue())),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value")
-                    .get("Txt").textValue(), is("someNote11")),
+                    .get("Txt").stringValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(4))
             );
         }
@@ -2158,8 +2161,9 @@ public class AccessControlServiceTest {
                 false);
 
             assertAll(() -> assertTrue(jsonNode.get("People").get(0).get(VALUE).get("BirthInfo").isEmpty()),
-                () -> assertThat(jsonNode.get("People").get(0).get(VALUE).get("FirstName").textValue(), is("Fatih")),
-                () -> assertThat(jsonNode.get("People").get(1).get(VALUE).get("FirstName").textValue(), is("Andrew")));
+                () -> assertThat(jsonNode.get("People").get(0).get(VALUE).get("FirstName").stringValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(1).get(VALUE).get("FirstName").stringValue(),
+                    is("Andrew")));
 
             List<ILoggingEvent> logsList = listAppender.list;
             assertEquals("Can not find field with caseFieldId=BirthInfo, "
@@ -4706,11 +4710,12 @@ public class AccessControlServiceTest {
         }
         if (logger != null) {
             logger.detachAndStopAllAppenders();
+            logger.setLevel(null);
         }
     }
 
     private JsonNode getTextNode(String value) {
-        return JSON_NODE_FACTORY.textNode(value);
+        return JSON_NODE_FACTORY.stringNode(value);
     }
 
     static CaseFieldDefinition getPeopleCollectionFieldDefinition() {

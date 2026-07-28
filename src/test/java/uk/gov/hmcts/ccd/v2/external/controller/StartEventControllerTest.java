@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class StartEventControllerTest {
     private static final boolean IGNORE_WARNING = false;
     private static final String TOKEN = "TOKEN";
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     @Mock
     private StartEventOperation startEventOperation;
@@ -52,10 +52,10 @@ class StartEventControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         Map<String, JsonNode> data = Maps.newHashMap();
-        data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
+        data.put("dataKey1", JSON_NODE_FACTORY.stringNode("dataValue1"));
         CASE_DETAILS.setData(data);
         Map<String, JsonNode> dataClassification = Maps.newHashMap();
-        dataClassification.put("classKey1", JSON_NODE_FACTORY.textNode("classValue1"));
+        dataClassification.put("classKey1", JSON_NODE_FACTORY.stringNode("classValue1"));
         CASE_DETAILS.setDataClassification(dataClassification);
         startEventResult.setCaseDetails(CASE_DETAILS);
         startEventResult.setToken(TOKEN);

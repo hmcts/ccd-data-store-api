@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -205,12 +206,12 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldNotFilterAnyResults() throws JsonProcessingException {
+    void shouldNotFilterAnyResults() throws JacksonException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("caseManagementLocation", mapper.readTree("{\n"
             + "      \"region\": \"valueOne\",\n"
@@ -233,12 +234,12 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenFieldDoesNotHaveReadPermission() throws JsonProcessingException {
+    void shouldFilterResultsWhenFieldDoesNotHaveReadPermission() throws JacksonException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("caseManagementLocation", mapper.readTree("{\n"
             + "      \"region\": \"valueOne\",\n"
@@ -268,12 +269,12 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldNotFilterResultsWhenFieldIsRestricted() throws JsonProcessingException {
+    void shouldNotFilterResultsWhenFieldIsRestricted() throws JacksonException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("caseManagementLocation", mapper.readTree("{\n"
             + "      \"region\": \"valueOne\",\n"
@@ -303,12 +304,12 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenRequestIncludesPartiesAndOtherReferences() throws JsonProcessingException {
+    void shouldFilterResultsWhenRequestIncludesPartiesAndOtherReferences() throws JacksonException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setParties(parties);
         searchCriteria.setOtherReferences(validFields);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("searchCriteria", mapper.readTree("{\n"
             + "      \"OtherCaseReferences\": \"valueOne\",\n"

@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,7 @@ class RegionValidatorTest {
     @Test
     @DisplayName("should be valid when text length between min and max")
     void regionFieldWithValidMinMax() {
-        final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
+        final JsonNode DATA = NODE_FACTORY.stringNode("5 & 10");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseFieldDefinition);
 
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
@@ -70,10 +69,10 @@ class RegionValidatorTest {
     @Test
     @DisplayName("should NOT be valid when text length outside of min and max")
     void regionFieldWithInvalidMinMax() {
-        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+        final JsonNode invalidMin = NODE_FACTORY.stringNode("Test");
         final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
 
-        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+        final JsonNode invalidMax = NODE_FACTORY.stringNode("Test Test Test");
         final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
 
         assertAll(
@@ -92,7 +91,7 @@ class RegionValidatorTest {
     @DisplayName("should be valid when no min and max defined")
     void regionFieldWithNoMinMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().build();
-        final JsonNode value = NODE_FACTORY.textNode("Test");
+        final JsonNode value = NODE_FACTORY.stringNode("Test");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, value, caseFieldDefinition);
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
     }
@@ -103,16 +102,16 @@ class RegionValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
             .withMax(5)
             .build();
-        final JsonNode valid_value = NODE_FACTORY.textNode("12345");
+        final JsonNode valid_value = NODE_FACTORY.stringNode("12345");
         final List<ValidationResult> validMinMaxResults =
             validator.validate(FIELD_ID, valid_value, caseFieldDefinition);
 
         // Test value over
-        final JsonNode over_value = NODE_FACTORY.textNode("123456");
+        final JsonNode over_value = NODE_FACTORY.stringNode("123456");
         final List<ValidationResult> overMinMaxResults = validator.validate(FIELD_ID, over_value, caseFieldDefinition);
 
         // Test value under
-        final JsonNode under_value = NODE_FACTORY.textNode("1234");
+        final JsonNode under_value = NODE_FACTORY.stringNode("1234");
         final List<ValidationResult> underMinMaxResults =
             validator.validate(FIELD_ID, under_value, caseFieldDefinition);
 
@@ -127,10 +126,10 @@ class RegionValidatorTest {
     @DisplayName("should test against regular expression")
     void regionRegex() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
-        final JsonNode validValue = NODE_FACTORY.textNode("1234-56-78");
+        final JsonNode validValue = NODE_FACTORY.stringNode("1234-56-78");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
 
-        final JsonNode invalidValue = NODE_FACTORY.textNode("aa-56-78");
+        final JsonNode invalidValue = NODE_FACTORY.stringNode("aa-56-78");
         final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseFieldDefinition);
 
         assertAll(
@@ -153,10 +152,10 @@ class RegionValidatorTest {
     }
 
     @Test
-    @DisplayName("should be valid when input is null text node")
-    void nullTextValue() {
+    @DisplayName("should be valid when input is an explicit null node")
+    void explicitNullValue() {
         final List<ValidationResult> validationResult =
-            validator.validate(FIELD_ID, new TextNode(null), caseFieldDefinition);
+            validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseFieldDefinition);
         assertThat(validationResult, hasSize(0));
     }
 

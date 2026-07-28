@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.Before;
-import org.junit.Test;
+import tools.jackson.databind.node.StringNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.function.Consumer;
@@ -38,7 +38,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
 
     private long initialVersion;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         initialVersion = getCurrentVersion(CASE_REFERENCE);
     }
@@ -96,7 +96,7 @@ public class SynchronisedCaseProcessorIT extends WireMockBaseTest {
         caseDetails.setCreatedDate(LocalDateTime.now());
         caseDetails.setLastModified(LocalDateTime.now());
         caseDetails.setVersion(version.intValue());
-        caseDetails.setData(Collections.singletonMap("PersonFirstName", new TextNode("Test")));
+        caseDetails.setData(Collections.singletonMap("PersonFirstName", new StringNode("Test")));
 
         DecentralisedCaseDetails decentralisedCaseDetails = new DecentralisedCaseDetails();
         decentralisedCaseDetails.setCaseDetails(caseDetails);

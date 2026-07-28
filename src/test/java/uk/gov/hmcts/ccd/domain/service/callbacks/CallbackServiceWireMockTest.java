@@ -19,9 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
@@ -65,7 +66,7 @@ import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_C
     })
 public class CallbackServiceWireMockTest extends WireMockBaseTest {
     private MockHttpServletRequest request;
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_START = CallbackType.ABOUT_TO_START;
     public static final CallbackType TEST_CALLBACK_ABOUT_TO_SUBMIT = CallbackType.ABOUT_TO_SUBMIT;
     public static final CallbackType TEST_CALLBACK_SUBMITTED = CallbackType.SUBMITTED;
@@ -500,12 +501,12 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         try {
             jsonNode1 = mapper.readTree(jsonObject.toString());
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
         try {
             jsonNode2 = mapper.readTree(ClientContextUtil.decodeFromBase64(contextValue));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
         assertEquals(jsonNode1, jsonNode2);

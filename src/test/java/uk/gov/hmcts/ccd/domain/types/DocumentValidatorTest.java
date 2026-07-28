@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -34,7 +35,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
     private static final String CASE_TYPE_ID = "FT_CaseAccessCategories";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String CASE_FIELD_STRING =
         "{\n"
             + "  \"id\": \"DOCUMENT_FIELD_ID\",\n"
@@ -330,7 +331,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldFailWhenValidatingTextNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("IATB"), caseFieldDefinition);
+            validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("IATB"), caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("string does not have document_url key specified"));
     }
@@ -471,14 +472,14 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     private ObjectNode createDoc(String documentUrl) {
         data = MAPPER.createObjectNode();
-        data.set(DOCUMENT_URL, new TextNode(documentUrl));
+        data.set(DOCUMENT_URL, new StringNode(documentUrl));
         return data;
     }
 
     private ObjectNode createDoc(String key, String value) {
         data = MAPPER.createObjectNode();
-        data.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
-        data.set(key, new TextNode(value));
+        data.set(DOCUMENT_URL, new StringNode(VALID_DOCUMENT_URL));
+        data.set(key, value == null ? NODE_FACTORY.nullNode() : new StringNode(value));
         return data;
     }
 

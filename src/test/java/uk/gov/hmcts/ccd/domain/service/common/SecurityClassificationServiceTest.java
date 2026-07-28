@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +58,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 @SuppressWarnings("checkstyle:OperatorWrap")
 public class SecurityClassificationServiceTest {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String JURISDICTION_ID = "PROBATE";
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 

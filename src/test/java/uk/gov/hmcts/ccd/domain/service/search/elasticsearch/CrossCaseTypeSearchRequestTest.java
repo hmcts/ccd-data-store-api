@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
 
 class CrossCaseTypeSearchRequestTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final String NAME =  "name";
     private static final String ALIAS_NAME =  "alias." + NAME;
@@ -37,7 +38,7 @@ class CrossCaseTypeSearchRequestTest {
 
     @Test
     @DisplayName("should throw exception when query node not found")
-    void shouldThrowExceptionWhenQueryNodeNotFound() throws JsonProcessingException {
+    void shouldThrowExceptionWhenQueryNodeNotFound() throws JacksonException {
 
         // ARRANGE
         String query = "{}";

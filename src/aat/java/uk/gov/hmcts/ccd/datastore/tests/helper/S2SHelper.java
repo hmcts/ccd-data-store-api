@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper;
 
 import feign.Feign;
-import feign.jackson.JacksonEncoder;
+import feign.gson.GsonEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.ServiceAuthTokenGenerator;
@@ -12,7 +12,7 @@ public class S2SHelper {
 
     public S2SHelper(final String s2sUrl, final String secret, final String microservice) {
         final ServiceAuthorisationApi serviceAuthorisationApi = Feign.builder()
-            .encoder(new JacksonEncoder())
+            .encoder(new GsonEncoder())
             .contract(new SpringMvcContract())
             .target(ServiceAuthorisationApi.class, s2sUrl);
 

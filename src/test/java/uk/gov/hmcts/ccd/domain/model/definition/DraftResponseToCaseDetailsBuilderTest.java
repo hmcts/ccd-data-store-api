@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -21,16 +21,16 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class DraftResponseToCaseDetailsBuilderTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String DRAFT_ID = "1";
     private static final String FULL_DRAFT_ID = "DRAFT1";
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PRIVATE;
     private static final String SECURITY_CLASSIFICATION_STRING = SECURITY_CLASSIFICATION.name();
     private static final Map<String, JsonNode> DATA = newCaseData()
-        .withPair("testDataKey", JSON_NODE_FACTORY.textNode("testDataValue"))
+        .withPair("testDataKey", JSON_NODE_FACTORY.stringNode("testDataValue"))
         .build();
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = newCaseData()
-        .withPair("testClassificationKey", JSON_NODE_FACTORY.textNode("testClassificationValue"))
+        .withPair("testClassificationKey", JSON_NODE_FACTORY.stringNode("testClassificationValue"))
         .build();
     private static final String TOKEN = "testToken";
     private static final String EVENT_ID = "EVENT_ID";

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ class TextAreaValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenEmptyString() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode(""),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode(""),
             caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
@@ -78,7 +78,7 @@ class TextAreaValidatorTest {
     @Test
     void validate_shouldBeValidWhenNonEmptyString() {
         final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                  NODE_FACTORY.textNode("Some text"),
+                                                                  NODE_FACTORY.stringNode("Some text"),
                 caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
@@ -88,7 +88,7 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenMinimumLengthRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode("xxx"),
             caseFieldDefinition);
 
         assertThat(results, hasSize(1));
@@ -99,7 +99,7 @@ class TextAreaValidatorTest {
     void validate_shouldBeValidWhenMinimumLengthRequirementMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx4"),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode("xxx4"),
             caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
@@ -109,7 +109,7 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenMaximumLengthRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx45"),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode("xxx45"),
             caseFieldDefinition);
 
         assertThat(results, hasSize(1));
@@ -120,7 +120,7 @@ class TextAreaValidatorTest {
     void validate_shouldBeValidWhenMaximumLengthRequirementMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(4).build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("xxx"),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode("xxx"),
             caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
@@ -130,7 +130,7 @@ class TextAreaValidatorTest {
     void validate_shouldNotBeValidWhenRegexRequirementNotMet() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
 
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.textNode("3232"),
+        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.stringNode("3232"),
             caseFieldDefinition);
 
         assertThat(results, hasSize(1));
@@ -142,7 +142,7 @@ class TextAreaValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
 
         final List<ValidationResult> results = validator.validate(FIELD_ID,
-                                                                  NODE_FACTORY.textNode("3232-32-32"),
+                                                                  NODE_FACTORY.stringNode("3232-32-32"),
                 caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));

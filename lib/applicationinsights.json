@@ -1,5 +1,6 @@
 {
   "connectionString": "${file:/mnt/secrets/ccd/app-insights-connection-string}",
+  "connectionStringConfiguredAtRuntime": true,
   "role": {
     "name": "ccd-data-store-api"
   },

@@ -1,15 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -165,7 +162,7 @@ class SubmitCaseTransactionNewCaseTest {
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
-        objectMapper = new ObjectMapper();
+        objectMapper = JsonMapper.builderWithJackson2Defaults().build();
         caseAccessGroupUtils = new CaseAccessGroupUtils(caseDataService, objectMapper);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
@@ -197,11 +194,10 @@ class SubmitCaseTransactionNewCaseTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
-        objectMapper = new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+        objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+            .build();
 
         inputCaseDetails = new CaseDetails();
         doReturn(true).when(applicationParams).getCaseGroupAccessFilteringEnabled();
@@ -306,13 +302,13 @@ class SubmitCaseTransactionNewCaseTest {
             SubmitCaseTransactionNewCaseTest.class.getClassLoader()
                 .getResourceAsStream("tests/".concat(fileName));
 
-        return new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+        return JsonMapper.builderWithJackson2Defaults().build().readValue(inputStream, new TypeReference<>() {
             });
     }
 
     @Test
     @DisplayName("should create a case With Organisations for new case false")
-    void shouldPersistCreateCaseEventWithOrganisationNewCaseFalse() throws JsonProcessingException {
+    void shouldPersistCreateCaseEventWithOrganisationNewCaseFalse() throws JacksonException {
         Map<String, JsonNode> dataOrganisation =
             organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
             "\"550e8400-e29b-41d4-a716-446655440000\"", true,false);
@@ -342,7 +338,7 @@ class SubmitCaseTransactionNewCaseTest {
     @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for "
         + "new case false and true")
     void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCase()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         organisationPolicyMultipleCaseDataNewCase(inputCaseDetails);
 
@@ -404,7 +400,7 @@ class SubmitCaseTransactionNewCaseTest {
     @DisplayName("should create a case With OrganisationID, multiple organisationProfileField for "
         + "new case false and true and update  when new case NO for organisationProfileField")
     void shouldPersistCreateCaseEventWithOrganisationIDCaseMultipleOrganisationProfileFieldNewCaseUpdate()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         organisationPolicyMultipleCaseDataNewCase(inputCaseDetails);
 
@@ -429,7 +425,7 @@ class SubmitCaseTransactionNewCaseTest {
     private Map<String, JsonNode> organisationPolicyCaseDataNewCase(String orgPolicyField, String role,
                                                                     String organisationId, boolean includeNewCase,
                                                                     boolean newCase)
-        throws JsonProcessingException {
+        throws JacksonException {
         JsonNode data;
         String yesOrNo = "No";
         if (newCase) {
@@ -466,7 +462,7 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private void organisationPolicyMultipleCaseDataNewCase(CaseDetails inputCaseDetails)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         Map<String, JsonNode> dataOrganisation =
             organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",
@@ -496,7 +492,7 @@ class SubmitCaseTransactionNewCaseTest {
     }
 
     private void organisationPolicyMultipleCaseDataNewCaseUpdate(CaseDetails inputCaseDetails)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         Map<String, JsonNode> dataOrganisation =
             organisationPolicyCaseDataNewCase("OrganisationPolicyField","caseAssignedField",

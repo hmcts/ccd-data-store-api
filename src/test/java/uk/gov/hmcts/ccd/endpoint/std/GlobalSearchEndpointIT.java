@@ -8,8 +8,8 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -285,7 +285,7 @@ class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     private JsonNode toJsonNode(String value) {
-        return new ObjectMapper().convertValue(value, JsonNode.class);
+        return JsonMapper.builderWithJackson2Defaults().build().convertValue(value, JsonNode.class);
     }
 
     private MsearchResponse<ElasticSearchCaseDetailsDTO> mockMultiSearchResponse() {

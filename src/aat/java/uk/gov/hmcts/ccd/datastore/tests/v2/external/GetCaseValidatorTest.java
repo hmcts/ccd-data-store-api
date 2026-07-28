@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 
 import java.util.function.Supplier;
 
@@ -37,7 +37,7 @@ class GetCaseValidatorTest extends BaseTest {
 
         @Test
         @DisplayName("should get 422 when event not provided")
-        void should422WhenEventNotProvided() throws JsonProcessingException {
+        void should422WhenEventNotProvided() throws JacksonException {
             callCaseDataValidate(INVALID_CASE_TYPE_ID, getBody(null))
                 .when()
                 .post("/case-types/{caseTypeId}/validate")
@@ -48,7 +48,7 @@ class GetCaseValidatorTest extends BaseTest {
 
         @Test
         @DisplayName("should get 422 when event trigger does not exist")
-        void should422WhenEventTriggerDoesNotExist() throws JsonProcessingException {
+        void should422WhenEventTriggerDoesNotExist() throws JacksonException {
             callCaseDataValidate(CASE_TYPE, getBody(INVALID_EVENT_TRIGGER_ID))
                 .when()
                 .post("/case-types/{caseTypeId}/validate")
@@ -58,7 +58,7 @@ class GetCaseValidatorTest extends BaseTest {
         }
 
         private RequestSpecification callCaseDataValidate(String caseTypeId, Supplier<String> supplier)
-                                                          throws JsonProcessingException {
+                                                          throws JacksonException {
             return asAutoTestCaseworker(FALSE)
                 .get()
                 .given()

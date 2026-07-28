@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -233,7 +234,7 @@ class CaseDetailsEndpointTest {
     void validateCaseFieldsForCaseWorker() {
         String pageId = "pageId";
         final Map<String, JsonNode> data = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.set("data", mapper.valueToTree(data));
         final JsonNode toBeReturned = objectNode;

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 
 class DefaultGetCaseHistoryViewOperationTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
@@ -167,7 +167,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = new HashMap<>();
         asList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+            dataMap.put(dataFieldId, JSON_NODE_FACTORY.stringNode(dataFieldId));
         });
         return dataMap;
     }

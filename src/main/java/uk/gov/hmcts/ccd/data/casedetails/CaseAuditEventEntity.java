@@ -5,7 +5,7 @@ import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

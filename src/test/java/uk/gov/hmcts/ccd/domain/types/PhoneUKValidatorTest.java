@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,27 +54,27 @@ class PhoneUKValidatorTest {
     @Test
     void validPhoneUKForBaseRegex() {
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("01222 555 555"),
+                                                                   NODE_FACTORY.stringNode("01222 555 555"),
                 caseFieldDefinition);
         assertEquals(0, result01.size(), result01.toString());
 
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("(010) 55555555 #2222"),
+                                                                   NODE_FACTORY.stringNode("(010) 55555555 #2222"),
                 caseFieldDefinition);
         assertEquals(0, result02.size(), result02.toString());
 
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("07222 555555"),
+                                                                   NODE_FACTORY.stringNode("07222 555555"),
                 caseFieldDefinition);
         assertEquals(0, result03.size(), result03.toString());
 
         final List<ValidationResult> result04 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("(07222) 555555"),
+                                                                   NODE_FACTORY.stringNode("(07222) 555555"),
                 caseFieldDefinition);
         assertEquals(0, result04.size(), result04.toString());
 
         final List<ValidationResult> result05 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("07222555555"),
+                                                                   NODE_FACTORY.stringNode("07222555555"),
                 caseFieldDefinition);
         assertEquals(0, result05.size(), result05.toString());
     }
@@ -82,17 +82,17 @@ class PhoneUKValidatorTest {
     @Test
     void invalidPhoneUKForBaseRegEx() {
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("3321M1 1AA"),
+                                                                   NODE_FACTORY.stringNode("3321M1 1AA"),
                 caseFieldDefinition);
         assertEquals(1, result01.size());
 
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("1m1 1m1"),
+                                                                   NODE_FACTORY.stringNode("1m1 1m1"),
                 caseFieldDefinition);
         assertEquals(1, result02.size());
 
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("0800505555"),
+                                                                   NODE_FACTORY.stringNode("0800505555"),
                 caseFieldDefinition);
         assertEquals(1, result03.size());
     }
@@ -101,12 +101,12 @@ class PhoneUKValidatorTest {
     void checkFieldRegex() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("^[0-9]*$").build();
         final List<ValidationResult> validResult = validator.validate(FIELD_ID,
-                                                                      NODE_FACTORY.textNode("123456789"),
+                                                                      NODE_FACTORY.stringNode("123456789"),
                 caseFieldDefinition);
         assertEquals(0, validResult.size());
 
         final List<ValidationResult> invalidResult = validator.validate(FIELD_ID,
-                                                                        NODE_FACTORY.textNode("abc123"),
+                                                                        NODE_FACTORY.stringNode("abc123"),
                 caseFieldDefinition);
         assertEquals(1, invalidResult.size(), invalidResult.toString());
     }
@@ -124,7 +124,7 @@ class PhoneUKValidatorTest {
     @Test
     void testInvalidMin() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5).build();
-        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+        final JsonNode invalidMin = NODE_FACTORY.stringNode("Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch min");
@@ -135,7 +135,7 @@ class PhoneUKValidatorTest {
     @Test
     void testInvalidMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(6).build();
-        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+        final JsonNode invalidMax = NODE_FACTORY.stringNode("Test Test Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch max");
@@ -151,7 +151,7 @@ class PhoneUKValidatorTest {
         // Disable regular expression checks
         when(phoneUkBaseType.getRegularExpression()).thenReturn("^.*$");
 
-        final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
+        final JsonNode DATA = NODE_FACTORY.stringNode("5 & 10");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseFieldDefinition);
         assertEquals(0, validMinMaxResults.size(), validMinMaxResults.toString());
     }

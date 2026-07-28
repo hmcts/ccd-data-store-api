@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +71,6 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
 
         final String caseId = "1504259907353529";
         final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
@@ -101,7 +99,6 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
     void testGetCategoriesAndDocumentsShouldReturn404WhenCaseDoesNotExist() throws Exception {
         final String caseId = "4259907353529155";
         final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)
@@ -118,7 +115,6 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
     void testGetCategoriesAndDocumentsShouldReturn404WhenUserIsNotAllowedAccessToCase() throws Exception {
         final String caseId = "1504259907353529";
         final String URL = "/categoriesAndDocuments/" + caseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CITIZEN);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
@@ -135,7 +131,6 @@ class CaseFileViewControllerTestIT extends WireMockBaseTest {
     void testGetCategoriesAndDocumentsShouldReturnBadRequestWhenCaseRefHasWrongFormat() throws Exception {
         final String badCaseId = "1504259907353529000";
         final String URL = "/categoriesAndDocuments/" + badCaseId;
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
                 .header(REQUEST_ID, REQUEST_ID_VALUE)

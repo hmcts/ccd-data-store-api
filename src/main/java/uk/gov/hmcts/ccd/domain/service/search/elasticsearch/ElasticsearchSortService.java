@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.CASE_DATA_PREFIX;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.COLLECTION_VALUE_SUFFIX;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.stringOrNullNode;
 
 @Service
 @Slf4j
@@ -59,7 +60,7 @@ public class ElasticsearchSortService {
         }
 
         // Always add created_date as the final sort (ES defaults to ascending when direction is not specified)
-        sortNode.add(new TextNode(CREATED_DATE.getDbColumnName()));
+        sortNode.add(new StringNode(CREATED_DATE.getDbColumnName()));
         return sortNode;
     }
 
@@ -95,7 +96,7 @@ public class ElasticsearchSortService {
             sb.append(KEYWORD_SUFFIX);
         }
 
-        objectNode.set(sb.toString(), new TextNode(sortOrderField.getDirection()));
+        objectNode.set(sb.toString(), stringOrNullNode(sortOrderField.getDirection()));
         return objectNode;
     }
 }

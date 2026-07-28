@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
@@ -29,7 +29,7 @@ public class FixedListValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        final String value = dataValue.textValue();
+        final String value = dataValue.stringValue(null);
         final List<FixedListItemDefinition> validValues =
             caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
 

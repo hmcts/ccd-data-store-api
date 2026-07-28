@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.message;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
@@ -24,7 +24,7 @@ class MessageCandidateMapperTest {
     private static final String USER_ID = "USER_ID";
     private static final LocalDateTime DATE_TIME =
         LocalDateTime.of(2020,12,07,16,42,00);
-    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private static final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @Test
     @DisplayName("Should map model to entity ")

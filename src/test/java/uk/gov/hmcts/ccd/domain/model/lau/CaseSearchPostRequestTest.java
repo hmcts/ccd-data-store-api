@@ -2,9 +2,10 @@ package uk.gov.hmcts.ccd.domain.model.lau;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 
@@ -32,7 +33,7 @@ class CaseSearchPostRequestTest {
     private ZonedDateTime currentZonedDateTime;
 
     @Test
-    void jsonContructionTestWithMultipleCaseRefs() throws JsonProcessingException {
+    void jsonContructionTestWithMultipleCaseRefs() throws JacksonException {
 
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
@@ -40,8 +41,10 @@ class CaseSearchPostRequestTest {
         searchLog.setTimestamp(SEARCH_LOG_TIMESTAMP);
 
         caseSearchPostRequest = new CaseSearchPostRequest(searchLog);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .changeDefaultVisibility(visibility ->
+                visibility.withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY))
+            .build();
 
         String jsonRequest = objectMapper
             .writerWithDefaultPrettyPrinter()
@@ -50,22 +53,24 @@ class CaseSearchPostRequestTest {
         Map<String, JsonNode> value = JacksonUtils.convertValue(objectMapper.readTree(jsonRequest));
 
         assertNotNull(value);
-        assertEquals(SEARCH_LOG_USER_ID, value.get("searchLog").get("userId").asText());
-        assertEquals("100001", value.get("searchLog").get("caseRefs").get(0).asText());
-        assertEquals("100002", value.get("searchLog").get("caseRefs").get(1).asText());
-        assertEquals(SEARCH_LOG_TIMESTAMP_AS_TEXT, value.get("searchLog").get("timestamp").asText());
+        assertEquals(SEARCH_LOG_USER_ID, value.get("searchLog").get("userId").asString());
+        assertEquals("100001", value.get("searchLog").get("caseRefs").get(0).asString());
+        assertEquals("100002", value.get("searchLog").get("caseRefs").get(1).asString());
+        assertEquals(SEARCH_LOG_TIMESTAMP_AS_TEXT, value.get("searchLog").get("timestamp").asString());
     }
 
     @Test
-    void jsonContructionTestWithEmptyCaseRefs() throws JsonProcessingException {
+    void jsonContructionTestWithEmptyCaseRefs() throws JacksonException {
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
         searchLog.setCaseRefs(null);
         searchLog.setTimestamp(SEARCH_LOG_TIMESTAMP);
 
         caseSearchPostRequest = new CaseSearchPostRequest(searchLog);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .changeDefaultVisibility(visibility ->
+                visibility.withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY))
+            .build();
 
         String jsonRequest = objectMapper
             .writerWithDefaultPrettyPrinter()
@@ -74,8 +79,8 @@ class CaseSearchPostRequestTest {
         Map<String, JsonNode> value = JacksonUtils.convertValue(objectMapper.readTree(jsonRequest));
 
         assertNotNull(value);
-        assertEquals(SEARCH_LOG_USER_ID, value.get("searchLog").get("userId").asText());
+        assertEquals(SEARCH_LOG_USER_ID, value.get("searchLog").get("userId").asString());
         assertEquals(0, value.get("searchLog").get("caseRefs").size());
-        assertEquals(SEARCH_LOG_TIMESTAMP_AS_TEXT, value.get("searchLog").get("timestamp").asText());
+        assertEquals(SEARCH_LOG_TIMESTAMP_AS_TEXT, value.get("searchLog").get("timestamp").asString());
     }
 }

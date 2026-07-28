@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import jakarta.inject.Named;
@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
@@ -41,7 +42,7 @@ public class DateValidator implements BaseTypeValidator {
 
         final LocalDate dateValue;
         try {
-            dateValue = LocalDate.parse(dataValue.asText(), ISO_DATE);
+            dateValue = LocalDate.parse(asText(dataValue), ISO_DATE);
         } catch (DateTimeParseException e) {
             return Collections.singletonList(new ValidationResult("Date or Time entered is not valid",
                 dataFieldId));
@@ -59,11 +60,11 @@ public class DateValidator implements BaseTypeValidator {
                 .getFieldTypeDefinition().getMin())), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), asText(dataValue))) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 
-        if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(getType().getRegularExpression(), asText(dataValue))) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 

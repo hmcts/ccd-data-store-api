@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -59,13 +59,13 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
         } else if (!caseRolesContainsCaseInsensitive(caseRoles, orgPolicyRoleNode)) {
             final String error = String.format("%1$s The value %2$s is not a valid organisation role.",
                 validationContext.getPath(),
-                orgPolicyRoleNode.textValue()
+                orgPolicyRoleNode.stringValue(null)
             );
             errors.add(new ValidationResult(error, validationContext.getFieldId()));
         }
     }
 
     private boolean caseRolesContainsCaseInsensitive(Set<String> caseRoles, JsonNode orgPolicyRoleNode) {
-        return caseRoles.stream().anyMatch(e -> e.equalsIgnoreCase(orgPolicyRoleNode.textValue()));
+        return caseRoles.stream().anyMatch(e -> e.equalsIgnoreCase(orgPolicyRoleNode.stringValue(null)));
     }
 }

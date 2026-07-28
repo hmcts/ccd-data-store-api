@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -118,7 +118,9 @@ public class CallbackResponse {
     private Optional<String> filterCaseState(final Map<String, JsonNode> data) {
         final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
         jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
-        return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
+        return jsonNode.flatMap(value ->
+            value.isString() ? Optional.of(value.stringValue(null)) : Optional.empty()
+        );
     }
 
     public void updateCallbackStateBasedOnPriority() {

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +56,7 @@ class DynamicMultiSelectListValidatorTest {
 
     @Test
     public void validValueMultipleSelection() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
             \t"value": [{
             \t\t"code": "MONDAYFIRSTOFMAY",
@@ -90,7 +90,7 @@ class DynamicMultiSelectListValidatorTest {
     @Test
     @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     public void invalidValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
                       "default": {
                         "code": "FixedList1",
@@ -135,7 +135,7 @@ class DynamicMultiSelectListValidatorTest {
         when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(500);
         validator = new DynamicMultiSelectListValidator(applicationParams);
 
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
             \t"value": [{
             \t\t"code": "MONDAYFIRSTOFMAY",
@@ -172,7 +172,7 @@ class DynamicMultiSelectListValidatorTest {
         when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(5);
         validator = new DynamicMultiSelectListValidator(applicationParams);
 
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
             \t"value": [{
             \t\t"code": "MONDAYFIRSTOFMAY",

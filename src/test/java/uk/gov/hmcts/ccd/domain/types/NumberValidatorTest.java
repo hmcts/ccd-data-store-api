@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class NumberValidatorTest {
 
     @Test
     void noValueOrMaxOrMin() {
-        final JsonNode data = NODE_FACTORY.textNode("");
+        final JsonNode data = NODE_FACTORY.stringNode("");
         assertEquals(0,
                      validator.validate("TEST_FIELD_ID", data, caseFieldDefinition).size(),
                      validator.validate("TEST_FIELD_ID", data, caseFieldDefinition).toString());
@@ -65,7 +65,7 @@ class NumberValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
                                                .withMax(10)
                                                .build();
-        final JsonNode data = NODE_FACTORY.textNode("");
+        final JsonNode data = NODE_FACTORY.stringNode("");
         assertEquals(0, validator.validate("TEST_FIELD_ID", data, caseFieldDefinition).size());
     }
 
@@ -76,7 +76,7 @@ class NumberValidatorTest {
                                                .build();
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("5"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("5"), caseFieldDefinition).size(),
                      "5 should be with in range of between 5 and 10");
 
         assertEquals(0,
@@ -84,7 +84,7 @@ class NumberValidatorTest {
                      "5 should be with in range of between 5 and 10");
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("5.001"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("5.001"), caseFieldDefinition).size(),
                      "5.001 should be with in range of between 5 and 10");
 
         assertEquals(0,
@@ -92,7 +92,8 @@ class NumberValidatorTest {
                      "5.001 should be with in range of between 5 and 10");
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("9.999999"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID",
+                         NODE_FACTORY.stringNode("9.999999"), caseFieldDefinition).size(),
                      "9.999999 should be with in range of between 5 and 10");
 
         assertEquals(0,
@@ -100,7 +101,7 @@ class NumberValidatorTest {
                      "9.999999 should be with in range of between 5 and 10");
 
         List<ValidationResult> textNodeBelowMin = validator.validate("TEST_FIELD_ID",
-                                                                     NODE_FACTORY.textNode("4.9"),
+                                                                     NODE_FACTORY.stringNode("4.9"),
                 caseFieldDefinition);
         assertEquals(1, textNodeBelowMin.size(), "4.9 should not be with in range of between 5 and 10");
         assertEquals("Should be more than or equal to 5", textNodeBelowMin.get(0).getErrorMessage());
@@ -112,7 +113,7 @@ class NumberValidatorTest {
         assertEquals("Should be more than or equal to 5", numberNodeBelowMin.get(0).getErrorMessage());
 
         List<ValidationResult> textNodeAboveMin = validator.validate("TEST_FIELD_ID",
-                                                                     NODE_FACTORY.textNode("10.1"),
+                                                                     NODE_FACTORY.stringNode("10.1"),
                 caseFieldDefinition);
         assertEquals(1, textNodeAboveMin.size(), "10.1 should not be with in range of between 5 and 10");
         assertEquals("Should be less than or equal to 10", textNodeAboveMin.get(0).getErrorMessage());
@@ -133,7 +134,7 @@ class NumberValidatorTest {
                                                .build();
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("0"), caseFieldDefinition).size(),
                      "0 should be with in range of between 0 and 0");
 
         assertEquals(0,
@@ -141,7 +142,7 @@ class NumberValidatorTest {
                      "0 should be with in range of between 0 and 0");
 
         assertEquals(1,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("-1"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("-1"), caseFieldDefinition).size(),
                      "-1 should not be with in range of between 0 and 0");
 
         assertEquals(1,
@@ -149,7 +150,7 @@ class NumberValidatorTest {
                      "-1 should not be with in range of between 0 and 0");
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0.0000000000"), caseFieldDefinition)
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("0.0000000000"), caseFieldDefinition)
                              .size(), "0.0000000000 should be with in range of between 0 and 0");
 
         assertEquals(0,
@@ -164,7 +165,7 @@ class NumberValidatorTest {
                                                .build();
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("0"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("0"), caseFieldDefinition).size(),
                      "0 should be with in range of between 0.00 and 0.00");
 
         assertEquals(0,
@@ -177,11 +178,11 @@ class NumberValidatorTest {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("^\\d\\.\\d\\d$").build();
 
         assertEquals(0,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.20"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("8.20"), caseFieldDefinition).size(),
                      "regular expression check");
 
         List<ValidationResult> results =
-                validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("8.2"), caseFieldDefinition);
+                validator.validate("TEST_FIELD_ID", NODE_FACTORY.stringNode("8.2"), caseFieldDefinition);
         assertEquals(1, results.size(), "regular expression check");
         assertEquals(REGEX_GUIDANCE, results.get(0).getErrorMessage());
     }
@@ -204,7 +205,8 @@ class NumberValidatorTest {
                                                .build();
 
         assertEquals(1,
-                     validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("10.1xxxx"), caseFieldDefinition).size(),
+                     validator.validate("TEST_FIELD_ID",
+                         NODE_FACTORY.stringNode("10.1xxxx"), caseFieldDefinition).size(),
                      "Did not catch invalid 10.1xxxx");
     }
 

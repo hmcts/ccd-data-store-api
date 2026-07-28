@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;

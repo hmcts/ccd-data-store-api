@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.util.Arrays;
 import jakarta.inject.Inject;
@@ -57,7 +56,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
                 MockUtils.ROLE_CASEWORKER_PUBLIC, MockUtils.ROLE_CITIZEN);

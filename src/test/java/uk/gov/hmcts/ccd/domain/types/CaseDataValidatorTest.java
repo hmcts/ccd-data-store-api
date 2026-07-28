@@ -4,9 +4,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.type.TypeFactory;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -645,7 +645,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  }\n" +
                 "}]";
         final List<CaseFieldDefinition> caseFields =
-            mapper.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+            mapper.readValue(caseFieldString, TypeFactory.createDefaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = caseDataFromJsonString(DATA);
@@ -674,7 +674,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  }\n" +
                 "}]";
         final List<CaseFieldDefinition> caseFields =
-            mapper.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+            mapper.readValue(caseFieldString, TypeFactory.createDefaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
 
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";

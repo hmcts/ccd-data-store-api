@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.jsonpath;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -83,7 +83,7 @@ class CaseDetailsJsonParserTest {
         try {
             String json = JacksonUtils.writeValueAsString(caseData.getData());
             assertTrue(json.contains(categoryId));
-        } catch (JsonProcessingException jpe) {
+        } catch (JacksonException jpe) {
             jpe.printStackTrace();
         }
     }

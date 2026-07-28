@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -88,7 +87,6 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         CaseDataResource caseDataResource = mapper.readValue(content, CaseDataResource.class);
 
@@ -97,28 +95,28 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
             CollectionValidator.VALUE);
 
         assertAll(
-            () -> assertThat(data.get(TEXT_FIELD).asText(), is("Case 1 Text")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_FIELD)).asText(),
+            () -> assertThat(data.get(TEXT_FIELD).asString(), is("Case 1 Text")),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_FIELD)).asString(),
                 is("1963-05-07")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_TIME_FIELD))
-                    .asText(),
+                    .asString(),
                 is("2008-04-02T16:37:00.000")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE)).asString(),
                 is("1999-08-19")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE_TIME))
-                    .asText(),
+                    .asString(),
                 is("2010-06-17T19:20:00.000")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
-                DATE_FIELD)).asText(),
+                DATE_FIELD)).asString(),
                 is("1981-02-01")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
-                DATE_TIME_FIELD)).asText(),
+                DATE_TIME_FIELD)).asString(),
                 is("2002-03-04T00:00:00.000")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
-                STANDARD_DATE)).asText(),
+                STANDARD_DATE)).asString(),
                 is("2020-02-19")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
-                STANDARD_DATE_TIME)).asText(),
+                STANDARD_DATE_TIME)).asString(),
                 is("2007-07-17T07:07:00.000"))
         );
     }
@@ -137,7 +135,6 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 422, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         DataProcessingException exception = mapper.readValue(content, DataProcessingException.class);
 

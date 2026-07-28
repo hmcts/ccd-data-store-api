@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLink;
@@ -91,7 +91,7 @@ public abstract class CaseLinkTestFixtures {
         return caseDetails;
     }
 
-    protected Map<String, JsonNode> createCaseDataMap(List<String> dataValues) throws JsonProcessingException {
+    protected Map<String, JsonNode> createCaseDataMap(List<String> dataValues) throws JacksonException {
         return JacksonUtils.MAPPER.readValue("{" + StringUtils.join(dataValues, ",") + "}",
             new TypeReference<HashMap<String, JsonNode>>() { });
     }

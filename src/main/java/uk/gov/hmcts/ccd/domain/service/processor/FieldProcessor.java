@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Optional;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -16,11 +17,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public abstract class FieldProcessor {
 
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     protected static final String FIELD_SEPARATOR = ".";
 
     private final CaseViewFieldBuilder caseViewFieldBuilder;
@@ -55,7 +57,7 @@ public abstract class FieldProcessor {
             return null;
         }
         ObjectNode newNode = MAPPER.createObjectNode();
-        complexNode.fieldNames().forEachRemaining(fieldId -> {
+        complexNode.propertyNames().forEach(fieldId -> {
             final JsonNode caseFieldNode = complexNode.get(fieldId);
             Optional<CaseFieldDefinition> complexCaseFieldOpt =
                 complexCaseFields.stream().filter(f -> f.getId().equals(fieldId)).findFirst();
@@ -117,7 +119,7 @@ public abstract class FieldProcessor {
     public static boolean isNullOrEmpty(final JsonNode node) {
         return node == null
             || node.isNull()
-            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
+            || (node.isString() && (null == asText(node) || asText(node).trim().length() == 0))
             || (node.isObject() && node.toString().equals("{}"));
     }
 

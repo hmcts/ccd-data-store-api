@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,17 +33,17 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 @DisplayName("CaseDataValidatorControllerTest")
 class CaseDataValidatorControllerTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String PAGE_ID = "PageId";
     private static final boolean IGNORE_WARNING = false;
 
     private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = newCaseData()
-        .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.textNode("aValue")))
+        .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.stringNode("aValue")))
         .build();
     public static final Map<String, JsonNode> UNWRAPPED_DATA = newCaseData()
-        .withPair("aField", JSON_NODE_FACTORY.textNode("aValue"))
+        .withPair("aField", JSON_NODE_FACTORY.stringNode("aValue"))
         .build();
     private static final JsonNode UNWRAPPED_DATA_NODE = JacksonUtils.convertValueJsonNode(UNWRAPPED_DATA);
     private static final String TOKEN = "JwtToken";

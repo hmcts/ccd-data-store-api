@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,7 +69,7 @@ public class DocumentValidator implements BaseTypeValidator {
             return nullOrEmptyValidationResult(DOCUMENT_URL, dataFieldId);
         }
 
-        final String documentUrlValue = documentUrl.textValue();
+        final String documentUrlValue = documentUrl.stringValue(null);
         if (documentUrlValue == null) {
             return Collections.singletonList(new ValidationResult(
                 DOCUMENT_URL + NOT_TEXT_OR_NULL, dataFieldId));
@@ -124,7 +124,7 @@ public class DocumentValidator implements BaseTypeValidator {
             return nullOrEmptyValidationResult(DOCUMENT_BINARY_URL, dataFieldId);
         }
 
-        final String documentBinaryUrlValue = documentBinaryUrl.textValue();
+        final String documentBinaryUrlValue = documentBinaryUrl.stringValue(null);
         final Matcher documentBinaryUrlMatcher = urlPattern.matcher(documentBinaryUrlValue);
 
         if (!documentBinaryUrlMatcher.matches()) {
@@ -146,7 +146,7 @@ public class DocumentValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        if (!categoryId.isTextual()) {
+        if (!categoryId.isString()) {
             final String nodeType = categoryId.getNodeType().toString().toLowerCase();
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string : " + CATEGORY_ID,
                     dataFieldId));

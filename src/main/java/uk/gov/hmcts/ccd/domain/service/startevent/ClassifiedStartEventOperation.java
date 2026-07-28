@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import java.util.HashMap;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

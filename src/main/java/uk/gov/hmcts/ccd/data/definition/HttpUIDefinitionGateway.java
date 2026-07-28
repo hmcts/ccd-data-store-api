@@ -131,7 +131,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     }
 
     private URI withVersionQueryParam(String url, int version) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("version", version);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url).queryParam("version", version);
         return builder.build().encode().toUri();
     }
 
@@ -165,7 +165,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
 
     private URI withJurisdictionIds(String url, final List<String> jurisdictionIds) {
         UriComponentsBuilder builder =
-            UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
+            UriComponentsBuilder.fromUriString(url).queryParam("ids", String.join(",", jurisdictionIds));
         return builder.build().encode().toUri();
     }
 }

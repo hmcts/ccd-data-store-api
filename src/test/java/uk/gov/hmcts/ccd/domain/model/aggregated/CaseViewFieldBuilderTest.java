@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,7 +47,7 @@ public class CaseViewFieldBuilderTest {
     private static final CaseEventFieldDefinition EVENT_FIELD_3 = new CaseEventFieldDefinition();
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
         .withUpdate(true).withDelete(false).build();
     private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
@@ -139,7 +139,7 @@ public class CaseViewFieldBuilderTest {
             final CaseViewField expectedField = new CaseViewField();
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
-            final JsonNode data = JSON_NODE_FACTORY.textNode("value");
+            final JsonNode data = JSON_NODE_FACTORY.stringNode("value");
 
             final CaseViewField field = fieldBuilder.build(CASE_FIELD, EVENT_FIELD, data);
 
@@ -159,8 +159,8 @@ public class CaseViewFieldBuilderTest {
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD, CASE_FIELD_2);
             final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
-            data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
+            data.put("PersonFirstName", JSON_NODE_FACTORY.stringNode(FIRST_NAME));
+            data.put("PersonLastName", JSON_NODE_FACTORY.stringNode(LAST_NAME));
 
             final List<CaseViewField> fields = fieldBuilder.build(caseFieldDefinitions, eventFields, data);
 
@@ -180,8 +180,8 @@ public class CaseViewFieldBuilderTest {
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD);
             final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD, EVENT_FIELD_2);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
-            data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
+            data.put("PersonFirstName", JSON_NODE_FACTORY.stringNode(FIRST_NAME));
+            data.put("PersonLastName", JSON_NODE_FACTORY.stringNode(LAST_NAME));
 
             final List<CaseViewField> fields = fieldBuilder.build(caseFieldDefinitions, eventFields, data);
 
@@ -202,8 +202,8 @@ public class CaseViewFieldBuilderTest {
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD, CASE_FIELD_2);
             final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("PersonFirstName", JSON_NODE_FACTORY.textNode(FIRST_NAME));
-            data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
+            data.put("PersonFirstName", JSON_NODE_FACTORY.stringNode(FIRST_NAME));
+            data.put("PersonLastName", JSON_NODE_FACTORY.stringNode(LAST_NAME));
 
             final List<CaseViewField> fields = fieldBuilder.build(caseFieldDefinitions, eventFields, data);
 
@@ -224,7 +224,7 @@ public class CaseViewFieldBuilderTest {
             final List<CaseFieldDefinition> caseFieldDefinitions = asList(CASE_FIELD);
             final List<CaseEventFieldDefinition> eventFields = asList(EVENT_FIELD);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("PersonLastName", JSON_NODE_FACTORY.textNode(LAST_NAME));
+            data.put("PersonLastName", JSON_NODE_FACTORY.stringNode(LAST_NAME));
 
             final List<CaseViewField> fields = fieldBuilder.build(caseFieldDefinitions, eventFields, data);
 

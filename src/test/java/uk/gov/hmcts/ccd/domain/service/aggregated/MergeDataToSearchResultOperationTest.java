@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -108,7 +108,8 @@ class MergeDataToSearchResultOperationTest {
         MockitoAnnotations.openMocks(this);
 
         Map<String, JsonNode> dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4);
-        ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
+        ObjectNode familyDetails = (ObjectNode) JsonMapper.builderWithJackson2Defaults()
+            .build().readTree(FAMILY_DETAILS_VALUE);
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
         CaseDetails caseDetails1 = new CaseDetails();
@@ -377,12 +378,12 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0)
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(0)
                 .getFields()
-                .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1)
+                .get(LABEL_ID)).asString(), is(LABEL_TEXT)),
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(1)
                 .getFields()
-                .get(LABEL_ID)).asText(), is(LABEL_TEXT)));
+                .get(LABEL_ID)).asString(), is(LABEL_TEXT)));
     }
 
     @Test
@@ -441,10 +442,10 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
-                .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
-                .get(LABEL_ID)).asText(), is(LABEL_TEXT)))
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(0).getFields()
+                .get(LABEL_ID)).asString(), is(LABEL_TEXT)),
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(1).getFields()
+                .get(LABEL_ID)).asString(), is(LABEL_TEXT)))
         ;
     }
 
@@ -465,10 +466,10 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
-                .get("FamilyDetails.FatherName")).asText(), is(FATHER_NAME_VALUE)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
-                .get("FamilyDetails.FatherName")).asText(), is(FATHER_NAME_VALUE)))
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(0).getFields()
+                .get("FamilyDetails.FatherName")).asString(), is(FATHER_NAME_VALUE)),
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(1).getFields()
+                .get("FamilyDetails.FatherName")).asString(), is(FATHER_NAME_VALUE)))
         ;
     }
 
@@ -491,10 +492,10 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseId(), is("999")),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
-                .get("FamilyDetails.FamilyAddress.PostCode")).asText(), is(POSTCODE_VALUE)),
-            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()
-                .get("FamilyDetails.FamilyAddress.PostCode")).asText(), is(POSTCODE_VALUE)))
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(0).getFields()
+                .get("FamilyDetails.FamilyAddress.PostCode")).asString(), is(POSTCODE_VALUE)),
+            () -> assertThat(((StringNode)searchResultView.getSearchResultViewItems().get(1).getFields()
+                .get("FamilyDetails.FamilyAddress.PostCode")).asString(), is(POSTCODE_VALUE)))
         ;
     }
 

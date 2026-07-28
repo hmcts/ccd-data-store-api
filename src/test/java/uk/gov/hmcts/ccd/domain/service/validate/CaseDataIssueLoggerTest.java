@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,7 +29,7 @@ public class CaseDataIssueLoggerTest {
     private static final String JURISDICTION_ID = "EMPLOYMENT";
     private static final String CASE_TYPE_ID = "TestCaseType";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<>() {};
 
     private CaseDetails caseDetails;

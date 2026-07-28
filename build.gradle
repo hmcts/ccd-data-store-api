@@ -6,7 +6,7 @@ plugins {
     id 'jacoco'
     id 'idea'
     id 'eclipse'
-    id 'org.springframework.boot' version '3.5.14'
+    id 'org.springframework.boot' version '4.0.7'
     id 'com.github.ben-manes.versions' version '0.54.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '7.3.0.8198'
@@ -14,9 +14,9 @@ plugins {
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'info.solidsoft.pitest' version '1.19.0'
-    id 'uk.gov.hmcts.java' version '0.12.68'
+    id 'uk.gov.hmcts.java' version '0.12.70'
     id 'au.com.dius.pact' version '4.7.1'
-    id 'org.jsonschema2pojo' version '1.2.2'
+    id 'org.jsonschema2pojo' version '1.3.3'
     id 'org.owasp.dependencycheck' version '12.2.1'
 }
 
@@ -25,24 +25,18 @@ def versions = [
 ]
 
 ext {
-    set('springCloudVersion', '2025.1.1')
-    set('spring-framework.version', '6.2.14')
-    set('spring-security.version', '6.5.7')
-    set('log4j2.version', '2.24.3')
-    set('jacksonVersion', '2.19.2')
-    set('snakeyaml.version', '2.2')
-    junit = '5.14.4'
-    junitPlatform = '1.14.4'
+    set('springCloudVersion', '2025.1.2')
     jjwt = '0.13.0'
-    appInsightsVersion = '2.6.4'
+    appInsightsVersion = '3.7.9'
+    jackson2AatVersion = '2.19.4'
     pactProviderVersion = '4.7.1'
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
     elasticVersion = '9.4.4'
-    testContainersVersion = '2.0.5'
     cucumber = '7.34.6'
-    beftaFwVersion = '9.2.7'
+    restAssuredVersion = '6.0.1'
+    beftaFwVersion = '9.2.8-rc1'
     ccdTestDefinitionVersion = '7.26.7'
     limits = [
             'instruction': 90,
@@ -187,11 +181,15 @@ configurations {
     }
 }
 
+// BEFTA still references PropertyNamingStrategy.SnakeCaseStrategy, removed in Jackson 2.20.
+// Keep this compatibility constraint isolated from the Boot 4 application runtime.
 configurations.matching { it.name in ['aatCompileClasspath', 'aatRuntimeClasspath', 'cucumberRuntime'] }.configureEach {
     resolutionStrategy.eachDependency { details ->
-        if (details.requested.group?.startsWith('com.fasterxml.jackson')) {
-            details.useVersion jacksonVersion
-            details.because 'BEFTA 9.2.x still references PropertyNamingStrategy$SnakeCaseStrategy, removed in Jackson 2.20'
+        def isSharedJacksonAnnotation = details.requested.group == 'com.fasterxml.jackson.core'
+            && details.requested.name == 'jackson-annotations'
+        if (details.requested.group?.startsWith('com.fasterxml.jackson') && !isSharedJacksonAnnotation) {
+            details.useVersion jackson2AatVersion
+            details.because 'BEFTA 9.2.8-rc1 requires the Jackson 2.19 naming-strategy compatibility class'
         }
     }
 }
@@ -219,45 +217,24 @@ task integration(type: Test) {
     failFast = true
 }
 
-ext.libraries = [
-  junit5: [
-    "org.junit.jupiter:junit-jupiter-api:${junit}",
-    "org.junit.jupiter:junit-jupiter-engine:${junit}",
-    "org.junit.jupiter:junit-jupiter-params:${junit}",
-    "org.junit.platform:junit-platform-commons:${junitPlatform}",
-    "org.junit.platform:junit-platform-engine:${junitPlatform}",
-    "org.junit.platform:junit-platform-launcher:${junitPlatform}",
-    "org.apiguardian:apiguardian-api:1.1.2"
-  ]
-]
-
 dependencies {
+
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'                  // java-property-to-json
-    implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
+    implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '3.0.0'                // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.7'                  // spring-security-oauth2-jose
-    runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.17'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
-    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.12'         // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.12'            // service-auth-provider-java-client
-    implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
+    aatImplementation group: 'io.github.openfeign', name: 'feign-gson'                              // AAT helpers
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
-    implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.42.Final'       // spring-boot-starter-data-jpa
-
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'             // ccd-test-definitions
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion  // ccd-test-definitions
     testImplementation group: 'org.json', name: 'json', version: '20250107'                         // ccd-test-definitions
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'                // spring-cloud-starter-contract-stub-runner
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockito                 // spring-cloud-starter-contract-stub-runner
@@ -277,44 +254,40 @@ dependencies {
 
     // Spring
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aspectj'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-flyway'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jackson'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-restclient'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security-oauth2-client'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security-oauth2-resource-server'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '4.3.2'
-    implementation group: 'org.springframework.hateoas', name: 'spring-hateoas'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer'
     implementation group: 'org.springframework.plugin', name: 'spring-plugin-core'
     implementation group: 'org.springframework.retry', name: 'spring-retry'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
-    implementation group: 'org.springframework.security', name: 'spring-security-core'
-    implementation group: 'org.springframework.security', name: 'spring-security-config'
-    implementation group: 'org.springframework.security', name: 'spring-security-web'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '3.0.3'
 
     // HMCTS
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
-    implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '6.0.1'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '4.0.0'
+    implementation(group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.60.0') {
+        exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-parameter-names'
+    }
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
     implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: appInsightsVersion
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
-    implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jjwt
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jjwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-gson', version: jjwt
     implementation group: 'io.searchbox', name: 'jest', version: '6.3.1'
     implementation group: 'io.vavr', name: 'vavr', version: '0.11.0'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
@@ -329,11 +302,7 @@ dependencies {
     implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
 
-//    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
-
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
+    runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
     implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
@@ -343,28 +312,34 @@ dependencies {
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
 
     // TEST DEPENDENCIES
-    testImplementation libraries.junit5
+    testImplementation enforcedPlatform('org.junit:junit-bom:6.0.3')
     testImplementation libs.mockito
     mockitoAgent(libs.mockito) {
         transitive = false
     }
 
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.1'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
-    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: testContainersVersion
-    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch', version: testContainersVersion
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-restclient-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-security-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc-test'
+    testImplementation group: 'org.testcontainers', name: 'testcontainers'
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql'
+    testImplementation group: 'org.testcontainers', name: 'testcontainers-elasticsearch'
+    testImplementation group: 'org.wiremock.integrations', name: 'wiremock-spring-boot', version: '4.2.1'
+    // Gradle's test launcher must be aligned with Boot 4's JUnit 6 engine.
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
     testImplementation group: 'org.openid4java', name: 'openid4java', version: '1.0.0' // for sonar analysis
     testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
     testImplementation(group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion) {
         exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework.cloud'
     }
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
-    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:4.3.3'
-
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pactProviderVersion
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pactProviderVersion
@@ -376,12 +351,6 @@ dependencies {
     cucumberRuntime group: 'io.cucumber', name: 'cucumber-junit-platform-engine', version: cucumber
 }
 // end::dependencies[]
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
 
 publishing {
     repositories {
@@ -534,14 +503,14 @@ jsonSchema2Pojo {
     // Whether to include a toString method in generated Java types.
     includeToString = true
 
-    // The style of annotations to use in the generated Java types. Supported values:
-    //  - jackson (alias of jackson2)
-    //  - jackson2 (apply annotations from the Jackson 2.x library)
+    // The style of annotations to use in the generated Java types. Supported values include:
+    //  - jackson3 (apply Jackson 3 annotations)
+    //  - jackson2 (apply Jackson 2 annotations)
     //  - jackson1 (apply annotations from the Jackson 1.x library)
     //  - gson (apply annotations from the Gson library)
     //  - moshi1 (apply annotations from the Moshi 1.x library)
     //  - none (apply no annotations at all)
-    annotationStyle = 'jackson'
+    annotationStyle = 'jackson3'
 
     // A fully qualified class name, referring to a custom annotator class that implements
     // org.jsonschema2pojo.Annotator and will be used in addition to the one chosen
@@ -589,10 +558,6 @@ jsonSchema2Pojo {
     formatDateTimes = true
     formatDates = true
     formatTimes = true
-
-    // Whether to use commons-lang 3.x imports instead of commons-lang 2.x imports when adding equals,
-    // hashCode and toString methods.
-    useCommonsLang3 = false
 
     // Whether to initialize Set and List fields as empty collections, or leave them as null.
     initializeCollections = true

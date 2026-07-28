@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.processor.date;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.primitives.Ints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,8 +27,6 @@ import static uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeFormatParse
 
 @Component
 public class DateTimeSearchInputProcessor {
-
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DateTimeFormatParser dateTimeFormatParser;
     private final GetCriteriaOperation getCriteriaOperation;

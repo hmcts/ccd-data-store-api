@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.NonNull;
 import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @Named
 public class CaseDocumentUtils {
@@ -42,15 +44,15 @@ public class CaseDocumentUtils {
         return documentNodes.stream()
             .map(node -> new Tuple2<>(
                 getDocumentId(node),
-                Optional.ofNullable(node.get(DOCUMENT_HASH)).map(JsonNode::textValue).orElse(null))
+                Optional.ofNullable(node.get(DOCUMENT_HASH)).map(JsonNode::stringValue).orElse(null))
             )
             .collect(Collectors.toUnmodifiableList());
     }
 
     private String getDocumentId(final JsonNode jsonNode) {
         final String documentIdField = Optional.ofNullable(jsonNode.get(DOCUMENT_BINARY_URL))
-            .map(JsonNode::asText)
-            .orElse(jsonNode.get(DOCUMENT_URL).asText());
+            .map(node -> asText(node))
+            .orElse(asText(jsonNode.get(DOCUMENT_URL)));
 
         final String documentId = documentIdField.contains(BINARY)
             ? documentIdField.substring(documentIdField.length() - 43, documentIdField.length() - 7)
@@ -80,7 +82,7 @@ public class CaseDocumentUtils {
     }
 
     private boolean nonHearingRecordingUrl(JsonNode documentNode) {
-        return !documentNode.get(DOCUMENT_URL).asText().contains(HEARING_RECORDINGS);
+        return !asText(documentNode.get(DOCUMENT_URL)).contains(HEARING_RECORDINGS);
     }
 
     public Set<String> getTamperedHashes(@NonNull final List<Tuple2<String, String>> preCallbackHashes,

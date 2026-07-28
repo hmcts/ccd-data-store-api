@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +68,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTa
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DefaultGetCaseViewOperationTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
@@ -385,7 +385,7 @@ class DefaultGetCaseViewOperationTest {
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = new HashMap<>();
         asList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+            dataMap.put(dataFieldId, JSON_NODE_FACTORY.stringNode(dataFieldId));
         });
         return dataMap;
     }

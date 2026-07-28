@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("MultiSelectListValidator")
 class MultiSelectListValidatorTest {
 
-    private static final JsonNodeFactory NODE_FACTORY = new JsonNodeFactory(Boolean.FALSE);
+    private static final JsonNodeFactory NODE_FACTORY = new JsonNodeFactory();
     private static final String FIELD_ID = "MultiSelectList1";
     private static final String OPTION_1 = "Option1";
     private static final String OPTION_2 = "Option2";
@@ -87,7 +87,7 @@ class MultiSelectListValidatorTest {
 
     @Test
     void validate_shouldNOTBeValidWhenValueIsNotAnArray() {
-        final JsonNode value = NODE_FACTORY.textNode("Nayab was here, 24/07/2017");
+        final JsonNode value = NODE_FACTORY.stringNode("Nayab was here, 24/07/2017");
 
         final List<ValidationResult> results = validator.validate(FIELD_ID, value, caseFieldDefinition);
 

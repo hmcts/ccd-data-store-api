@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
@@ -11,16 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
+import org.wiremock.spring.WireMockConfigurationCustomizer;
 
 import jakarta.inject.Inject;
 import java.io.IOException;
 
-@AutoConfigureWireMock(port = 0)
+@EnableWireMock(@ConfigureWireMock(configurationCustomizers = WireMockBaseContractTest.Customizer.class))
 public abstract class WireMockBaseContractTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseContractTest.class);
@@ -32,6 +35,9 @@ public abstract class WireMockBaseContractTest {
 
     @Inject
     protected ApplicationParams applicationParams;
+
+    @InjectWireMock
+    protected WireMockServer wireMockServer;
 
     @BeforeEach
     public void initMock() throws IOException {
@@ -45,12 +51,15 @@ public abstract class WireMockBaseContractTest {
         ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
     }
 
-    @Configuration
-    static class WireMockTestConfiguration {
+    protected void stubFor(MappingBuilder mappingBuilder) {
+        wireMockServer.stubFor(mappingBuilder);
+    }
 
-        @Bean
-        public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-            return config -> config.extensions(new ResponseDefinitionTransformer() {
+    public static class Customizer implements WireMockConfigurationCustomizer {
+
+        @Override
+        public void customize(WireMockConfiguration configuration, ConfigureWireMock options) {
+            configuration.extensions(new ResponseDefinitionTransformer() {
 
                 @Override
                 public String getName() {

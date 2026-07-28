@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -102,13 +102,13 @@ class CaseSearchEndpointTest {
     }
 
     @Test
-    void searchCaseDetailsInvokesOperation() throws JsonProcessingException {
+    void searchCaseDetailsInvokesOperation() throws JacksonException {
 
         // ARRANGE
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
@@ -131,7 +131,7 @@ class CaseSearchEndpointTest {
     }
 
     @Test
-    void searchCaseDetailsGlobalInvokesOperation() throws JsonProcessingException {
+    void searchCaseDetailsGlobalInvokesOperation() throws JacksonException {
 
         // ARRANGE
         when(applicationParams.getGlobalSearchIndexName()).thenReturn(GLOBAL_INDEX);
@@ -139,7 +139,7 @@ class CaseSearchEndpointTest {
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
@@ -165,13 +165,13 @@ class CaseSearchEndpointTest {
     }
 
     @Test
-    void searchCaseDetailsInvokesOperationWithExpandedCaseTypesForWildcard() throws JsonProcessingException {
+    void searchCaseDetailsInvokesOperationWithExpandedCaseTypesForWildcard() throws JacksonException {
 
         // ARRANGE
         CaseSearchResult result = mock(CaseSearchResult.class);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(ElasticsearchRequest.WILDCARD);
@@ -202,7 +202,7 @@ class CaseSearchEndpointTest {
         when(applicationParams.getGlobalSearchIndexType()).thenReturn(INDEX_TYPE_DOC);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
 

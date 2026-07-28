@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -380,8 +381,8 @@ class CaseAccessGroupUtilsTest {
 
         JsonNode mergedNode = null;
         try {
-            mergedNode = new ObjectMapper().readTree(mergedValue);
-        } catch (JsonProcessingException e) {
+            mergedNode = JsonMapper.builderWithJackson2Defaults().build().readTree(mergedValue);
+        } catch (JacksonException e) {
             throw new ValidationException(String.format(e.getMessage()));
         }
 
@@ -404,7 +405,7 @@ class CaseAccessGroupUtilsTest {
         try {
             dataOrganisation = organisationPolicyCaseData("caseAssignedField",
                 "\"" + TEST_ORGID + "\"");
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
 
@@ -412,7 +413,7 @@ class CaseAccessGroupUtilsTest {
     }
 
     private Map<String, JsonNode> organisationPolicyCaseData(String role, String organisationId)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -451,7 +452,7 @@ class CaseAccessGroupUtilsTest {
 
         caseAccessGroupForUIs.add(caseAccessGroupForUI1);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         Map<String, JsonNode> result = new HashMap<>();
         result.put(CaseAccessGroupUtils.CASE_ACCESS_GROUPS, data);

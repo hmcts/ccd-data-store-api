@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,7 +96,7 @@ public class ElasticsearchQueryHelper {
                 normaliseRangeObject((ObjectNode) rangeNode);
             }
 
-            Iterator<JsonNode> elements = objectNode.elements();
+            Iterator<JsonNode> elements = objectNode.values().iterator();
             while (elements.hasNext()) {
                 normaliseRangeQueries(elements.next());
             }
@@ -111,7 +111,7 @@ public class ElasticsearchQueryHelper {
     }
 
     private void normaliseRangeObject(ObjectNode rangeNode) {
-        rangeNode.fieldNames().forEachRemaining(fieldName -> {
+        rangeNode.propertyNames().forEach(fieldName -> {
             ObjectNode fieldObject = asObject(rangeNode.get(fieldName));
             if (fieldObject == null) {
                 return;
@@ -202,6 +202,6 @@ public class ElasticsearchQueryHelper {
 
     private boolean arrayContainsOnlyText(ArrayNode node) {
         return StreamSupport.stream(node.spliterator(), false)
-            .allMatch(JsonNode::isTextual);
+            .allMatch(JsonNode::isString);
     }
 }

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.StringNode;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -100,11 +100,11 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
 
         assertAll(
             () -> assertNotNull(savedCase.getSupplementaryData(), "Supplementary data should be persisted"),
-            () -> assertThat(savedCase.getSupplementaryData().get("key1").asText()).isEqualTo("value1"),
+            () -> assertThat(savedCase.getSupplementaryData().get("key1").asString()).isEqualTo("value1"),
             () -> assertThat(savedCase.getSupplementaryData().get("key2").asInt()).isEqualTo(42),
             () -> assertNotNull(result.getSavedCaseDetails().getSupplementaryData(),
                 "Result should contain supplementary data"),
-            () -> assertThat(result.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
+            () -> assertThat(result.getSavedCaseDetails().getSupplementaryData().get("key1").asString())
                 .isEqualTo("value1")
         );
     }
@@ -144,7 +144,7 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
 
             // Create supplementary_data map
             Map<String, JsonNode> supplementaryData = new HashMap<>();
-            supplementaryData.put("key1", TextNode.valueOf("value1"));
+            supplementaryData.put("key1", StringNode.valueOf("value1"));
             supplementaryData.put("key2", IntNode.valueOf(42));
 
             updateSupplementaryDataInDatabase(CASE_REFERENCE, supplementaryData);
@@ -186,7 +186,7 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
         try {
             String jsonString = MAPPER.writeValueAsString(supplementaryData);
             updateSupplementaryDataInDatabase(caseReference, jsonString);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Failed to convert supplementary data to JSON", e);
         }
     }
@@ -228,9 +228,9 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
             JsonNode dbSupplementaryData = MAPPER.readTree(dbSupplementaryDataJson);
             assertThat(dbSupplementaryData.has("key1")).as("Database should contain key1").isTrue();
             assertThat(dbSupplementaryData.has("key2")).as("Database should contain key2").isTrue();
-            assertThat(dbSupplementaryData.get("key1").asText()).as("Database key1 value").isEqualTo("value1");
+            assertThat(dbSupplementaryData.get("key1").asString()).as("Database key1 value").isEqualTo("value1");
             assertThat(dbSupplementaryData.get("key2").asInt()).as("Database key2 value").isEqualTo(42);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Failed to parse supplementary_data from database", e);
         }
     }

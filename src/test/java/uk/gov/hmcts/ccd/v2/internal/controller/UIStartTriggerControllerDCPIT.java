@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -86,7 +85,6 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
     @SuppressWarnings("unchecked")
     public void shouldGetStartTriggerForCaseWithDCPConfigured() throws Exception {
         assertCaseDataResultSetSize();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final MvcResult result = mockMvc.perform(get(GET_START_TRIGGER)
             .contentType(MediaType.APPLICATION_JSON)

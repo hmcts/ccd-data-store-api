@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -74,11 +74,11 @@ class UICaseSearchControllerTest {
     }
 
     @Test
-    void shouldSearchCaseDetails() throws JsonProcessingException {
+    void shouldSearchCaseDetails() throws JacksonException {
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
         CaseSearchResultView caseSearchResultView = mock(CaseSearchResultView.class);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
@@ -110,11 +110,11 @@ class UICaseSearchControllerTest {
     }
 
     @Test
-    void shouldSearchCaseDetailsGlobal() throws JsonProcessingException {
+    void shouldSearchCaseDetailsGlobal() throws JacksonException {
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
         CaseSearchResultView caseSearchResultView = mock(CaseSearchResultView.class);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-        JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
+        JsonNode searchRequestNode = JsonMapper.builderWithJackson2Defaults().build().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),

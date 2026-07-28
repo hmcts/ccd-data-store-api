@@ -14,28 +14,28 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class CollectionSanitiserTest {
 
-    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory();
 
     private static final String TYPE_1 = "Type1";
     private static final FieldTypeDefinition FIELD_1_TYPE = new FieldTypeDefinition();
 
-    private static final JsonNode ITEM_1_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 1");
-    private static final JsonNode ITEM_1_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 1");
-    private static final JsonNode ITEM_2_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value 2");
-    private static final JsonNode ITEM_2_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value 2");
+    private static final JsonNode ITEM_1_VALUE_INITIAL = JSON_FACTORY.stringNode("Initial value 1");
+    private static final JsonNode ITEM_1_VALUE_SANITISED = JSON_FACTORY.stringNode("Sanitised value 1");
+    private static final JsonNode ITEM_2_VALUE_INITIAL = JSON_FACTORY.stringNode("Initial value 2");
+    private static final JsonNode ITEM_2_VALUE_SANITISED = JSON_FACTORY.stringNode("Sanitised value 2");
 
     private static final FieldTypeDefinition COLLECTION_FIELD_TYPE = new FieldTypeDefinition();
-    private static final JsonNode UNIQUE_ID = JSON_FACTORY.textNode("123");
+    private static final JsonNode UNIQUE_ID = JSON_FACTORY.stringNode("123");
 
     static {
         FIELD_1_TYPE.setId(TYPE_1);

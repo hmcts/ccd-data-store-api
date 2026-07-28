@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -223,7 +223,7 @@ class CaseLinkRetrievalServiceTest extends CaseLinkTestFixtures {
             caseDetails = createCaseDetails(linkedCaseReference, CASE_TYPE_ID, createCaseDataMap(dataValues));
             caseDetails.setId(valueOf(linkedCaseReference));
 
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             fail("Unexpected exception when prepping mock data: " + e.getMessage());
         }
 

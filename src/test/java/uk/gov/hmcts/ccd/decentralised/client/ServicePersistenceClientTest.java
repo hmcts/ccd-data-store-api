@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.decentralised.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import tools.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedAuditEvent;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ServicePersistenceClientTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
@@ -65,7 +65,7 @@ public class ServicePersistenceClientTest {
     private DecentralisedCaseDetails decentralisedCaseDetails;
     private DecentralisedSubmitEventResponse submitEventResponse;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         casePointer = createCasePointer();
         caseDetails = createCaseDetails();

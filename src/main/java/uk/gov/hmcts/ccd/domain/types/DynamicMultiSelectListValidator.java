@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -27,8 +27,8 @@ public class DynamicMultiSelectListValidator extends DynamicListValidator {
                                       String dataFieldId,
                                       List<ValidationResult> results) {
         if (value != null && value.isArray()) {
-            value.elements()
-                .forEachRemaining(node -> validateLength(results, node, dataFieldId));
+            value.values()
+                .forEach(node -> validateLength(results, node, dataFieldId));
         }
     }
 

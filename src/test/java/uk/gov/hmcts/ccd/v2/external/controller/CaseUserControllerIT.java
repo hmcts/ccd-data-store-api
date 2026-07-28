@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Sets;
-import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,8 +25,9 @@ import jakarta.inject.Inject;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -42,7 +42,7 @@ public class CaseUserControllerIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    public void setUp() throws JacksonException {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
 
@@ -88,6 +88,6 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE_ACCESS.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseId));
         assertThat(captor.getValue().getTargetIdamId(), is(userId));
-        assertThat(captor.getValue().getTargetCaseRoles(), is(Lists.newArrayList(role1, role2)));
+        assertThat(captor.getValue().getTargetCaseRoles(), containsInAnyOrder(role1, role2));
     }
 }

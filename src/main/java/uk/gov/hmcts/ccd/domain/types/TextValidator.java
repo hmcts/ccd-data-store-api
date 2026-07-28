@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import jakarta.inject.Named;
@@ -31,13 +31,13 @@ public class TextValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        if (!dataValue.isTextual()) {
+        if (!dataValue.isString()) {
             final String nodeType = dataValue.getNodeType().toString().toLowerCase();
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
                 dataFieldId));
         }
 
-        final String value = dataValue.textValue();
+        final String value = dataValue.stringValue(null);
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             String fieldValueSummary = getFieldValueSummary(value);

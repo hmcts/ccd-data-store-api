@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -107,7 +108,7 @@ class ElasticsearchQueryHelperTest {
     @Mock
     private UserRepository userRepository;
 
-    private final ObjectMapper objectMapperES = new ObjectMapper();
+    private final ObjectMapper objectMapperES = JsonMapper.builderWithJackson2Defaults().build();
 
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
@@ -235,7 +236,7 @@ class ElasticsearchQueryHelperTest {
             assertAll(
                 () -> assertTrue(elasticsearchRequest.getNativeSearchRequest().has("search_after")),
                 () -> assertThat(searchAfterNode.get(0).asLong(), is(123456789L)),
-                () -> assertThat(searchAfterNode.get(1).asText(), is("case-2"))
+                () -> assertThat(searchAfterNode.get(1).asString(), is("case-2"))
             );
         }
 
@@ -243,7 +244,7 @@ class ElasticsearchQueryHelperTest {
         void shouldConvertWrappedQueryToElasticSearchRequest() {
             String searchRequest
                 = """
-                    {"native_es_query":{"query":{}},"supplementary_data":["Field1","Field2"]}}
+                    {"native_es_query":{"query":{}},"supplementary_data":["Field1","Field2"]}
                 """;
 
             ElasticsearchRequest elasticsearchRequest
@@ -281,8 +282,8 @@ class ElasticsearchQueryHelperTest {
                 () -> assertFalse(rangeNode.has(TO)),
                 () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
                 () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
-                () -> assertThat(rangeNode.get(GT).asText(), is("2020-01-01")),
-                () -> assertThat(rangeNode.get(LT).asText(), is("2020-02-01"))
+                () -> assertThat(rangeNode.get(GT).asString(), is("2020-01-01")),
+                () -> assertThat(rangeNode.get(LT).asString(), is("2020-02-01"))
             );
         }
 
@@ -358,8 +359,8 @@ class ElasticsearchQueryHelperTest {
                 () -> assertFalse(rangeNode.has(TO)),
                 () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
                 () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
-                () -> assertThat(rangeNode.get(GTE).asText(), is("10")),
-                () -> assertThat(rangeNode.get(LT).asText(), is("101"))
+                () -> assertThat(rangeNode.get(GTE).asString(), is("10")),
+                () -> assertThat(rangeNode.get(LT).asString(), is("101"))
             );
         }
 
@@ -381,8 +382,8 @@ class ElasticsearchQueryHelperTest {
                 () -> assertFalse(rangeNode.has(TO)),
                 () -> assertFalse(rangeNode.has(INCLUDE_LOWER)),
                 () -> assertFalse(rangeNode.has(INCLUDE_UPPER)),
-                () -> assertThat(rangeNode.get(expectedLowerKey).asText(), is(expectedLowerValue)),
-                () -> assertThat(rangeNode.get(expectedUpperKey).asText(), is(expectedUpperValue))
+                () -> assertThat(rangeNode.get(expectedLowerKey).asString(), is(expectedLowerValue)),
+                () -> assertThat(rangeNode.get(expectedUpperKey).asString(), is(expectedUpperValue))
             );
         }
 
@@ -413,7 +414,7 @@ class ElasticsearchQueryHelperTest {
         @Test
         void shouldErrorWhenSupplementaryDataIsNotAnArray() {
             String searchRequest
-                = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}}";
+                = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}";
 
             BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
                 elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
@@ -427,7 +428,7 @@ class ElasticsearchQueryHelperTest {
         @Test
         void shouldErrorWhenSupplementaryDataIsAnArrayOfNonTextFields() {
             String searchRequest
-                = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
+                = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}";
 
             BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
                 elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));

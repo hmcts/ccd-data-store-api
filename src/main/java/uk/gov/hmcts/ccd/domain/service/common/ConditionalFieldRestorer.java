@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.extractAccessProfileNames;
 
 /**
@@ -105,7 +106,7 @@ public class ConditionalFieldRestorer {
         ObjectNode sanitizedObjectNode = initializeSanitizedObjectNode(sanitizedNode);
         ObjectNode existingObjectNode = (ObjectNode) existingNode;
 
-        existingObjectNode.fieldNames().forEachRemaining(fieldName -> {
+        existingObjectNode.propertyNames().forEach(fieldName -> {
             JsonNode existingSubField = existingObjectNode.get(fieldName);
             JsonNode sanitizedSubField = sanitizedObjectNode.get(fieldName);
 
@@ -242,7 +243,7 @@ public class ConditionalFieldRestorer {
     private boolean isNullId(JsonNode newItem) {
         return newItem.get(ID) == null
             || newItem.get(ID).equals(NullNode.getInstance())
-            || "null".equalsIgnoreCase(newItem.get(ID).asText());
+            || "null".equalsIgnoreCase(asText(newItem.get(ID)));
     }
 
     private boolean isNullNode(JsonNode node) {

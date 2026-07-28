@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -222,14 +222,14 @@ public interface AccessControlService {
         if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(jsonNode1 -> ((ObjectNode) jsonNode1.get(VALUE)).remove(childField.getId()));
         } else {
-            // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
-            // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
+            // We are getting class tools.jackson.databind.node.MissingNode cannot be cast to class
+            // tools.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
             // is added to check if the value exists.
             if (jsonNode instanceof ObjectNode) {
                 ((ObjectNode) jsonNode).remove(childField.getId());
             } else {
-                LOG.debug("Logging below details as we are getting com.fasterxml.jackson.databind.node.MissingNode "
-                    + " cannot be cast to class com.fasterxml.jackson.databind.node.ObjectNode");
+                LOG.debug("Logging below details as we are getting tools.jackson.databind.node.MissingNode "
+                    + " cannot be cast to class tools.jackson.databind.node.ObjectNode");
                 LOG.info("Can not find field with caseFieldId={}, accessControlList={}",
                     caseField.getId(), caseField.getAccessControlLists());
             }
@@ -562,7 +562,10 @@ public interface AccessControlService {
     }
 
     default Stream<String> getStream(JsonNode newData) {
-        return StreamSupport.stream(spliteratorUnknownSize(newData.fieldNames(), Spliterator.ORDERED), false);
+        return StreamSupport.stream(
+            spliteratorUnknownSize(newData.propertyNames().iterator(), Spliterator.ORDERED),
+            false
+        );
     }
 
     default boolean hasCaseEventAccess(String eventId,

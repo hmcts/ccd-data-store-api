@@ -4,7 +4,7 @@ import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

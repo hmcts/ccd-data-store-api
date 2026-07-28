@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 
@@ -56,7 +58,7 @@ class CaseDocumentTimestampServiceTest {
     private final String urlMicrosoft = "https://www.microsoft.com";
     private final String urlElastic = "https://www.elastic.com";
     private final String urlApple = "https://www.apple.com";
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
     private static final Clock FIXED_CLOCK =
         Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneOffset.UTC);
     private final JsonNode jsonRequestNode =
@@ -160,9 +162,9 @@ class CaseDocumentTimestampServiceTest {
         System.out.println("lstDocumentUrls:" + lstDocumentUrls);
         AtomicInteger countChanges = new AtomicInteger();
         lstJsonNodes.forEach(node -> {
-            if (lstDocumentUrls.contains(node.get(DOCUMENT_URL).asText())) {
+            if (lstDocumentUrls.contains(node.get(DOCUMENT_URL).asString())) {
                 countChanges.getAndIncrement();
-                System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
+                System.out.println("node - " + node.get(DOCUMENT_URL).asString() + " : " + node.get(UPLOAD_TIMESTAMP));
                 assertTrue(node.has(UPLOAD_TIMESTAMP));
             }
         });
@@ -177,8 +179,8 @@ class CaseDocumentTimestampServiceTest {
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
-        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
-        System.out.println(jsonNode.asText());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
+        System.out.println(asText(jsonNode));
     }
 
     @Test
@@ -188,14 +190,14 @@ class CaseDocumentTimestampServiceTest {
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
-        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
 
         String uploadTimestampNew = LocalDateTime.now().toString();
         underTest.insertUploadTimestamp(jsonNode, uploadTimestampNew);
-        assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
-        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+        assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
 
-        System.out.println(jsonNode.asText());
+        System.out.println(asText(jsonNode));
     }
 
     @Test
@@ -205,15 +207,15 @@ class CaseDocumentTimestampServiceTest {
 
         underTest.insertUploadTimestamp(jsonNode, uploadTimestamp);
         assertTrue(jsonNode.has(UPLOAD_TIMESTAMP));
-        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
-        System.out.println(jsonNode.asText());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
+        System.out.println(asText(jsonNode));
 
         String uploadTimestampNew = LocalDateTime.now().toString();
         underTest.insertUploadTimestamp(jsonNode, uploadTimestampNew);
-        assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
-        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).textValue());
+        assertNotEquals(uploadTimestampNew, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
+        assertEquals(uploadTimestamp, jsonNode.get(UPLOAD_TIMESTAMP).stringValue());
 
-        System.out.println(jsonNode.asText());
+        System.out.println(asText(jsonNode));
     }
 
     @Test
@@ -729,10 +731,10 @@ class CaseDocumentTimestampServiceTest {
         data.put("nullTypeField", nullTypeNode);
 
         // Complex field whose value is not an object -> non-object guard
-        data.put("complexField", objectMapper.getNodeFactory().textNode("notAnObject"));
+        data.put("complexField", objectMapper.getNodeFactory().stringNode("notAnObject"));
 
         // Collection field that is not an array -> !isArray guard
-        data.put("collectionNotArray", objectMapper.getNodeFactory().textNode("notArray"));
+        data.put("collectionNotArray", objectMapper.getNodeFactory().stringNode("notArray"));
 
         // Collection with item missing \"value\" -> itemValue null branch
         ObjectNode arrayItemNoValue = objectMapper.createObjectNode();
@@ -1014,7 +1016,7 @@ class CaseDocumentTimestampServiceTest {
 
         underTest.addUploadTimestamps(modified, original, docDef);
 
-        assertEquals("2023-01-01T00:00:00", docWithTimestamp.get(UPLOAD_TIMESTAMP).asText());
+        assertEquals("2023-01-01T00:00:00", docWithTimestamp.get(UPLOAD_TIMESTAMP).asString());
     }
 
     @Test
@@ -1385,7 +1387,7 @@ class CaseDocumentTimestampServiceTest {
         underTest.addUploadTimestamps(modified, original, caseTypeDefinition);
 
         JsonNode valueNode = modified.getData().get("textCollection").get(0).get("value");
-        assertTrue(valueNode.isTextual());
+        assertTrue(valueNode.isString());
     }
 
     @Test

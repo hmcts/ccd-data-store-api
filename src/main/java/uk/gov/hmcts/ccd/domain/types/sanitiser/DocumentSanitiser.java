@@ -11,9 +11,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -35,7 +35,7 @@ public class DocumentSanitiser implements Sanitiser {
     public static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     public static final String TYPE = "Document";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     private final DocumentManagementRestClient documentManagementRestClient;
     private final ApplicationParams applicationParams;
@@ -60,7 +60,7 @@ public class DocumentSanitiser implements Sanitiser {
             || fieldData.isNull()) {
             return fieldData;
         } else {
-            final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();
+            final String documentUrl = fieldData.get(DOCUMENT_URL).stringValue(null);
 
             sanitisedData.put(DOCUMENT_URL, documentUrl);
             Document document = retrieveDocument(fieldTypeDefinition, documentUrl);
@@ -71,15 +71,15 @@ public class DocumentSanitiser implements Sanitiser {
 
             final JsonNode documentHashNode = fieldData.get(DOCUMENT_HASH);
             if (documentHashNode != null) {
-                sanitisedData.put(DOCUMENT_HASH, documentHashNode.textValue());
+                sanitisedData.put(DOCUMENT_HASH, documentHashNode.stringValue(null));
             }
             final JsonNode documentCategoryId = fieldData.get(CATEGORY_ID);
             if (documentCategoryId != null) {
-                sanitisedData.put(CATEGORY_ID, documentCategoryId.textValue());
+                sanitisedData.put(CATEGORY_ID, documentCategoryId.stringValue(null));
             }
             final JsonNode documentUploadTimeStamp = fieldData.get(UPLOAD_TIMESTAMP);
             if (documentUploadTimeStamp != null) {
-                sanitisedData.put(UPLOAD_TIMESTAMP, documentUploadTimeStamp.textValue());
+                sanitisedData.put(UPLOAD_TIMESTAMP, documentUploadTimeStamp.stringValue(null));
             }
 
             validateDocumentFilename(fieldTypeDefinition, document);

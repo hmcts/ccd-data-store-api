@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -56,7 +57,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     @Mock
     private CaseDataService caseDataService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @BeforeEach
     void setUp() {
@@ -315,7 +316,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
             .id(uuid).build();
         caseAccessGroupForUIs.add(caseAccessGroupForUI);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         JsonNode data  = mapper.convertValue(caseAccessGroupForUIs, JsonNode.class);
         return data;
     }

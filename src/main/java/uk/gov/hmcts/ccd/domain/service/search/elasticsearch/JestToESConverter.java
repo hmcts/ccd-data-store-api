@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.SearchRequestBody;
 import co.elastic.clients.json.JsonpMapper;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.json.jackson.Jackson3JsonpMapper;
 import com.google.gson.Gson;
 import io.searchbox.core.Search;
 import jakarta.json.Json;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class JestToESConverter {
 
-    private static final JsonpMapper mapper = new JacksonJsonpMapper();
+    private static final JsonpMapper mapper = new Jackson3JsonpMapper();
     private static final Gson GSON = new Gson();
     private static final String INCLUDES = "includes";
     private static final String SOURCE = "_source";

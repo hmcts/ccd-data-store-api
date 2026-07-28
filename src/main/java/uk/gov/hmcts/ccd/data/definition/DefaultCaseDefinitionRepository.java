@@ -241,7 +241,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(applicationParams.jurisdictionDefURL());
             jurisdictionIds.ifPresent(ids -> builder.queryParam("ids", String.join(",", ids)));
 
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",

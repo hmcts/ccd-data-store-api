@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
+import org.springframework.hateoas.mediatype.hal.HalJacksonModule;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.test.annotation.DirtiesContext;
@@ -33,8 +34,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.inject.Inject;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -67,7 +68,9 @@ public class DocumentControllerITest extends WireMockBaseTest {
     protected DataSource db;
 
     private MockMvc mockMvc;
-    protected static final ObjectMapper mapper = new ObjectMapper();
+    protected static final JsonMapper mapper = JsonMapper.builder()
+        .addModule(new HalJacksonModule())
+        .build();
     private static final String caseTypeResponseString = """
         {\n
           \"id\": \"TestAddressBookCase\",\n
@@ -122,7 +125,6 @@ public class DocumentControllerITest extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
-        mapper.registerModule(new Jackson2HalModule());
     }
 
     @Test
@@ -144,6 +146,8 @@ public class DocumentControllerITest extends WireMockBaseTest {
                     .header(CUSTOM_CONTEXT, ClientContextUtil.encodeToBase64(new JSONObject(responseJson1).toString()))
                     .header("experimental", true))
             .andExpect(status().is(200))
+            .andExpect(jsonPath("$._links.self.href")
+                .value(hostUrl + "/cases/" + CASE_ID + "/documents"))
             .andReturn();
 
         final DocumentsResource documentsResource = mapper.readValue(result.getResponse().getContentAsString(),
