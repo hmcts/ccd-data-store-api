@@ -1,2 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress until="2026-10-31Z">
+        <notes><![CDATA[
+            CVE-2025-21199 affects the Azure Backup and Site Recovery agent installers, not the
+            Application Insights Java SDK. Remove this suppression when Dependency-Check no longer
+            maps applicationinsights-core to the microsoft:azure_agent CPE.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-core@3\.7\.9$</packageUrl>
+        <cve>CVE-2025-21199</cve>
+    </suppress>
+    <suppress until="2026-10-31Z">
+        <notes><![CDATA[
+            CVE-2026-53914 affects Kotlin build-cache metadata deserialization, not the JVM runtime
+            standard-library artifacts. Remove this suppression when Dependency-Check no longer
+            maps the runtime stdlib jars to the affected Kotlin build tooling.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-stdlib(?:-jdk7|-jdk8)?@2\.2\.21$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
 </suppressions>
