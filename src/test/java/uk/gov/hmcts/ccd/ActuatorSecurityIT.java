@@ -68,24 +68,32 @@ class ActuatorSecurityIT extends WireMockBaseTest {
         mockMvc.perform(get("/metrics/cache.hits"))
             .andExpect(status().isOk());
 
+        mockMvc.perform(get("/metrics/cache.hits.rate"))
+            .andExpect(status().isOk());
+
         mockMvc.perform(get("/metrics/cache.misses"))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/metrics/cache.loads"))
+        mockMvc.perform(get("/metrics/cache.misses.rate"))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/metrics/cache.eviction"))
+        mockMvc.perform(get("/metrics/cache.load.count"))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/metrics/cache.average"))
+        mockMvc.perform(get("/metrics/cache.average.load.penalty"))
             .andExpect(status().isOk());
-        mockMvc.perform(get("/metrics/cache.of"))
+
+        mockMvc.perform(get("/metrics/cache.eviction.count"))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/metrics/cache.eviction.weight"))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/metrics/cache.request.count"))
             .andExpect(status().isOk());
 
         mockMvc.perform(get("/metrics/cache.hitrate"))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/metrics/cache.puts"))
-            .andExpect(status().isOk());
     }
 }
