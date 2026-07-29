@@ -219,6 +219,14 @@ task integration(type: Test) {
     failFast = true
 }
 
+task aatTest(type: Test) {
+    description = "Runs JUnit AAT tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.aat.output.classesDirs
+    classpath = sourceSets.aat.runtimeClasspath
+    failFast = true
+}
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${junit}",
