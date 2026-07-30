@@ -16,6 +16,22 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment
 
 public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
+    /**
+     * Reserved namespace for every named parameter that carries an access control predicate value.
+     *
+     * <p>Access control parameters are bound into the same {@code Query} as the user supplied search criteria
+     * (see {@code SearchQueryFactoryOperation#build}), and the criteria are bound last. Without a reserved
+     * namespace a search field such as {@code case.region_1_basic} would sanitise down to the parameter name
+     * {@code region_1_basic} and silently overwrite the region restriction of the first basic grant type group.
+     *
+     * <p>The {@code $} is the part that makes this collision-proof rather than merely unlikely: user supplied
+     * field names are validated against {@code ^[A-Za-z0-9_.-]+$} in {@code FieldMapSanitizeOperation}, and
+     * {@code Criterion#buildParameterId} only ever removes characters, so no user input can produce a name in
+     * this namespace. {@code $} is not a parameter separator for either Hibernate or Spring's named parameter
+     * parsers, so it binds normally.
+     */
+    public static final String ACCESS_CONTROL_PARAM_PREFIX = "abac$";
+
     public static final String OR = " OR ";
 
     public static final String AND_NOT = " AND NOT ";
@@ -40,23 +56,25 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String AND = " AND ";
 
-    public static final String CASE_STATES_PARAM = "states_%s_%s";
+    public static final String CASE_STATES_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "states_%s_%s";
 
-    public static final String CLASSIFICATIONS_PARAM = "classifications_%s_%s";
+    public static final String CLASSIFICATIONS_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "classifications_%s_%s";
 
-    public static final String REFERENCES_PARAM = "references_%s_%s";
+    public static final String REFERENCES_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "references_%s_%s";
 
     public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
 
-    public static final String JURISDICTION_PARAM = "jurisdiction_%s_%s";
+    public static final String JURISDICTION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "jurisdiction_%s_%s";
 
-    public static final String REGION_PARAM = "region_%s_%s";
+    public static final String REGION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "region_%s_%s";
 
-    public static final String LOCATION_PARAM = "location_%s_%s";
+    public static final String LOCATION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "location_%s_%s";
 
-    public static final String CASE_ACCESS_GROUP_ID_PARAM = "case_access_group_id_%s_%s";
+    public static final String CASE_ACCESS_GROUP_ID_PARAM =
+        ACCESS_CONTROL_PARAM_PREFIX + "case_access_group_id_%s_%s";
 
-    public static final String CASE_ACCESS_CATEGORY_PARAM = "case_access_category_%s_%s";
+    public static final String CASE_ACCESS_CATEGORY_PARAM =
+        ACCESS_CONTROL_PARAM_PREFIX + "case_access_category_%s_%s";
 
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
                                        CaseDataAccessControl caseDataAccessControl,

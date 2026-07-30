@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.SqlParamAssert.assertBoundParams;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -41,8 +45,14 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
 
+    private static final Set<String> STATES = Set.of("CaseCreated");
+    private static final List<String> PRIVATE_CLASSIFICATIONS = List.of("PUBLIC", "PRIVATE");
+
+    private Map<String, Object> params;
+
     @BeforeEach
     void setUp() {
+        params = Maps.newHashMap();
         MockitoAnnotations.openMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeQueryBuilder(
             new BasicGrantTypeQueryBuilder(accessControlService, caseDataAccessControl, applicationParams),
@@ -61,9 +71,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     @Test
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(),
-            Maps.newHashMap(), caseTypeDefinition);
+            params, caseTypeDefinition);
         assertNotNull(query);
         assertTrue(StringUtils.isBlank(query));
+        assertTrue(params.isEmpty(), "a blank query must bind nothing, params were: " + params);
     }
 
     @Test
@@ -71,12 +82,15 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "ROLE1",
             "PRIVATE", "", "", null);
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(),
+            .createQuery(Lists.newArrayList(roleAssignment), params,
                 caseTypeDefinition);
-        String expectedValue =  " AND ( ( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) ) )";
+        String expectedValue =  " AND ( ( state in (:abac$states_1_basic) "
+            + "AND security_classification in (:abac$classifications_1_basic) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", STATES,
+            "abac$classifications_1_basic", PRIVATE_CLASSIFICATIONS);
     }
 
 
@@ -90,15 +104,23 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment,
                 specificRoleAssignment),
-                Maps.newHashMap(),
+                params,
                 caseTypeDefinition);
         String expectedValue = """
-             AND ( ( ( state in (:states_1_basic) \
-            AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction = :jurisdiction_1_specific \
-            AND reference in (:references_1_specific) AND state in (:states_1_specific) \
-            AND security_classification in (:classifications_1_specific) ) ) )""";
+             AND ( ( ( state in (:abac$states_1_basic) \
+            AND security_classification in (:abac$classifications_1_basic) ) \
+            OR ( jurisdiction = :abac$jurisdiction_1_specific \
+            AND reference in (:abac$references_1_specific) AND state in (:abac$states_1_specific) \
+            AND security_classification in (:abac$classifications_1_specific) ) ) )""";
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", STATES,
+            "abac$classifications_1_basic", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_specific", "Test",
+            "abac$references_1_specific", List.of("caseId1"),
+            "abac$states_1_specific", STATES,
+            "abac$classifications_1_specific", PRIVATE_CLASSIFICATIONS);
     }
 
     @Test
@@ -118,25 +140,42 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             null, "caseId1");
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment),
-            Maps.newHashMap(), caseTypeDefinition);
+            params, caseTypeDefinition);
 
         String expectedValue = """
-             AND ( ( ( state in (:states_1_basic) \
-            AND security_classification in (:classifications_1_basic) ) OR\
-             ( jurisdiction = :jurisdiction_1_specific \
-            AND reference in (:references_1_specific) AND state in (:states_1_specific) \
-            AND security_classification in (:classifications_1_specific) ) ) OR ( ( \
-            jurisdiction = :jurisdiction_1_standard \
-            AND data #>> '{caseManagementLocation,region}' = :region_1_standard \
-            AND data #>> '{caseManagementLocation,baseLocation}' = :location_1_standard \
-            AND reference in (:references_1_standard) AND state in (:states_1_standard) \
-            AND security_classification in (:classifications_1_standard) ) OR ( \
-            jurisdiction = :jurisdiction_1_challenged \
-            AND reference in (:references_1_challenged) AND state in (:states_1_challenged) \
-            AND security_classification in (:classifications_1_challenged) ) ) )""";
+             AND ( ( ( state in (:abac$states_1_basic) \
+            AND security_classification in (:abac$classifications_1_basic) ) OR\
+             ( jurisdiction = :abac$jurisdiction_1_specific \
+            AND reference in (:abac$references_1_specific) AND state in (:abac$states_1_specific) \
+            AND security_classification in (:abac$classifications_1_specific) ) ) OR ( ( \
+            jurisdiction = :abac$jurisdiction_1_standard \
+            AND data #>> '{caseManagementLocation,region}' = :abac$region_1_standard \
+            AND data #>> '{caseManagementLocation,baseLocation}' = :abac$location_1_standard \
+            AND reference in (:abac$references_1_standard) AND state in (:abac$states_1_standard) \
+            AND security_classification in (:abac$classifications_1_standard) ) OR ( \
+            jurisdiction = :abac$jurisdiction_1_challenged \
+            AND reference in (:abac$references_1_challenged) AND state in (:abac$states_1_challenged) \
+            AND security_classification in (:abac$classifications_1_challenged) ) ) )""";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", STATES,
+            "abac$classifications_1_basic", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_specific", "Test",
+            "abac$references_1_specific", List.of("caseId1"),
+            "abac$states_1_specific", STATES,
+            "abac$classifications_1_specific", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_standard", "Test",
+            "abac$region_1_standard", "reg1",
+            "abac$location_1_standard", "loc1",
+            "abac$references_1_standard", List.of("caseId1"),
+            "abac$states_1_standard", STATES,
+            "abac$classifications_1_standard", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_challenged", "Test",
+            "abac$references_1_challenged", List.of("caseId1"),
+            "abac$states_1_challenged", STATES,
+            "abac$classifications_1_challenged", PRIVATE_CLASSIFICATIONS);
     }
 
     @Test
@@ -162,24 +201,45 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment,
             standardRoleAssignment, excludedRoleAssignment),
-            Maps.newHashMap(),
+            params,
             caseTypeDefinition);
 
-        String expectedValue =  " AND ( ( ( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) ) "
-            + "OR ( jurisdiction = :jurisdiction_1_specific AND reference in (:references_1_specific) "
-            + "AND state in (:states_1_specific) AND security_classification in (:classifications_1_specific) ) ) "
-            + "OR ( ( ( jurisdiction = :jurisdiction_1_standard "
-            + "AND data #>> '{caseManagementLocation,region}' = :region_1_standard "
-            + "AND data #>> '{caseManagementLocation,baseLocation}' = :location_1_standard "
-            + "AND reference in (:references_1_standard) "
-            + "AND state in (:states_1_standard) AND security_classification in (:classifications_1_standard) ) "
-            + "OR ( jurisdiction = :jurisdiction_1_challenged AND reference in (:references_1_challenged) "
-            + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
-            + "AND NOT reference in (:case_ids_excluded) ) )";
+        String expectedValue =  " AND ( ( ( state in (:abac$states_1_basic) "
+            + "AND security_classification in (:abac$classifications_1_basic) ) "
+            + "OR ( jurisdiction = :abac$jurisdiction_1_specific AND reference in (:abac$references_1_specific) "
+            + "AND state in (:abac$states_1_specific) "
+            + "AND security_classification in (:abac$classifications_1_specific) ) ) "
+            + "OR ( ( ( jurisdiction = :abac$jurisdiction_1_standard "
+            + "AND data #>> '{caseManagementLocation,region}' = :abac$region_1_standard "
+            + "AND data #>> '{caseManagementLocation,baseLocation}' = :abac$location_1_standard "
+            + "AND reference in (:abac$references_1_standard) "
+            + "AND state in (:abac$states_1_standard) "
+            + "AND security_classification in (:abac$classifications_1_standard) ) "
+            + "OR ( jurisdiction = :abac$jurisdiction_1_challenged AND reference in (:abac$references_1_challenged) "
+            + "AND state in (:abac$states_1_challenged) "
+            + "AND security_classification in (:abac$classifications_1_challenged) ) ) "
+            + "AND NOT reference in (:abac$case_ids_excluded) ) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", STATES,
+            "abac$classifications_1_basic", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_specific", "Test",
+            "abac$references_1_specific", List.of("caseId1"),
+            "abac$states_1_specific", STATES,
+            "abac$classifications_1_specific", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_standard", "Test",
+            "abac$region_1_standard", "reg1",
+            "abac$location_1_standard", "loc1",
+            "abac$references_1_standard", List.of("caseId1"),
+            "abac$states_1_standard", STATES,
+            "abac$classifications_1_standard", PRIVATE_CLASSIFICATIONS,
+            "abac$jurisdiction_1_challenged", "Test",
+            "abac$references_1_challenged", List.of("caseId1"),
+            "abac$states_1_challenged", STATES,
+            "abac$classifications_1_challenged", PRIVATE_CLASSIFICATIONS,
+            "abac$case_ids_excluded", Set.of("caseId1"));
     }
 
     @Test
@@ -195,16 +255,23 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(challengedRoleAssignment,
                 excludedRoleAssignment),
-                Maps.newHashMap(),
+                params,
                 caseTypeDefinition);
 
-        String expectedValue =  " AND ( ( ( jurisdiction = :jurisdiction_1_challenged "
-            + "AND reference in (:references_1_challenged) "
-            + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
-            + "AND NOT reference in (:case_ids_excluded) )";
+        String expectedValue =  " AND ( ( ( jurisdiction = :abac$jurisdiction_1_challenged "
+            + "AND reference in (:abac$references_1_challenged) "
+            + "AND state in (:abac$states_1_challenged) "
+            + "AND security_classification in (:abac$classifications_1_challenged) ) ) "
+            + "AND NOT reference in (:abac$case_ids_excluded) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$jurisdiction_1_challenged", "Test",
+            "abac$references_1_challenged", List.of("caseId1"),
+            "abac$states_1_challenged", STATES,
+            "abac$classifications_1_challenged", PRIVATE_CLASSIFICATIONS,
+            "abac$case_ids_excluded", Set.of("caseId1"));
     }
 
     @Test
@@ -218,15 +285,19 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment, excludedRoleAssignment),
-                Maps.newHashMap(),
+                params,
                 caseTypeDefinition);
 
-        String expectedValue =  " AND ( ( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) ) "
-            + "AND NOT reference in (:case_ids_excluded) )";
+        String expectedValue =  " AND ( ( state in (:abac$states_1_basic) "
+            + "AND security_classification in (:abac$classifications_1_basic) ) "
+            + "AND NOT reference in (:abac$case_ids_excluded) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", STATES,
+            "abac$classifications_1_basic", PRIVATE_CLASSIFICATIONS,
+            "abac$case_ids_excluded", Set.of("caseId1"));
     }
 
     @Test
@@ -237,15 +308,20 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(challengedRoleAssignment),
-                Maps.newHashMap(),
+                params,
                 caseTypeDefinition);
 
-        String expectedValue = " AND ( ( ( jurisdiction = :jurisdiction_1_challenged "
-            + "AND reference in (:references_1_challenged) "
-            + "AND state in (:states_1_challenged) "
-            + "AND security_classification in (:classifications_1_challenged) ) ) )";
+        String expectedValue = " AND ( ( ( jurisdiction = :abac$jurisdiction_1_challenged "
+            + "AND reference in (:abac$references_1_challenged) "
+            + "AND state in (:abac$states_1_challenged) "
+            + "AND security_classification in (:abac$classifications_1_challenged) ) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$jurisdiction_1_challenged", "Test",
+            "abac$references_1_challenged", List.of("caseId1"),
+            "abac$states_1_challenged", STATES,
+            "abac$classifications_1_challenged", PRIVATE_CLASSIFICATIONS);
     }
 
     @Test
@@ -256,12 +332,14 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(excludedRoleAssignment),
-                Maps.newHashMap(),
+                params,
                 caseTypeDefinition);
 
-        String expectedValue =  " AND NOT reference in (:case_ids_excluded)";
+        String expectedValue =  " AND NOT reference in (:abac$case_ids_excluded)";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+        assertBoundParams(query, params,
+            "abac$case_ids_excluded", Set.of("caseId1"));
     }
 }

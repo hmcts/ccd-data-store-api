@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.SqlParamAssert.assertBoundParams;
 
 /**
  * Security regression tests for {@link GrantTypeSqlQueryBuilder} (exercised through the concrete
@@ -91,16 +92,16 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains(GrantTypeSqlQueryBuilder.JURISDICTION + " = :jurisdiction_1_basic"),
+        assertTrue(query.contains(GrantTypeSqlQueryBuilder.JURISDICTION + " = :abac$jurisdiction_1_basic"),
             "expected a bound placeholder, but was: " + query);
         assertFalse(query.contains(QUOTE_PAYLOAD),
             "payload must not appear in SQL text, but was: " + query);
-        assertEquals(QUOTE_PAYLOAD, params.get("jurisdiction_1_basic"),
+        assertEquals(QUOTE_PAYLOAD, params.get("abac$jurisdiction_1_basic"),
             "expected the payload to be bound under the suffixed key, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "jurisdiction_1_basic", QUOTE_PAYLOAD);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$jurisdiction_1_basic", QUOTE_PAYLOAD);
     }
 
     @Test
@@ -113,16 +114,16 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains(GrantTypeSqlQueryBuilder.REGION + " = :region_1_basic"),
+        assertTrue(query.contains(GrantTypeSqlQueryBuilder.REGION + " = :abac$region_1_basic"),
             "expected a bound placeholder, but was: " + query);
         assertFalse(query.contains(QUOTE_PAYLOAD),
             "payload must not appear in SQL text, but was: " + query);
-        assertEquals(QUOTE_PAYLOAD, params.get("region_1_basic"),
+        assertEquals(QUOTE_PAYLOAD, params.get("abac$region_1_basic"),
             "expected the payload to be bound under the suffixed key, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "region_1_basic", QUOTE_PAYLOAD);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$region_1_basic", QUOTE_PAYLOAD);
     }
 
     @Test
@@ -135,16 +136,16 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains(GrantTypeSqlQueryBuilder.LOCATION + " = :location_1_basic"),
+        assertTrue(query.contains(GrantTypeSqlQueryBuilder.LOCATION + " = :abac$location_1_basic"),
             "expected a bound placeholder, but was: " + query);
         assertFalse(query.contains(QUOTE_PAYLOAD),
             "payload must not appear in SQL text, but was: " + query);
-        assertEquals(QUOTE_PAYLOAD, params.get("location_1_basic"),
+        assertEquals(QUOTE_PAYLOAD, params.get("abac$location_1_basic"),
             "expected the payload to be bound under the suffixed key, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "location_1_basic", QUOTE_PAYLOAD);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$location_1_basic", QUOTE_PAYLOAD);
     }
 
     @Test
@@ -159,17 +160,17 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
             caseTypeDefinition);
 
         assertTrue(query.contains("data->'CaseAccessGroups' @> jsonb_build_array(jsonb_build_object("
-                + "'value', jsonb_build_object('caseAccessGroupId', CAST(:case_access_group_id_1_basic "
+                + "'value', jsonb_build_object('caseAccessGroupId', CAST(:abac$case_access_group_id_1_basic "
                 + "AS text))))"),
             "expected a bound JSONB containment, but was: " + query);
         assertFalse(query.contains(QUOTE_PAYLOAD),
             "payload must not appear in SQL text, but was: " + query);
-        assertEquals(QUOTE_PAYLOAD, params.get("case_access_group_id_1_basic"),
+        assertEquals(QUOTE_PAYLOAD, params.get("abac$case_access_group_id_1_basic"),
             "expected the payload to be bound under the suffixed key, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "case_access_group_id_1_basic", QUOTE_PAYLOAD);
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$case_access_group_id_1_basic", QUOTE_PAYLOAD);
     }
 
     @Test
@@ -182,16 +183,16 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains("reference in (:references_1_basic)"),
+        assertTrue(query.contains("reference in (:abac$references_1_basic)"),
             "expected a bound placeholder, but was: " + query);
         assertFalse(query.contains(QUOTE_PAYLOAD),
             "payload must not appear in SQL text, but was: " + query);
         assertTrue(paramsContainValue(params),
             "expected the payload to be bound as a parameter, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "references_1_basic", List.of(QUOTE_PAYLOAD));
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$references_1_basic", List.of(QUOTE_PAYLOAD));
     }
 
     @Test
@@ -211,16 +212,16 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
             params, caseTypeDefinition);
 
         assertTrue(query.contains(GrantTypeSqlQueryBuilder.CASE_ACCESS_CATEGORY
-                + " LIKE :case_access_category_1_1_basic ESCAPE '\\'"),
+                + " LIKE :abac$case_access_category_1_1_basic ESCAPE '\\'"),
             "expected a bound LIKE pattern with an ESCAPE clause, but was: " + query);
         assertFalse(query.contains("LIKE 'a%b_c%'"),
             "the raw wildcard literal must no longer be concatenated, but was: " + query);
-        assertEquals("a\\%b\\_c%", params.get("case_access_category_1_1_basic"),
+        assertEquals("a\\%b\\_c%", params.get("abac$case_access_category_1_1_basic"),
             "expected the input wildcards escaped in the bound value, params were: " + params);
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC"),
-            "case_access_category_1_1_basic", "a\\%b\\_c%");
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC"),
+            "abac$case_access_category_1_1_basic", "a\\%b\\_c%");
     }
 
     @Test
@@ -245,7 +246,7 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
             params, caseTypeDefinition);
 
         assertTrue(query.contains(GrantTypeSqlQueryBuilder.CASE_ACCESS_CATEGORY
-                + " LIKE :case_access_category_1_1_basic ESCAPE '\\'"),
+                + " LIKE :abac$case_access_category_1_1_basic ESCAPE '\\'"),
             "expected the LIKE pattern to keep its explicit ESCAPE '\\' clause, but was: " + query);
     }
 
@@ -261,27 +262,27 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(groupOne, groupTwo), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains(":region_1_basic") && query.contains(":region_2_basic"),
+        assertTrue(query.contains(":abac$region_1_basic") && query.contains(":abac$region_2_basic"),
             "expected two distinct region placeholders, but was: " + query);
-        assertNotEquals("region_1_basic", "region_2_basic");
+        assertNotEquals("abac$region_1_basic", "abac$region_2_basic");
 
-        assertTrue(params.containsKey("region_1_basic") && params.containsKey("region_2_basic"),
+        assertTrue(params.containsKey("abac$region_1_basic") && params.containsKey("abac$region_2_basic"),
             "expected both suffixed region keys, params were: " + params);
         assertEquals(Sets.newHashSet("REGION-A", "REGION-B"),
-            Sets.newHashSet(params.get("region_1_basic"), params.get("region_2_basic")),
+            Sets.newHashSet(params.get("abac$region_1_basic"), params.get("abac$region_2_basic")),
             "both region values must be retrievable under distinct keys, params were: " + params);
 
-        assertTrue(query.contains(":jurisdiction_1_basic") && query.contains(":jurisdiction_2_basic"),
+        assertTrue(query.contains(":abac$jurisdiction_1_basic") && query.contains(":abac$jurisdiction_2_basic"),
             "expected two distinct jurisdiction placeholders, but was: " + query);
         assertEquals(Sets.newHashSet("JUR-A", "JUR-B"),
-            Sets.newHashSet(params.get("jurisdiction_1_basic"), params.get("jurisdiction_2_basic")),
+            Sets.newHashSet(params.get("abac$jurisdiction_1_basic"), params.get("abac$jurisdiction_2_basic")),
             "both jurisdiction values must be retrievable under distinct keys, params were: " + params);
 
         assertEquals(8, params.size(), "unexpected number of bound params, params were: " + params);
-        assertEquals(Set.of("CaseCreated"), params.get("states_1_basic"));
-        assertEquals(Set.of("CaseCreated"), params.get("states_2_basic"));
-        assertEquals(List.of("PUBLIC", "PRIVATE"), params.get("classifications_1_basic"));
-        assertEquals(List.of("PUBLIC", "PRIVATE"), params.get("classifications_2_basic"));
+        assertEquals(Set.of("CaseCreated"), params.get("abac$states_1_basic"));
+        assertEquals(Set.of("CaseCreated"), params.get("abac$states_2_basic"));
+        assertEquals(List.of("PUBLIC", "PRIVATE"), params.get("abac$classifications_1_basic"));
+        assertEquals(List.of("PUBLIC", "PRIVATE"), params.get("abac$classifications_2_basic"));
     }
 
     @Test
@@ -294,13 +295,13 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains("jurisdiction = :jurisdiction_1_basic"),
+        assertTrue(query.contains("jurisdiction = :abac$jurisdiction_1_basic"),
             "expected the real jurisdiction column bound, but was: " + query);
-        assertEquals("PROBATE", params.get("jurisdiction_1_basic"));
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "jurisdiction_1_basic", "PROBATE");
+        assertEquals("PROBATE", params.get("abac$jurisdiction_1_basic"));
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$jurisdiction_1_basic", "PROBATE");
     }
 
     @Test
@@ -313,13 +314,13 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains("data #>> '{caseManagementLocation,region}' = :region_1_basic"),
+        assertTrue(query.contains("data #>> '{caseManagementLocation,region}' = :abac$region_1_basic"),
             "expected the real region column bound, but was: " + query);
-        assertEquals("GB-EAST", params.get("region_1_basic"));
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "region_1_basic", "GB-EAST");
+        assertEquals("GB-EAST", params.get("abac$region_1_basic"));
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$region_1_basic", "GB-EAST");
     }
 
     @Test
@@ -332,13 +333,13 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
         String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params,
             caseTypeDefinition);
 
-        assertTrue(query.contains("data #>> '{caseManagementLocation,baseLocation}' = :location_1_basic"),
+        assertTrue(query.contains("data #>> '{caseManagementLocation,baseLocation}' = :abac$location_1_basic"),
             "expected the real location column bound, but was: " + query);
-        assertEquals("LOC-1", params.get("location_1_basic"));
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "location_1_basic", "LOC-1");
+        assertEquals("LOC-1", params.get("abac$location_1_basic"));
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$location_1_basic", "LOC-1");
     }
 
     @Test
@@ -354,14 +355,50 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
             caseTypeDefinition);
 
         assertTrue(query.contains("data->'CaseAccessGroups' @> jsonb_build_array(jsonb_build_object("
-                + "'value', jsonb_build_object('caseAccessGroupId', CAST(:case_access_group_id_1_basic "
+                + "'value', jsonb_build_object('caseAccessGroupId', CAST(:abac$case_access_group_id_1_basic "
                 + "AS text))))"),
             "expected jsonb_build containment around the bound value, but was: " + query);
-        assertEquals("GRP-1", params.get("case_access_group_id_1_basic"));
-        assertParamsExactly(params,
-            "states_1_basic", Set.of("CaseCreated"),
-            "classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
-            "case_access_group_id_1_basic", "GRP-1");
+        assertEquals("GRP-1", params.get("abac$case_access_group_id_1_basic"));
+        assertBoundParams(query, params,
+            "abac$states_1_basic", Set.of("CaseCreated"),
+            "abac$classifications_1_basic", List.of("PUBLIC", "PRIVATE"),
+            "abac$case_access_group_id_1_basic", "GRP-1");
+    }
+
+    @Test
+    @DisplayName("Every emitted parameter sits in the reserved namespace, unreachable from a search field")
+    void allParams_useReservedNamespace_soASearchFieldCannotRebindThem() {
+        // These params are bound into the same query as the user's search criteria, and the criteria are
+        // bound last (SearchQueryFactoryOperation#build). Before the reserved prefix, `case.region_1_basic`
+        // sanitised to `region_1_basic` and silently replaced this builder's region restriction.
+        when(applicationParams.getCaseGroupAccessFilteringEnabled()).thenReturn(true);
+
+        AccessProfile accessProfile = mock(AccessProfile.class);
+        when(accessProfile.getAccessProfile()).thenReturn("ROLE1");
+        when(accessProfile.getCaseAccessCategories()).thenReturn("CIVIL");
+        when(caseDataAccessControl.filteredAccessProfiles(anyList(), any(CaseTypeDefinition.class),
+            anyBoolean())).thenReturn(Sets.newHashSet(accessProfile));
+
+        Map<String, Object> params = Maps.newHashMap();
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "ROLE1",
+            "PRIVATE", "PROBATE", "LOC-1", "GB-EAST", null,
+            "1234567890123456", "GRP-1");
+
+        String query = queryBuilder.createQuery(Lists.newArrayList(roleAssignment), params, caseTypeDefinition);
+
+        assertFalse(params.isEmpty(), "the builder produced no params - the test would prove nothing");
+        params.keySet().forEach(param -> {
+            assertTrue(param.startsWith(GrantTypeSqlQueryBuilder.ACCESS_CONTROL_PARAM_PREFIX),
+                "'" + param + "' is outside the reserved namespace and can be rebound by a search field");
+            assertFalse(param.substring(GrantTypeSqlQueryBuilder.ACCESS_CONTROL_PARAM_PREFIX.length())
+                    .contains(GrantTypeSqlQueryBuilder.ACCESS_CONTROL_PARAM_PREFIX),
+                "'" + param + "' is double-prefixed");
+            assertTrue(query.contains(":" + param),
+                "'" + param + "' is bound but no longer referenced by the SQL: " + query);
+        });
+        assertFalse(GrantTypeSqlQueryBuilder.ACCESS_CONTROL_PARAM_PREFIX.matches("[A-Za-z0-9_.\\-]+"),
+            "the prefix must use a character that FieldMapSanitizeOperation's field name validation rejects, "
+                + "otherwise a search field could still be crafted to land inside the namespace");
     }
 
     private boolean paramsContainValue(Map<String, Object> params) {
@@ -369,15 +406,5 @@ class GrantTypeSqlQueryBuilderSecurityTest extends GrantTypeQueryBuilderTest {
             paramValue instanceof Collection
                 ? ((Collection<?>) paramValue).contains(GrantTypeSqlQueryBuilderSecurityTest.QUOTE_PAYLOAD)
                 : GrantTypeSqlQueryBuilderSecurityTest.QUOTE_PAYLOAD.equals(paramValue));
-    }
-
-    private void assertParamsExactly(Map<String, Object> params, Object... expectedKeyValues) {
-        assertEquals(expectedKeyValues.length / 2, params.size(),
-            "unexpected number of bound params, params were: " + params);
-        for (int i = 0; i < expectedKeyValues.length; i += 2) {
-            String key = (String) expectedKeyValues[i];
-            assertEquals(expectedKeyValues[i + 1], params.get(key),
-                "wrong bound value for '" + key + "', params were: " + params);
-        }
     }
 }

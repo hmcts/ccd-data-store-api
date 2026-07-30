@@ -38,6 +38,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.SqlParamAssert.assertParamsMatchQuery;
 
 /**
  * Executes the clause produced by {@link GrantTypeSqlQueryBuilder} (through the concrete
@@ -142,6 +143,7 @@ public class GrantTypeSqlQueryBuilderIT extends WireMockBaseTest {
         String clause = queryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
         assertTrue(clause != null && !clause.isBlank(),
             "builder produced no clause - the test would prove nothing");
+        assertParamsMatchQuery(clause, params);
         return execute(clause, params);
     }
 
@@ -276,8 +278,9 @@ public class GrantTypeSqlQueryBuilderIT extends WireMockBaseTest {
             Lists.newArrayList(basicRoleAssignment("PROBATE", null, null,
                 null)), params, caseTypeDefinition);
 
-        assertEquals("( jurisdiction = :jurisdiction_1_basic )", clause);
-        assertEquals("PROBATE", params.get("jurisdiction_1_basic"));
+        assertEquals("( jurisdiction = :abac$jurisdiction_1_basic )", clause);
+        assertEquals("PROBATE", params.get("abac$jurisdiction_1_basic"));
+        assertParamsMatchQuery(clause, params);
 
         String probateRef = "4444000000000001";
         String divorceRef = "4444000000000002";
@@ -297,9 +300,10 @@ public class GrantTypeSqlQueryBuilderIT extends WireMockBaseTest {
             Lists.newArrayList(basicRoleAssignment(QUOTE_PAYLOAD, null, null, null)),
             params, caseTypeDefinition);
 
-        assertEquals("( jurisdiction = :jurisdiction_1_basic )", clause);
+        assertEquals("( jurisdiction = :abac$jurisdiction_1_basic )", clause);
         assertFalse(clause.contains(QUOTE_PAYLOAD), "payload must not appear in SQL text: " + clause);
-        assertEquals(QUOTE_PAYLOAD, params.get("jurisdiction_1_basic"));
+        assertEquals(QUOTE_PAYLOAD, params.get("abac$jurisdiction_1_basic"));
+        assertParamsMatchQuery(clause, params);
 
         String probateRef = "4444000000000011";
         seedCase(probateRef, "PROBATE", "{}");
@@ -308,6 +312,45 @@ public class GrantTypeSqlQueryBuilderIT extends WireMockBaseTest {
 
         assertTrue(returned.isEmpty(),
             "the bound payload must match no rows (treated as literal data), returned: " + returned);
+    }
+
+    @Test
+    @DisplayName("A search field named after the region ABAC param cannot rebind it and widen the results")
+    void searchFieldSharingAbacParamName_cannotWidenResults() {
+        String grantedRef = "6666000000000001";
+        String otherRef = "6666000000000002";
+        seedCase(grantedRef, "PROBATE", locationRegionData("LOC-1", "GB-EAST"));
+        seedCase(otherRef, "PROBATE", locationRegionData("LOC-1", "GB-WEST"));
+
+        Map<String, Object> params = new HashMap<>();
+        String abacClause = queryBuilder.createQuery(
+            Lists.newArrayList(basicRoleAssignment(null, null, "GB-EAST", null)),
+            params, caseTypeDefinition);
+
+        // `case.region_1_basic=GB-WEST` sanitises to the parameter name that the region predicate used to use.
+        String searchField = String.format(GrantTypeSqlQueryBuilder.REGION_PARAM, 1, "basic")
+            .substring(GrantTypeSqlQueryBuilder.ACCESS_CONTROL_PARAM_PREFIX.length());
+        assertFalse(params.containsKey(searchField),
+            "the ABAC region param must not sit in the namespace a search field can reach");
+
+        Query query = entityManager.createNativeQuery(
+            "SELECT reference FROM case_data WHERE " + abacClause
+                + " AND data #>> '{caseManagementLocation,region}' = :" + searchField);
+        // production binding order: access control params first, user criteria last
+        params.forEach(query::setParameter);
+        query.setParameter(searchField, "GB-WEST");
+
+        @SuppressWarnings("unchecked")
+        Set<String> returned = ((List<Object>) query.getResultList()).stream()
+            .map(String::valueOf)
+            .collect(Collectors.toSet());
+
+        assertTrue(returned.isEmpty(),
+            "the ABAC region restriction (GB-EAST) must still apply and contradict the search field (GB-WEST), "
+                + "returned: " + returned);
+        assertFalse(returned.contains(otherRef),
+            "a case outside the granted region must never be reachable by naming a search field after an "
+                + "ABAC parameter");
     }
 
     @Test
