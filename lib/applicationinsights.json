@@ -22,7 +22,7 @@
           "attributes": [
             {
               "key": "http.url",
-              "value": "https?://[^/]+/metrics.*",
+              "value": "https?://[^/]+/metrics/[^?]+\\?tag=cache:[^&]+$",
               "matchType": "regexp"
             }
           ],

@@ -31,6 +31,11 @@ public class CaffeineCacheRateMetricsBinder implements MeterBinder {
                     .tag(CACHE, cacheName)
                     .register(registry);
 
+                FunctionCounter.builder("cache.hits", nativeCache, c -> c.stats().hitCount())
+                    .description("The number of cache Hit Count")
+                    .tag(CACHE, cacheName)
+                    .register(registry);
+
                 FunctionCounter.builder("cache.hits.rate", nativeCache, c -> c.stats().hitRate())
                     .description("The number of cache Hit Rate")
                     .tag(CACHE, cacheName)
