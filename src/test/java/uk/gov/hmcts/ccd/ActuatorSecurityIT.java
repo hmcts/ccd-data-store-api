@@ -92,7 +92,10 @@ class ActuatorSecurityIT extends WireMockBaseTest {
         mockMvc.perform(get("/metrics/cache.request.count"))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/metrics/cache.hitrate"))
+        mockMvc.perform(get("/metrics/cache.puts"))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/metrics/cache.size"))
             .andExpect(status().isOk());
 
     }

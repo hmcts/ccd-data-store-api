@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.config;
 
 import io.micrometer.core.instrument.FunctionCounter;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -20,7 +20,7 @@ public class CaffeineCacheRateMetricsBinder implements MeterBinder {
     }
 
     @Override
-    public void bindTo(MeterRegistry registry) {
+    public void bindTo(@NonNull MeterRegistry registry) {
         cacheManager.getCacheNames().forEach(cacheName -> {
             Cache cache = cacheManager.getCache(cacheName);
             if (cache instanceof CaffeineCache caffeineCache) {
@@ -36,47 +36,46 @@ public class CaffeineCacheRateMetricsBinder implements MeterBinder {
                     .tag(CACHE, cacheName)
                     .register(registry);
 
-
                 FunctionCounter.builder("cache.misses", nativeCache, c -> c.stats().missCount())
                     .description("The number of cache Miss Count")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.misses.rate", nativeCache, c -> c.stats().missRate())
-                    .description("The number of cache Miss Rate")
+                    .description("The number of cache miss rate")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.load.count", nativeCache, c -> c.stats().loadCount())
-                    .description("The number of cache Load Count")
+                    .description("The number of cache load count")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.average.load.penalty", nativeCache, c -> c.stats().averageLoadPenalty())
-                    .description("The number of cache Average Load Penalty")
+                    .description("The number of cache average load penalty")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.eviction.count", nativeCache, c -> c.stats().evictionCount())
-                    .description("The number of cache Eviction Count")
+                    .description("The number of cache eviction count")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.eviction.weight", nativeCache, c -> c.stats().evictionWeight())
-                    .description("The number of cache Eviction Weight")
+                    .description("The number of cache eviction weight")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
                 FunctionCounter.builder("cache.request.count", nativeCache, c -> c.stats().requestCount())
-                    .description("The number of cache Request Count")
+                    .description("The number of cache request count")
                     .tag(CACHE, cacheName)
                     .register(registry);
 
-
-                Gauge.builder("cache.hitrate", nativeCache, c -> c.stats().hitRate())
-                    .description("The cache hit rate")
+                FunctionCounter.builder("cache.puts", nativeCache, c -> c.stats().loadSuccessCount())
+                    .description("The number of cache puts (load success count)")
                     .tag(CACHE, cacheName)
                     .register(registry);
+
             }
         });
     }
