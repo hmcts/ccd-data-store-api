@@ -77,16 +77,32 @@ class CaffeineCacheRateMetricsBinderTest {
             () -> assertEquals(cacheTwoStats.loadCount(), metricValue(registry, "cache.load.count", CACHE_TWO), DELTA),
             () -> assertEquals(cacheOneStats.averageLoadPenalty(),
                 metricValue(registry, "cache.average.load.penalty", CACHE_ONE), DELTA),
+
             () -> assertEquals(cacheTwoStats.averageLoadPenalty(),
                 metricValue(registry, "cache.average.load.penalty", CACHE_TWO), DELTA),
-            () -> assertEquals(cacheOneStats.evictionCount(), metricValue(registry, "cache.eviction.count", CACHE_ONE), DELTA),
-            () -> assertEquals(cacheTwoStats.evictionCount(), metricValue(registry, "cache.eviction.count", CACHE_TWO), DELTA),
-            () -> assertEquals(cacheOneStats.evictionWeight(), metricValue(registry, "cache.eviction.weight", CACHE_ONE), DELTA),
-            () -> assertEquals(cacheTwoStats.evictionWeight(), metricValue(registry, "cache.eviction.weight", CACHE_TWO), DELTA),
-            () -> assertEquals(cacheOneStats.requestCount(), metricValue(registry, "cache.request.count", CACHE_ONE), DELTA),
-            () -> assertEquals(cacheTwoStats.requestCount(), metricValue(registry, "cache.request.count", CACHE_TWO), DELTA),
-            () -> assertEquals(cacheOneStats.loadSuccessCount(), metricValue(registry, "cache.puts", CACHE_ONE), DELTA),
-            () -> assertEquals(cacheTwoStats.loadSuccessCount(), metricValue(registry, "cache.puts", CACHE_TWO), DELTA),
+
+            () -> assertEquals(cacheOneStats.evictionCount(),
+                metricValue(registry, "cache.eviction.count", CACHE_ONE), DELTA),
+
+            () -> assertEquals(cacheTwoStats.evictionCount(),
+                metricValue(registry, "cache.eviction.count", CACHE_TWO), DELTA),
+
+            () -> assertEquals(cacheOneStats.evictionWeight(),
+                metricValue(registry, "cache.eviction.weight", CACHE_ONE), DELTA),
+
+            () -> assertEquals(cacheTwoStats.evictionWeight(),
+                metricValue(registry, "cache.eviction.weight", CACHE_TWO), DELTA),
+            () -> assertEquals(cacheOneStats.requestCount(),
+                metricValue(registry, "cache.request.count", CACHE_ONE), DELTA),
+
+            () -> assertEquals(cacheTwoStats.requestCount(),
+                metricValue(registry, "cache.request.count", CACHE_TWO), DELTA),
+
+            () -> assertEquals(cacheOneStats.loadSuccessCount(),
+                metricValue(registry, "cache.puts", CACHE_ONE), DELTA),
+
+            () -> assertEquals(cacheTwoStats.loadSuccessCount(),
+                metricValue(registry, "cache.puts", CACHE_TWO), DELTA),
             // Duplicate cache.hits registration should still resolve to a single meter per cache tag.
             () -> assertEquals(20, registry.getMeters().size())
         );
