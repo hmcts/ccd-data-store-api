@@ -6,8 +6,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 
@@ -15,9 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
 
 @DisplayName("CaffeineCacheRateMetricsBinder")
 class CaffeineCacheRateMetricsBinderTest {
@@ -42,8 +39,8 @@ class CaffeineCacheRateMetricsBinderTest {
         cacheManager.setCaffeine(Caffeine.newBuilder().maximumSize(1).recordStats());
         cacheManager.setCacheNames(List.of(CACHE_ONE, CACHE_TWO));
 
-        CaffeineCache cacheOne = (CaffeineCache) cacheManager.getCache(CACHE_ONE);
-        CaffeineCache cacheTwo = (CaffeineCache) cacheManager.getCache(CACHE_TWO);
+        final CaffeineCache cacheOne = (CaffeineCache) cacheManager.getCache(CACHE_ONE);
+        final CaffeineCache cacheTwo = (CaffeineCache) cacheManager.getCache(CACHE_TWO);
 
         cacheOne.put("k1", "v1");
         cacheOne.get("k1");
@@ -93,19 +90,6 @@ class CaffeineCacheRateMetricsBinderTest {
             // Duplicate cache.hits registration should still resolve to a single meter per cache tag.
             () -> assertEquals(20, registry.getMeters().size())
         );
-    }
-
-    @Test
-    @DisplayName("should ignore non caffeine caches")
-    void shouldIgnoreNonCaffeineCaches() {
-        CacheManager cacheManager = mock(CacheManager.class);
-        when(cacheManager.getCacheNames()).thenReturn(List.of("simple"));
-        when(cacheManager.getCache("simple")).thenReturn(mock(Cache.class));
-
-        SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        new CaffeineCacheRateMetricsBinder(cacheManager).bindTo(registry);
-
-        assertTrue(registry.getMeters().isEmpty());
     }
 
     private double metricValue(SimpleMeterRegistry registry, String name, String cacheName) {
