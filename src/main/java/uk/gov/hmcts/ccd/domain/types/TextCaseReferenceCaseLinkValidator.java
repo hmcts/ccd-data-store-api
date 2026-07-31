@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,7 +42,7 @@ public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
             textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
 
         if (validationResults.isEmpty() && !textValidator.isNullOrEmpty(dataValue)) {
-            final String value = dataValue.textValue();
+            final String value = dataValue.stringValue(null);
             return isAnExistingCase(value, dataFieldId);
         }
         return validationResults;

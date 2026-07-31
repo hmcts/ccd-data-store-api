@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -1458,7 +1458,7 @@ public class CallbackTest extends WireMockBaseTest {
         future.get(); // This will rethrow Exceptions and Errors as ExecutionException
     }
 
-    private void stubForErrorCallbackResponse(final String url) throws JsonProcessingException {
+    private void stubForErrorCallbackResponse(final String url) throws JacksonException {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 

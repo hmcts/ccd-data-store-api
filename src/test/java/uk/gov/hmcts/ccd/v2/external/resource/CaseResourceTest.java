@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,9 +36,9 @@ class CaseResourceTest {
     private static final String STATE = "Started";
     private static final String CALLBACK_COMPLETED = "CALLBACK_COMPLETED";
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
-    private static final Map<String, JsonNode> DATA = Collections.singletonMap("FieldID", new TextNode("Value"));
+    private static final Map<String, JsonNode> DATA = Collections.singletonMap("FieldID", new StringNode("Value"));
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Collections.singletonMap("FieldID",
-        new TextNode("PUBLIC"));
+        new StringNode("PUBLIC"));
     private static final AfterSubmitCallbackResponse CALLBACK_BODY = new AfterSubmitCallbackResponse();
     private static final ResponseEntity<AfterSubmitCallbackResponse> AFTER_SUBMIT_CALLBACK_RESPONSE =
         ResponseEntity.ok(CALLBACK_BODY);

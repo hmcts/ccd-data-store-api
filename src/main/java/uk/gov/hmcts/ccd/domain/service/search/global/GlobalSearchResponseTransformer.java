@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_CATEGORY;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_LOCATION;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_NAME_HMCTS_INTERNAL;
@@ -129,10 +130,10 @@ public class GlobalSearchResponseTransformer {
 
         final Optional<JsonNode> optionalJsonNode = Optional.ofNullable(jsonNodeMap.get(parentKey));
         return optionalJsonNode.map(node -> {
-            if (node.isContainerNode()) {
-                return Optional.ofNullable(node.at(childPath)).map(JsonNode::asText).orElse(null);
+            if (node.isContainer()) {
+                return Optional.ofNullable(node.at(childPath)).map(value -> asText(value)).orElse(null);
             }
-            return node.asText();
+            return asText(node);
         }).orElse(null);
     }
 
@@ -142,7 +143,7 @@ public class GlobalSearchResponseTransformer {
 
         // get values from collection list
         return optionalJsonNode.map(node -> StreamSupport.stream(node.spliterator(), false)
-            .map(x -> x.get(CollectionValidator.VALUE).asText())
+            .map(x -> asText(x.get(CollectionValidator.VALUE)))
             .collect(Collectors.toUnmodifiableList()))
             .orElse(emptyList());
     }

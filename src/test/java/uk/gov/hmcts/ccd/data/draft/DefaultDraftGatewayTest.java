@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.data.draft;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,9 +60,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuild
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.newUpdateCaseDraft;
 
 class DefaultDraftGatewayTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    public static final TextNode VALUE_CLASS = JSON_NODE_FACTORY.textNode("valueClass");
-    public static final TextNode VALUE = JSON_NODE_FACTORY.textNode("value");
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
+    public static final StringNode VALUE_CLASS = JSON_NODE_FACTORY.stringNode("valueClass");
+    public static final StringNode VALUE = JSON_NODE_FACTORY.stringNode("value");
     private static final String CASE_DATA_CONTENT = "CaseDataContent";
     private static final String UID = "1";
     private static final String JID = "TEST";
@@ -108,7 +108,7 @@ class DefaultDraftGatewayTest {
     private final String draftURL5 = "draftBaseURL/" + DID;
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    public void setUp() throws JacksonException {
         MockitoAnnotations.openMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
@@ -156,17 +156,17 @@ class DefaultDraftGatewayTest {
 
     @Test
     void shouldSuccessfullyCreateDraft() throws URISyntaxException {
-        ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
+        ResponseEntity<Void> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
-            any(HttpEntity.class), eq(HttpEntity.class));
+            any(HttpEntity.class), eq(Void.class));
 
         Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
             () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class),
-                eq(HttpEntity.class)),
+                eq(Void.class)),
             () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class),
-                eq(HttpEntity.class)),
+                eq(Void.class)),
             () -> assertEquals(4L, result)
         );
     }
@@ -175,7 +175,7 @@ class DefaultDraftGatewayTest {
     void shouldFailToCreateDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
-            any(HttpEntity.class), eq(HttpEntity.class));
+            any(HttpEntity.class), eq(Void.class));
 
         final ServiceException actualException =
             assertThrows(ServiceException.class, () -> draftGateway.create(createCaseDraftRequest));
@@ -186,9 +186,9 @@ class DefaultDraftGatewayTest {
 
     @Test
     void shouldFailToGetResponseFromCreateDraft() {
-        ResponseEntity<HttpEntity> response = ResponseEntity.noContent().build();
+        ResponseEntity<Void> response = ResponseEntity.noContent().build();
         doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
-            any(HttpEntity.class), eq(HttpEntity.class));
+            any(HttpEntity.class), eq(Void.class));
 
         assertNull(draftGateway.create(createCaseDraftRequest));
     }

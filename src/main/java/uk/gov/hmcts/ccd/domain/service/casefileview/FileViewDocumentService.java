@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casefileview;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.vavr.Tuple2;

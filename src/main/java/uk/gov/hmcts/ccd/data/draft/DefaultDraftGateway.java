@@ -11,11 +11,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.inject.Inject;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.function.Consumer;
@@ -41,7 +42,7 @@ public class DefaultDraftGateway implements DraftGateway {
 
     public static final String QUALIFIER = "default";
     private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
     public static final String DRAFT_STORE_DOWN_ERR_MESSAGE = "The draft service is currently down, please refresh "
@@ -78,7 +79,7 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders responseHeaders = createDraftRestTemplate.exchange(applicationParams.draftBaseURL(),
                                                                            HttpMethod.POST,
                                                                            requestEntity,
-                                                                           HttpEntity.class).getHeaders();
+                                                                           Void.class).getHeaders();
             return getDraftId(responseHeaders);
         } catch (Exception e) {
             LOG.warn("Error while saving draft", e);
@@ -204,7 +205,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 draftResponse.setCreated(draft.getCreated().toLocalDateTime());
                 draftResponse.setUpdated(draft.getUpdated().toLocalDateTime());
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             exceptionConsumer.accept(e);
         }
         return draftResponse;

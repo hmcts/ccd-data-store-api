@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -108,7 +109,7 @@ import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.
 
 class CreateCaseEventServiceTest extends TestFixtures {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String USER_ID = "123";
     private static final String TOKEN = "eygeyvcey12w2";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
@@ -117,7 +118,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private static final LocalDateTime LAST_MODIFIED = LocalDateTime.of(2015, 12, 21, 15, 30);
     private static final String ATTRIBUTE_PATH = "DocumentField";
     private static final String CATEGORY_ID = "categoryId";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
     private static final String EXISTING_CASE_REFERENCE = "1234123412341234";
     protected static final String NON_EXISTENT_CASE_REFERENCE = "1234123412341289";
@@ -389,7 +390,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     void shouldSetSupplementaryDataWhenPresentInAboutToSubmitCallback() {
         // GIVEN - Create supplementary_data map
         final Map<String, JsonNode> supplementaryDataMap = new HashMap<>();
-        supplementaryDataMap.put("key1", TextNode.valueOf("value1"));
+        supplementaryDataMap.put("key1", StringNode.valueOf("value1"));
         supplementaryDataMap.put("key2", IntNode.valueOf(42));
 
         // Mock callbackInvoker to set supplementary_data on the CaseDetails
@@ -410,7 +411,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertAll(
             () -> verify(caseDetailsRepository, times(2)).findByReference(anyString(), anyBoolean()),
             () -> assertNotNull(caseEventResult.getSavedCaseDetails().getSupplementaryData()),
-            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asText())
+            () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key1").asString())
                 .isEqualTo("value1"),
             () -> assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData().get("key2").asInt())
                 .isEqualTo(42)
@@ -607,7 +608,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
     void shouldUpdateCaseDocumentCategoryIdBySendingFullDataContent() throws Exception {
         caseDetailsFromDB = caseDetails.shallowClone();
         Map<String, JsonNode> data = Maps.newHashMap();
-        data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
+        data.put("dataKey1", JSON_NODE_FACTORY.stringNode("dataValue1"));
         caseDetailsFromDB.setData(data);
         CaseDetailsRepository defaultCaseDetailsRepository = mock(CaseDetailsRepository.class);
 
@@ -673,7 +674,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         AtomicInteger countChanges = new AtomicInteger();
         nodes.forEach(node -> {
             countChanges.getAndIncrement();
-            System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
+            System.out.println("node - " + node.get(DOCUMENT_URL).asString() + " : " + node.get(UPLOAD_TIMESTAMP));
             assertTrue(node.has(UPLOAD_TIMESTAMP));
         });
         assertEquals(1, countChanges.get());
@@ -768,7 +769,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         savedCaseDetails.setReference(Long.parseLong(CASE_REFERENCE));
         savedCaseDetails.setCaseTypeId(CASE_TYPE_ID);
         savedCaseDetails.setState(POST_STATE);
-        final Map<String, JsonNode> savedData = Map.of("savedKey", JSON_NODE_FACTORY.textNode("savedValue"));
+        final Map<String, JsonNode> savedData = Map.of("savedKey", JSON_NODE_FACTORY.stringNode("savedValue"));
         savedCaseDetails.setData(savedData);
 
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
@@ -870,7 +871,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         Map<String, JsonNode> data = Maps.newHashMap();
         ObjectNode objectNode = createBasicDoc();
         final String uploadTimestamp = "2001-01-01T01:02:03.00Z";
-        objectNode.set(UPLOAD_TIMESTAMP, new TextNode(uploadTimestamp));
+        objectNode.set(UPLOAD_TIMESTAMP, new StringNode(uploadTimestamp));
         data.put("dataKey1", objectNode);
         caseDetails.setData(data);
         caseDetailsFromDB = caseDetails.shallowClone();
@@ -888,9 +889,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
         AtomicInteger countChanges = new AtomicInteger();
         nodes.forEach(node -> {
             countChanges.getAndIncrement();
-            System.out.println("node - " + node.get(DOCUMENT_URL).asText() + " : " + node.get(UPLOAD_TIMESTAMP));
+            System.out.println("node - " + node.get(DOCUMENT_URL).asString() + " : " + node.get(UPLOAD_TIMESTAMP));
             assertTrue(node.has(UPLOAD_TIMESTAMP));
-            assertEquals(uploadTimestamp, node.get(UPLOAD_TIMESTAMP).asText());
+            assertEquals(uploadTimestamp, node.get(UPLOAD_TIMESTAMP).asString());
         });
         assertEquals(1, countChanges.get());
     }
@@ -913,9 +914,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     private ObjectNode createBasicDoc() {
         ObjectNode node = MAPPER.createObjectNode();
-        node.set(DOCUMENT_URL, new TextNode(VALID_DOCUMENT_URL));
-        node.set(DOCUMENT_BINARY_URL, new TextNode(VALID_DOCUMENT_URL + "/binary"));
-        node.set("document_filename", new TextNode("test-a5.pdf"));
+        node.set(DOCUMENT_URL, new StringNode(VALID_DOCUMENT_URL));
+        node.set(DOCUMENT_BINARY_URL, new StringNode(VALID_DOCUMENT_URL + "/binary"));
+        node.set("document_filename", new StringNode("test-a5.pdf"));
 
         return node;
     }

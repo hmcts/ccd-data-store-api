@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;

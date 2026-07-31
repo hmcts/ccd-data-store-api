@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 /**
@@ -158,7 +159,7 @@ public class CrossCaseTypeSearchRequest {
 
         private List<String> sourceFilterToAliasFields(JsonNode multiCaseTypeSearchSourceNode) {
             return StreamSupport.stream(multiCaseTypeSearchSourceNode.spliterator(), false)
-                .map(JsonNode::asText)
+                .map(node -> asText(node))
                 .filter(nodeText -> nodeText.startsWith(SEARCH_ALIAS_FIELD_PREFIX))
                 .map(nodeText -> nodeText.replaceFirst(SEARCH_ALIAS_FIELD_PREFIX, ""))
                 .collect(Collectors.toList());

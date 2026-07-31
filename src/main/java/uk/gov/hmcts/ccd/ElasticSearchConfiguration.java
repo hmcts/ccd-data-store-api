@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.json.jackson.Jackson3JsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -22,8 +21,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchMappings;
 
 import java.util.Arrays;
@@ -40,26 +39,29 @@ public class ElasticSearchConfiguration {
         this.applicationParams = applicationParams;
     }
 
-    @Bean(name = "DefaultObjectMapper")
+    @Bean(name = "ElasticsearchObjectMapper")
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public ObjectMapper objectMapper() {
-        return new Jackson2ObjectMapperBuilder()
-            .featuresToEnable(MapperFeature.DEFAULT_VIEW_INCLUSION)
-            .featuresToEnable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
-            .featuresToEnable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
-            .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .modulesToInstall(JavaTimeModule.class)
+    public JsonMapper objectMapper() {
+        return JsonMapper.builderWithJackson2Defaults()
+            .enable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
+            .enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
     }
 
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public JacksonJsonpMapper jsonpMapper(ObjectMapper objectMapper) {
-        return new JacksonJsonpMapper(objectMapper);
+    public Jackson3JsonpMapper jsonpMapper(
+        @Qualifier("ElasticsearchObjectMapper") JsonMapper objectMapper
+    ) {
+        return new Jackson3JsonpMapper(objectMapper);
     }
 
     @Bean
-    public ElasticsearchClient elasticsearchClient(ObjectMapper objectMapper) {
+    public ElasticsearchClient elasticsearchClient(
+        @Qualifier("ElasticsearchObjectMapper") JsonMapper objectMapper
+    ) {
         HttpHost[] esHosts = applicationParams.getElasticSearchDataHosts().stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
@@ -84,7 +86,7 @@ public class ElasticSearchConfiguration {
 
         ElasticsearchTransport transport = new RestClientTransport(
             restClient,
-            new JacksonJsonpMapper(objectMapper)
+            new Jackson3JsonpMapper(objectMapper)
         );
 
         return new ElasticsearchClient(transport);

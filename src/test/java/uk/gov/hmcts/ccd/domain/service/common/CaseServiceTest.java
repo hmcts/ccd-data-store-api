@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -179,7 +180,7 @@ class CaseServiceTest {
             final JsonNode cloneNames = clonePerson.get(DATA_NAMES);
 
             // Change name
-            ((ObjectNode) names).set(DATA_FNAME, new TextNode(OTHER_NAME));
+            ((ObjectNode) names).set(DATA_FNAME, new StringNode(OTHER_NAME));
 
             final JsonNode fname = names.get(DATA_FNAME);
             final JsonNode cloneFname = cloneNames.get(DATA_FNAME);
@@ -189,8 +190,8 @@ class CaseServiceTest {
                 () -> assertThat(clonePerson, not(sameInstance(person))),
                 () -> assertThat(cloneNames, not(sameInstance(names))),
                 () -> assertThat(cloneFname, not(sameInstance(fname))),
-                () -> assertThat(cloneFname.asText(), equalTo(PERSON_FNAME)),
-                () -> assertThat(fname.asText(), equalTo(OTHER_NAME))
+                () -> assertThat(cloneFname.asString(), equalTo(PERSON_FNAME)),
+                () -> assertThat(fname.asString(), equalTo(OTHER_NAME))
             );
         }
 
@@ -211,7 +212,7 @@ class CaseServiceTest {
             final JsonNode cloneNames = clonePerson.get(DATA_NAMES);
 
             // Change name classification
-            ((ObjectNode) names).set(DATA_FNAME, new TextNode("PRIVATE"));
+            ((ObjectNode) names).set(DATA_FNAME, new StringNode("PRIVATE"));
 
             final JsonNode fname = names.get(DATA_FNAME);
             final JsonNode cloneFname = cloneNames.get(DATA_FNAME);
@@ -221,8 +222,8 @@ class CaseServiceTest {
                 () -> assertThat(clonePerson, not(sameInstance(person))),
                 () -> assertThat(cloneNames, not(sameInstance(names))),
                 () -> assertThat(cloneFname, not(sameInstance(fname))),
-                () -> assertThat(cloneFname.asText(), equalTo("PUBLIC")),
-                () -> assertThat(fname.asText(), equalTo("PRIVATE"))
+                () -> assertThat(cloneFname.asString(), equalTo("PUBLIC")),
+                () -> assertThat(fname.asString(), equalTo("PRIVATE"))
             );
         }
     }
@@ -326,17 +327,17 @@ class CaseServiceTest {
                 () -> assertNull(result.get("ChangeOrganisationRequestField").get("CaseRoleId")),
                 () -> assertNotNull(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
                                         .get("OrganisationID")),
-                () -> assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asText(),
+                () -> assertThat(result.get("ChangeOrganisationRequestField").get("Reason").asString(),
                                  is("SomeReasonX")),
                 () -> assertThat(result.get("ChangeOrganisationRequestField").get("OrganisationToAdd")
-                                     .get("OrganisationID").asText(), is("Solicitor firm 1")),
+                                     .get("OrganisationID").asString(), is("Solicitor firm 1")),
 
                 () -> assertTrue(result.containsKey("OrganisationPolicyField")),
                 () -> assertNotNull(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole")),
-                () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asText(),
+                () -> assertThat(result.get("OrganisationPolicyField").get("OrgPolicyCaseAssignedRole").asString(),
                                  is("[Claimant]")),
                 () -> assertTrue(result.containsKey("TextField0")),
-                () -> assertThat(result.get("TextField0").asText(), is("Default text"))
+                () -> assertThat(result.get("TextField0").asString(), is("Default text"))
             );
         }
     }
@@ -389,7 +390,7 @@ class CaseServiceTest {
             assertAll(
                 () -> assertThat(result.size(), is(1)),
                 () -> assertTrue(result.containsKey("TextField0")),
-                () -> assertThat(result.get("TextField0").asText(), is(""))
+                () -> assertThat(JacksonUtils.asText(result.get("TextField0")), is(""))
             );
         }
 
@@ -440,7 +441,7 @@ class CaseServiceTest {
                 () -> assertThat(result.size(), is(1)),
                 () -> assertTrue(result.containsKey("TextField0")),
                 () -> assertTrue(result.get("TextField0") instanceof ArrayNode),
-                () -> assertThat(result.get("TextField0").asText(), is(""))
+                () -> assertThat(JacksonUtils.asText(result.get("TextField0")), is(""))
             );
         }
 
@@ -504,10 +505,10 @@ class CaseServiceTest {
 
     private Map<String, JsonNode> buildCaseDataStructure(String fnameValue) {
         final HashMap<String, JsonNode> data = new HashMap<>();
-        final ObjectMapper objectMapper = new ObjectMapper();
+        final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
         final ObjectNode namesNode = objectMapper.createObjectNode();
-        namesNode.set(DATA_FNAME, new TextNode(fnameValue));
+        namesNode.set(DATA_FNAME, new StringNode(fnameValue));
 
         final ObjectNode personNode = objectMapper.createObjectNode();
         personNode.set(DATA_NAMES, namesNode);

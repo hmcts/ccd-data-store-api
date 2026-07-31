@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
@@ -280,7 +279,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             MockUtils.setSecurityAuthorities(authentication, AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
             mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         }
 
         @Test
@@ -752,9 +750,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(2)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField2").asText(), is("SDField2Value")),
+                    .get("SDField2").asString(), is("SDField2Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField3").asText(), is("SDField3Value"))
+                    .get("SDField3").asString(), is("SDField3Value"))
             );
         }
 
@@ -773,11 +771,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(3)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField1").asText(), is("SDField1Value")),
+                    .get("SDField1").asString(), is("SDField1Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField2").asText(), is("SDField2Value")),
+                    .get("SDField2").asString(), is("SDField2Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField3").asText(), is("SDField3Value"))
+                    .get("SDField3").asString(), is("SDField3Value"))
             );
         }
 
@@ -811,11 +809,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData().size(),
                     is(3)),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField1").asText(), is("SDField1Value")),
+                    .get("SDField1").asString(), is("SDField1Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField2").asText(), is("SDField2Value")),
+                    .get("SDField2").asString(), is("SDField2Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
-                    .get("SDField3").asText(), is("SDField3Value"))
+                    .get("SDField3").asString(), is("SDField3Value"))
             );
         }
 
@@ -827,7 +825,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 400);
 
             assertAll(
-                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asString(),
                     is("The provided use case 'INVALID' is unsupported for case type 'AAT'."))
             );
         }
@@ -840,7 +838,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 400);
 
             assertAll(
-                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asString(),
                     is("missing required field 'query'"))
             );
         }
@@ -855,7 +853,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
 
             assertAll(
-                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asString(),
                     containsString("No mapping found for [invalid.keyword] in order to sort on"))
             );
         }
@@ -876,7 +874,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 mapper, mockMvc, JsonNode.class);
 
             assertAll(
-                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asString(),
                     containsString("Request requires correctly formatted JSON"))
             );
         }
@@ -1727,11 +1725,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
-                    () -> assertThat(caseSearchResult.getCases().getFirst().getData().get(TEXT_ALIAS).asText(),
+                    () -> assertThat(caseSearchResult.getCases().getFirst().getData().get(TEXT_ALIAS).asString(),
                         is(TEXT_VALUE)),
-                    () -> assertThat(caseSearchResult.getCases().get(1).getData().get(TEXT_ALIAS).asText(),
+                    () -> assertThat(caseSearchResult.getCases().get(1).getData().get(TEXT_ALIAS).asString(),
                         is("CCC TextValue")),
-                    () -> assertThat(caseSearchResult.getCases().get(2).getData().get(TEXT_ALIAS).asText(),
+                    () -> assertThat(caseSearchResult.getCases().get(2).getData().get(TEXT_ALIAS).asString(),
                         is("BBB TextValue")),
                     () -> assertThat(caseSearchResult.getCases().getFirst().getData().size(), is(1)),
                     () -> assertThat(caseSearchResult.getCases().get(1).getData().size(), is(1)),
@@ -1799,11 +1797,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asString(),
                         is("SDField1Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asString(),
                         is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asString(),
                         is("SDField3Value"))
                 );
             }
@@ -1823,9 +1821,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(2)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asString(),
                         is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asString(),
                         is("SDField3Value"))
                 );
             }
@@ -1845,11 +1843,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asString(),
                         is("SDField1Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asString(),
                         is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asString(),
                         is("SDField3Value"))
                 );
             }
@@ -1861,7 +1859,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 JsonNode exceptionNode = executeErrorRequest(searchRequest, "INVALID", 404);
 
                 assertAll(
-                    () -> assertThat(exceptionNode.get("message").asText(),
+                    () -> assertThat(exceptionNode.get("message").asString(),
                         startsWith("Resource not found when getting case type definition for INVALID"))
                 );
             }
@@ -1883,39 +1881,40 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             public void assertExampleCaseData(CaseDetails caseDetails) {
                 Map<String, JsonNode> data = caseDetails.getData();
                 assertAll(
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_1).asText(), is(STREET_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_2).asText(), is(ADDRESS_LINE_2_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_3).asText(), is(ADDRESS_LINE_3_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTRY_NESTED_FIELD).asText(), is(COUNTRY_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTY_FIELD).asText(), is(COUNTY_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(POST_CODE_FIELD).asText(), is(POST_CODE_VALUE)),
-                    () -> assertThat(data.get(ADDRESS_FIELD).get(TOWN_FIELD).asText(), is(TOWN_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_1).asString(), is(STREET_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_2).asString(), is(ADDRESS_LINE_2_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(ADDRESS_LINE_3).asString(), is(ADDRESS_LINE_3_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTRY_NESTED_FIELD).asString(), is(COUNTRY_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(COUNTY_FIELD).asString(), is(COUNTY_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(POST_CODE_FIELD).asString(), is(POST_CODE_VALUE)),
+                    () -> assertThat(data.get(ADDRESS_FIELD).get(TOWN_FIELD).asString(), is(TOWN_VALUE)),
                     () -> assertThat(data.get(COLLECTION_FIELD).toString(),
                         is("[{\"id\":\"2c6da07c-1dfb-4765-88f6-96cd5d5f33b1\",\"value\":\"CollectionTextValue2\"},"
                             + "{\"id\":\"f7d67f03-172d-4adb-85e5-ca958ad442ce\",\"value\":\"CollectionTextValue1\"}]")),
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_TEXT_FIELD).asText(), is(COMPLEX_TEXT_VALUE)),
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asText(),
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_TEXT_FIELD).asString(),
+                        is(COMPLEX_TEXT_VALUE)),
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asString(),
                         is(COMPLEX_FIXED_LIST_VALUE)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD)
-                        .asText(), is(NESTED_NUMBER_FIELD_VALUE)),
+                        .asString(), is(NESTED_NUMBER_FIELD_VALUE)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_COLLECTION_TEXT_FIELD)
                             .toString(),
                         is("[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\","
                             + "\"value\":\"NestedCollectionTextValue1\"},"
                             + "{\"id\":\"95f337e8-5f17-4b25-a795-b7f84f4b2855\","
                             + "\"value\":\"NestedCollectionTextValue2\"}]")),
-                    () -> assertThat(data.get(DATE_FIELD).asText(), is(DATE_VALUE)),
-                    () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is(DATE_TIME_VALUE)),
-                    () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),
-                    () -> assertThat(data.get(FIXED_LIST_FIELD).asText(), is(FIXED_LIST_VALUE)),
+                    () -> assertThat(data.get(DATE_FIELD).asString(), is(DATE_VALUE)),
+                    () -> assertThat(data.get(DATE_TIME_FIELD).asString(), is(DATE_TIME_VALUE)),
+                    () -> assertThat(data.get(EMAIL_FIELD).asString(), is(EMAIL_VALUE)),
+                    () -> assertThat(data.get(FIXED_LIST_FIELD).asString(), is(FIXED_LIST_VALUE)),
                     () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD).isNull(), is(true)),
                     () -> assertThat(data.get(MULTI_SELECT_LIST_FIELD).toString(),
                         is("[\"OPTION2\",\"OPTION4\"]")),
-                    () -> assertThat(data.get(NUMBER_FIELD).asText(), is(NUMBER_VALUE)),
-                    () -> assertThat(data.get(PHONE_FIELD).asText(), is(PHONE_VALUE)),
-                    () -> assertThat(data.get(TEXT_AREA_FIELD).asText(), is(TEXT_AREA_VALUE)),
-                    () -> assertThat(data.get(TEXT_FIELD).asText(), is(TEXT_VALUE)),
-                    () -> assertThat(data.get(YES_OR_NO_FIELD).asText(), is(YES_OR_NO_VALUE))
+                    () -> assertThat(data.get(NUMBER_FIELD).asString(), is(NUMBER_VALUE)),
+                    () -> assertThat(data.get(PHONE_FIELD).asString(), is(PHONE_VALUE)),
+                    () -> assertThat(data.get(TEXT_AREA_FIELD).asString(), is(TEXT_AREA_VALUE)),
+                    () -> assertThat(data.get(TEXT_FIELD).asString(), is(TEXT_VALUE)),
+                    () -> assertThat(data.get(YES_OR_NO_FIELD).asString(), is(YES_OR_NO_VALUE))
                 );
             }
         }

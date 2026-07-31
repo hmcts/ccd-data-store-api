@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 public class AccessControlServiceImpl implements AccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessControlServiceImpl.class);
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     private final ApplicationParams applicationParams;
 
@@ -109,7 +109,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                    final Set<AccessProfile> accessProfiles,
                                                    final Predicate<AccessControlList> criteria) {
         if (caseFields != null) {
-            final Iterator<String> fieldNames = caseFields.fieldNames();
+            final Iterator<String> fieldNames = caseFields.propertyNames().iterator();
             while (fieldNames.hasNext()) {
                 if (!hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, criteria, fieldNames.next())) {
                     return false;

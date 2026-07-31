@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,7 +35,7 @@ class TestConfiguration extends ContextCleanupListener {
     private final ApplicationParams applicationParams;
     private final DefinitionStoreClient definitionStoreClient;
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     private static final String baseTypes =

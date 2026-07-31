@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
 
         final CaseFieldDefinition caseFieldDefinition = caseField().build();
         caseFieldDefinition.setId("TEST");
-        final JsonNode validValue = NODE_FACTORY.textNode("XXXX");
+        final JsonNode validValue = NODE_FACTORY.stringNode("XXXX");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
@@ -90,7 +90,7 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
         final Set<String> roles = Collections.singleton("ROLE_1");
         final CaseFieldDefinition caseFieldDefinition = caseField().build();
         caseFieldDefinition.setCaseTypeId("TEST");
-        final JsonNode validValue = NODE_FACTORY.textNode("ROLE_1");
+        final JsonNode validValue = NODE_FACTORY.stringNode("ROLE_1");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
 
         when(caseRoleRepository.getRoles(anyString())).thenReturn(roles);
@@ -116,11 +116,11 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
     void textRegexFail() {
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
-        final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
+        final JsonNode validValue = NODE_FACTORY.stringNode("15xxxx00");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
-        final JsonNode invalidValue = NODE_FACTORY.textNode("15961077777774840593131");
+        final JsonNode invalidValue = NODE_FACTORY.stringNode("15961077777774840593131");
         ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
         final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 

@@ -1,16 +1,14 @@
 package uk.gov.hmcts.ccd.config;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 
 @Configuration
 public class JacksonObjectMapperConfig {
@@ -22,19 +20,18 @@ public class JacksonObjectMapperConfig {
      */
     @Primary
     @Bean(name = "DefaultObjectMapper")
-    public ObjectMapper defaultObjectMapper() {
-        return new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+    public JsonMapper defaultObjectMapper() {
+        return JsonMapper.builderWithJackson2Defaults()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(MapperFeature.DETECT_PARAMETER_NAMES)
+            .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+            .addMixIn(Document.class, AmDocumentJacksonMixin.class)
+            .build();
     }
 
     @Bean(name = "SimpleObjectMapper")
-    public ObjectMapper simpleObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
+    public JsonMapper simpleObjectMapper() {
+        return JsonMapper.builderWithJackson2Defaults().build();
     }
 
     @Bean

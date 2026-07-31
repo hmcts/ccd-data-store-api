@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.data.message.additionaldata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -53,7 +54,7 @@ class DefinitionBlockGeneratorTest {
     private CaseTypeDefinition caseTypeDefinition;
     private CaseDetails caseDetails;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final String FIELD_ID = "FieldId";
     private static final String FIELD_ALIAS = "FieldAlias";
@@ -74,7 +75,7 @@ class DefinitionBlockGeneratorTest {
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() throws JacksonException {
         MockitoAnnotations.openMocks(this);
 
         Map<String, String> mappings = newHashMap();

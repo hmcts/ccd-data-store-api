@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.processor.date;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.base.Strings;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -23,6 +22,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.stringOrNullNode;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEDISPLAY;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
@@ -56,8 +57,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     @Override
     protected CaseViewField executeSimple(CaseViewField caseViewField, BaseType baseType) {
         caseViewField.setFormattedValue(
-            caseViewField.getValue() instanceof TextNode
-                ? executeSimple((TextNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(),
+            caseViewField.getValue() instanceof StringNode
+                ? executeSimple((StringNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(),
                 null, caseViewField)
                 : caseViewField.getValue()
         );
@@ -76,7 +77,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return !isNullOrEmpty(node)
             && field.hasDisplayContextParameter(DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext))
             && isSupportedBaseType(baseType, SUPPORTED_TYPES)
-                ? createNode(field, node.asText(), baseType, fieldPath, displayContext)
+                ? createNode(field, asText(node), baseType, fieldPath, displayContext)
                 : node;
     }
 
@@ -110,7 +111,7 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                     isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
                         ? createNode(
                             field,
-                            item.get(VALUE).asText(),
+                            asText(item.get(VALUE)),
                             collectionFieldType,
                             fieldPath,
                             displayContext) :
@@ -129,17 +130,17 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return collectionNode;
     }
 
-    private TextNode createNode(CommonDCPModel field, String valueToConvert, BaseType baseType, String fieldPath,
+    private JsonNode createNode(CommonDCPModel field, String valueToConvert, BaseType baseType, String fieldPath,
                                 DisplayContext displayContext) {
-        if (Strings.isNullOrEmpty(valueToConvert)) {
-            return new TextNode(valueToConvert);
+        if (valueToConvert == null || valueToConvert.isEmpty()) {
+            return stringOrNullNode(valueToConvert);
         }
         if (DISPLAY_CONTEXT_DCP_MAPPING.containsKey(displayContext)) {
             String format = format(field, displayContext, baseType);
             return dateTimeFormatParser.valueToTextNode(valueToConvert, baseType, fieldPath, format, false);
         }
 
-        return new TextNode(valueToConvert);
+        return stringOrNullNode(valueToConvert);
     }
 
     private String format(CommonDCPModel field, DisplayContext displayContext, BaseType baseType) {

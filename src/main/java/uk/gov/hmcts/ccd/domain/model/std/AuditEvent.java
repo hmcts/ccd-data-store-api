@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

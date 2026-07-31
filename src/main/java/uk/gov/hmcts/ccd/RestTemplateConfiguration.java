@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.ConnectionConfig;
@@ -18,7 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.annotation.PreDestroy;
@@ -32,6 +36,16 @@ class RestTemplateConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
     private final List<PoolingHttpClientConnectionManager> connectionManagers = new ArrayList<>();
+    private final JsonMapper restClientObjectMapper;
+
+    RestTemplateConfiguration(ObjectMapper objectMapper) {
+        JsonMapper jsonMapper = objectMapper instanceof JsonMapper
+            ? (JsonMapper) objectMapper
+            : JsonMapper.builderWithJackson2Defaults().build();
+        this.restClientObjectMapper = jsonMapper.rebuild()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
+    }
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -62,7 +76,7 @@ class RestTemplateConfiguration {
 
     @Bean(name = "definitionStoreRestTemplate")
     public RestTemplate definitionStoreRestTemplate() {
-        final RestTemplate restTemplate = new RestTemplate();
+        final RestTemplate restTemplate = createJsonRestTemplate();
         restTemplate.setRequestFactory(
             new HttpComponentsClientHttpRequestFactory(getHttpClient(definitionStoreConnectionTimeout)));
         LOG.info("definitionStoreConnectionTimeout: {}", definitionStoreConnectionTimeout);
@@ -71,7 +85,7 @@ class RestTemplateConfiguration {
 
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
-        final RestTemplate restTemplate = new RestTemplate();
+        final RestTemplate restTemplate = createJsonRestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient(connectionTimeout, readTimeout));
         LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
@@ -79,10 +93,15 @@ class RestTemplateConfiguration {
         return restTemplate;
     }
 
+    @Bean(name = "printableDocumentsRestTemplate")
+    public RestTemplate printableDocumentsRestTemplate() {
+        return createJsonRestTemplate();
+    }
+
     @Bean(name = "documentRestTemplate")
     public RestTemplate documentRestTemplate() {
 
-        final RestTemplate restTemplate = new RestTemplate();
+        final RestTemplate restTemplate = createJsonRestTemplate();
         HttpComponentsClientHttpRequestFactory requestFactory =
             new HttpComponentsClientHttpRequestFactory(getHttpClient());
         LOG.info("connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
@@ -90,7 +109,8 @@ class RestTemplateConfiguration {
 
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         //Add the Jackson Message converter
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        JacksonJsonHttpMessageConverter converter =
+            new JacksonJsonHttpMessageConverter(restClientObjectMapper);
         // Note: here we are making this converter to process any kind of response,
         // not only application/*json, which is the default behaviour
         converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
@@ -102,7 +122,7 @@ class RestTemplateConfiguration {
 
     @Bean(name = "createDraftRestTemplate")
     public RestTemplate createDraftsRestTemplate() {
-        final RestTemplate restTemplate = new RestTemplate();
+        final RestTemplate restTemplate = createJsonRestTemplate();
         restTemplate.setRequestFactory(
             new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCreateConnectionTimeout)));
         return restTemplate;
@@ -110,10 +130,18 @@ class RestTemplateConfiguration {
 
     @Bean(name = "draftsRestTemplate")
     public RestTemplate draftsRestTemplate() {
-        final RestTemplate restTemplate = new RestTemplate();
+        final RestTemplate restTemplate = createJsonRestTemplate();
         restTemplate.setRequestFactory(
             new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
         return restTemplate;
+    }
+
+    private RestTemplate createJsonRestTemplate() {
+        HttpMessageConverters messageConverters = HttpMessageConverters.forClient()
+            .registerDefaults()
+            .withJsonConverter(new JacksonJsonHttpMessageConverter(restClientObjectMapper))
+            .build();
+        return new RestTemplate(messageConverters);
     }
 
     @PreDestroy

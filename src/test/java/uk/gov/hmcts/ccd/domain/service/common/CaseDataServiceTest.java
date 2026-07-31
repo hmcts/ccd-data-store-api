@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -525,13 +525,13 @@ class CaseDataServiceTest {
                                                       String... expectedItemClassifications) {
         assertThat(collection.isObject(), is(true));
         assertThat(collection.size(), is(2));
-        assertThat(collection.get("classification").textValue(), is(expectedCollectionClassification));
+        assertThat(collection.get("classification").stringValue(), is(expectedCollectionClassification));
         final JsonNode classificationValues = collection.get("value");
         assertThat(classificationValues.isArray(), is(true));
         assertThat(classificationValues.size(), is(expectedItemClassifications.length));
 
         for (int i = 0; i < expectedItemClassifications.length; i++) {
-            assertThat(classificationValues.get(i).get("classification").textValue(),
+            assertThat(classificationValues.get(i).get("classification").stringValue(),
                 is(expectedItemClassifications[i]));
         }
     }

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +127,7 @@ public class CaseService {
 
                 String defaultValue = caseField.getDefaultValue();
                 if (defaultValue != null) {
-                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().textNode(defaultValue));
+                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().stringNode(defaultValue));
                 }
 
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
@@ -140,7 +140,7 @@ public class CaseService {
                 if (!collect.isEmpty()) { // to prevent construct like "FieldA": {}
                     ObjectNode objectNode = MAPPER.getNodeFactory().objectNode();
                     collect.forEach(e -> {
-                        String next = e.fieldNames().next();
+                        String next = e.propertyNames().iterator().next();
                         objectNode.set(next, e.findValue(next));
                     });
                     data.put(caseField.getCaseFieldId(), objectNode);

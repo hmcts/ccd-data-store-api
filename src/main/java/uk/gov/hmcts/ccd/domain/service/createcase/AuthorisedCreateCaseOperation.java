@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;

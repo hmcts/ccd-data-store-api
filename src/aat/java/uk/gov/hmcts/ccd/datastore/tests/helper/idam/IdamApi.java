@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import feign.Body;
 import feign.Headers;
 import feign.Param;
@@ -33,7 +33,7 @@ public interface IdamApi {
     IdamUser getUser(@Param("access_token") String accessToken);
 
     class AuthenticateUserResponse {
-        @JsonProperty("code")
+        @SerializedName("code")
         private String code;
 
         public String getCode() {
@@ -43,7 +43,7 @@ public interface IdamApi {
 
     class TokenExchangeResponse {
 
-        @JsonProperty("access_token")
+        @SerializedName("access_token")
         private String accessToken;
 
         public String getAccessToken() {
@@ -52,10 +52,10 @@ public interface IdamApi {
     }
 
     class IdamUser {
-        @JsonProperty("uid")
+        @SerializedName("uid")
         private String uid;
 
-        @JsonProperty("roles")
+        @SerializedName("roles")
         private List<String> roles;
 
         public String getUid() {
@@ -67,4 +67,3 @@ public interface IdamApi {
         }
     }
 }
-

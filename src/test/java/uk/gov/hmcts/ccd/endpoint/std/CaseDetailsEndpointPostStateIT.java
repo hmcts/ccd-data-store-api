@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.util.List;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,7 +86,7 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
         performRequestAndValidate(data, "Goodness", "CaseEnteredIntoLegacy");
     }
 
-    private JsonNode createData() throws com.fasterxml.jackson.core.JsonProcessingException {
+    private JsonNode createData() throws tools.jackson.core.JacksonException {
         return mapper.readTree("{"
             + "\"PersonLastName\":\"Test Last\","
             + "\"PersonFirstName\":\"Test First\"}");

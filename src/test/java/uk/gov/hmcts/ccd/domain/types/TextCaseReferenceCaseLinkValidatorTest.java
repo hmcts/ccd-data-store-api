@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,11 +68,11 @@ class TextCaseReferenceCaseLinkValidatorTest {
 
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
-        final JsonNode validValue = NODE_FACTORY.textNode("1596-1048-4059-0000");
+        final JsonNode validValue = NODE_FACTORY.stringNode("1596-1048-4059-0000");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
-        final JsonNode invalidValue = NODE_FACTORY.textNode("1596104840593131");
+        final JsonNode invalidValue = NODE_FACTORY.stringNode("1596104840593131");
         ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
         final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 
@@ -96,11 +96,11 @@ class TextCaseReferenceCaseLinkValidatorTest {
     void textRegexFail() {
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
-        final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
+        final JsonNode validValue = NODE_FACTORY.stringNode("15xxxx00");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
-        final JsonNode invalidValue = NODE_FACTORY.textNode("15961077777774840593131");
+        final JsonNode invalidValue = NODE_FACTORY.stringNode("15961077777774840593131");
         ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
         final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 
@@ -117,7 +117,7 @@ class TextCaseReferenceCaseLinkValidatorTest {
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final String caseReference = "1596-1048-4059-0000";
-        final JsonNode validValue = NODE_FACTORY.textNode(caseReference);
+        final JsonNode validValue = NODE_FACTORY.stringNode(caseReference);
 
         when(caseService.getCaseDetailsByCaseReference("1596104840590000")).thenThrow(
             new ResourceNotFoundException("No case exist with id=" + caseReference)
@@ -126,7 +126,7 @@ class TextCaseReferenceCaseLinkValidatorTest {
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
-        final JsonNode invalidValue = NODE_FACTORY.textNode("1596104840593131");
+        final JsonNode invalidValue = NODE_FACTORY.stringNode("1596104840593131");
         ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
         final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 

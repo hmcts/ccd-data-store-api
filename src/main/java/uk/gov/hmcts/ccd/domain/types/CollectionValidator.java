@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
@@ -71,7 +71,7 @@ public class CollectionValidator implements BaseTypeValidator {
         }
 
         final Set<String> ids = new HashSet<>();
-        final Iterator<JsonNode> items = dataValue.elements();
+        final Iterator<JsonNode> items = dataValue.values().iterator();
 
         Integer index = 0;
         while (items.hasNext()) {
@@ -87,19 +87,19 @@ public class CollectionValidator implements BaseTypeValidator {
 
             if (item.hasNonNull(ID)) {
                 final JsonNode itemId = item.get(ID);
-                if (!itemId.isTextual()) {
+                if (!itemId.isString()) {
                     final ValidationResult result =
                         new ValidationResult("Collection item ID must be a string", itemFieldId);
                     validationResults.add(result);
                 }
 
-                if (ids.contains(itemId.textValue())) {
+                if (ids.contains(itemId.stringValue(null))) {
                     final ValidationResult result =
                         new ValidationResult("Collection item ID must be unique", itemFieldId);
                     validationResults.add(result);
                 }
 
-                ids.add(itemId.textValue());
+                ids.add(itemId.stringValue(null));
             }
 
             index++;

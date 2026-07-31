@@ -129,7 +129,7 @@ public class DefaultUserRepository implements UserRepository {
             final HttpHeaders requestHeaders = securityUtils.authorizationHeaders();
             requestHeaders.add(EMAIL_HEADER, userId.toLowerCase());
             final HttpEntity<RestRequest> requestEntity = new HttpEntity<>(requestHeaders);
-            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
+            final String encodedUrl = UriComponentsBuilder.fromUriString(applicationParams.userDefaultSettingsURL())
                 .toUriString();
 
             UserDefaultCollection userDefaultCollection = restTemplate

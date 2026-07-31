@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.jsonpath;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -53,7 +53,7 @@ public class CaseDetailsJsonParser {
         documentContext.set(JsonPath.compile(jsonPath), value);
         try {
             caseDetails.setData(JacksonUtils.convertJsonNode(documentContext.jsonString()));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new BadRequestException("Unable to process updated Case Details Data");
         }
     }
@@ -73,7 +73,7 @@ public class CaseDetailsJsonParser {
     private String convertToJson(CaseDetails caseDetails) {
         try {
             return JacksonUtils.writeValueAsString(caseDetails.getData());
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new BadRequestException("Unable to process Case Details Data");
         }
     }

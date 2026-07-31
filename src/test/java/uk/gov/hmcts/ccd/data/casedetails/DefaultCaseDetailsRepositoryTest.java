@@ -36,7 +36,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRequestEvent;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -178,12 +177,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
         caseDetails.setResolvedTTL(RESOLVED_TTL);
-        try {
-            caseDetails.setData(JacksonUtils.convertValue(
-                mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        caseDetails.setData(JacksonUtils.convertValue(
+            mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
         final CaseDetails caseDetailsPersisted = caseDetailsRepository.set(caseDetails);
         assertThat(caseDetailsPersisted.getId(), is(notNullValue()));
         assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
@@ -205,11 +200,11 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
             () -> assertThat(byId.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
             () -> assertThat(byId.getReference(), is(1504259907353529L)),
-            () -> assertThat(byId.getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byId.getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
-            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byId.getData().get("PersonFirstName").asString(), is("Janet")),
+            () -> assertThat(byId.getData().get("PersonLastName").asString(), is("Parker")),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine1").asString(), is("123")),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine2").asString(), is("Fake Street")),
+            () -> assertThat(byId.getData().get("PersonAddress").get("AddressLine3").asString(), is("Hexton"))
         );
     }
 
@@ -226,12 +221,12 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
             () -> assertThat(byReference.getSecurityClassification(), is(SecurityClassification.PUBLIC)),
             () -> assertThat(byReference.getReference(), is(1504259907353529L)),
-            () -> assertThat(byReference.getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byReference.getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(),
+            () -> assertThat(byReference.getData().get("PersonFirstName").asString(), is("Janet")),
+            () -> assertThat(byReference.getData().get("PersonLastName").asString(), is("Parker")),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asString(), is("123")),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asString(),
                     is("Fake Street")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asString(), is("Hexton"))
         );
     }
 
@@ -529,13 +524,16 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(),
                 is(SecurityClassification.PUBLIC)),
             () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is(1504259907353529L)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asString(), is("Janet")),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asString(), is("Parker")),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress")
+                .get("AddressLine1").asString(),
                 is("123")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress")
+                .get("AddressLine2").asString(),
                 is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress")
+                .get("AddressLine3").asString(),
                 is("Hexton"))
         );
     }

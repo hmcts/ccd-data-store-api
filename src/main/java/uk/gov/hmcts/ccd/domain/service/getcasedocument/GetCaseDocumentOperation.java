@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class GetCaseDocumentOperation {
 
     private boolean isDocumentPresentInTheCaseData(String documentId, Map<String, JsonNode> data) {
         return data.values().stream()
-            .map(node -> node.findValuesAsText(DOCUMENT_BINARY_URL))
+            .map(node -> node.findValuesAsString(DOCUMENT_BINARY_URL))
             .flatMap(List::stream)
             .anyMatch(binaryLink -> isDocumentIdMatches(binaryLink, documentId));
     }

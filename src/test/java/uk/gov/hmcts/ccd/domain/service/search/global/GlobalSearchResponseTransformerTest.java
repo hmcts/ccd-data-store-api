@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

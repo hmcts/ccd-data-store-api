@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -17,14 +17,14 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,7 +50,7 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_EXTERNAL_USER);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -73,10 +73,10 @@ public class ExternalUserRoleIT extends WireMockBaseTest {
 
         // Check that we have the expected test data set size
         List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 1, resultList.size());
+        assertEquals(1, resultList.size(), "Incorrect data initiation");
 
         List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect data initiation", 3, eventList.size());
+        assertEquals(3, eventList.size(), "Incorrect data initiation");
 
         mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT_EXTERNAL,
                 eventList.get(1).getId()))

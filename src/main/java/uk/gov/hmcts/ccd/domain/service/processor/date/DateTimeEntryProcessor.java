@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.processor.date;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.processor.CaseDataFieldProcessor;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType.DATETIMEENTRY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
@@ -45,7 +45,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
         return !isNullOrEmpty(node)
             && field.hasDisplayContextParameter(DATETIMEENTRY)
             && isSupportedBaseType(baseType, SUPPORTED_TYPES)
-            ? createNode(field, node.asText(), baseType, fieldPath)
+            ? createNode(field, asText(node), baseType, fieldPath)
             : node;
     }
 
@@ -84,7 +84,7 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
             return valueNode;
         }
         return isSupportedBaseType(collectionFieldType, SUPPORTED_TYPES)
-            ? createNode(caseViewField, valueNode.asText(), collectionFieldType, fieldPath)
+            ? createNode(caseViewField, asText(valueNode), collectionFieldType, fieldPath)
             : executeComplex(valueNode,
                             caseViewField.getFieldTypeDefinition().getChildren(),
                             null,
@@ -92,7 +92,10 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                             topLevelField);
     }
 
-    private TextNode createNode(CommonField caseViewField, String valueToConvert, BaseType baseType, String fieldPath) {
+    private JsonNode createNode(CommonField caseViewField,
+                                String valueToConvert,
+                                BaseType baseType,
+                                String fieldPath) {
         String format = caseViewField.getDisplayContextParameterValue(DATETIMEENTRY)
             .orElseThrow(() -> new DataProcessingException().withDetails(
                 String.format("Unable to obtain datetime format for field %s with display context parameter %s",

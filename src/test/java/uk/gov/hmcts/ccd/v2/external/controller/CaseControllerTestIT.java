@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -107,7 +106,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
     @BeforeEach
     public void setUp() throws JSONException {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
         responseJsonObject1 = new JSONObject(responseJson1);
@@ -391,7 +389,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         assertNotNull(savedCaseResource, "Saved Case Details should not be null");
 
         JsonNode searchCriteriaJsonNode = savedCaseResource.getData().get("SearchCriteria");
-        assertEquals(searchCriteriaJsonNode.get("OtherCaseReferences").findValue("value").asText(),
+        assertEquals(searchCriteriaJsonNode.get("OtherCaseReferences").findValue("value").asString(),
             testFieldValue,
             "Saved case data should contain SearchCriteria with OtherCaseReferences");
 
@@ -867,12 +865,12 @@ class CaseControllerTestIT extends WireMockBaseTest {
         }
     }
 
-    private Map<String, Map<String, Object>> readValueToMap(String jsonRequest) throws JsonProcessingException {
+    private Map<String, Map<String, Object>> readValueToMap(String jsonRequest) throws JacksonException {
         return mapper.readValue(jsonRequest, new TypeReference<HashMap<String, Map<String, Object>>>() {
         });
     }
 
-    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestMultiple() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestMultiple() throws JacksonException {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
             + "\t\t\"orgs_assigned_users.organisationA\": 25,\n"
@@ -884,7 +882,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
-    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestOrgB() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequestOrgB() throws JacksonException {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
             + "\t\t\"orgs_assigned_users.organisationB\": 23\n"
@@ -895,7 +893,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
-    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequest() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataSetRequest() throws JacksonException {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
             + "\t\t\"orgs_assigned_users.organisationA\": 22\n"
@@ -906,7 +904,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         return new SupplementaryDataUpdateRequest(requestData);
     }
 
-    private SupplementaryDataUpdateRequest createSupplementaryDataIncrementRequest() throws JsonProcessingException {
+    private SupplementaryDataUpdateRequest createSupplementaryDataIncrementRequest() throws JacksonException {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
             + "\t\t\"orgs_assigned_users.organisationA\": 3\n"
@@ -1034,7 +1032,6 @@ class CaseControllerTestIT extends WireMockBaseTest {
             final String caseReference = "abc";
             final String URL = "/getLinkedCases/" + caseReference;
 
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             final MvcResult mvcResult = mockMvc.perform(get(URL)
                     .header(REQUEST_ID, REQUEST_ID_VALUE)

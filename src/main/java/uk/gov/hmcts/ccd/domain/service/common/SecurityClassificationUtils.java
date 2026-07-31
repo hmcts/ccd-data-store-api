@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class SecurityClassificationUtils {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationUtils.class);
 
     private static final String ID = "id";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     private SecurityClassificationUtils() {
     }
@@ -40,7 +40,7 @@ public class SecurityClassificationUtils {
         if (dataNode == null || dataNode.isNull()) {
             return Optional.empty();
         }
-        return getSecurityClassification(dataNode.textValue());
+        return getSecurityClassification(dataNode.stringValue(null));
     }
 
     public static Optional<SecurityClassification> getSecurityClassification(String classification) {

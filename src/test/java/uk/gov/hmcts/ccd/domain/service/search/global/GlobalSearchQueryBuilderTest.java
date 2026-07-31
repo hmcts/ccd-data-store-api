@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
@@ -62,7 +62,8 @@ class GlobalSearchQueryBuilderTest {
     @DisplayName("GlobalSearch Query")
     class GlobalSearchQuery {
 
-        private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+        private final ObjectMapperService objectMapperService =
+            new DefaultObjectMapperService(JsonMapper.builderWithJackson2Defaults().build());
 
         @DisplayName("Null Check: should return empty QueryBuilder when supplied with null request")
         @Test
@@ -460,7 +461,7 @@ class GlobalSearchQueryBuilderTest {
         private String getNestedQueriesPathValue(QueryBuilder queryBuilder) {
             // NB: cannot read nested path value so force into JSON
             JsonNode jsonNode = objectMapperService.convertStringToObject(queryBuilder.toString(), JsonNode.class);
-            return jsonNode != null ? jsonNode.at("/nested/path").asText() : null;
+            return jsonNode != null ? jsonNode.at("/nested/path").asString() : null;
         }
 
         private RangeQueryBuilder getRangeQueryBuilder(QueryBuilder queryBuilder, String fieldName) {

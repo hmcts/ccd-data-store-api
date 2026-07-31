@@ -10,17 +10,17 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Named
 @Singleton
 public class CollectionSanitiser implements Sanitiser {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     public static final String VALUE = "value";
     public static final String ID = "id";
 
@@ -59,10 +59,10 @@ public class CollectionSanitiser implements Sanitiser {
                 }
 
                 // Generate missing IDs
-                if (item.hasNonNull(ID) && item.get(ID).isTextual()) {
+                if (item.hasNonNull(ID) && item.get(ID).isString()) {
                     sanitisedItem.set(ID, item.get(ID));
                 } else {
-                    sanitisedItem.set(ID, JSON_NODE_FACTORY.textNode(UUID.randomUUID().toString()));
+                    sanitisedItem.set(ID, JSON_NODE_FACTORY.stringNode(UUID.randomUUID().toString()));
                 }
 
                 sanitisedData.add(sanitisedItem);

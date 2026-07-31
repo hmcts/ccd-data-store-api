@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,7 +48,7 @@ public class CasePointerRepositoryTest extends WireMockBaseTest {
     @Inject
     private PlatformTransactionManager transactionManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         originalCaseDetails = createOriginalCaseDetails();
     }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 
@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static java.math.BigDecimal.ONE;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @Named
 @Singleton
@@ -47,7 +48,7 @@ public class MultiSelectListValidator implements BaseTypeValidator {
         final HashSet<String> uniqueValues = new HashSet<>();
 
         dataValue.forEach(value -> {
-            final String textValue = value.asText();
+            final String textValue = asText(value);
 
             final Boolean found = validValues.stream()
                 .anyMatch(validValue -> validValue.getCode().equals(textValue));

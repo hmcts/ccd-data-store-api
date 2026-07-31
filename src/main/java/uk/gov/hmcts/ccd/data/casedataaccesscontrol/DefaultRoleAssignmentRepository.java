@@ -148,7 +148,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
             return roleAssignments.get(userId).getRight();
         }
-        if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
+        if (exchange.getHeaders().containsHeader(ETAG) && exchange.getHeaders().getETag() != null) {
             log.debug("GET RoleAssignments response contains header ETag={}", exchange.getHeaders().getETag());
             if (thereAreRoleAssignmentsInTheBody(exchange)) {
                 roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
@@ -188,7 +188,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         final Map<String, String> queryParams = new HashMap<>();
         queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
 
-        final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
+        final String encodedUrl = UriComponentsBuilder.fromUriString(applicationParams.amGetRoleAssignmentsURL())
             .buildAndExpand(queryParams).toUriString();
 
         return restTemplate.exchange(new URI(encodedUrl),

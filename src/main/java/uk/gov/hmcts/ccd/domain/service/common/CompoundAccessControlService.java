@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static java.util.Spliterators.spliteratorUnknownSize;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_DELETE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -107,8 +108,10 @@ public class CompoundAccessControlService {
                                                   CaseFieldDefinition caseFieldDefinition,
                                                   Set<AccessProfile> accessProfiles) {
         boolean containsDeletedItem = caseFieldDefinition.isCollectionFieldType() && StreamSupport
-            .stream(spliteratorUnknownSize(existingData.get(caseFieldDefinition.getId()).elements(),
-                Spliterator.ORDERED), false)
+            .stream(spliteratorUnknownSize(
+                existingData.get(caseFieldDefinition.getId()).values().iterator(),
+                Spliterator.ORDERED
+            ), false)
             .anyMatch(oldItem -> itemMissing(oldItem, newData.get(caseFieldDefinition.getId())));
 
         return (!containsDeletedItem
@@ -121,7 +124,7 @@ public class CompoundAccessControlService {
 
     private boolean itemMissing(JsonNode oldItem, JsonNode newValue) {
         boolean itemExists =
-            StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+            StreamSupport.stream(spliteratorUnknownSize(newValue.values().iterator(), Spliterator.ORDERED), false)
                 .anyMatch(newItem -> !isNullId(newItem) && newItem.get("id").equals(oldItem.get("id")));
         return !itemExists;
     }
@@ -199,7 +202,10 @@ public class CompoundAccessControlService {
                                                   Set<AccessProfile> accessProfiles) {
         if (caseFieldDefinition.isCollectionFieldType()) {
             boolean containsUpdatedItem = StreamSupport.stream(
-                spliteratorUnknownSize(existingData.get(caseFieldDefinition.getId()).elements(), Spliterator.ORDERED),
+                spliteratorUnknownSize(
+                    existingData.get(caseFieldDefinition.getId()).values().iterator(),
+                    Spliterator.ORDERED
+                ),
                 false)
                 .anyMatch(oldItem ->
                     itemUpdated(oldItem, newData.get(caseFieldDefinition.getId()),
@@ -213,7 +219,7 @@ public class CompoundAccessControlService {
 
     private boolean itemUpdated(JsonNode oldItem, JsonNode newValue, CaseFieldDefinition caseFieldDefinition,
                                 Set<AccessProfile> accessProfiles) {
-        return StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+        return StreamSupport.stream(spliteratorUnknownSize(newValue.values().iterator(), Spliterator.ORDERED), false)
             .anyMatch(newItem -> {
                 boolean itemExists = !isNullId(newItem) && newItem.get("id").equals(oldItem.get("id"));
                 if (itemExists) {
@@ -340,19 +346,19 @@ public class CompoundAccessControlService {
         if (newItem == null) {
             return Optional.empty();
         }
-        return StreamSupport.stream(spliteratorUnknownSize(newItem.elements(), Spliterator.ORDERED), false)
+        return StreamSupport.stream(spliteratorUnknownSize(newItem.values().iterator(), Spliterator.ORDERED), false)
             .filter(node -> node.get("id") != null && node.get("id").equals(id))
             .findFirst();
     }
 
     private boolean containsNewCollectionItem(JsonNode data) {
-        return StreamSupport.stream(spliteratorUnknownSize(data.elements(), Spliterator.ORDERED), false)
+        return StreamSupport.stream(spliteratorUnknownSize(data.values().iterator(), Spliterator.ORDERED), false)
             .anyMatch(this::isNullId);
     }
 
     private boolean isNullId(JsonNode newItem) {
         return newItem.get("id") == null
             || newItem.get("id").equals(NullNode.getInstance())
-            || newItem.get("id").asText().equalsIgnoreCase("null");
+            || asText(newItem.get("id")).equalsIgnoreCase("null");
     }
 }

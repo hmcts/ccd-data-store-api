@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,7 +42,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponse
 
 public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_CASE = "/internal/cases/1504259907353529";
-    private static final String GET_EVENT = "/internal/cases/1504259907353529/events/1";
+    private static final String GET_EVENT = "/internal/cases/1504259907353529/events/%s";
     private static final String UID_NO_EVENT_ACCESS = "1234";
     private static final String UID_WITH_EVENT_ACCESS = "123";
 
@@ -97,7 +96,6 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
@@ -138,7 +136,6 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
@@ -159,6 +156,18 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldGetEventById() throws Exception {
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            roleAssignmentJson("idam:[02-TEST-EVENT-ACCESS-ROLE]", "PROBATE",
+                "TestAddressBookNoEventAccessToCaseRole", "1504259907353529")
+        );
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + UID_WITH_EVENT_ACCESS))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+
+        final Long eventId = template.queryForObject(
+            "SELECT id FROM case_event WHERE event_id = ?",
+            Long.class,
+            "TEST_EVENT_ACCESS"
+        );
 
         UserInfo userInfo = UserInfo.builder()
             .uid(UID_WITH_EVENT_ACCESS)
@@ -171,17 +180,16 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
         headers.add(AUTHORIZATION, "Bearer " + UID_WITH_EVENT_ACCESS);
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
-        final MvcResult result = mockMvc.perform(get(GET_EVENT)
+        final MvcResult result = mockMvc.perform(get(String.format(GET_EVENT, eventId))
             .contentType(JSON_CONTENT_TYPE)
             .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         CaseHistoryViewResource response = mapper.readValue(content, CaseHistoryViewResource.class);
-        assertThat(response.getEvent().getId(), is(1L));
+        assertThat(response.getEvent().getId(), is(eventId));
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());

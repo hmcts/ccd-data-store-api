@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.decentralised.client.ServicePersistenceClient;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DelegatingCaseDetailsRepositoryTest {
 
     private static final String JURISDICTION = "TEST_JURISDICTION";
@@ -54,7 +54,7 @@ public class DelegatingCaseDetailsRepositoryTest {
     private CaseDetails decentralizedCaseDetails;
     private CaseDetails decentralizedFullCaseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         centralizedCaseDetails = createCaseDetails(CASE_TYPE_CENTRALIZED);
         decentralizedCaseDetails = createCaseDetails(CASE_TYPE_DECENTRALIZED);

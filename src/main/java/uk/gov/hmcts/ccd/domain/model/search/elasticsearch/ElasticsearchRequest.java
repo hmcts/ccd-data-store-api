@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import lombok.Data;
 import lombok.NonNull;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -16,6 +16,8 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.stringOrNullNode;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_CLASSIFICATION_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.DATA_COL;
 
@@ -39,9 +41,9 @@ public class ElasticsearchRequest {
     static {
         METADATA_FIELDS = MAPPER.createArrayNode();
         for (String metadata : MetaData.CaseField.getColumnNames()) {
-            METADATA_FIELDS.add(new TextNode(metadata));
+            METADATA_FIELDS.add(new StringNode(metadata));
         }
-        METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
+        METADATA_FIELDS.add(new StringNode(DATA_CLASSIFICATION_COL));
     }
 
     public ElasticsearchRequest(@NonNull JsonNode searchRequest) {
@@ -76,7 +78,7 @@ public class ElasticsearchRequest {
         }
 
         return nativeSearchRequest.has(SOURCE) && !getSource().isEmpty()
-            && !(getSource().size() == 1 && getSource().get(0).asText().equals(WILDCARD));
+            && !(getSource().size() == 1 && asText(getSource().get(0)).equals(WILDCARD));
     }
 
     public JsonNode getSource() {
@@ -86,7 +88,7 @@ public class ElasticsearchRequest {
     public List<String> getRequestedFields() {
         if (hasSourceFields() && getSource().isArray()) {
             return StreamSupport.stream(getSource().spliterator(), false)
-                .map(JsonNode::asText)
+                .map(node -> asText(node))
                 .map(this::getFieldId)
                 .filter(Objects::nonNull)
                 .collect(toList());
@@ -114,7 +116,7 @@ public class ElasticsearchRequest {
     public void setRequestedSupplementaryData(String... requestedSupplementaryDataFields) {
         requestedSupplementaryData = MAPPER.createArrayNode();
         for (String field : requestedSupplementaryDataFields) {
-            requestedSupplementaryData.add(new TextNode(field));
+            requestedSupplementaryData.add(stringOrNullNode(field));
         }
     }
 
@@ -137,12 +139,12 @@ public class ElasticsearchRequest {
         if (hasSourceFields()) {
             sourceFields.addAll((ArrayNode) getSource());
         } else {
-            sourceFields.add(new TextNode(DATA_COL));
+            sourceFields.add(new StringNode(DATA_COL));
         }
 
         if (hasRequestedSupplementaryData()) {
             StreamSupport.stream(getRequestedSupplementaryData().spliterator(), false)
-                .forEach(sd -> sourceFields.add(new TextNode(SUPPLEMENTARY_DATA_PREFIX + sd.asText())));
+                .forEach(sd -> sourceFields.add(new StringNode(SUPPLEMENTARY_DATA_PREFIX + asText(sd))));
         }
 
         return sourceFields;

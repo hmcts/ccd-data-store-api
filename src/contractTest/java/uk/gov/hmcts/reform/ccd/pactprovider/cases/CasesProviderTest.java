@@ -8,10 +8,11 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.StringNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +57,7 @@ public class CasesProviderTest {
     @Mock
     private CreateCaseOperation createCaseOperation;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
@@ -77,35 +78,35 @@ public class CasesProviderTest {
     }
 
     @State("A Get Case is requested")
-    public void getCase() throws JsonProcessingException {
+    public void getCase() throws JacksonException {
         when(getCaseOperation.execute(anyString())).thenReturn(Optional.of(mockCaseDetails()));
     }
 
     @State("A Start event for a Citizen is requested")
-    public void startEventForCitizen() throws JsonProcessingException {
+    public void startEventForCitizen() throws JacksonException {
         when(startEventOperation.triggerStartForCase(anyString(), anyString(), anyBoolean()))
             .thenReturn(mockStartEventResult());
     }
 
     @State("A Start case for a Citizen is requested")
-    public void startCaseForCitizen() throws JsonProcessingException {
+    public void startCaseForCitizen() throws JacksonException {
         when(startEventOperation.triggerStartForCaseType(anyString(), anyString(), anyBoolean()))
             .thenReturn(mockStartEventResult());
     }
 
     @State("A Submit event for a Citizen is requested")
-    public void createCaseEventForCitizen() throws JsonProcessingException {
+    public void createCaseEventForCitizen() throws JacksonException {
         when(createEventOperation.createCaseEvent(anyString(), nullable(CaseDataContent.class)))
             .thenReturn(mockCaseDetails());
     }
 
     @State("A Submit case for a Citizen is requested")
-    public void saveCaseDetailsForCitizen() throws JsonProcessingException {
+    public void saveCaseDetailsForCitizen() throws JacksonException {
         when(createCaseOperation.createCaseDetails(anyString(), nullable(CaseDataContent.class), anyBoolean()))
             .thenReturn(mockCaseDetails());
     }
 
-    private StartEventResult mockStartEventResult() throws JsonProcessingException {
+    private StartEventResult mockStartEventResult() throws JacksonException {
         StartEventResult startEventResult = new StartEventResult();
         startEventResult.setToken("someToken");
         startEventResult.setEventId("startAppeal");
@@ -113,7 +114,7 @@ public class CasesProviderTest {
         return startEventResult;
     }
 
-    private CaseDetails mockCaseDetails() throws JsonProcessingException {
+    private CaseDetails mockCaseDetails() throws JacksonException {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(1L);
         caseDetails.setCaseTypeId("ET_EnglandWales");
@@ -122,29 +123,29 @@ public class CasesProviderTest {
         caseDetails.setAfterSubmitCallbackResponseEntity(new ResponseEntity<>(HttpStatus.OK));
         caseDetails.setState("appealStarted");
         caseDetails.setData(new HashMap<String, JsonNode>() {{
-                put("appealReferenceNumber", new TextNode("DRAFT"));
-                put("appealType", new TextNode("protection"));
-                put("appellantDateOfBirth", new TextNode("1990-12-07"));
-                put("appellantFamilyName", new TextNode("Smith"));
-                put("appellantGivenNames", new TextNode("Bob"));
-                put("appellantNameForDisplay", new TextNode("Bob Smith"));
-                put("appellantTitle", new TextNode("Mr"));
-                put("applicationOutOfTimeExplanation", new TextNode("test case"));
+                put("appealReferenceNumber", new StringNode("DRAFT"));
+                put("appealType", new StringNode("protection"));
+                put("appellantDateOfBirth", new StringNode("1990-12-07"));
+                put("appellantFamilyName", new StringNode("Smith"));
+                put("appellantGivenNames", new StringNode("Bob"));
+                put("appellantNameForDisplay", new StringNode("Bob Smith"));
+                put("appellantTitle", new StringNode("Mr"));
+                put("applicationOutOfTimeExplanation", new StringNode("test case"));
                 put("caseManagementLocation", objectMapper.readTree("{\"baseLocation\":\"765324\",\"region\":"
                     + "\"1\"}"));
-                put("currentCaseStateVisibleToLegalRepresentative", new TextNode("appealStarted"));
-                put("homeOfficeDecisionDate", new TextNode("2019-08-01"));
-                put("homeOfficeReferenceNumber", new TextNode("000123456"));
+                put("currentCaseStateVisibleToLegalRepresentative", new StringNode("appealStarted"));
+                put("homeOfficeDecisionDate", new StringNode("2019-08-01"));
+                put("homeOfficeReferenceNumber", new StringNode("000123456"));
                 put("legalRepCompanyAddress", objectMapper.readTree("{\"AddressLine1\":\"\",\"AddressLine2\":"
                     + "\"\",\"AddressLine3\":\"\",\"Country\":\"\",\"PostCode\":\"\",\"PostTown\":\"\"}"));
-                put("legalRepCompanyName", new TextNode(""));
-                put("staffLocation", new TextNode("Taylor House"));
-                put("submissionOutOfTime", new TextNode("Yes"));
+                put("legalRepCompanyName", new StringNode(""));
+                put("staffLocation", new StringNode("Taylor House"));
+                put("submissionOutOfTime", new StringNode("Yes"));
                 put("subscriptions", objectMapper.readTree("[{\"id\":\"1\",\"value\":{\"email\":"
                     + "\"test@example.com\",\"mobileNumber\":\"0111111111\",\"subscriber\":\"appellant\","
                     + "\"wantsEmail\":\"Yes\",\"wantsSms\":\"Yes\"}}]"));
-                put("uploadAddendumEvidenceLegalRepActionAvailable", new TextNode("No"));
-                put("uploadAdditionalEvidenceActionAvailable", new TextNode("No"));
+                put("uploadAddendumEvidenceLegalRepActionAvailable", new StringNode("No"));
+                put("uploadAdditionalEvidenceActionAvailable", new StringNode("No"));
                 put("uploadTheNoticeOfDecisionDocs", objectMapper.readTree("[{\"id\":\"1\",\"value\":"
                     + "{\"description\":\"some notice of decision description\",\"document\":{\"document_binary_url\":"
                     + "\"http://dm-store-aat.service.core-compute-aat.internal/documents/"
@@ -152,8 +153,8 @@ public class CasesProviderTest {
                     + "\"some-notice-of-decision-letter.pdf\",\"document_url\":"
                     + "\"http://dm-store-aat.service.core-compute-aat.internal/documents/"
                     + "7f63ca9b-c361-49ab-aa8c-8fbdb6bc2936\"}}}]"));
-                put("caseSource", new TextNode("Manually Created"));
-                put("caseType", new TextNode("Single"));
+                put("caseSource", new StringNode("Manually Created"));
+                put("caseType", new StringNode("Single"));
             }
         });
         return caseDetails;

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.json.JSONException;
@@ -61,7 +61,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @Mock
     private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
-    private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+    private final ObjectMapperService objectMapperService =
+        new DefaultObjectMapperService(JsonMapper.builderWithJackson2Defaults().build());
     private JsonNode searchRequestNode;
     private ElasticsearchRequest elasticsearchRequest;
 
@@ -96,7 +97,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         assertEquals(CASE_TYPE_ID_1, securedSearchRequest.getCaseTypeId());
         assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
         assertEquals(FILTER_VALUE_1, jsonNode.at("/query/bool/filter").get(0).at("/term/filterTermValue/value")
-            .asText());
+            .asString());
     }
 
     @Test
@@ -163,13 +164,13 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         Map<String, JsonNode> mapOfFilterValues =
             createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
         assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
-            .at("/term/filterTermValue/value").asText());
+            .at("/term/filterTermValue/value").asString());
         assertEquals(FILTER_VALUE_2, mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
-            .at("/term/filterTermValue/value").asText());
+            .at("/term/filterTermValue/value").asString());
         assertEquals(CASE_TYPE_ID_1.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must")
-            .get(1).at("/term/case_type_id/value").asText());
+            .get(1).at("/term/case_type_id/value").asString());
         assertEquals(CASE_TYPE_ID_2.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
-            .get(1).at("/term/case_type_id/value").asText());
+            .get(1).at("/term/case_type_id/value").asString());
     }
 
     @Test
@@ -294,7 +295,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     }
 
     private String decodedQuery(JsonNode queryJsonNode) {
-        return new String(Base64.getDecoder().decode(queryJsonNode.asText()));
+        return new String(Base64.getDecoder().decode(queryJsonNode.asString()));
     }
 
     private QueryBuilder newQueryBuilder(String value) {
@@ -309,7 +310,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
             for (JsonNode mustNode : shouldNode.at("/bool/must")) {
                 if (!mustNode.at("/term/case_type_id").isEmpty()) {
                     values.put(
-                        mustNode.at("/term/case_type_id/value").asText(),
+                        mustNode.at("/term/case_type_id/value").asString(),
                         shouldNode
                     );
                 }

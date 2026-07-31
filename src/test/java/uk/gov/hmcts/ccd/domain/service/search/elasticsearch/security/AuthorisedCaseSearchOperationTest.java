@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -202,9 +202,9 @@ class AuthorisedCaseSearchOperationTest {
                 anyBoolean())).thenReturn(searchResult);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
-            dataNode.set("firstName", JsonNodeFactory.instance.textNode("Baker"));
+            dataNode.set("firstName", JsonNodeFactory.instance.stringNode("Baker"));
             ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
-            complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
+            complexNode.set("postcode", JsonNodeFactory.instance.stringNode("W4"));
             dataNode.set("personAddress", complexNode);
             when(objectMapperService.convertObjectToJsonNode(anyMap()))
                 .thenReturn(dataNode);
@@ -244,9 +244,9 @@ class AuthorisedCaseSearchOperationTest {
                 anyBoolean())).thenReturn(searchResult);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
-            dataNode.set("firstName", JsonNodeFactory.instance.textNode("Baker"));
+            dataNode.set("firstName", JsonNodeFactory.instance.stringNode("Baker"));
             ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
-            complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
+            complexNode.set("postcode", JsonNodeFactory.instance.stringNode("W4"));
             dataNode.set("personAddress", complexNode);
             when(objectMapperService.convertObjectToJsonNode(anyMap()))
                 .thenReturn(dataNode);
@@ -274,7 +274,7 @@ class AuthorisedCaseSearchOperationTest {
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
             ObjectNode textNode = JsonNodeFactory.instance.objectNode();
-            textNode.set("value", JsonNodeFactory.instance.textNode("some text"));
+            textNode.set("value", JsonNodeFactory.instance.stringNode("some text"));
             ArrayNode collectionNode = JsonNodeFactory.instance.arrayNode();
             collectionNode.add(textNode);
             dataNode.set("collectionField", collectionNode);

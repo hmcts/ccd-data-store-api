@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public class CaseLinkRetrievalService {
         final JsonNode caseLinksJsonNode = caseDetails.getData()
             .getOrDefault(CaseLinkExtractor.STANDARD_CASE_LINK_FIELD, NullNode.getInstance());
 
-        Iterator<JsonNode> iterator = caseLinksJsonNode.elements();
+        Iterator<JsonNode> iterator = caseLinksJsonNode.values().iterator();
         while (iterator.hasNext()) {
             if (caseReference.equals(getValueFromPath("value.CaseReference", iterator.next()))) {
                 return true; // found

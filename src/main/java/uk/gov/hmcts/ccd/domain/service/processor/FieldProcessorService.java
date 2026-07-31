@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @Service
 public class FieldProcessorService {
@@ -114,7 +116,7 @@ public class FieldProcessorService {
     private boolean isNullOrEmpty(final JsonNode node) {
         return node == null
             || node.isNull()
-            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
+            || (node.isString() && (null == asText(node) || asText(node).trim().length() == 0))
             || (node.isObject() && node.toString().equals("{}"));
     }
 }

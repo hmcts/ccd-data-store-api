@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -142,7 +141,6 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         );
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         String userJson = "{\n"
             + "          \"sub\": \"Cloud.Strife@test.com\",\n"

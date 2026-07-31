@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.Link;
@@ -21,16 +22,16 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 @DisplayName("CaseDataResource")
 class CaseDataResourceTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String PAGE_ID = "pageId";
     private static final Map<String, JsonNode> DATA = newCaseData()
-        .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.textNode("aValue")))
+        .withPair("data", JSON_NODE_FACTORY.objectNode().set("aField", JSON_NODE_FACTORY.stringNode("aValue")))
         .build();
     public static final Map<String, JsonNode> UNWRAPPED_DATA = newCaseData()
-        .withPair("aField", JSON_NODE_FACTORY.textNode("aValue"))
+        .withPair("aField", JSON_NODE_FACTORY.stringNode("aValue"))
         .build();
     private static final JsonNode UNWRAPPED_DATA_NODE = JacksonUtils.convertValueJsonNode(UNWRAPPED_DATA);
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().withData(DATA).build();

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +101,7 @@ public class GlobalSearchProcessorService {
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference()) && !jsonNode.isNull()) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(jsonNode.textValue())
+                        .value(jsonNode.stringValue(null))
                         .build());
                 }
             }));
@@ -304,7 +304,7 @@ public class GlobalSearchProcessorService {
     }
 
     private String jsonNodeObjectToText(JsonNode jsonNode) {
-        return isNull(jsonNode) ? null : jsonNode.textValue();
+        return isNull(jsonNode) ? null : jsonNode.stringValue(null);
     }
 
     private boolean isNull(JsonNode jsonNode) {

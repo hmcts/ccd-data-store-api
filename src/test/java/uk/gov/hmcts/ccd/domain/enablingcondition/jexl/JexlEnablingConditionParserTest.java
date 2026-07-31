@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 class JexlEnablingConditionParserTest {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
 
     private JexlEnablingConditionParser enablingConditionParser;
 
@@ -112,9 +112,9 @@ class JexlEnablingConditionParserTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenDataIsNotValidJson() throws JsonProcessingException {
+    void shouldThrowExceptionWhenDataIsNotValidJson() throws JacksonException {
         ObjectMapper objectMapper = mock(ObjectMapper.class);
-        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+        when(objectMapper.writeValueAsString(any())).thenThrow(JacksonException.class);
         enablingConditionParser = new JexlEnablingConditionParser(new JexlEnablingConditionConverter(),
             objectMapper);
         String enablingCondition = "FieldA!=\"\" AND FieldB=\"I'm innocent\")";
@@ -132,7 +132,7 @@ class JexlEnablingConditionParserTest {
         String enablingCondition = "[INJECTED_DATA__gsData]=\"myValue\"";
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put("[INJECTED_DATA__gsData]", JSON_NODE_FACTORY.textNode("myValue"));
+        data.put("[INJECTED_DATA__gsData]", JSON_NODE_FACTORY.stringNode("myValue"));
 
         Boolean isValid = enablingConditionParser.evaluate(enablingCondition, data);
 
@@ -145,7 +145,7 @@ class JexlEnablingConditionParserTest {
         String enablingCondition = "[INJECTED_DATA.gsData]=\"myValue\"";
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put("[INJECTED_DATA.gsData]", JSON_NODE_FACTORY.textNode("myValue"));
+        data.put("[INJECTED_DATA.gsData]", JSON_NODE_FACTORY.stringNode("myValue"));
 
         Boolean isValid = enablingConditionParser.evaluate(enablingCondition, data);
 
@@ -156,8 +156,8 @@ class JexlEnablingConditionParserTest {
     private Map<String, JsonNode> createCaseData(String fieldA,
                                                  String fieldB) {
         Map<String, JsonNode> data = new HashMap<>();
-        data.put("FieldA", JSON_NODE_FACTORY.textNode(fieldA));
-        data.put("FieldB", JSON_NODE_FACTORY.textNode(fieldB));
+        data.put("FieldA", JSON_NODE_FACTORY.stringNode(fieldA));
+        data.put("FieldB", JSON_NODE_FACTORY.stringNode(fieldB));
         return data;
     }
 }

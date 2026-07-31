@@ -6,8 +6,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class DynamicListValidatorTest {
 
     @Test
     public void validValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
                       "value": {
                         "code": "FixedList1",
@@ -100,7 +100,7 @@ class DynamicListValidatorTest {
         when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(500);
         validator = new DynamicListValidator(applicationParams);
 
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
                       "value": {
                         "code": "FixedList1",
@@ -143,7 +143,7 @@ class DynamicListValidatorTest {
         when(applicationParams.getValidationDynamicListValueMaxLength()).thenReturn(2);
         validator = new DynamicListValidator(applicationParams);
 
-        JsonNode dataValue = new ObjectMapper().readTree("""
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build().readTree("""
             {
                       "value": {
                         "code": "FixedList1",
@@ -183,7 +183,8 @@ class DynamicListValidatorTest {
     @Test
     @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     public void invalidValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build()
+            .readTree("{\n" + "          \"default\": {\n"
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
@@ -222,7 +223,8 @@ class DynamicListValidatorTest {
 
     @Test
     public void emptyCodeAndValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build()
+            .readTree("{\n" + "          \"default\": {\n"
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
@@ -260,7 +262,8 @@ class DynamicListValidatorTest {
 
     @Test
     public void emptyListItems() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+        JsonNode dataValue = JsonMapper.builderWithJackson2Defaults().build()
+            .readTree("{\n" + "          \"default\": {\n"
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"

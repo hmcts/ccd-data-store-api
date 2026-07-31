@@ -5,9 +5,9 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -85,14 +85,14 @@ public class DefaultStartEventOperationTest {
     private static final String PRIVATE = SecurityClassification.PRIVATE.name();
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Maps.newHashMap();
     private static final Map<String, JsonNode> DEFAULT_VALUE_DATA = expectedDefaultValue();
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final int TTL_INCREMENT = 20;
 
     private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION =
-        Map.of("key", JSON_NODE_FACTORY.textNode("value"));
+        Map.of("key", JSON_NODE_FACTORY.stringNode("value"));
 
     private static final Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION_TTL =
-        Map.of("key", JSON_NODE_FACTORY.textNode("value_with_ttl"));
+        Map.of("key", JSON_NODE_FACTORY.stringNode("value_with_ttl"));
 
     static Map<String, JsonNode> expectedDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
@@ -115,11 +115,11 @@ public class DefaultStartEventOperationTest {
                                                                  + "}");
             data.put("OrganisationPolicyField", orgPolicyDefaultValue);
 
-            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+            data.put("TextField0",  MAPPER.getNodeFactory().stringNode("Default text"));
 
-            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Should not replace existing text"));
+            data.put("TextField1",  MAPPER.getNodeFactory().stringNode("Should not replace existing text"));
 
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return data;
@@ -147,12 +147,12 @@ public class DefaultStartEventOperationTest {
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
 
-            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
+            data.put("TextField1",  MAPPER.getNodeFactory().stringNode("Existing text"));
 
             data.put("TextField0",  MAPPER.getNodeFactory().nullNode());
 
 
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return data;
@@ -169,7 +169,7 @@ public class DefaultStartEventOperationTest {
                 + "}");
 
             data.put("TTL", ttl);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             ex.printStackTrace();
         }
 
@@ -198,11 +198,11 @@ public class DefaultStartEventOperationTest {
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
 
-            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+            data.put("TextField0",  MAPPER.getNodeFactory().stringNode("Default text"));
 
-            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
+            data.put("TextField1",  MAPPER.getNodeFactory().stringNode("Existing text"));
 
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return data;

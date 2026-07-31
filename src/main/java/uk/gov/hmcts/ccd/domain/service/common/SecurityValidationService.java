@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,8 @@ public class SecurityValidationService {
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
 
-        Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
+        Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator =
+            callbackDataClassification.properties().iterator();
         while (callbackDataClassificationIterator.hasNext()) {
             Map.Entry<String, JsonNode> callbackClassificationMap = callbackDataClassificationIterator.next();
             String callbackClassificationKey = callbackClassificationMap.getKey();

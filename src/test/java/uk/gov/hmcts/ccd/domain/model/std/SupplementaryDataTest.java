@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,8 @@ class SupplementaryDataTest {
     private static final String INVALID_KEY = "orgs_assigned_users.test";
 
     @Test
-    void testConstruction() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    void testConstruction() throws JacksonException {
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
             + "\t\t\"orgs_assigned_users\": {\n"
@@ -40,8 +41,8 @@ class SupplementaryDataTest {
     }
 
     @Test
-    void testConstructionFailure() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    void testConstructionFailure() throws JacksonException {
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
             + "\t\t\"orgs_assigned_users\": {\n"

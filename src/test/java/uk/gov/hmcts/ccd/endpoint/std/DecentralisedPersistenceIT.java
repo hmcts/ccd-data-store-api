@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +86,7 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
     private JdbcTemplate jdbcTemplate;
     private JsonNode data;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         data = mapper.readTree(DATA_JSON_STRING);
 
@@ -105,7 +105,7 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
             .willReturn(okJson(getTestDefinition(wiremockPort, DECENTRALISED_CASE_TYPE_ID)).withStatus(200)));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         wireMockServer.resetAll();
     }
@@ -181,7 +181,7 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
 
         assertThat(actualResponseData)
             .as("Response should contain case data from decentralised service (only readable fields)")
-            .containsEntry("PersonLastName", expectedResponseDataNode.get("PersonLastName").asText())
+            .containsEntry("PersonLastName", expectedResponseDataNode.get("PersonLastName").asString())
             .containsEntry("PersonAddress", expectedAddress);
 
         // AND: The ServicePersistenceAPI should have been called exactly once
@@ -252,6 +252,11 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         Map<?, ?> responseBody = mapper.readValue(content, Map.class);
         Map<?, ?> responseData = (Map<?, ?>) responseBody.get("data");
         assertEquals("Roof", responseData.get("PersonLastName"));
+        Map<?, ?> responseAddress = (Map<?, ?>) responseData.get("PersonAddress");
+        assertEquals("Wales", responseAddress.get("Country"));
+        Map<?, ?> links = (Map<?, ?>) responseBody.get("_links");
+        Map<?, ?> selfLink = (Map<?, ?>) links.get("self");
+        assertThat(selfLink.get("href").toString()).endsWith(URL);
 
     }
 
@@ -508,7 +513,7 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         assertEquals("Expected decentralised case history view to be returned", 200, status);
 
         final JsonNode response = mapper.readTree(mvcResult.getResponse().getContentAsString());
-        assertThat(response.get("case_id").asText())
+        assertThat(response.get("case_id").asString())
             .as("Response should include original case reference")
             .isEqualTo(caseReference);
 
@@ -516,9 +521,9 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
         assertThat(responseEvent.get("id").asLong())
             .as("Case history view should include decentralised event id")
             .isEqualTo(eventId);
-        assertThat(responseEvent.get("event_name").asText()).isEqualTo("Create Case");
-        assertThat(responseEvent.get("event_id").asText()).isEqualTo("CREATE-CASE");
-        assertThat(responseEvent.get("state_id").asText()).isEqualTo("CaseCreated");
+        assertThat(responseEvent.get("event_name").asString()).isEqualTo("Create Case");
+        assertThat(responseEvent.get("event_id").asString()).isEqualTo("CREATE-CASE");
+        assertThat(responseEvent.get("state_id").asString()).isEqualTo("CaseCreated");
 
         verify(getRequestedFor(urlEqualTo("/ccd-persistence/cases/" + caseReference + "/history/" + eventId)));
 
@@ -757,7 +762,7 @@ public class DecentralisedPersistenceIT extends WireMockBaseTest {
 
         assertEquals("Start event should provide a valid token", 200, startEventResult.getResponse().getStatus());
         final JsonNode startEventJson = mapper.readTree(startEventResult.getResponse().getContentAsString());
-        return startEventJson.get("token").asText();
+        return startEventJson.get("token").asString();
     }
 
     private CaseDataContent buildEventContent(String token, JsonNode caseData, String eventId) {

@@ -10,10 +10,10 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLE
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -24,7 +24,7 @@ import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 @Service
 public class CaseDataService {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
     private static final String DEFAULT_CLASSIFICATION = "";
@@ -47,7 +47,7 @@ public class CaseDataService {
                                               final JsonNode existingDataClassificationNode,
                                               final List<CaseFieldDefinition> caseFieldDefinitions,
                                               final String fieldIdPrefix) {
-        final Iterator<String> fieldNames = dataNode.fieldNames();
+        final Iterator<String> fieldNames = dataNode.propertyNames().iterator();
         while (fieldNames.hasNext()) {
             boolean found = false;
             final String fieldName = fieldNames.next();
@@ -109,7 +109,8 @@ public class CaseDataService {
                                                    String fieldName,
                                                    CaseFieldDefinition caseField) {
         dataNode.put(fieldName, existingDataClassificationNode.equals(JSON_NODE_FACTORY.objectNode())
-            ? getClassificationFromCaseFieldOrDefault(caseField) : existingDataClassificationNode.textValue());
+            ? getClassificationFromCaseFieldOrDefault(caseField)
+            : existingDataClassificationNode.stringValue(null));
     }
 
     private String getClassificationFromCaseFieldOrDefault(CaseFieldDefinition caseField) {
@@ -142,8 +143,8 @@ public class CaseDataService {
                 } else {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
                     // Add `classification` property
-                    final String newClassification = itemClassification.isTextual()
-                        ? itemClassification.textValue() : getClassificationFromCaseFieldOrDefault(caseField);
+                    final String newClassification = itemClassification.isString()
+                        ? itemClassification.stringValue(null) : getClassificationFromCaseFieldOrDefault(caseField);
                     simpleCollectionItemNode.put(CLASSIFICATION, newClassification);
                     // Remove `value` property
                     simpleCollectionItemNode.remove(VALUE);

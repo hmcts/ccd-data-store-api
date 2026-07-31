@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import jakarta.inject.Named;
@@ -32,7 +32,7 @@ public class EmailValidator implements BaseTypeValidator {
             return Collections.emptyList();
         }
 
-        final String value = dataValue.textValue();
+        final String value = dataValue.stringValue(null);
 
         if (null == value) {
             return Collections.singletonList(new ValidationResult(dataValue + " is not a valid email",

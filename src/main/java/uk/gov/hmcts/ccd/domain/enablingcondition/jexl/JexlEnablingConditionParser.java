@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     @Inject
     public JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter) {
-        this(enablingConditionConverter, new ObjectMapper().registerModule(new JavaTimeModule()));
+        this(enablingConditionConverter, JsonMapper.builderWithJackson2Defaults().build());
     }
 
     protected JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter,
@@ -93,7 +93,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     private String caseDataToJsonString(Map<String, ?> caseData) {
         try {
             return this.objectMapper.writeValueAsString(caseData);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ServiceException("Unable to convert case data to JSON string", e);
         }
     }

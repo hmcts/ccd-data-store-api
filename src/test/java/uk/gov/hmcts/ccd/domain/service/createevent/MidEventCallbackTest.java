@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 class MidEventCallbackTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
@@ -441,8 +442,8 @@ class MidEventCallbackTest {
 
     private Map<String, JsonNode> createData() {
         Map<String, JsonNode> data = new HashMap<>();
-        data.put("createCase2_field1", new TextNode("test1"));
-        data.put("createCase2_field1_complex1", new TextNode("complex1"));
+        data.put("createCase2_field1", new StringNode("test1"));
+        data.put("createCase2_field1_complex1", new StringNode("complex1"));
         return data;
     }
 

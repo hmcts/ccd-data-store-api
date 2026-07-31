@@ -3,8 +3,11 @@ package uk.gov.hmcts.ccd;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.net.URI;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -37,9 +41,10 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
@@ -68,6 +73,19 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
         final ResponseEntity<JsonNode> response = restTemplate.exchange(request, JsonNode.class);
         assertResponse(response);
+    }
+
+    @Test
+    public void shouldConfigureOnlyJackson3JsonObjectConverter() {
+        RestTemplate configuredRestTemplate = new RestTemplateConfiguration(
+            JsonMapper.builderWithJackson2Defaults().build()).printableDocumentsRestTemplate();
+
+        List<HttpMessageConverter<?>> jsonObjectConverters = configuredRestTemplate.getMessageConverters().stream()
+            .filter(converter -> converter.canWrite(OptionalJsonPayload.class, MediaType.APPLICATION_JSON))
+            .toList();
+
+        assertThat(jsonObjectConverters, hasSize(1));
+        assertThat(jsonObjectConverters.getFirst().getClass(), is(JacksonJsonHttpMessageConverter.class));
     }
 
     @Test
@@ -112,7 +130,8 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     public void shouldApplyDistinctConnectAndReadTimeoutsWhenConfiguredSeparately() {
         final int connectTimeout = 500;
         final int readTimeout = 5000;
-        RestTemplateConfiguration configuration = new RestTemplateConfiguration();
+        RestTemplateConfiguration configuration =
+            new RestTemplateConfiguration(JsonMapper.builderWithJackson2Defaults().build());
         // Provide minimal defaults to satisfy the configuration wiring
         ReflectionTestUtils.setField(configuration, "maxTotalHttpClient", 10);
         ReflectionTestUtils.setField(configuration, "maxSecondsIdleConnection", 1);
@@ -137,7 +156,8 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     public void defaultClientFactoryShouldUseReadTimeoutForSocket() {
         final int connectTimeout = 800;
         final int readTimeout = 3200;
-        RestTemplateConfiguration configuration = new RestTemplateConfiguration();
+        RestTemplateConfiguration configuration =
+            new RestTemplateConfiguration(JsonMapper.builderWithJackson2Defaults().build());
         ReflectionTestUtils.setField(configuration, "maxTotalHttpClient", 10);
         ReflectionTestUtils.setField(configuration, "maxSecondsIdleConnection", 1);
         ReflectionTestUtils.setField(configuration, "maxClientPerRoute", 2);
@@ -162,11 +182,14 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             .withBody(RESPONSE_BODY)));
     }
 
-    private void assertResponse(final ResponseEntity<JsonNode> response) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+    private void assertResponse(final ResponseEntity<JsonNode> response) throws JacksonException {
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
         assertThat(response.getBody(), is(objectMapper.readValue(RESPONSE_BODY, JsonNode.class)));
         assertThat(response.getHeaders().get(CONTENT_TYPE), contains(MIME_TYPE));
         assertThat(response.getStatusCode().value(), is(SC_OK));
+    }
+
+    private record OptionalJsonPayload(Optional<String> value) {
     }
 }

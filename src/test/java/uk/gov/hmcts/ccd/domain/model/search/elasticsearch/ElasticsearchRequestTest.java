@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.search.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +32,10 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 class ElasticsearchRequestTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @Test
-    void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -43,7 +44,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void hasSourceFieldsShouldReturnTrueWhenSourceIsProvided() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnTrueWhenSourceIsProvided() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.Field\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -52,7 +53,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void hasSourceFieldsShouldReturnFalseWhenSourceIsEmpty() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsEmpty() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -61,7 +62,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void hasSourceFieldsShouldReturnFalseWhenSourceOnlyHasWildcard() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceOnlyHasWildcard() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -70,7 +71,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void hasSourceFieldsShouldReturnFalseWhenSourceIsFalse() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsFalse() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": false,\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -79,7 +80,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void hasSourceFieldsShouldReturnFalseWhenSourceIsTrue() throws JsonProcessingException {
+    void hasSourceFieldsShouldReturnFalseWhenSourceIsTrue() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": true,\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -88,7 +89,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldReturnRequestedFieldsAsCaseFieldIds() throws JsonProcessingException {
+    void shouldReturnRequestedFieldsAsCaseFieldIds() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
                                              + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
@@ -106,7 +107,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldOnlyReturnRequestedMetadataFieldsThatExist() throws JsonProcessingException {
+    void shouldOnlyReturnRequestedMetadataFieldsThatExist() throws JacksonException {
         JsonNode queryNode =
                 queryAsJsonNode("{\"_source\":[\"reference\",\"INVALID\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
@@ -121,7 +122,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldReturnNoRequestedFieldsWhenOnlyWildcardIsRequested() throws JsonProcessingException {
+    void shouldReturnNoRequestedFieldsWhenOnlyWildcardIsRequested() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
                 new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
@@ -132,7 +133,7 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldHandleWrappedQueryFormatWithSupplementaryData() throws JsonProcessingException {
+    void shouldHandleWrappedQueryFormatWithSupplementaryData() throws JacksonException {
         JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.CaseDataField\","
               + "\"reference\",\"state\",\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}},"
                + "\"supplementary_data\":[\"SupDataField\"]}");
@@ -187,8 +188,7 @@ class ElasticsearchRequestTest {
     void shouldSetMetadataFieldsArrayNode() throws Exception {
         ArrayNode result = ElasticsearchRequest.METADATA_FIELDS;
 
-        List<String> resultAsList =
-                new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
+        List<String> resultAsList = mapper.convertValue(result, new TypeReference<ArrayList<String>>() {});
         assertAll(
             () -> assertThat(result.size(), is(9)),
             () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
@@ -216,7 +216,7 @@ class ElasticsearchRequestTest {
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
             List<String> sourceFields =
-                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+                mapper.convertValue(sourceNode, new TypeReference<ArrayList<String>>() {});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
@@ -243,7 +243,7 @@ class ElasticsearchRequestTest {
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
             List<String> sourceFields =
-                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+                mapper.convertValue(sourceNode, new TypeReference<ArrayList<String>>() {});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(10)),
@@ -271,7 +271,7 @@ class ElasticsearchRequestTest {
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
             List<String> sourceFields =
-                    new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+                mapper.convertValue(sourceNode, new TypeReference<ArrayList<String>>() {});
 
             assertAll(
                 () -> assertThat(sourceFields.size(), is(12)),
@@ -291,7 +291,7 @@ class ElasticsearchRequestTest {
         }
     }
 
-    private JsonNode queryAsJsonNode(String query) throws JsonProcessingException {
+    private JsonNode queryAsJsonNode(String query) throws JacksonException {
         return mapper.readTree(query);
     }
 }

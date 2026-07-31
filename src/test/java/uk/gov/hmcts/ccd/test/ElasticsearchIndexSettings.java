@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
@@ -17,7 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class ElasticsearchIndexSettings {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private final Map<String, JsonNode> types;
     private final Optional<JsonNode> settings;
     private final Optional<JsonNode> aliases;
@@ -66,7 +68,7 @@ public class ElasticsearchIndexSettings {
     public static JsonNode rawToJson(String rawJson) {
         try {
             return OBJECT_MAPPER.readTree(rawJson);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Problem converting to JSON", e);
         }
     }

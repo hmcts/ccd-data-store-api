@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;

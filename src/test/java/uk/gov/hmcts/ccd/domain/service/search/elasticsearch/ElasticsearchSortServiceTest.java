@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -83,7 +84,7 @@ class ElasticsearchSortServiceTest {
     @Mock
     private ElasticsearchMappings elasticsearchMappings;
 
-    private ObjectMapper objectMapperES = new ObjectMapper();
+    private ObjectMapper objectMapperES = JsonMapper.builderWithJackson2Defaults().build();
 
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
@@ -113,7 +114,7 @@ class ElasticsearchSortServiceTest {
     }
 
     @Test
-    void shouldApplyConfiguredSortForMetadataFields() throws JsonProcessingException {
+    void shouldApplyConfiguredSortForMetadataFields() throws JacksonException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC)
             .build());
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(LAST_MODIFIED_DATE).metadata(true)
@@ -135,7 +136,7 @@ class ElasticsearchSortServiceTest {
     }
 
     @Test
-    void shouldApplyConfiguredSortForCaseDataFields() throws JsonProcessingException {
+    void shouldApplyConfiguredSortForCaseDataFields() throws JacksonException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(TEXT_FIELD_ID).direction(ASC).build());
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(DATE_FIELD_ID).direction(DESC).build());
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_TEXT_FIELD_ID)
@@ -160,7 +161,7 @@ class ElasticsearchSortServiceTest {
     }
 
     @Test
-    void shouldNotApplyConfiguredSortWhenRequestContainsSortOverride() throws JsonProcessingException {
+    void shouldNotApplyConfiguredSortWhenRequestContainsSortOverride() throws JacksonException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC)
             .build());
         String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
@@ -176,7 +177,7 @@ class ElasticsearchSortServiceTest {
     }
 
     @Test
-    void shouldApplyDefaultSortWhenNoSortsAreConfigured() throws JsonProcessingException {
+    void shouldApplyDefaultSortWhenNoSortsAreConfigured() throws JacksonException {
         String searchRequest = "{\"query\":{}}";
         ElasticsearchRequest elasticsearchRequest =
             new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
@@ -190,7 +191,7 @@ class ElasticsearchSortServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenSortOrderCaseFieldIsNotInCaseType() throws JsonProcessingException {
+    void shouldThrowExceptionWhenSortOrderCaseFieldIsNotInCaseType() throws JacksonException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId("UnknownCaseField").direction(ASC).build());
         ElasticsearchRequest elasticsearchRequest =
             new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));

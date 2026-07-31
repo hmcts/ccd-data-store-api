@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -139,7 +139,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
             searchRequestObjectNode.set(NATIVE_ES_QUERY, updatedSearchRequestQuery.deepCopy());
             searchRequestObjectNode.set(SUPPLEMENTARY_DATA, request.getRequestedSupplementaryData());
         } else {
-            searchRequestObjectNode = updatedSearchRequestQuery.deepCopy();
+            searchRequestObjectNode = (ObjectNode) updatedSearchRequestQuery.deepCopy();
         }
 
         return new ElasticsearchRequest(searchRequestObjectNode);

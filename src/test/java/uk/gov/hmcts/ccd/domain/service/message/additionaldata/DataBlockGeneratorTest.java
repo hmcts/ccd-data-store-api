@@ -1,14 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.DecimalNode;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.DecimalNode;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +58,9 @@ class DataBlockGeneratorTest {
     private CaseTypeDefinition caseTypeDefinition;
     private CaseDetails caseDetails;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build();
 
     private static final String FIELD_ID = "FieldId";
     private static final String FIELD_ID_2 = "FieldId2";
@@ -74,7 +77,6 @@ class DataBlockGeneratorTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Test
@@ -101,7 +103,7 @@ class DataBlockGeneratorTest {
             .build();
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, new TextNode("Yes"));
+        data.put(FIELD_ID, new StringNode("Yes"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -184,7 +186,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
 
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.convertValue(TEXT_FIELD, JsonNode.class));
@@ -197,13 +199,13 @@ class DataBlockGeneratorTest {
         Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
 
         assertAll(
-            () -> assertThat(result.get(FIELD_ALIAS).textValue(), is("TextValue")),
+            () -> assertThat(result.get(FIELD_ALIAS).stringValue(), is("TextValue")),
             () -> assertThat(result.size(), is(1))
         );
     }
 
     @Test
-    void shouldBuildDataForPublishableSimpleAddressUkField() throws JsonProcessingException {
+    void shouldBuildDataForPublishableSimpleAddressUkField() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -231,7 +233,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         final JsonNode DATA = mapper.readTree("{\n"
             + "    \"AddressLine1\" : \"line 1\",\n"
@@ -256,7 +258,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForPublishableSimpleCollectionField() throws JsonProcessingException {
+    void shouldBuildDataForPublishableSimpleCollectionField() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -280,7 +282,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         final JsonNode DATA = mapper.readTree("[\n"
             + "    {\n"
@@ -313,7 +315,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForPublishableComplexCollectionField() throws JsonProcessingException {
+    void shouldBuildDataForPublishableComplexCollectionField() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -382,7 +384,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForPublishableComplexField() throws JsonProcessingException {
+    void shouldBuildDataForPublishableComplexField() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -422,7 +424,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         JsonNode jsonData = mapper.readTree("{\n"
             + "      \"NestedField1\": \"valueOne\",\n"
@@ -447,7 +449,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithComplexOverrides() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithComplexOverrides() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -498,7 +500,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField1\": \"valueOne\",\n"
@@ -519,12 +521,12 @@ class DataBlockGeneratorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(1)),
-            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo"))
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asString(), is("valueTwo"))
         );
     }
 
     @Test
-    void shouldBuildDataForComplexWithComplexOverrides2() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithComplexOverrides2() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -569,7 +571,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField1\": \"valueOne\",\n"
@@ -594,7 +596,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithCollectionOverrides() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithCollectionOverrides() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -651,7 +653,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "    \"NestedField2\": [\n"
@@ -689,7 +691,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithCollectionOverrides2() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithCollectionOverrides2() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -733,7 +735,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "    \"NestedField2\": [\n"
@@ -764,7 +766,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithCollectionOverrides3() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithCollectionOverrides3() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -808,7 +810,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "    \"NestedField2\": [\n"
@@ -839,7 +841,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithComplexOverridesWithAlias() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithComplexOverridesWithAlias() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -890,7 +892,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField1\": \"valueOne\",\n"
@@ -918,7 +920,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithComplexOverridesWithMoneyGBP() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithComplexOverridesWithMoneyGBP() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -969,7 +971,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField1\": \"1271\",\n"
@@ -995,7 +997,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForComplexWithComplexOverridesWithYesOrNoField() throws JsonProcessingException {
+    void shouldBuildDataForComplexWithComplexOverridesWithYesOrNoField() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -1046,7 +1048,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField1\": \"No\",\n"
@@ -1199,7 +1201,7 @@ class DataBlockGeneratorTest {
             .build();
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, new TextNode(""));
+        data.put(FIELD_ID, new StringNode(""));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -1246,7 +1248,7 @@ class DataBlockGeneratorTest {
     }
 
     @Test
-    void shouldBuildDataForPublishableComplexOverrideFieldWithNullValue() throws JsonProcessingException {
+    void shouldBuildDataForPublishableComplexOverrideFieldWithNullValue() throws JacksonException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
                 newCaseEventField()
@@ -1303,7 +1305,7 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builderWithJackson2Defaults().build();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
             + "      \"NestedField2\": null"

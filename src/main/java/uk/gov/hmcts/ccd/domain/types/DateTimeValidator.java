@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -14,6 +14,7 @@ import jakarta.inject.Singleton;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 /**
@@ -40,7 +41,7 @@ public class DateTimeValidator implements BaseTypeValidator {
 
         final LocalDateTime dateTimeValue;
         try {
-            dateTimeValue = LocalDateTime.parse(dataValue.asText(), ISO_DATE_TIME);
+            dateTimeValue = LocalDateTime.parse(asText(dataValue), ISO_DATE_TIME);
         } catch (DateTimeParseException e) {
             return Collections.singletonList(new ValidationResult("Date or Time entered is not valid",
                 dataFieldId));
@@ -58,17 +59,17 @@ public class DateTimeValidator implements BaseTypeValidator {
                 .getMin())), dataFieldId));
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), asText(dataValue))) {
             return Collections.singletonList(
-                new ValidationResult(dataValue.asText()
+                new ValidationResult(asText(dataValue)
                     + " Field Type Regex Failed:" + caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(),
                     dataFieldId)
             );
         }
 
-        if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
+        if (!checkRegex(getType().getRegularExpression(), asText(dataValue))) {
             return Collections.singletonList(
-                new ValidationResult(dataValue.asText() + " Date Time Type Regex Failed:" + getType()
+                new ValidationResult(asText(dataValue) + " Date Time Type Regex Failed:" + getType()
                     .getRegularExpression(), dataFieldId)
             );
         }

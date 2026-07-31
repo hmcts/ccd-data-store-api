@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import co.elastic.clients.json.jackson.Jackson3JsonpMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import io.searchbox.core.Search;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JestToESConverterTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @Test
     void fromJest_shouldConvertSingleSearch() {
@@ -76,7 +77,7 @@ class JestToESConverterTest {
         RequestItem item = request.searches().get(0);
 
         StringWriter writer = new StringWriter();
-        var mapper = new JacksonJsonpMapper();
+        var mapper = new Jackson3JsonpMapper();
         var generator = mapper.jsonProvider().createGenerator(writer);
         item.body().serialize(generator, mapper);
         generator.close();
@@ -89,7 +90,7 @@ class JestToESConverterTest {
             () -> assertTrue(bodyJson.has("size")),
             () -> assertTrue(bodyJson.has("search_after")),
             () -> assertEquals(123456789L, bodyJson.get("search_after").get(0).asLong()),
-            () -> assertEquals("case-2", bodyJson.get("search_after").get(1).asText())
+            () -> assertEquals("case-2", bodyJson.get("search_after").get(1).asString())
         );
     }
 
@@ -111,7 +112,7 @@ class JestToESConverterTest {
         RequestItem item = request.searches().get(0);
 
         StringWriter writer = new StringWriter();
-        var mapper = new JacksonJsonpMapper();
+        var mapper = new Jackson3JsonpMapper();
         var generator = mapper.jsonProvider().createGenerator(writer);
         item.body().serialize(generator, mapper);
         generator.close();
@@ -122,7 +123,7 @@ class JestToESConverterTest {
             () -> assertTrue(bodyJson.has("_source")),
             () -> assertTrue(bodyJson.has("search_after")),
             () -> assertEquals(987654321L, bodyJson.get("search_after").get(0).asLong()),
-            () -> assertEquals("case-3", bodyJson.get("search_after").get(1).asText())
+            () -> assertEquals("case-3", bodyJson.get("search_after").get(1).asString())
         );
     }
 }

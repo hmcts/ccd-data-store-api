@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -29,6 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_URL;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.UPLOAD_TIMESTAMP;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
@@ -126,13 +127,13 @@ public class CaseDocumentTimestampService {
     protected List<String> findDocumentUrls(Collection<JsonNode> nodes) {
         List<JsonNode> lstJsonNodes = findNodes(nodes);
         List<String> lstDocumentUrls = new ArrayList<>();
-        lstJsonNodes.forEach(node -> lstDocumentUrls.add(node.get(DOCUMENT_URL).asText()));
+        lstJsonNodes.forEach(node -> lstDocumentUrls.add(asText(node.get(DOCUMENT_URL))));
         return lstDocumentUrls;
     }
 
     protected List<String> findDocumentUrls(List<JsonNode> jsonNodes) {
         List<String> documentUrls = new ArrayList<>();
-        jsonNodes.forEach(node -> documentUrls.add(node.get(DOCUMENT_URL).asText()));
+        jsonNodes.forEach(node -> documentUrls.add(asText(node.get(DOCUMENT_URL))));
         return documentUrls;
     }
 
@@ -177,7 +178,7 @@ public class CaseDocumentTimestampService {
         jsonNodes.forEach(jsonNode -> {
             JsonNode documentUrl = jsonNode.get(DOCUMENT_URL);
             if (documentUrl != null
-                && documentUrlsNew.contains(documentUrl.asText())
+                && documentUrlsNew.contains(asText(documentUrl))
                 && isToBeUpdatedWithTimestamp(jsonNode)) {
                 insertUploadTimestamp(jsonNode, uploadTimestamp);
             }
@@ -281,12 +282,12 @@ public class CaseDocumentTimestampService {
         if (urlNode == null || urlNode.isNull()) {
             return null;
         }
-        return urlNode.asText();
+        return asText(urlNode);
     }
 
     private String getDocumentFilename(JsonNode documentNode) {
-        if (documentNode.has(DOCUMENT_FILENAME) && documentNode.get(DOCUMENT_FILENAME).isTextual()) {
-            return documentNode.get(DOCUMENT_FILENAME).asText();
+        if (documentNode.has(DOCUMENT_FILENAME) && documentNode.get(DOCUMENT_FILENAME).isString()) {
+            return asText(documentNode.get(DOCUMENT_FILENAME));
         }
         return null;
     }

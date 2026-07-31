@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.refdata;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;

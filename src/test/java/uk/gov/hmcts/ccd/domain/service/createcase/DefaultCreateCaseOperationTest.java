@@ -43,9 +43,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -139,7 +139,7 @@ class DefaultCreateCaseOperationTest {
     @Mock
     private IdempotencyKeyHolder keyHolder;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     private TimeToLiveService timeToLiveService;
 
@@ -185,7 +185,6 @@ class DefaultCreateCaseOperationTest {
                                                                     timeToLiveService,
                                                                     keyHolder);
         data = buildJsonNodeData();
-        objectMapper.registerModule(new JavaTimeModule());
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();

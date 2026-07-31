@@ -8,8 +8,7 @@ import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -306,7 +305,6 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
     }
 
     public static List<ElasticSearchCaseDetailsDTO> parseSources(String json) throws Exception {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JsonNode root = mapper.readTree(json);
         List<ElasticSearchCaseDetailsDTO> caseDetailsList = new ArrayList<>();
         JsonNode hitsArray = root.path("hits").path("hits");

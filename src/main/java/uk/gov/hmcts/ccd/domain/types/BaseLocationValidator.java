@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 

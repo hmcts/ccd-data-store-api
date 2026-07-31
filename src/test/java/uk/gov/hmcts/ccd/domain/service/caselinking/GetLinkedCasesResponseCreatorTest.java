@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
@@ -28,8 +28,7 @@ class GetLinkedCasesResponseCreatorTest {
 
     private GetLinkedCasesResponseCreator getLinkedCasesResponseCreator;
 
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-        .registerModule(new JavaTimeModule());
+    protected static final ObjectMapper OBJECT_MAPPER = JsonMapper.builderWithJackson2Defaults().build();
 
     private static final String CASE_REFERENCE = "1648478073517926";
 
@@ -398,7 +397,7 @@ class GetLinkedCasesResponseCreatorTest {
         getLinkedCasesResponseCreator = new GetLinkedCasesResponseCreator();
     }
 
-    private CaseDetails createCaseDetail(List<String> parameters) throws JsonProcessingException {
+    private CaseDetails createCaseDetail(List<String> parameters) throws JacksonException {
         if (parameters.size() != 5) {
             fail("Need 5 strings to create a CaseDetails");
         }
@@ -409,7 +408,7 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfoList() throws JsonProcessingException {
+    void testCreateCaseLinkInfoList() throws JacksonException {
         List<String> caseDetails1 = List.of("1500638105106660",
             "jurisdiction",
             "state",
@@ -449,7 +448,7 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfoListNoCaseLinkFieldsPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListNoCaseLinkFieldsPresent() throws JacksonException {
         final String caseDetails = String.format(CASE_DETAILS_TEMPLATE_NO_CASE_LINK_FIELDS, "1500638105106660",
             "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
 
@@ -468,7 +467,7 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfoListNoLinkReasonCaseLinkFieldsPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListNoLinkReasonCaseLinkFieldsPresent() throws JacksonException {
         final String caseDetails =
             String.format(CASE_DETAILS_TEMPLATE_NO_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
             "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
@@ -490,7 +489,7 @@ class GetLinkedCasesResponseCreatorTest {
     }
 
     @Test
-    void testCreateCaseLinkInfoListEmptyLinkReasonCaseLinkFieldsPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListEmptyLinkReasonCaseLinkFieldsPresent() throws JacksonException {
         final String caseDetails =
             String.format(CASE_DETAILS_TEMPLATE_EMPTY_LINK_REASON_CASE_LINK_FIELDS, "1500638105106660",
                 "jurisdiction", "state", "caseTypeId", "caseNameHmctsInternal");
@@ -513,7 +512,7 @@ class GetLinkedCasesResponseCreatorTest {
 
 
     @Test
-    void testCreateCaseLinkInfoListNoCaseNameHmctsInternalFieldPresent() throws JsonProcessingException {
+    void testCreateCaseLinkInfoListNoCaseNameHmctsInternalFieldPresent() throws JacksonException {
 
         final String minimalCaseDetails = "{\n"
             + "  \"id\": \"1500638105106660\",\n"

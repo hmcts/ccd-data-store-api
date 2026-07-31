@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedCreateCaseOperationTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";

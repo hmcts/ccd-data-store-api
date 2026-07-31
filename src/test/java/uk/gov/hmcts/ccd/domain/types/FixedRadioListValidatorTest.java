@@ -6,7 +6,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class FixedRadioListValidatorTest {
     @Test
     void validValue() {
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
-            NODE_FACTORY.textNode("AAAAAA"),
+            NODE_FACTORY.stringNode("AAAAAA"),
                 caseFieldDefinition);
         assertEquals(0, result01.size());
     }
@@ -60,7 +60,7 @@ class FixedRadioListValidatorTest {
     @Test
     void invalidValue() {
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
-            NODE_FACTORY.textNode("DDDD"),
+            NODE_FACTORY.stringNode("DDDD"),
                 caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
     }

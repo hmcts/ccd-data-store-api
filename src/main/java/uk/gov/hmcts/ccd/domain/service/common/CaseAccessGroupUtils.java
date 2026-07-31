@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @Component
 public class CaseAccessGroupUtils {
@@ -76,7 +78,7 @@ public class CaseAccessGroupUtils {
                                            List<CaseAccessGroupWithId> caseAccessGroupWithIds) {
         if (caseAssignedRoleFieldNode != null) {
             String orgIdentifier = caseAssignedRoleFieldNode.get(ORGANISATION)
-                .get(ORGANISATIONID).textValue();
+                .get(ORGANISATIONID).stringValue(null);
 
             if (orgIdentifier != null && !orgIdentifier.isEmpty()) {
                 String caseGroupID = acd.getCaseAccessGroupIdTemplate()
@@ -140,7 +142,7 @@ public class CaseAccessGroupUtils {
                 JsonNode mergedNode = null;
                 try {
                     mergedNode = objectMapper.readTree(mergedValue);
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     throw new ValidationException(String.format(e.getMessage()));
                 }
 
@@ -165,7 +167,7 @@ public class CaseAccessGroupUtils {
             .stream()
             .filter(Objects::nonNull)
             .filter(node -> node != null && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE) != null
-                && node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
+                && asText(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE)).equalsIgnoreCase(caseRoleId))
             .toList();
 
         LOG.debug("Organisations found for CASE_ACCESS_GROUPS={} caseType={} version={} ORGANISATION={},"
@@ -223,7 +225,7 @@ public class CaseAccessGroupUtils {
     private boolean isCaseAccessGroupTypeField(JsonNode field) {
         return (field != null
             && field.get(CASE_ACCESS_GROUP_TYPE) != null
-            && field.get(CASE_ACCESS_GROUP_TYPE).textValue().equals(CCD_ALL_CASES));
+            && field.get(CASE_ACCESS_GROUP_TYPE).stringValue(null).equals(CCD_ALL_CASES));
     }
 
     private boolean isCaseAccessGroupFromDataClassificationAvailable(CaseDetails caseDetails) {

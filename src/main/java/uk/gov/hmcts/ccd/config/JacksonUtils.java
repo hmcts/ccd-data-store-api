@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ccd.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.TokenStreamFactory;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.POJONode;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
@@ -32,16 +33,16 @@ public final class JacksonUtils {
     private JacksonUtils() {
     }
 
-    public static final JsonFactory jsonFactory = JsonFactory.builder()
+    public static final JsonFactory jsonFactory = JsonFactory.builderWithJackson2Defaults()
         // Change per-factory setting to prevent use of `String.intern()` on symbols
-        .disable(JsonFactory.Feature.INTERN_FIELD_NAMES)
+        .disable(TokenStreamFactory.Feature.INTERN_PROPERTY_NAMES)
         .build();
 
     public static final ObjectMapper MAPPER = JsonMapper.builder(jsonFactory)
+        .configureForJackson2()
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
-        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-        .addModule(new JavaTimeModule())
+        .configure(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES, true)
+        .configure(JsonReadFeature.ALLOW_SINGLE_QUOTES, true)
         .build();
 
     public static Map<String, JsonNode> convertValue(Object from) {
@@ -63,13 +64,58 @@ public final class JacksonUtils {
         });
     }
 
-    public static Map<String, JsonNode> convertJsonNode(String from) throws JsonProcessingException {
+    public static Map<String, JsonNode> convertJsonNode(String from) throws JacksonException {
         return MAPPER.readValue(from, new TypeReference<HashMap<String, JsonNode>>() {
         });
     }
 
-    public static String writeValueAsString(Map<String, JsonNode> caseData) throws JsonProcessingException {
+    public static String writeValueAsString(Map<String, JsonNode> caseData) throws JacksonException {
         return JacksonUtils.MAPPER.writeValueAsString(caseData);
+    }
+
+    /**
+     * Coerces a node to text using Jackson 2's {@code JsonNode.asText()} semantics.
+     *
+     * <p>Jackson 3's replacement, {@code asString()}, rejects container and missing nodes,
+     * while CCD previously relied on Jackson 2 returning an empty string for those nodes.
+     */
+    public static String asText(@NonNull JsonNode jsonNode) {
+        if (jsonNode.isContainer() || jsonNode.isMissingNode()) {
+            return "";
+        }
+        if (jsonNode.isNull()) {
+            return "null";
+        }
+        if (jsonNode.isPojo()) {
+            Object value = ((POJONode) jsonNode).getPojo();
+            return value == null ? "null" : value.toString();
+        }
+        return jsonNode.asString(null);
+    }
+
+    /**
+     * Coerces a node to text using Jackson 2's {@code JsonNode.asText(defaultValue)} semantics.
+     */
+    public static String asText(@NonNull JsonNode jsonNode, String defaultValue) {
+        if (jsonNode.isNull() || jsonNode.isMissingNode()) {
+            return defaultValue;
+        }
+        if (jsonNode.isPojo()) {
+            Object value = ((POJONode) jsonNode).getPojo();
+            return value == null ? defaultValue : value.toString();
+        }
+        if (jsonNode.isContainer()) {
+            return "";
+        }
+        return jsonNode.asString(defaultValue);
+    }
+
+    /**
+     * Creates a Jackson 3 string node while preserving Jackson 2's effective JSON-null
+     * representation for the formerly permitted {@code new TextNode(null)}.
+     */
+    public static JsonNode stringOrNullNode(String value) {
+        return value == null ? MAPPER.getNodeFactory().nullNode() : MAPPER.getNodeFactory().stringNode(value);
     }
 
     /**
@@ -90,7 +136,7 @@ public final class JacksonUtils {
 
     private static JsonNode addNode(List<String> pathElements, String value) {
         if (pathElements.isEmpty()) {
-            return MAPPER.getNodeFactory().textNode(value);
+            return MAPPER.getNodeFactory().stringNode(value);
         } else {
             String first = pathElements.remove(0);
             return MAPPER.getNodeFactory().objectNode().set(first, addNode(pathElements, value));
@@ -115,7 +161,7 @@ public final class JacksonUtils {
             return mainNode;
         }
 
-        Iterator<String> fieldNames = updateNode.fieldNames();
+        Iterator<String> fieldNames = updateNode.propertyNames().iterator();
         while (fieldNames.hasNext()) {
             String updatedFieldName = fieldNames.next();
             JsonNode valueToBeUpdated = mainNode.get(updatedFieldName);
@@ -191,14 +237,12 @@ public final class JacksonUtils {
     }
 
     private static String getValue(@NonNull JsonNode jsonNode) {
-        String returnValue = null;
-
-        if (jsonNode instanceof IntNode) {
-            returnValue = jsonNode.toString();
-        } else {
-            return jsonNode.iterator().hasNext() ? jsonNode.iterator().next().textValue() : jsonNode.textValue();
+        Iterator<JsonNode> values = jsonNode.iterator();
+        JsonNode valueNode = values.hasNext() ? values.next() : jsonNode;
+        if (valueNode instanceof IntNode) {
+            return valueNode.toString();
         }
-        return returnValue;
+        return valueNode.isString() ? valueNode.stringValue() : null;
     }
 
     public static Map<String, JsonNode> convertValueInDataField(Map<String, JsonNode> from) {

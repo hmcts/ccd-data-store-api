@@ -1,27 +1,20 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
 import jakarta.inject.Inject;
 import javax.sql.DataSource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -36,9 +29,6 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.domain.CaseDocumentMetadata;
-import uk.gov.hmcts.ccd.v2.external.domain.Permission;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseDocumentResource;
 
 public class CaseDocumentControllerIT extends WireMockBaseTest {
 
@@ -61,7 +51,6 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
     private SecurityContext securityContext;
 
     private MockMvc mockMvc;
-    protected static final ObjectMapper mapper = new ObjectMapper();
     private static String CUSTOM_CONTEXT = "";
 
     @BeforeEach
@@ -76,7 +65,6 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(customHeadersFilter).build();
         CUSTOM_CONTEXT = applicationParams.getCallbackPassthruHeaderContexts().get(0);
 
-        mapper.registerModule(new Jackson2HalModule());
     }
 
     @Test
@@ -90,22 +78,13 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
                          .header(CUSTOM_CONTEXT, new JSONObject(responseJson1).toString())
                          .header("experimental", true))
             .andExpect(status().is(200))
+            .andExpect(jsonPath("$._links.self.href").value(String
+                .format("http://localhost:%s/cases/1504259907353651/documents/"
+                    + "05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", super.wiremockPort)))
+            .andExpect(jsonPath("$.documentMetadata.documentPermissions.permissions", hasSize(1)))
+            .andExpect(jsonPath("$.documentMetadata.documentPermissions.permissions[0]").value("READ"))
             .andReturn();
 
         assertTrue(result.getResponse().getHeaderNames().contains(CUSTOM_CONTEXT));
-        final CaseDocumentResource caseDocumentResource
-            = mapper.readValue(result.getResponse().getContentAsString(), CaseDocumentResource.class);
-
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentResource.getDocumentMetadata();
-        Optional<Link> self = caseDocumentResource.getLink("self");
-
-        assertAll(
-            () -> assertThat(self.get().getHref(),
-                             is(String
-                                    .format("http://localhost:%s/cases/1504259907353651/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", super.wiremockPort))),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), hasSize(1)),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
-                hasItems(Permission.READ))
-        );
     }
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 
 @Slf4j
 @Component
@@ -61,13 +63,13 @@ public class CaseAccessGroupsMatcher implements RoleAttributeMatcher {
 
         List<String> allGroupIds = new ArrayList<>();
         if (caseAccessGroups.isArray()) {
-            Iterator<JsonNode> elements = caseAccessGroups.elements();
+            Iterator<JsonNode> elements = caseAccessGroups.values().iterator();
             while (elements.hasNext()) {
                 JsonNode jsonNode = elements.next();
                 JsonNode valueNode = jsonNode.get(COLLECTION_VALUE_FIELD);
                 JsonNode idNode = jsonNode.get(COLLECTION_ID_FIELD);
                 if (valueNode != null && idNode != null) {
-                    String caseAccessGroupId = valueNode.get(CASE_ACCESS_GROUP_ID_FIELD).asText();
+                    String caseAccessGroupId = asText(valueNode.get(CASE_ACCESS_GROUP_ID_FIELD));
                     allGroupIds.add(caseAccessGroupId);
                 }
             }

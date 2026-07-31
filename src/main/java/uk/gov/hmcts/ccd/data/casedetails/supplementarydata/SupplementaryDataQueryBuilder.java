@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -56,9 +57,9 @@ public interface SupplementaryDataQueryBuilder {
 
     default String jsonNodeToString(Object data) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
             return objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ServiceException("Unable to map object to JSON string", e);
         }
     }

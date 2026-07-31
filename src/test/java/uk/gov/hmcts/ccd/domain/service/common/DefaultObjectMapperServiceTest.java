@@ -11,12 +11,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +28,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 class DefaultObjectMapperServiceTest {
 
     private DefaultObjectMapperService objectMapperService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
 
     @BeforeEach
     void setUp() {
@@ -77,10 +78,10 @@ class DefaultObjectMapperServiceTest {
 
         @Test
         @DisplayName("should throw exception for errors on converting object to json string")
-        void shouldThrowExceptionOnConvertObjectToString() throws JsonProcessingException {
+        void shouldThrowExceptionOnConvertObjectToString() throws JacksonException {
             ObjectMapper objectMapper = mock(ObjectMapper.class);
             DefaultObjectMapperService service = new DefaultObjectMapperService(objectMapper);
-            doThrow(new JsonParseException(null, "")).when(objectMapper).writeValueAsString(any());
+            doThrow(new StreamReadException(null, "")).when(objectMapper).writeValueAsString(any());
 
             assertThrows(ServiceException.class, () -> service.convertObjectToString(new JsonTestDto()));
         }
@@ -127,7 +128,7 @@ class DefaultObjectMapperServiceTest {
 
         @Test
         @DisplayName("should throw exception for errors on converting object to json string")
-        void shouldThrowExceptionOnConvertObjectToString() throws JsonProcessingException {
+        void shouldThrowExceptionOnConvertObjectToString() throws JacksonException {
             ObjectNode node = objectMapper.createObjectNode();
             node.put("field", "value");
             ObjectMapper objectMapper = mock(ObjectMapper.class);
@@ -136,6 +137,14 @@ class DefaultObjectMapperServiceTest {
                     ArgumentMatchers.<TypeReference<HashMap<String, JsonNode>>>any());
 
             assertThrows(ServiceException.class, () -> service.convertJsonNodeToMap(node));
+        }
+
+        @Test
+        @DisplayName("should wrap Jackson mapping errors")
+        void shouldWrapJacksonMappingErrors() {
+            JsonNode arrayNode = objectMapper.createArrayNode();
+
+            assertThrows(ServiceException.class, () -> objectMapperService.convertJsonNodeToMap(arrayNode));
         }
 
     }

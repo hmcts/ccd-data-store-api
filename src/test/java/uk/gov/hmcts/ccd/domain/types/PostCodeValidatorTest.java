@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,22 +60,22 @@ class PostCodeValidatorTest {
     @Test
     void validPostCodesForBaseRegEx() {
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("M1 1AA"),
+                                                                   NODE_FACTORY.stringNode("M1 1AA"),
             caseFieldDefinition);
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("N60 1NW"),
+                                                                   NODE_FACTORY.stringNode("N60 1NW"),
             caseFieldDefinition);
         final List<ValidationResult> result03 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("CR2 6XH"),
+                                                                   NODE_FACTORY.stringNode("CR2 6XH"),
             caseFieldDefinition);
         final List<ValidationResult> result04 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("DN55 1PT"),
+                                                                   NODE_FACTORY.stringNode("DN55 1PT"),
             caseFieldDefinition);
         final List<ValidationResult> result05 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("W1A 1HQ"),
+                                                                   NODE_FACTORY.stringNode("W1A 1HQ"),
             caseFieldDefinition);
         final List<ValidationResult> result06 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("EC1A 1BB"),
+                                                                   NODE_FACTORY.stringNode("EC1A 1BB"),
             caseFieldDefinition);
 
         assertAll(
@@ -91,10 +91,10 @@ class PostCodeValidatorTest {
     @Test
     void invalidPostCodesForBaseRegEx() {
         final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("3321M1 1AA"),
+                                                                   NODE_FACTORY.stringNode("3321M1 1AA"),
             caseFieldDefinition);
         final List<ValidationResult> result02 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("1m1 1m1"),
+                                                                   NODE_FACTORY.stringNode("1m1 1m1"),
             caseFieldDefinition);
 
         assertAll(
@@ -108,12 +108,12 @@ class PostCodeValidatorTest {
     void checkFieldRegex() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("^[0-9]*$").build();
         final List<ValidationResult> validResult = validator.validate(FIELD_ID,
-                                                                      NODE_FACTORY.textNode("123456789"),
+                                                                      NODE_FACTORY.stringNode("123456789"),
             caseFieldDefinition);
         assertEquals(0, validResult.size());
 
         final List<ValidationResult> invalidResult = validator.validate(FIELD_ID,
-                                                                        NODE_FACTORY.textNode("abc123"),
+                                                                        NODE_FACTORY.stringNode("abc123"),
             caseFieldDefinition);
         assertEquals(1, invalidResult.size(), invalidResult.toString());
     }
@@ -131,7 +131,7 @@ class PostCodeValidatorTest {
     @Test
     void testInvalidMin() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5).build();
-        final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
+        final JsonNode invalidMin = NODE_FACTORY.stringNode("Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch min");
@@ -142,7 +142,7 @@ class PostCodeValidatorTest {
     @Test
     void testInvalidMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMax(6).build();
-        final JsonNode invalidMax = NODE_FACTORY.textNode("Test Test Test");
+        final JsonNode invalidMax = NODE_FACTORY.stringNode("Test Test Test");
 
         final List<ValidationResult> validationResults = validator.validate(FIELD_ID, invalidMax, caseFieldDefinition);
         assertEquals(1, validationResults.size(), "Did not catch max");
@@ -158,7 +158,7 @@ class PostCodeValidatorTest {
         // Disable regular expression checks
         when(postcodeBaseType.getRegularExpression()).thenReturn("^.*$");
 
-        final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
+        final JsonNode DATA = NODE_FACTORY.stringNode("5 & 10");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseFieldDefinition);
         assertEquals(0, validMinMaxResults.size(), validMinMaxResults.toString());
     }
@@ -229,7 +229,7 @@ class PostCodeValidatorTest {
     void shouldPass_whenValidatingNulText() {
         final List<ValidationResult>
             result =
-            validator.validate(FIELD_ID, NODE_FACTORY.textNode(null), caseFieldDefinition);
+            validator.validate(FIELD_ID, NODE_FACTORY.stringNode(null), caseFieldDefinition);
         assertThat(result, empty());
     }
 

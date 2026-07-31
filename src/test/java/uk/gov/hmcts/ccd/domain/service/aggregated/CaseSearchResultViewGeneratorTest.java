@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.IOException;
@@ -157,7 +157,8 @@ class CaseSearchResultViewGeneratorTest {
 
         dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
         supplementaryDataMap = buildData(SUPPLEMENTARY_DATA_FIELD_1, SUPPLEMENTARY_DATA_FIELD_2);
-        ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
+        ObjectNode familyDetails = (ObjectNode) JsonMapper.builderWithJackson2Defaults()
+            .build().readTree(FAMILY_DETAILS_VALUE);
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
@@ -387,10 +388,10 @@ class CaseSearchResultViewGeneratorTest {
                     is(LAST_MODIFIED_DATE)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData().size(), is(2)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData()
-                            .get(SUPPLEMENTARY_DATA_FIELD_1).asText(),
+                            .get(SUPPLEMENTARY_DATA_FIELD_1).asString(),
                 is(SUPPLEMENTARY_DATA_FIELD_1)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getSupplementaryData()
-                            .get(SUPPLEMENTARY_DATA_FIELD_2).asText(),
+                            .get(SUPPLEMENTARY_DATA_FIELD_2).asString(),
                 is(SUPPLEMENTARY_DATA_FIELD_2)),
             () -> assertThat(caseSearchResultView.getCases().get(1).getSupplementaryData(), is(nullValue())),
             () -> assertThat(caseSearchResultView.getCases().get(2).getSupplementaryData(), is(nullValue()))
@@ -620,10 +621,10 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY + SEPARATOR + FATHER_NAME, FAMILY_DETAILS, TEXT_TYPE),
             () -> assertHeaderField(caseSearchResultView.getHeaders().get(0).getFields().get(1),
                 FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED, FAMILY_DETAILS, TEXT_TYPE),
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
+            () -> assertThat(((StringNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(FAMILY + SEPARATOR + FATHER_NAME)).asString(), is(FATHER_NAME_VALUE)),
+            () -> assertThat(((StringNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asString(), is(POSTCODE_VALUE))
         );
     }
 
@@ -660,10 +661,10 @@ class CaseSearchResultViewGeneratorTest {
             Collections.emptyList());
 
         assertAll(
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(CaseAccessMetadata.ACCESS_PROCESS)).asText(), is(AccessProcess.CHALLENGED.name())),
-            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
-                .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
+            () -> assertThat(((StringNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_PROCESS)).asString(), is(AccessProcess.CHALLENGED.name())),
+            () -> assertThat(((StringNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_GRANTED)).asString(),
                 is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
         );
     }

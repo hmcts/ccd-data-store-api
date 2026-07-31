@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -88,7 +88,7 @@ class AuditCaseRemoteOperationTest {
         .build();
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() throws JacksonException {
         MockitoAnnotations.openMocks(this);
         doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();

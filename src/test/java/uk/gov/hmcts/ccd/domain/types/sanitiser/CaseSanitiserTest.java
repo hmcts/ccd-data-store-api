@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 
 public class CaseSanitiserTest {
 
-    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory();
 
     private static final CaseTypeDefinition CASE_TYPE = new CaseTypeDefinition();
 
@@ -30,8 +30,8 @@ public class CaseSanitiserTest {
     private static final FieldTypeDefinition SIMPLE_FIELD_TYPE = new FieldTypeDefinition();
     private static final String SIMPLE_FIELD_ID = "FirstName";
     private static final CaseFieldDefinition SIMPLE_FIELD = new CaseFieldDefinition();
-    private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.textNode("Initial value");
-    private static final JsonNode SIMPLE_VALUE_SANITISED = JSON_FACTORY.textNode("Sanitised value");
+    private static final JsonNode SIMPLE_VALUE_INITIAL = JSON_FACTORY.stringNode("Initial value");
+    private static final JsonNode SIMPLE_VALUE_SANITISED = JSON_FACTORY.stringNode("Sanitised value");
     private static final String TYPE_OTHER = "Other";
 
     static {

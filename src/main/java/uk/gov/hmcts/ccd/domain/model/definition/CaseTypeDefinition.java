@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.StringNode;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -215,12 +215,12 @@ public class CaseTypeDefinition implements Serializable, Copyable<CaseTypeDefini
     }
 
     @JsonIgnore
-    public Map<String, TextNode> getLabelsFromCaseFields() {
+    public Map<String, StringNode> getLabelsFromCaseFields() {
         return getCaseFieldDefinitions()
             .stream()
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField ->
-                JsonNodeFactory.instance.textNode(caseField.getLabel())));
+                JsonNodeFactory.instance.stringNode(caseField.getLabel())));
     }
 
     public List<RoleToAccessProfileDefinition> getRoleToAccessProfiles() {

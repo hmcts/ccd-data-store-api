@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassi
 
 class SecurityValidationServiceTest {
 
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private SecurityValidationService securityValidationService;
 
     @Mock
@@ -1190,6 +1190,6 @@ class SecurityValidationServiceTest {
     }
 
     private JsonNode getTextNode(String value) {
-        return JSON_NODE_FACTORY.textNode(value);
+        return JSON_NODE_FACTORY.stringNode(value);
     }
 }

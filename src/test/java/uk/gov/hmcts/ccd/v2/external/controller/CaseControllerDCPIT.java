@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -82,7 +81,6 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Test
@@ -103,16 +101,16 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
         Map<String, JsonNode> data = caseResource.getData();
 
         assertAll(
-            () -> assertThat(data.get(TEXT_FIELD).asText(), is("Case 1 Text")),
-            () -> assertThat(data.get(DATE_FIELD).asText(), is("2003-01-01")),
-            () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is("1970-01-01T07:08:00.000")),
-            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("0", CollectionValidator.VALUE)).asText(),
+            () -> assertThat(data.get(TEXT_FIELD).asString(), is("Case 1 Text")),
+            () -> assertThat(data.get(DATE_FIELD).asString(), is("2003-01-01")),
+            () -> assertThat(data.get(DATE_TIME_FIELD).asString(), is("1970-01-01T07:08:00.000")),
+            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("0", CollectionValidator.VALUE)).asString(),
                 is("2017-12-16T18:19:20.000")),
-            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("1", CollectionValidator.VALUE)).asText(),
+            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("1", CollectionValidator.VALUE)).asString(),
                 is("2020-12-21T22:23:24.000")),
-            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_DATE_TIME_FIELD)).asText(),
+            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_DATE_TIME_FIELD)).asString(),
                 is("2004-07-01T00:00:00.000")),
-            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_NESTED_FIELD, NESTED_NUMBER_FIELD)).asText(),
+            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_NESTED_FIELD, NESTED_NUMBER_FIELD)).asString(),
                 is("1970-01-01T12:34:00.000"))
         );
     }
@@ -138,40 +136,40 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
         Map<String, JsonNode> data = caseResource.getData();
 
         assertAll(
-            () -> assertThat(data.get(TEXT_FIELD).asText(), is("Case 1 Text")),
-            () -> assertThat(data.get(DATE_FIELD).asText(), is("2000-10-20")),
-            () -> assertThat(data.get(DATE_TIME_FIELD).asText(), is("1987-01-15T00:00:00.000")),
-            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("0", CollectionValidator.VALUE)).asText(),
+            () -> assertThat(data.get(TEXT_FIELD).asString(), is("Case 1 Text")),
+            () -> assertThat(data.get(DATE_FIELD).asString(), is("2000-10-20")),
+            () -> assertThat(data.get(DATE_TIME_FIELD).asString(), is("1987-01-15T00:00:00.000")),
+            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("0", CollectionValidator.VALUE)).asString(),
                 is("2004-01-01T05:06:00.000")),
-            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("1", CollectionValidator.VALUE)).asText(),
+            () -> assertThat(data.get(COLLECTION_FIELD).at(jsonPath("1", CollectionValidator.VALUE)).asString(),
                 is("2010-01-01T11:12:00.000")),
-            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_DATE_TIME_FIELD)).asText(),
+            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_DATE_TIME_FIELD)).asString(),
                 is("2005-03-01T00:00:00.000")),
-            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_NESTED_FIELD, NESTED_NUMBER_FIELD)).asText(),
+            () -> assertThat(data.get(COMPLEX_FIELD).at(jsonPath(COMPLEX_NESTED_FIELD, NESTED_NUMBER_FIELD)).asString(),
                 is("1970-01-01T17:30:00.000")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, DATE_FIELD)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, DATE_FIELD)).asString(),
                 is("1963-05-07")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, DATE_TIME_FIELD)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, DATE_TIME_FIELD)).asString(),
                 is("2008-04-02T16:37:00.000")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, STANDARD_DATE)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, STANDARD_DATE)).asString(),
                 is("1999-08-19")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, STANDARD_DATE_TIME)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, STANDARD_DATE_TIME)).asString(),
                 is("2010-06-17T19:20:00.000")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, DATE_FIELD)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, DATE_FIELD)).asString(),
                 is("1981-02-01")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, DATE_TIME_FIELD)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, DATE_TIME_FIELD)).asString(),
                 is("2002-03-04T00:00:00.000")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, STANDARD_DATE)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, STANDARD_DATE)).asString(),
                 is("2020-02-19")),
             () -> assertThat(data.get(COLLECTION_COMPLEX_DATE_TIME)
-                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, STANDARD_DATE_TIME)).asText(),
+                    .at(jsonPath("0", CollectionValidator.VALUE, NESTED_COMPLEX, STANDARD_DATE_TIME)).asString(),
                 is("2007-07-17T07:07:00.000"))
         );
     }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
-import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryContext;
-import uk.gov.hmcts.ccd.appinsights.CallbackTelemetryThreadContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -139,7 +137,6 @@ public class CallbackService {
 
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
-        CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
         int httpStatus = 0;
         Instant startTime = Instant.now();
 
@@ -214,7 +211,7 @@ public class CallbackService {
 
     private void addPassThruContextValuesToHttpHeaders(HttpHeaders httpHeaders, String context) {
         if (null != request.getAttribute(context)) {
-            if (httpHeaders.containsKey(context)) {
+            if (httpHeaders.containsHeader(context)) {
                 httpHeaders.remove(context);
             }
 

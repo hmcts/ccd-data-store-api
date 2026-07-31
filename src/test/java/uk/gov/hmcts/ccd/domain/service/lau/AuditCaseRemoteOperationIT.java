@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
@@ -157,7 +157,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldMakeAuditRequestWhenPerformingCaseSearch() throws JsonProcessingException, InterruptedException {
+    public void shouldMakeAuditRequestWhenPerformingCaseSearch() throws JacksonException, InterruptedException {
 
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
@@ -195,7 +195,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldMakeAuditRequestWhenPerformingCaseAction() throws JsonProcessingException, InterruptedException {
+    public void shouldMakeAuditRequestWhenPerformingCaseAction() throws JacksonException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)
@@ -236,7 +236,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     @Test
     public void shouldNotThrowExceptionInAuditServiceIfLauIsDown()
-        throws JsonProcessingException, InterruptedException {
+        throws JacksonException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)
@@ -269,7 +269,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     @Test
     public void shouldNotThrowExceptionInAuditServiceIfLauSearchIsDownAndRetry()
-        throws JsonProcessingException, InterruptedException {
+        throws JacksonException, InterruptedException {
         final SearchLog searchLog = new SearchLog();
         searchLog.setUserId(SEARCH_LOG_USER_ID);
         searchLog.setCaseRefs(SEARCH_LOG_CASE_REFS);
@@ -298,7 +298,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     public void shouldRetryIf403StatusFromLAU()
-        throws JsonProcessingException, InterruptedException {
+        throws JacksonException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)
@@ -330,7 +330,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     public void shouldRetryIfResponseStatus502()
-        throws JsonProcessingException, InterruptedException {
+        throws JacksonException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)
@@ -362,7 +362,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     }
 
     public void shouldRetryIfResponseStatus504()
-        throws JsonProcessingException, InterruptedException {
+        throws JacksonException, InterruptedException {
         AuditContext auditContext = AuditContext.auditContextWith()
             .caseId(CASE_ID)
             .auditOperationType(AuditOperationType.CASE_ACCESSED)

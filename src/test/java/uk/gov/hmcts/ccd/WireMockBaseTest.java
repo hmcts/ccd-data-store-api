@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
@@ -20,15 +21,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
+import org.wiremock.spring.WireMockConfigurationCustomizer;
 import uk.gov.hmcts.ccd.feign.FeignClientConfig;
+import uk.gov.hmcts.ccd.wiremock.extensions.CustomisedResponseTransformer;
+import uk.gov.hmcts.ccd.wiremock.extensions.DynamicOAuthJwkSetResponseTransformer;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -46,15 +49,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-@AutoConfigureWireMock(port = 0)
+@EnableWireMock(@ConfigureWireMock(configurationCustomizers = WireMockBaseTest.Customizer.class))
 @Import({FeignClientConfig.class})
 public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
-    protected final ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    protected final ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build();
 
     // data values as per: classpath:sql/insert_cases.sql
     public static final String CASE_01_REFERENCE = "1504259907353529";
@@ -115,7 +118,7 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     @Inject
     protected ApplicationParams applicationParams;
 
-    @Inject
+    @InjectWireMock
     protected WireMockServer wireMockServer;
 
     @BeforeEach
@@ -153,10 +156,10 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     }
 
     public void stubUpstreamFault(final String path, final UUID mappingId) {
-        stubFor(get(urlPathEqualTo(path))
+        upsertStub(get(urlPathEqualTo(path))
             .withId(mappingId)
             .willReturn(aResponse()
-                .withFault(Fault.MALFORMED_RESPONSE_CHUNK)));
+                .withFault(Fault.MALFORMED_RESPONSE_CHUNK)), mappingId);
     }
 
     public void editSuccessStub(final String path, final String payload, final UUID mappingId) {
@@ -172,43 +175,48 @@ public abstract class WireMockBaseTest extends AbstractBaseIntegrationTest {
     }
 
     public void stubNotFound(final String path, final UUID mappingId) {
-        stubFor(get(urlPathEqualTo(path))
+        upsertStub(get(urlPathEqualTo(path))
             .withId(mappingId)
             .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.NOT_FOUND.value())
-            )
-        );
+            ), mappingId);
     }
 
-    public String objectToJsonString(final Object object) {
-        try {
-            return mapper.writeValueAsString(object);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void upsertStub(MappingBuilder mappingBuilder, UUID mappingId) {
+        if (wireMockServer.getSingleStubMapping(mappingId) == null) {
+            wireMockServer.stubFor(mappingBuilder);
+        } else {
+            wireMockServer.editStub(mappingBuilder);
         }
     }
 
-    @Configuration
-    static class WireMockTestConfiguration {
+    public String objectToJsonString(final Object object) {
+        return mapper.writeValueAsString(object);
+    }
 
-        @Bean
-        public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-            return config -> config.extensions(new ResponseDefinitionTransformer() {
+    public static class Customizer implements WireMockConfigurationCustomizer {
 
-                @Override
-                public String getName() {
-                    return "keep-alive-disabler";
-                }
+        @Override
+        public void customize(WireMockConfiguration configuration, ConfigureWireMock options) {
+            configuration.extensions(
+                new CustomisedResponseTransformer(),
+                new DynamicOAuthJwkSetResponseTransformer(),
+                new ResponseDefinitionTransformer() {
 
-                @Override
-                public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
-                                                    FileSource files, Parameters parameters) {
-                    return ResponseDefinitionBuilder.like(responseDefinition)
-                        .withHeader(HttpHeaders.CONNECTION, "close")
-                        .build();
-                }
-            });
+                    @Override
+                    public String getName() {
+                        return "keep-alive-disabler";
+                    }
+
+                    @Override
+                    public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
+                                                        FileSource files, Parameters parameters) {
+                        return ResponseDefinitionBuilder.like(responseDefinition)
+                            .withHeader(HttpHeaders.CONNECTION, "close")
+                            .build();
+                    }
+                });
         }
     }
 

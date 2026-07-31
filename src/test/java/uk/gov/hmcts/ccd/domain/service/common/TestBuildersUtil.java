@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.helpers.MessageFormatter;
@@ -1724,7 +1724,7 @@ public class TestBuildersUtil {
     }
 
     public static JsonNode collectionItem(String id, String value) {
-        return collectionItem(id, JsonNodeFactory.instance.textNode(value));
+        return collectionItem(id, JsonNodeFactory.instance.stringNode(value));
     }
 
     public static JsonNode collectionItem(String id, JsonNode value) {
@@ -1783,7 +1783,7 @@ public class TestBuildersUtil {
     }
 
     public static JsonNode collectionClassification(String id, String classification) {
-        return collectionItem(id, JsonNodeFactory.instance.textNode(classification));
+        return collectionItem(id, JsonNodeFactory.instance.stringNode(classification));
     }
 
     public static JsonNode collectionClassification(String id, JsonNode classification) {

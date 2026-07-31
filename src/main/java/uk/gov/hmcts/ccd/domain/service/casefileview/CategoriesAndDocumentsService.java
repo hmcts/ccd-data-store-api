@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casefileview;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import io.vavr.Tuple2;
 import lombok.NonNull;
 import uk.gov.hmcts.ccd.domain.model.casefileview.CategoriesAndDocuments;

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,6 +27,39 @@ class JacksonUtilsTest {
     private static final String UUID_MARKER = "UUID";
 
     @Test
+    void shouldCoerceNodesToTextUsingJackson2Semantics() {
+        assertAll(
+            () -> assertEquals("", JacksonUtils.asText(MAPPER.createObjectNode().put("field", "value"))),
+            () -> assertEquals("", JacksonUtils.asText(MAPPER.createArrayNode().add("value"))),
+            () -> assertEquals("", JacksonUtils.asText(MAPPER.getNodeFactory().missingNode())),
+            () -> assertEquals("null", JacksonUtils.asText(MAPPER.getNodeFactory().nullNode())),
+            () -> assertEquals("42", JacksonUtils.asText(MAPPER.getNodeFactory().numberNode(42))),
+            () -> assertEquals("value", JacksonUtils.asText(MAPPER.getNodeFactory().stringNode("value"))),
+            () -> assertEquals("wrapped", JacksonUtils.asText(MAPPER.getNodeFactory().pojoNode("wrapped")))
+        );
+    }
+
+    @Test
+    void shouldUseDefaultOnlyForNullOrMissingNodesUsingJackson2Semantics() {
+        assertAll(
+            () -> assertEquals("default", JacksonUtils.asText(MAPPER.getNodeFactory().missingNode(), "default")),
+            () -> assertEquals("default", JacksonUtils.asText(MAPPER.getNodeFactory().nullNode(), "default")),
+            () -> assertEquals("", JacksonUtils.asText(MAPPER.createObjectNode().put("field", "value"), "default")),
+            () -> assertEquals("", JacksonUtils.asText(MAPPER.createArrayNode().add("value"), "default")),
+            () -> assertEquals("value", JacksonUtils.asText(
+                MAPPER.getNodeFactory().stringNode("value"), "default"))
+        );
+    }
+
+    @Test
+    void shouldRepresentNullStringsAsJsonNull() {
+        assertAll(
+            () -> assertTrue(JacksonUtils.stringOrNullNode(null).isNull()),
+            () -> assertEquals("value", JacksonUtils.asText(JacksonUtils.stringOrNullNode("value")))
+        );
+    }
+
+    @Test
     void buildFromDottedPath() {
         JsonNode result = JacksonUtils.buildFromDottedPath("FieldA.FieldB.FieldC", "Test value");
 
@@ -35,7 +69,7 @@ class JacksonUtilsTest {
         assertNotNull(result.get("FieldA").get("FieldB"));
         assertNotNull(result.get("FieldA").get("FieldB").get("FieldC"));
         assertThat(result.get("FieldA").get("FieldB").get("FieldC").getNodeType(), is(JsonNodeType.STRING));
-        assertThat(result.get("FieldA").get("FieldB").get("FieldC").asText(), is("Test value"));
+        assertThat(result.get("FieldA").get("FieldB").get("FieldC").asString(), is("Test value"));
     }
 
     @Test
@@ -89,38 +123,38 @@ class JacksonUtilsTest {
     @Test
     void shouldMergeNullTopLevelValue() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
-        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().stringNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
         mergeInto.put("TextField0", MAPPER.getNodeFactory().nullNode());
 
         JacksonUtils.merge(mergeFrom, mergeInto);
 
-        assertEquals("Default text", mergeInto.get("TextField0").asText());
+        assertEquals("Default text", mergeInto.get("TextField0").asString());
     }
 
     @Test
     void shouldNotUseDefaultValueWhenTopLevelValueExists() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
-        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().stringNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
-        mergeInto.put("TextField0", MAPPER.getNodeFactory().textNode("Existing text"));
+        mergeInto.put("TextField0", MAPPER.getNodeFactory().stringNode("Existing text"));
 
         JacksonUtils.merge(mergeFrom, mergeInto);
 
-        assertEquals("Existing text", mergeInto.get("TextField0").asText());
+        assertEquals("Existing text", mergeInto.get("TextField0").asString());
     }
 
     @Test
     void shouldOnlyUseDefaultValueWhenTopLevelKeyNotPresent() {
         Map<String, JsonNode> mergeFrom = new HashMap<>();
-        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().stringNode("Default text"));
         Map<String, JsonNode> mergeInto = new HashMap<>();
-        mergeInto.put("TextField1", MAPPER.getNodeFactory().textNode("Existing text"));
+        mergeInto.put("TextField1", MAPPER.getNodeFactory().stringNode("Existing text"));
 
         JacksonUtils.merge(mergeFrom, mergeInto);
 
-        assertEquals("Default text", mergeInto.get("TextField0").asText());
-        assertEquals("Existing text", mergeInto.get("TextField1").asText());
+        assertEquals("Default text", mergeInto.get("TextField0").asString());
+        assertEquals("Existing text", mergeInto.get("TextField1").asString());
     }
 
     @ParameterizedTest(name = "Test getValueFromPath - #{index} - `{0}`")
@@ -176,7 +210,7 @@ class JacksonUtilsTest {
         "CaseLinkCollection.0.CaseReference," + "1637697929437509",
         "CaseLinkCollection.1.CaseReference," + "1637697929619312"
     })
-    void testGetValueFromPath(final String path, final String expected) throws JsonProcessingException {
+    void testGetValueFromPath(final String path, final String expected) throws JacksonException {
 
         // ARRANGE
         final String testId = UUID.randomUUID().toString();
@@ -297,7 +331,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> mySchoolDataWithNestedCollection(String name, String className1, String className2)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -325,7 +359,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> mySchoolDefaultValueData(String name, String className)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -341,7 +375,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> topLevelCollectionCaseData()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "["
@@ -365,7 +399,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> topLevelCollectionDefaultValue()
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -378,7 +412,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> organisationPolicyCaseData(String role)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -396,7 +430,7 @@ class JacksonUtilsTest {
     }
 
     static Map<String, JsonNode> organisationPolicyDefaultValue(String role)
-        throws JsonProcessingException {
+        throws JacksonException {
 
         JsonNode data = MAPPER.readTree(""
             + "{"
@@ -411,7 +445,7 @@ class JacksonUtilsTest {
     @Test
     void testConvertValueInDataFieldFromMap() {
         Map<String, JsonNode> inputMap = new HashMap<>();
-        inputMap.put("data1", MAPPER.getNodeFactory().textNode("Name_1"));
+        inputMap.put("data1", MAPPER.getNodeFactory().stringNode("Name_1"));
         inputMap.put("data2", MAPPER.getNodeFactory().numberNode(42));
 
         Map<String, JsonNode> result = JacksonUtils.convertValueInDataField(inputMap);
@@ -420,7 +454,7 @@ class JacksonUtilsTest {
         assertTrue(result.containsKey(DATA));
 
         JsonNode dataNode = result.get(DATA);
-        assertEquals("Name_1", dataNode.get("data1").asText());
+        assertEquals("Name_1", dataNode.get("data1").asString());
         assertEquals(42, dataNode.get("data2").asInt());
     }
 }

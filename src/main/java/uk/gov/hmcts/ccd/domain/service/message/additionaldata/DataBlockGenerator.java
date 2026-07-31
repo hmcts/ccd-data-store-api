@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.DecimalNode;
-import com.fasterxml.jackson.databind.node.LongNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.DecimalNode;
+import tools.jackson.databind.node.LongNode;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
@@ -29,7 +30,7 @@ import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 @Component
 public class DataBlockGenerator {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
 
     public Map<String, JsonNode> generateData(AdditionalDataContext context) {
         Map<String, JsonNode> dataBlock = newHashMap();
@@ -166,15 +167,17 @@ public class DataBlockGenerator {
     }
 
     private JsonNode booleanNodeOf(JsonNode node) {
-        if (isNullOrEmpty(node.textValue())) {
+        if (isNullOrEmpty(node.stringValue(null))) {
             return MAPPER.nullNode();
         }
 
-        return node.textValue().equalsIgnoreCase("Yes") ? BooleanNode.TRUE : BooleanNode.FALSE;
+        return node.stringValue(null).equalsIgnoreCase("Yes") ? BooleanNode.TRUE : BooleanNode.FALSE;
     }
 
     private JsonNode processNumberNodeOf(JsonNode node) {
-        return node.isNumber() ? LongNode.valueOf(node.asLong()) : LongNode.valueOf(Long.parseLong(node.textValue()));
+        return node.isNumber()
+            ? LongNode.valueOf(node.asLong())
+            : LongNode.valueOf(Long.parseLong(node.stringValue(null)));
     }
 
     private JsonNode numberNodeOf(JsonNode node) {

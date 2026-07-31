@@ -1,14 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,16 +41,15 @@ public class SearchResultDefinitionTest {
     public void setUp() {
         searchResultDefinition = new SearchResultDefinition();
 
-        objectMapper = new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-            .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+        objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+            .build();
     }
 
     @Test
-    public void workBasket_1CompareActualAndClone() throws JsonProcessingException {
+    public void workBasket_1CompareActualAndClone() throws JacksonException {
         String fileContent = fromFileAsString("tests/Data-workbasket-1.json");
 
         SearchResultDefinition searchResultDefinition = objectMapper
@@ -72,7 +68,7 @@ public class SearchResultDefinitionTest {
     }
 
     @Test
-    public void workBasket_2CompareActualAndClone() throws JsonProcessingException {
+    public void workBasket_2CompareActualAndClone() throws JacksonException {
         String fileContent = fromFileAsString("tests/Data-workbasket-2.json");
 
         SearchResultDefinition searchResultDefinition = objectMapper
@@ -91,7 +87,7 @@ public class SearchResultDefinitionTest {
     }
 
     @Test
-    public void workBasketEmptyAndNullFieldInListCompareActualAndClone() throws JsonProcessingException {
+    public void workBasketEmptyAndNullFieldInListCompareActualAndClone() throws JacksonException {
         String fileContent = fromFileAsString("tests/Data-workbasket-3.json");
 
         SearchResultDefinition searchResultDefinition = objectMapper
@@ -114,7 +110,7 @@ public class SearchResultDefinitionTest {
     }
 
     @Test
-    public void workBasketEmptyFieldsListInListCompareActualAndClone() throws JsonProcessingException {
+    public void workBasketEmptyFieldsListInListCompareActualAndClone() throws JacksonException {
         String fileContent = fromFileAsString("tests/Data-workbasket-4.json");
 
         SearchResultDefinition searchResultDefinition = objectMapper

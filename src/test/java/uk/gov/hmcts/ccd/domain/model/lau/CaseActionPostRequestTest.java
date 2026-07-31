@@ -2,9 +2,10 @@ package uk.gov.hmcts.ccd.domain.model.lau;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 
@@ -36,7 +37,7 @@ class CaseActionPostRequestTest {
     private ZonedDateTime currentZonedDateTime;
 
     @Test
-    void jsonContructionTestWithMultipleCaseRefs() throws JsonProcessingException {
+    void jsonContructionTestWithMultipleCaseRefs() throws JacksonException {
         caseActionPostRequest = new CaseActionPostRequest(new ActionLog(
             ACTION_LOG_USER_ID,
             ACTION_LOG_CASE_ACTION,
@@ -45,8 +46,10 @@ class CaseActionPostRequestTest {
             ACTION_LOG_CASE_TYPE_ID,
             ACTION_LOG_TIMESTAMP));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+            .changeDefaultVisibility(visibility ->
+                visibility.withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY))
+            .build();
 
         String jsonRequest = objectMapper
             .writerWithDefaultPrettyPrinter()
@@ -55,12 +58,12 @@ class CaseActionPostRequestTest {
         Map<String, JsonNode> value = JacksonUtils.convertValue(objectMapper.readTree(jsonRequest));
 
         assertNotNull(value);
-        assertEquals(ACTION_LOG_USER_ID, value.get("actionLog").get("userId").asText());
-        assertEquals(ACTION_LOG_CASE_REF, value.get("actionLog").get("caseRef").asText());
-        assertEquals(ACTION_LOG_CASE_ACTION, value.get("actionLog").get("caseAction").asText());
-        assertEquals(ACTION_LOG_CASE_TYPE_ID, value.get("actionLog").get("caseTypeId").asText());
-        assertEquals(ACTION_LOG_CASE_JURISDICTION_ID, value.get("actionLog").get("caseJurisdictionId").asText());
-        assertEquals(ACTION_LOG_TIMESTAMP_AS_TEXT, value.get("actionLog").get("timestamp").asText());
+        assertEquals(ACTION_LOG_USER_ID, value.get("actionLog").get("userId").asString());
+        assertEquals(ACTION_LOG_CASE_REF, value.get("actionLog").get("caseRef").asString());
+        assertEquals(ACTION_LOG_CASE_ACTION, value.get("actionLog").get("caseAction").asString());
+        assertEquals(ACTION_LOG_CASE_TYPE_ID, value.get("actionLog").get("caseTypeId").asString());
+        assertEquals(ACTION_LOG_CASE_JURISDICTION_ID, value.get("actionLog").get("caseJurisdictionId").asString());
+        assertEquals(ACTION_LOG_TIMESTAMP_AS_TEXT, value.get("actionLog").get("timestamp").asString());
     }
 
 }

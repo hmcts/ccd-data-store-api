@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -43,7 +43,7 @@ public class DynamicListValidator implements BaseTypeValidator {
         }
         List<ValidationResult> results = new ArrayList<>();
 
-        dataValue.get(LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
+        dataValue.get(LIST_ITEMS).values().forEach(node -> validateLength(results, node, dataFieldId));
         JsonNode value = dataValue.get(VALUE);
         validateValueField(value, dataFieldId, results);
         return results;
@@ -74,10 +74,10 @@ public class DynamicListValidator implements BaseTypeValidator {
         //For String values textValue() is never null, but may be empty
 
         if (node.get(CODE) != null) {
-            code = node.get(CODE).textValue();
+            code = node.get(CODE).stringValue(null);
         }
         if (node.get(LABEL) != null) {
-            value = node.get(LABEL).textValue();
+            value = node.get(LABEL).stringValue(null);
         }
 
         //To correct Fortify dereferencing a null-pointer,

@@ -4,10 +4,11 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -600,12 +602,12 @@ class ConditionalFieldRestorerTest {
             Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asText()),
-            () -> assertEquals("null", result.get("caseCategory").get("value").get("code").asText()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asString()),
+            () -> assertTrue(result.get("caseCategory").get("value").get("code").isNull()),
             () -> assertEquals("Test",
-                result.get("caseCategory").get("list_items").get(0).get("value").get("label").asText()),
+                result.get("caseCategory").get("list_items").get(0).get("value").get("label").asString()),
             () -> assertEquals("Test",
-                result.get("caseCategory").get("list_items").get(0).get("value").get("code").asText())
+                result.get("caseCategory").get("list_items").get(0).get("value").get("code").asString())
         );
     }
 
@@ -658,12 +660,12 @@ class ConditionalFieldRestorerTest {
             existingData, ACCESS_PROFILES);
 
         assertAll(
-            () -> assertEquals("Test", filteredFields.get("caseCategory").get("value").get("label").asText()),
-            () -> assertEquals("null", filteredFields.get("caseCategory").get("value").get("code").asText()),
+            () -> assertEquals("Test", filteredFields.get("caseCategory").get("value").get("label").asString()),
+            () -> assertTrue(filteredFields.get("caseCategory").get("value").get("code").isNull()),
             () -> assertEquals("Test",
-                filteredFields.get("caseCategory").get("list_items").get(0).get("value").get("label").asText()),
+                filteredFields.get("caseCategory").get("list_items").get(0).get("value").get("label").asString()),
             () -> assertEquals("Test",
-                filteredFields.get("caseCategory").get("list_items").get(0).get("value").get("code").asText())
+                filteredFields.get("caseCategory").get("list_items").get(0).get("value").get("code").asString())
         );
     }
 
@@ -697,8 +699,8 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("caseCategory").has("value")),
             () -> assertTrue(result.get("caseCategory").get("value").has("code")),
             () -> assertTrue(result.get("caseCategory").get("value").has("label")),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asText()),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asText())
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asString()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asString())
         );
     }
 
@@ -732,11 +734,11 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("caseCategory").get("value").isNull()),
             () -> assertTrue(result.get("caseCategory").has("list_items")),
             () -> assertEquals(1, result.get("caseCategory").get("list_items").size()),
-            () -> assertEquals("123456", result.get("caseCategory").get("list_items").get(0).get("id").asText()),
+            () -> assertEquals("123456", result.get("caseCategory").get("list_items").get(0).get("id").asString()),
             () -> assertEquals("Test", result.get("caseCategory").get("list_items").get(0).get("value").get("label")
-                .asText()),
+                .asString()),
             () -> assertEquals("Test", result.get("caseCategory").get("list_items").get(0).get("value").get("code")
-                .asText())
+                .asString())
         );
     }
 
@@ -893,8 +895,8 @@ class ConditionalFieldRestorerTest {
         assertAll(
             () -> assertTrue(result.containsKey("caseCategory")),
             () -> assertTrue(result.get("caseCategory").has("value")),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asText()),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asText()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asString()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asString()),
             () -> assertFalse(result.get("caseCategory").has("list_items"))
         );
     }
@@ -931,11 +933,11 @@ class ConditionalFieldRestorerTest {
         assertAll(
             () -> assertTrue(result.containsKey("caseCategory")),
             () -> assertTrue(result.get("caseCategory").has("value")),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asText()),
-            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asText()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("label").asString()),
+            () -> assertEquals("Test", result.get("caseCategory").get("value").get("code").asString()),
             () -> assertTrue(result.get("caseCategory").has("list_items")),
             () -> assertEquals(1, result.get("caseCategory").get("list_items").size()),
-            () -> assertEquals("444", result.get("caseCategory").get("list_items").get(0).get("id").asText())
+            () -> assertEquals("444", result.get("caseCategory").get("list_items").get(0).get("id").asString())
         );
     }
 
@@ -971,16 +973,16 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertNotNull(result.get("Note").get("Tags").get(0).get("value").get("Category")),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
-            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText()),
-            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asText())
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
+            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString()),
+            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asString())
         );
     }
 
@@ -1020,20 +1022,20 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertNotNull(result.get("Note").get("Tags").get(0).get("value").get("Category")),
-            () -> assertEquals("null",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertTrue(
+                result.get("Note").get("Tags").get(0).get("value").get("Category").isNull()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString()),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString())
         );
     }
 
@@ -1066,16 +1068,16 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertEquals("123",
-                result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1111,13 +1113,13 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Note").get("Tags").size()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isNull()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1158,21 +1160,23 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal",
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Note").get("Tags").get(0).has("id")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText()),
+            () -> assertEquals("public", result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Note").get("Tags").get(2).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Note").get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(2).get("id").asText())
+            () -> assertEquals("private", result.get("Note").get("Tags").get(2).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal",
+                result.get("Note").get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -1214,26 +1218,26 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Note").get("Tags").get(1).has("id")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(2).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(2).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(2).get("id").asText())
+                result.get("Note").get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -1275,15 +1279,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString())
         );
     }
 
@@ -1326,26 +1330,27 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("null", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("null",
+                JacksonUtils.asText(result.get("Note").get("Tags").get(0).get("id"))),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(2).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(2).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(2).get("id").asText())
+                result.get("Note").get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -1388,26 +1393,26 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("null", result.get("Note").get("Tags").get(1).get("id").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertTrue(result.get("Note").get("Tags").get(1).get("id").isNull()),
             () -> assertTrue(result.get("Note").get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(2).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(2).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(2).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(2).get("id").asText())
+                result.get("Note").get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -1435,18 +1440,18 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1488,16 +1493,16 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertFalse(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).get("value").has("Category")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1534,13 +1539,13 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Note").get("Tags").size()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isEmpty()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1576,13 +1581,13 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Note").get("Tags").size()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").isNull()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1624,16 +1629,16 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Note").get("Tags").get(0).has("id")),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1675,15 +1680,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Note").get("Tags").get(1).has("id"))
         );
     }
@@ -1726,15 +1731,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Note").get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertFalse(result.get("Note").get("Tags").get(1).get("value").has("Tag")),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1777,17 +1782,18 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("id")),
-            () -> assertEquals("null", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("null",
+                JacksonUtils.asText(result.get("Note").get("Tags").get(0).get("id"))),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1830,17 +1836,17 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Note").get("Tags").get(0).get("value").has("Category")),
             () -> assertEquals("private",
-                result.get("Note").get("Tags").get(0).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Tag").asString()),
             () -> assertEquals("Personal",
-                result.get("Note").get("Tags").get(0).get("value").get("Category").asText()),
+                result.get("Note").get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Note").get("Tags").get(0).has("id")),
-            () -> assertEquals("null", result.get("Note").get("Tags").get(0).get("id").asText()),
+            () -> assertTrue(result.get("Note").get("Tags").get(0).get("id").isNull()),
             () -> assertTrue(result.get("Note").get("Tags").get(1).has("value")),
             () -> assertEquals("public",
-                result.get("Note").get("Tags").get(1).get("value").get("Tag").asText()),
+                result.get("Note").get("Tags").get(1).get("value").get("Tag").asString()),
             () -> assertEquals("Work",
-                result.get("Note").get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asText())
+                result.get("Note").get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Note").get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -1901,21 +1907,21 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Tags").get(0).has("id")),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText()),
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(2).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Tags").get(2).get("id").asText())
+            () -> assertEquals("private", result.get("Tags").get(2).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -1953,22 +1959,22 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Tags").get(1).has("id")),
             () -> assertTrue(result.get("Tags").get(2).has("value")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(2).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(2).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(2).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -2006,20 +2012,20 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(3, result.get("Tags").size()),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("999", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("999", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText()),
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(2).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(2).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(2).get("value").get("Category").asText()),
-            () -> assertEquals("123", result.get("Tags").get(2).get("id").asText())
+            () -> assertEquals("private", result.get("Tags").get(2).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(2).get("value").get("Category").asString()),
+            () -> assertEquals("123", result.get("Tags").get(2).get("id").asString())
         );
     }
 
@@ -2104,19 +2110,19 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.containsKey("Tags")),
             () -> assertEquals(2, result.get("Tags").size()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
 
         if (testCase.expectedMessage.isEmpty()) {
             assertTrue(result.get("Tags").get(0).has("value"));
             assertTrue(result.get("Tags").get(0).get("value").isNull());
         } else {
-            assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText());
-            assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText());
+            assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString());
+            assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString());
         }
     }
 
@@ -2193,15 +2199,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Tags").get(1).has("id"))
         );
     }
@@ -2239,15 +2245,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertFalse(result.get("Tags").get(0).has("id")),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -2285,16 +2291,16 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("999", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("999", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -2327,13 +2333,13 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Tags").size()),
             () -> assertTrue(result.get("Tags").get(0).get("value").isEmpty()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -2365,13 +2371,13 @@ class ConditionalFieldRestorerTest {
             () -> assertEquals(2, result.get("Tags").size()),
             () -> assertTrue(result.get("Tags").get(0).get("value").isNull()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asText()),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("public", result.get("Tags").get(1).get("value").get("Tag").asString()),
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -2408,15 +2414,15 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(result.get("Tags").get(0).has("value")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(0).get("value").has("Category")),
-            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asText()),
-            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asText()),
+            () -> assertEquals("private", result.get("Tags").get(0).get("value").get("Tag").asString()),
+            () -> assertEquals("Personal", result.get("Tags").get(0).get("value").get("Category").asString()),
             () -> assertTrue(result.get("Tags").get(0).has("id")),
-            () -> assertEquals("123", result.get("Tags").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("Tags").get(0).get("id").asString()),
             () -> assertTrue(result.get("Tags").get(1).has("value")),
             () -> assertFalse(result.get("Tags").get(1).get("value").has("Tag")),
             () -> assertTrue(result.get("Tags").get(1).get("value").has("Category")),
-            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asText()),
-            () -> assertEquals("456", result.get("Tags").get(1).get("id").asText())
+            () -> assertEquals("Work", result.get("Tags").get(1).get("value").get("Category").asString()),
+            () -> assertEquals("456", result.get("Tags").get(1).get("id").asString())
         );
     }
 
@@ -2531,29 +2537,29 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(filteredFields.containsKey("Documents")),
             () -> assertTrue(filteredFields.get("Documents").isArray()),
             () -> assertEquals(2, filteredFields.get("Documents").size()),
-            () -> assertEquals("CollectionField2", filteredFields.get("Documents").get(0).get("id").asText()),
+            () -> assertEquals("CollectionField2", filteredFields.get("Documents").get(0).get("id").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).has("value")),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-                filteredFields.get("Documents").get(0).get("value").get("document_url").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_binary_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-                filteredFields.get("Documents").get(0).get("value").get("document_binary_url").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_binary_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_filename")),
             () -> assertEquals("Elastic Search test Case.png --> updated by Solicitor 1",
-                filteredFields.get("Documents").get(0).get("value").get("document_filename").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_filename").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).has("id")),
-            () -> assertEquals("CollectionField1", filteredFields.get("Documents").get(1).get("id").asText()),
+            () -> assertEquals("CollectionField1", filteredFields.get("Documents").get(1).get("id").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).has("value")),
             () -> assertTrue(filteredFields.get("Documents").get(1).get("value").has("document_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg",
-                filteredFields.get("Documents").get(1).get("value").get("document_url").asText()),
+                filteredFields.get("Documents").get(1).get("value").get("document_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).get("value").has("document_binary_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary",
-                filteredFields.get("Documents").get(1).get("value").get("document_binary_url").asText()),
+                filteredFields.get("Documents").get(1).get("value").get("document_binary_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).get("value").has("document_filename")),
             () -> assertEquals("Elastic Search test Case.png --> updated by Solicitor 1",
-                filteredFields.get("Documents").get(1).get("value").get("document_filename").asText()),
+                filteredFields.get("Documents").get(1).get("value").get("document_filename").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).has("id"))
         );
 
@@ -2647,26 +2653,26 @@ class ConditionalFieldRestorerTest {
             () -> assertTrue(filteredFields.containsKey("Documents")),
             () -> assertTrue(filteredFields.get("Documents").isArray()),
             () -> assertEquals(2, filteredFields.get("Documents").size()),
-            () -> assertEquals("CollectionField1", filteredFields.get("Documents").get(0).get("id").asText()),
+            () -> assertEquals("CollectionField1", filteredFields.get("Documents").get(0).get("id").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).has("value")),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg",
-                filteredFields.get("Documents").get(0).get("value").get("document_url").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_binary_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary",
-                filteredFields.get("Documents").get(0).get("value").get("document_binary_url").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_binary_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(0).get("value").has("document_filename")),
             () -> assertEquals("Elastic Search test Case.png --> updated by Solicitor 1",
-                filteredFields.get("Documents").get(0).get("value").get("document_filename").asText()),
-            () -> assertEquals("CollectionField2", filteredFields.get("Documents").get(1).get("id").asText()),
+                filteredFields.get("Documents").get(0).get("value").get("document_filename").asString()),
+            () -> assertEquals("CollectionField2", filteredFields.get("Documents").get(1).get("id").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).has("value")),
             () -> assertFalse(filteredFields.get("Documents").get(1).get("value").has("document_url")),
             () -> assertTrue(filteredFields.get("Documents").get(1).get("value").has("document_binary_url")),
             () -> assertEquals("{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-                filteredFields.get("Documents").get(1).get("value").get("document_binary_url").asText()),
+                filteredFields.get("Documents").get(1).get("value").get("document_binary_url").asString()),
             () -> assertTrue(filteredFields.get("Documents").get(1).get("value").has("document_filename")),
             () -> assertEquals("Elastic Search test Case.png --> updated by Solicitor 1",
-                filteredFields.get("Documents").get(1).get("value").get("document_filename").asText())
+                filteredFields.get("Documents").get(1).get("value").get("document_filename").asString())
         );
 
         String expectedMessage = "Missing field 'document_url' under 'Documents'.";
@@ -2748,22 +2754,22 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertEquals("project, timeline, deliverable", result.get("Note").get("content")
-                    .get("additionalInfo").get("tags").asText()),
+                    .get("additionalInfo").get("tags").asString()),
             () -> assertEquals("123 Main Street",
-                result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText())
+                result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString())
         );
     }
 
@@ -2803,25 +2809,25 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("tags").asString()),
             () -> assertEquals("123 Main Street",
-                result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+                result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -2861,26 +2867,26 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("tags").asString()),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
-            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
+            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
 
     }
@@ -2956,21 +2962,21 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, "");
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isNull()),
-            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -3006,24 +3012,24 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText()),
-            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+                result.get("Note").get("content").get("additionalInfo").get("tags").asString()),
+            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -3055,27 +3061,27 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, expectedMessage);
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
-            () -> assertEquals("123 Main Street", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("123 Main Street", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("noteID")),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").has("tags")),
             () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText())
+                result.get("Note").get("content").get("additionalInfo").get("tags").asString())
         );
     }
 
@@ -3106,17 +3112,17 @@ class ConditionalFieldRestorerTest {
             noteWithNestedFieldsWithCreateAndWithoutReadPermission(), Level.INFO, "");
 
         assertAll(
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
             () -> assertEquals("123 Main Street",
-                result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
+                result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString()),
             () -> assertTrue(result.get("Note").has("content")),
             () -> assertTrue(result.get("Note").get("content").isNull())
         );
@@ -3159,27 +3165,27 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
-                result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+                result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertEquals("abc123",
-                result.get("Note").get("content").get("additionalInfo").get("noteID").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("noteID").asString()),
             () -> assertEquals("Meeting",
-                result.get("Note").get("content").get("additionalInfo").get("category").asText()),
+                result.get("Note").get("content").get("additionalInfo").get("category").asString()),
             () -> assertEquals("project, timeline, deliverable",
-                result.get("Note").get("content").get("additionalInfo").get("tags").asText())
+                result.get("Note").get("content").get("additionalInfo").get("tags").asString())
         );
     }
 
@@ -3449,23 +3455,23 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
             () -> assertTrue(result.get("Note").has("content")),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertTrue(result.get("Note").get("content").has("additionalInfo")),
             () -> assertTrue(result.get("Note").get("content").get("additionalInfo").isNull()),
             () -> assertTrue(result.get("Note").has("location")),
-            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -3502,20 +3508,20 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
-            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
+            () -> assertEquals("Meeting Notes", result.get("Note").get("content").get("title").asString()),
             () -> assertEquals("Discussion about project timelines and deliverables.",
-                result.get("Note").get("content").get("body").asText()),
+                result.get("Note").get("content").get("body").asString()),
             () -> assertTrue(result.get("Note").has("location")),
-            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asText()),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+            () -> assertEquals("address1", result.get("Note").get("location").get("AddressLine1").asString()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -3547,28 +3553,28 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
-            () -> assertEquals("PersonalNote", result.get("Note").get("type").asText()),
+            () -> assertEquals("PersonalNote", result.get("Note").get("type").asString()),
             () -> assertTrue(result.get("Note").has("metadata")),
             () -> assertTrue(result.get("Note").get("metadata").has("authorName")),
-            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asText()),
+            () -> assertEquals("John Doe", result.get("Note").get("metadata").get("authorName").asString()),
             () -> assertTrue(result.get("Note").get("metadata").has("creationDate")),
-            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asText()),
+            () -> assertEquals("2024-11-04", result.get("Note").get("metadata").get("creationDate").asString()),
             () -> assertTrue(result.get("Note").has("content")),
             () -> assertTrue(result.get("Note").get("content").isNull()),
             () -> assertTrue(result.get("Note").has("location")),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine1")),
             () -> assertEquals("123 Main Street",
-                result.get("Note").get("location").get("AddressLine1").asText()),
+                result.get("Note").get("location").get("AddressLine1").asString()),
             () -> assertTrue(result.get("Note").get("location").has("AddressLine2")),
-            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asText()),
+            () -> assertEquals("Suite 500", result.get("Note").get("location").get("AddressLine2").asString()),
             () -> assertTrue(result.get("Note").get("location").has("City")),
-            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asText()),
+            () -> assertEquals("Anytown", result.get("Note").get("location").get("City").asString()),
             () -> assertTrue(result.get("Note").get("location").has("State")),
-            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asText()),
+            () -> assertEquals("Anystate", result.get("Note").get("location").get("State").asString()),
             () -> assertTrue(result.get("Note").get("location").has("Country")),
-            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asText()),
+            () -> assertEquals("AnyCountry", result.get("Note").get("location").get("Country").asString()),
             () -> assertTrue(result.get("Note").get("location").has("PostalCode")),
-            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asText())
+            () -> assertEquals("12345", result.get("Note").get("location").get("PostalCode").asString())
         );
     }
 
@@ -3714,7 +3720,7 @@ class ConditionalFieldRestorerTest {
 
         assertAll(
             () -> assertTrue(result.get("Note").has("type")),
-            () -> assertEquals("test", result.get("Note").get("type").asText()),
+            () -> assertEquals("test", result.get("Note").get("type").asString()),
             () -> assertEquals("Adding missing field 'type' under 'Note'.",
               listAppender.list.getFirst().getFormattedMessage())
         );
@@ -3806,34 +3812,34 @@ class ConditionalFieldRestorerTest {
         assertAll(
             () -> assertTrue(result.get("generatedCaseDocuments").isArray()),
             () -> assertEquals(1, result.get("generatedCaseDocuments").size()),
-            () -> assertEquals("123", result.get("generatedCaseDocuments").get(0).get("id").asText()),
+            () -> assertEquals("123", result.get("generatedCaseDocuments").get(0).get("id").asString()),
             () -> assertEquals("Test",
-                result.get("generatedCaseDocuments").get(0).get("value").get("createdBy").asText()),
+                result.get("generatedCaseDocuments").get(0).get("value").get("createdBy").asString()),
             () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").get("documentLink").has(
                 "document_url")),
             () -> assertEquals("http_document_url",
                 result.get("generatedCaseDocuments").get(0).get("value").get("documentLink")
-                    .get("document_url").asText()),
+                    .get("document_url").asString()),
             () -> assertTrue(result.get("generatedCaseDocuments").get(0)
                 .get("value").get("documentLink").has("document_filename")),
             () -> assertEquals("document.pdf", result.get("generatedCaseDocuments").get(0)
-                .get("value").get("documentLink").get("document_filename").asText()),
+                .get("value").get("documentLink").get("document_filename").asString()),
             () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").get("documentLink")
                 .has("document_binary_url")),
             () -> assertEquals("http://document/binary", result.get("generatedCaseDocuments").get(0)
-                .get("value").get("documentLink").get("document_binary_url").asText()),
+                .get("value").get("documentLink").get("document_binary_url").asString()),
             () -> assertTrue(result.get("generatedCaseDocuments").get(0).get("value").get("documentLink")
                 .has("category_id")),
             () -> assertEquals("detailsOfClaim", result.get("generatedCaseDocuments").get(0)
-                .get("value").get("documentLink").get("category_id").asText()),
+                .get("value").get("documentLink").get("category_id").asString()),
             () -> assertEquals("document.pdf", result.get("generatedCaseDocuments").get(0)
-                .get("value").get("documentName").asText()),
+                .get("value").get("documentName").asString()),
             () -> assertEquals(34805, result.get("generatedCaseDocuments").get(0).get("value")
                 .get("documentSize").asInt()),
             () -> assertEquals("CLAIM", result.get("generatedCaseDocuments").get(0).get("value")
-                .get("documentType").asText()),
+                .get("documentType").asString()),
             () -> assertEquals("2024-10-16T10:47:03", result.get("generatedCaseDocuments").get(0)
-                .get("value").get("createdDatetime").asText())
+                .get("value").get("createdDatetime").asString())
         );
     }
 
@@ -3906,10 +3912,10 @@ class ConditionalFieldRestorerTest {
 
     private Map<String, JsonNode> getJsonMapNode(final String content) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults().build();
             return objectMapper.readValue(content,
                 objectMapper.getTypeFactory().constructMapType(Map.class, String.class, JsonNode.class));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -3946,13 +3952,14 @@ class ConditionalFieldRestorerTest {
 
     private CaseTypeDefinition caseDefinitionWithNestedList() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            ObjectMapper objectMapper = JsonMapper.builderWithJackson2Defaults()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
 
             String defContent  = fromFileAsString("tests/nested-list-definition.json");
 
             return objectMapper.readValue(defContent, CaseTypeDefinition.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }

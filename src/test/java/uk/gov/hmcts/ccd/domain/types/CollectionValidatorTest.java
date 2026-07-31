@@ -12,7 +12,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -20,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 public class CollectionValidatorTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapper.builderWithJackson2Defaults().build();
     private static final String TYPE_TEXT = "Text";
     private static final String CASE_FIELD_ID = "Aliases";
 

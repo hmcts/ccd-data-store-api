@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caselinking;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkDetails;
 import uk.gov.hmcts.ccd.domain.model.caselinking.CaseLinkInfo;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.getValueFromPath;
 
 @Service
@@ -32,9 +33,8 @@ public class GetLinkedCasesResponseCreator {
         List<CaseLinkInfo> caseLinkInfoList = new ArrayList<>();
         caseDetails.forEach(
             caseDetail -> caseLinkInfoList.add(CaseLinkInfo.builder()
-                .caseNameHmctsInternal(caseDetail.getData()
-                    .getOrDefault("caseNameHmctsInternal", NullNode.getInstance())
-                    .asText(null))
+                .caseNameHmctsInternal(asText(caseDetail.getData()
+                    .getOrDefault("caseNameHmctsInternal", NullNode.getInstance()), null))
                 .caseReference(String.valueOf(caseDetail.getReference()))
                 .ccdCaseType(caseDetail.getCaseTypeId())
                 .ccdJurisdiction(caseDetail.getJurisdiction())

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.StringNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,7 +93,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
 
 class CallbackInvokerTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory();
     private static final Boolean IGNORE_WARNING = true;
     private static final String URL_ABOUT_TO_START = "http://about-to-start";
     private static final String URL_ABOUT_TO_SUBMIT = "http://about-to-submit";
@@ -213,7 +213,7 @@ class CallbackInvokerTest {
 
         @Test
         @DisplayName("should handle exception in printCallbackDetails gracefully")
-        void shouldHandleExceptionInPrintCallbackDetailsGracefully() throws JsonProcessingException {
+        void shouldHandleExceptionInPrintCallbackDetailsGracefully() throws JacksonException {
             when(applicationParams.getCcdCallbackLogControl()).thenReturn(Collections.singletonList("*"));
             doNothing().when(appinsights).trackCallbackEvent(any(), anyString(), anyString(), any(Duration.class));
 
@@ -609,7 +609,7 @@ class CallbackInvokerTest {
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", JsonNodeFactory.instance.textNode(state));
+            data.put("state", JsonNodeFactory.instance.stringNode(state));
             response.setData(data);
             return response;
         }
@@ -622,7 +622,7 @@ class CallbackInvokerTest {
             significantItem.setType(SignificantItemType.DOCUMENT.name());
             response.setSignificantItem(significantItem);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", JsonNodeFactory.instance.textNode(state));
+            data.put("state", JsonNodeFactory.instance.stringNode(state));
             response.setData(data);
             return response;
         }
@@ -635,7 +635,7 @@ class CallbackInvokerTest {
 
             response.setSignificantItem(significantItem);
             final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", JsonNodeFactory.instance.textNode(state));
+            data.put("state", JsonNodeFactory.instance.stringNode(state));
             response.setData(data);
             return response;
         }
@@ -782,7 +782,7 @@ class CallbackInvokerTest {
             void validateAndSetDataForAboutToStart() {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 final Map<String, JsonNode> data = new HashMap<>();
-                data.put("xxx", TextNode.valueOf("ngitb"));
+                data.put("xxx", StringNode.valueOf("ngitb"));
                 callbackResponse.setData(data);
                 HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
                 when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition,
@@ -896,11 +896,11 @@ class CallbackInvokerTest {
                 caseDetails.setDataClassification(currentDataClassification);
                 caseDetails.setData(data);
                 callbackResponse.setData(data);
-                currentDataClassification.put("currentKey", JSON_NODE_FACTORY.textNode("currentValue"));
+                currentDataClassification.put("currentKey", JSON_NODE_FACTORY.stringNode("currentValue"));
                 caseDetails.setState("BAYAN");
-                newFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("value"));
+                newFieldsDataClassification.put("key", JSON_NODE_FACTORY.stringNode("value"));
 
-                allFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("otherValue"));
+                allFieldsDataClassification.put("key", JSON_NODE_FACTORY.stringNode("otherValue"));
                 callbackResponse.setSecurityClassification(PRIVATE);
                 callbackResponse.setDataClassification(allFieldsDataClassification);
                 when(callbackService.send(caseEventDefinition.getCallBackURLAboutToSubmitEvent(),
@@ -923,7 +923,7 @@ class CallbackInvokerTest {
             @Test
             void doNotValidateCallbackResponseIfNoDataSecurityPassedBack() {
                 callbackResponse.setDataClassification(null);
-                data.put("state", TextNode.valueOf("ngitb"));
+                data.put("state", StringNode.valueOf("ngitb"));
 
                 callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
                     caseTypeDefinition, TRUE);
@@ -948,7 +948,7 @@ class CallbackInvokerTest {
             @Test
             void doNotValidateCallbackResponseIfNoCaseSecurityPassedBack() {
                 callbackResponse.setSecurityClassification(null);
-                data.put("state", TextNode.valueOf("ngitb"));
+                data.put("state", StringNode.valueOf("ngitb"));
                 callbackResponse.setState(null);
                 callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
                     caseTypeDefinition, TRUE);
@@ -1011,7 +1011,7 @@ class CallbackInvokerTest {
             @DisplayName("validate call back response and set case details state for about to submit")
             @Test
             void validateAndSetStateForAboutToSubmit() {
-                data.put("state", TextNode.valueOf("ngitb"));
+                data.put("state", StringNode.valueOf("ngitb"));
                 callbackResponse.setState("toto");
 
                 callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
@@ -1104,7 +1104,7 @@ class CallbackInvokerTest {
             void validateAndSetDataForAboutToStart() {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 final Map<String, JsonNode> data = new HashMap<>();
-                data.put("xxx", TextNode.valueOf("ngitb"));
+                data.put("xxx", StringNode.valueOf("ngitb"));
                 callbackResponse.setData(data);
                 HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
                 when(caseDataService.getDefaultSecurityClassifications(caseTypeDefinition, data,
@@ -1211,7 +1211,7 @@ class CallbackInvokerTest {
             final CallbackResponse callbackResponse = new CallbackResponse();
             final Map<String, JsonNode> data = new HashMap<>();
 
-            data.put("state", TextNode.valueOf("stateInDataSection"));
+            data.put("state", StringNode.valueOf("stateInDataSection"));
             data.put("blah", IntNode.valueOf(678));
             callbackResponse.setData(data);
 
@@ -1254,7 +1254,7 @@ class CallbackInvokerTest {
             final Map<String, JsonNode> data = new HashMap<>();
 
             data.put("blah", IntNode.valueOf(678));
-            data.put("state", TextNode.valueOf("stateInDataSection"));
+            data.put("state", StringNode.valueOf("stateInDataSection"));
             callbackResponse.setData(data);
             callbackResponse.setState("stateInTopLevel");
 

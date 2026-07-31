@@ -7,7 +7,7 @@ import java.util.List;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
@@ -295,11 +295,11 @@ class CallbackServiceTest {
         callbackService.addPassThroughHeaders(httpHeaders);
 
         assertEquals(2, httpHeaders.size());
-        assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
+        assertTrue(httpHeaders.containsHeader(customHeaders.get(0)));
         assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
-        assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
+        assertTrue(httpHeaders.containsHeader(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
-        assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+        assertFalse(httpHeaders.containsHeader(customHeaders.get(2)));
     }
 
     @Test
@@ -327,11 +327,11 @@ class CallbackServiceTest {
         callbackService.addPassThroughHeaders(httpHeaders);
 
         assertEquals(2, httpHeaders.size());
-        assertTrue(httpHeaders.containsKey(customHeaders.get(0)));
+        assertTrue(httpHeaders.containsHeader(customHeaders.get(0)));
         assertEquals(customHeaderValues.get(0), httpHeaders.get(customHeaders.get(0)).get(0));
-        assertTrue(httpHeaders.containsKey(customHeaders.get(1)));
+        assertTrue(httpHeaders.containsHeader(customHeaders.get(1)));
         assertEquals(customHeaderValues.get(1), httpHeaders.get(customHeaders.get(1)).get(0));
-        assertFalse(httpHeaders.containsKey(customHeaders.get(2)));
+        assertFalse(httpHeaders.containsHeader(customHeaders.get(2)));
     }
 
     @Test

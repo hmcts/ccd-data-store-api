@@ -27,6 +27,6 @@ public abstract class AbstractReferenceDataIT extends WireMockBaseTest implement
             stubMapping.ifPresent(mapping -> wireMockServer.removeStub(mapping));
         });
 
-        wireMockServer.resetAll();
+        wireMockServer.resetRequests();
     }
 }

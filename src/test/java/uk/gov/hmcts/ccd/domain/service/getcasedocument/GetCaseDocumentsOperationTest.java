@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -177,7 +177,7 @@ public class GetCaseDocumentsOperationTest {
         InputStream inputStream =
             GetCaseDocumentsOperationTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
         return
-            new ObjectMapper().readValue(inputStream, new TypeReference<>() {
+            JsonMapper.builderWithJackson2Defaults().build().readValue(inputStream, new TypeReference<>() {
             });
     }
 

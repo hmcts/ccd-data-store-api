@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -95,7 +94,6 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
 

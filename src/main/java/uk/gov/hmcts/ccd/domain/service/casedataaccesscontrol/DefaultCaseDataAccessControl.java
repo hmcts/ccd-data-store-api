@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.logging.log4j.util.Strings;
@@ -45,6 +45,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.ccd.config.JacksonUtils.asText;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -183,7 +184,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         if (caseDetails.getData() != null) {
             caseAccessCategory = caseDetails.getData().get("CaseAccessCategory");
         }
-        return caseAccessCategory != null ? caseAccessCategory.asText().trim() : "";
+        return caseAccessCategory != null ? asText(caseAccessCategory).trim() : "";
     }
 
     @Override

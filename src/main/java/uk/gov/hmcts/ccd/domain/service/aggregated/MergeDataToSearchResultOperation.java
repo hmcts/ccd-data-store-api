@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -121,7 +121,7 @@ public class MergeDataToSearchResultOperation {
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
         convertReferenceToString(caseMetadata);
-        Map<String, TextNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
+        Map<String, StringNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
         String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
         return new SearchResultViewItem(caseId, caseFields, new HashMap<>(caseFields));
@@ -137,7 +137,7 @@ public class MergeDataToSearchResultOperation {
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,
                                             Map<String, JsonNode> caseData,
                                             Map<String, Object> metadata,
-                                            Map<String, TextNode> labels) {
+                                            Map<String, StringNode> labels) {
 
         Map<String, Object> newResults = new HashMap<>();
 
