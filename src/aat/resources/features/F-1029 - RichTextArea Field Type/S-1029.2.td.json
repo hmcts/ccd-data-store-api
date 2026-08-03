@@ -1,0 +1,32 @@
+{
+	"title": "must get a negative response when a RichTextArea field value is shorter than the configured minimum",
+	"_guid_": "S-1029.2",
+	"_extends_": "F-1029_CreateCaseBase",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a RichTextArea field with a Min of 10 configured against it",
+		"contains a value for that field which is shorter than the configured minimum"
+	],
+
+	"prerequisites": [ {
+		"S-1029_GetCreateToken": "S-1029_GetCreateToken"
+	} ],
+
+	"request": {
+		"body": {
+			"data": {
+				"RichTextAreaMinField": "<p>hi</p>"
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_422_Response",
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+			"message": "[[ANY_STRING_NOT_NULLABLE]]",
+			"details": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}
