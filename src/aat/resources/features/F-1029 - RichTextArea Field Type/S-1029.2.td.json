@@ -24,8 +24,8 @@
 	"expectedResponse": {
 		"_extends_": "Common_422_Response",
 		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-			"message": "[[ANY_STRING_NOT_NULLABLE]]",
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+			"message": "Case data validation failed",
 			"details": "[[ANYTHING_PRESENT]]"
 		}
 	}
