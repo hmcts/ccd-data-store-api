@@ -186,7 +186,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), any())).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), any())).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), any())).thenReturn(true);
-        when(accessControlService.canAccessCaseFieldsForUpsert(any(), any(), any(), any())).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(anyString(), any(), any(), any())).thenReturn(true);
 
         when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate()).thenReturn(List.of());
@@ -986,7 +985,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
             any(),
             any(),
             eq(false));
-        inOrder.verify(accessControlService).canAccessCaseFieldsForUpsert(any(), any(), any(), any());
         inOrder.verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
@@ -1072,25 +1070,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw when update field upsert access is denied before mid event")
-    void shouldThrowWhenUpdateFieldUpsertAccessDenied() {
-        CaseDataContent content = new CaseDataContent();
-        attachEvent(content);
-        content.setCaseReference(CASE_REFERENCE);
-        content.setData(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
-
-        when(accessControlService.canAccessCaseFieldsForUpsert(any(), any(), any(), any())).thenReturn(false);
-
-        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
-
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
-
-        assertEquals(NO_FIELD_FOUND, exception.getMessage());
-        verify(midEventCallback, never()).invoke(anyString(), any(), any());
-    }
-
-    @Test
     @DisplayName("should throw when create field access is denied before mid event")
     void shouldThrowWhenCreateFieldAccessDenied() {
         CaseDataContent content = new CaseDataContent();
@@ -1108,41 +1087,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         assertEquals(NO_FIELD_FOUND, exception.getMessage());
         verify(midEventCallback, never()).invoke(anyString(), any(), any());
-    }
-
-    @Test
-    @DisplayName("should verify update field upsert access before invoking mid event callback")
-    void shouldVerifyUpdateFieldUpsertAccessBeforeInvokingMidEventCallback() {
-        CaseDataContent content = new CaseDataContent();
-        attachEvent(content);
-        content.setCaseReference(CASE_REFERENCE);
-        content.setData(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
-
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
-
-        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
-        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
-            .thenReturn(filteredData);
-        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
-            .thenReturn(JacksonUtils.convertValue(filteredData));
-
-        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
-
-        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
-
-        InOrder inOrder = inOrder(accessControlService, eventTokenService, midEventCallback);
-        inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(
-            eq(EVENT_ID), any(), any(), eq(CAN_CREATE));
-        inOrder.verify(eventTokenService).validateToken(
-            eq(EVENT_TOKEN),
-            eq("user-id"),
-            any(CaseDetails.class),
-            eq(caseEventDefinition),
-            any(),
-            any(),
-            eq(false));
-        inOrder.verify(accessControlService).canAccessCaseFieldsForUpsert(any(), any(), any(), any());
-        inOrder.verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
     @Test

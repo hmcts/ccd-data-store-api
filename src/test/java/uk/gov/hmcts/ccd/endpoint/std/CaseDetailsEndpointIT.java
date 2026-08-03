@@ -184,7 +184,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String REFERENCE_2 = "1504259907353545";
     private static final String VALIDATE_PAGE_ID = "createCaseInfoPage";
-    private static final String NO_CREATE_FIELD_CASE_REFERENCE = "1504259907353602";
     private static final String CASEWORKER_ROLE = "caseworkers";
 
     @BeforeEach
@@ -4601,25 +4600,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
             TEST_EVENT_ID, null, token, data);
-
-        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE_NO_CREATE_FIELD_ACCESS, VALIDATE_PAGE_ID,
-            caseDetailsToValidate, 404);
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void shouldReturn404WhenPostValidateCaseDetailsWithNoUpdateFieldAccessAndPageIdForCaseworker() throws Exception {
-        final JsonNode data = mapper.readTree(
-            "{\n"
-                + "  \"PersonFirstName\": \"Updated First Name\",\n"
-                + "  \"PersonLastName\": \"Last Name\"\n"
-                + "}\n");
-        final String token = generateEventToken(
-            template, UID, JURISDICTION, CASE_TYPE_NO_CREATE_FIELD_ACCESS, NO_CREATE_FIELD_CASE_REFERENCE,
-            PRE_STATES_EVENT_ID);
-
-        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
-            PRE_STATES_EVENT_ID, NO_CREATE_FIELD_CASE_REFERENCE, token, data);
 
         postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE_NO_CREATE_FIELD_ACCESS, VALIDATE_PAGE_ID,
             caseDetailsToValidate, 404);

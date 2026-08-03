@@ -270,7 +270,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
 
         validateUpdatePreState(existingCaseDetails, caseEventDefinition);
         validateUpdateEventToken(content, existingCaseDetails, caseEventDefinition, caseTypeDefinition);
-        verifyUpdateCaseFieldsAccess(content, existingCaseDetails, caseTypeDefinition, accessProfiles);
 
         return existingCaseDetails.getCaseTypeId();
     }
@@ -336,22 +335,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles,
             CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_FIELD_FOUND);
-        }
-    }
-
-    private void verifyUpdateCaseFieldsAccess(CaseDataContent content,
-                                              CaseDetails existingCaseDetails,
-                                              CaseTypeDefinition caseTypeDefinition,
-                                              Set<AccessProfile> accessProfiles) {
-        if (content.getData() == null) {
-            return;
-        }
-        if (!accessControlService.canAccessCaseFieldsForUpsert(
-            JacksonUtils.convertValueJsonNode(content.getData()),
-            JacksonUtils.convertValueJsonNode(existingCaseDetails.getData()),
-            caseTypeDefinition.getCaseFieldDefinitions(),
-            accessProfiles)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }
