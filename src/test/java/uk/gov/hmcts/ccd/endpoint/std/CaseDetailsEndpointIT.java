@@ -1027,7 +1027,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
 
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY, TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1245,7 +1246,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY, TEST_EVENT_ID));
         caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -3683,7 +3685,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
         Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_NO_READ_CASE_TYPE_ACCESS, CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
 
@@ -5695,7 +5697,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
 
         caseDetailsToSave.setToken(token);
 
@@ -5752,7 +5754,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -5799,7 +5801,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
