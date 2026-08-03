@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -91,10 +93,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -188,6 +192,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private ConditionalFieldRestorer conditionalFieldRestorer;
     @Mock
     private CaseAccessService caseAccessService;
+    @Mock
+    private DateCaseClosedService dateCaseClosedService;
 
     @Spy
     private CaseDocumentTimestampService caseDocumentTimestampService =
@@ -242,6 +248,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
         caseDetails.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore = caseDetails.shallowClone();
 
+        CaseStateDefinition preState = new CaseStateDefinition();
+        preState.setId(PRE_STATE_ID);
         CaseStateDefinition postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
@@ -261,6 +269,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        doReturn(preState).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
         doReturn(user).when(userRepository).getUser();
         doReturn(user).when(userRepository).getUserByUserId(anyString());
         doReturn(user).when(userRepository).getUser(anyString());
@@ -369,6 +378,106 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(PRE_STATE_ID);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LAST_MODIFIED);
+    }
+
+    @Test
+    @DisplayName("should save date case closed when case moves into closed for payment state category")
+    void shouldSaveDateCaseClosedWhenCaseMovesIntoClosedForPaymentStateCategory() throws Exception {
+        // Case object after save
+        CaseDetails savedCaseDetails = caseDetails.shallowClone();
+        savedCaseDetails.setState(POST_STATE);
+        savedCaseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+        savedCaseDetails.setLastStateModifiedDate(lastModifiedTimestamp);
+
+        // Case object during update before save
+        CaseDetails updatedCaseDetails = caseDetails.shallowClone();
+
+        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
+        CaseStateDefinition newState = state(POST_STATE, "CLOSED FOR PAYMENT,End");
+
+        doReturn(caseDetailsBefore, updatedCaseDetails).when(caseService).clone(caseDetails);
+        doReturn(previousState).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
+        doReturn(newState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
+
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+        verify(dateCaseClosedService).updateForExistingCase(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
+    }
+
+    @Test
+    @DisplayName("should remove date case closed when case moves out of closed for payment state category")
+    void shouldRemoveDateCaseClosedWhenCaseMovesOutOfClosedForPaymentStateCategory() throws Exception {
+        String closedForPaymentState = "ClosedForPayment";
+        caseDetails.setState(closedForPaymentState);
+        caseDetailsBefore.setState(closedForPaymentState);
+
+        CaseDetails updatedCaseDetails = caseDetails.shallowClone();
+        CaseDetails savedCaseDetails = caseDetails.shallowClone();
+        savedCaseDetails.setState(POST_STATE);
+        savedCaseDetails.setReference(Long.parseLong(CASE_REFERENCE));
+
+        CaseStateDefinition previousState = state(closedForPaymentState, "CLOSED FOR PAYMENT,End");
+        CaseStateDefinition newState = state(POST_STATE, "End");
+
+        doReturn(caseDetailsBefore, updatedCaseDetails).when(caseService).clone(caseDetails);
+        doReturn(true).when(eventTriggerService).isPreStateValid(closedForPaymentState, caseEventDefinition);
+        doReturn(previousState).when(caseTypeService).findState(caseTypeDefinition, closedForPaymentState);
+        doReturn(newState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        doReturn(savedCaseDetails).when(caseDetailsRepository).set(any(CaseDetails.class));
+
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        verify(dateCaseClosedService).updateForExistingCase(savedCaseDetails, caseDetailsBefore, caseTypeDefinition);
+    }
+
+    @Test
+    @DisplayName("should use about to submit state override when updating date case closed")
+    void shouldUseAboutToSubmitStateOverrideWhenUpdatingDateCaseClosed() throws Exception {
+        String callbackState = "CallbackClosedForPayment";
+
+        CaseStateDefinition callbackStateDefinition = new CaseStateDefinition();
+        callbackStateDefinition.setId(callbackState);
+        callbackStateDefinition.setStateCategory("CLOSED FOR PAYMENT,End");
+        // Case object passed into the about-to-submit callback
+        CaseDetails updatedCaseDetails = caseDetails.shallowClone();
+
+        // createCaseEvent() clones case for before snapshot, then clones again for update
+        doReturn(caseDetailsBefore, updatedCaseDetails).when(caseService).clone(caseDetails);
+        doAnswer(invocation -> invocation.getArgument(0))
+            .when(caseDocumentService).stripDocumentHashes(any(CaseDetails.class));
+        doAnswer(invocation -> {
+            CaseDetails callbackCaseDetails = invocation.getArgument(2);
+            callbackCaseDetails.setState(callbackState);
+            aboutToSubmitCallbackResponse.setState(Optional.of(callbackState));
+            return aboutToSubmitCallbackResponse;
+        }).when(callbackInvoker).invokeAboutToSubmitCallback(any(),
+            any(),
+            any(),
+            any(),
+            any());
+        // Return the callback-mutated case as the saved final case
+        doAnswer(invocation -> invocation.getArgument(0)).when(caseDetailsRepository).set(any(CaseDetails.class));
+        CaseStateDefinition previousState = state(PRE_STATE_ID, "End");
+        CaseStateDefinition newState = state(POST_STATE, "End");
+        doReturn(previousState).when(caseTypeService).findState(caseTypeDefinition, PRE_STATE_ID);
+        doReturn(newState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
+        doReturn(callbackStateDefinition).when(caseTypeService).findState(caseTypeDefinition, callbackState);
+
+        underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+        ArgumentCaptor<CaseDetails> finalCaseDetailsCaptor =
+            ArgumentCaptor.forClass(CaseDetails.class);
+
+        InOrder inOrder = inOrder(casePostStateService, callbackInvoker);
+        inOrder.verify(casePostStateService).evaluateCaseState(caseEventDefinition, updatedCaseDetails);
+        inOrder.verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
+            caseDetailsBefore,
+            updatedCaseDetails,
+            caseTypeDefinition,
+            IGNORE_WARNING);
+        verify(dateCaseClosedService).updateForExistingCase(finalCaseDetailsCaptor.capture(),
+            eq(caseDetailsBefore),
+            eq(caseTypeDefinition));
+        assertThat(finalCaseDetailsCaptor.getValue().getState()).isEqualTo(callbackState);
     }
 
     @Test
@@ -918,6 +1027,13 @@ class CreateCaseEventServiceTest extends TestFixtures {
         node.set("document_filename", new TextNode("test-a5.pdf"));
 
         return node;
+    }
+
+    private CaseStateDefinition state(String id, String stateCategory) {
+        CaseStateDefinition state = new CaseStateDefinition();
+        state.setId(id);
+        state.setStateCategory(stateCategory);
+        return state;
     }
 
 }

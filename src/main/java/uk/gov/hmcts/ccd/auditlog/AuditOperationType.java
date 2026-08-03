@@ -15,7 +15,8 @@ public enum AuditOperationType {
     GLOBAL_SEARCH("Global search"),
     MIGRATION("Data migration"),
     CATEGORIES_AND_DOCUMENTS_ACCESSED("Categories and documents accessed"),
-    LINKED_CASES_ACCESSED("Get Linked Cases");
+    LINKED_CASES_ACCESSED("Get Linked Cases"),
+    GET_CLOSED_CASES("Get Closed Cases");
 
     private final String label;
 
