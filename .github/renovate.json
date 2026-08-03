@@ -6,6 +6,16 @@
   ],
   "labels": ["Renovate Dependencies"],
   "schedule": ["* 16-19 * * 1-5"],
-  "platformAutomerge": false,
-  "automergeSchedule": ["* * 31 2 *"]
+  "automergeSchedule": ["* 14-18 * * 1-4"],
+  "packageRules": [
+    {
+      "matchManagers": ["gradle"],
+      "matchDepNames": [
+        "ccd-test-definitions",
+        "befta-fw"
+      ],
+      "matchCurrentValue": "!/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
+      "enabled": false
+    }
+  ]
 }
