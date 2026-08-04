@@ -335,7 +335,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And     the request [contains the standard CaseLinks field with Case Reference values]
 
    # get event token to update Another
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token],
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase],
     When    a request is prepared with appropriate values
     And     the request [contains the standard CaseLinks field with Case Reference values]
 
