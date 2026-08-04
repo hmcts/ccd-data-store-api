@@ -1,0 +1,31 @@
+{
+	"title": "must accept a null value for an optional RichTextArea field",
+	"_guid_": "S-1029.6",
+	"_extends_": "F-1029_CreateCaseBase",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a null value for the RichTextArea field"
+	],
+
+	"prerequisites": [ {
+		"S-1029_GetCreateToken": "S-1029_GetCreateToken"
+	} ],
+
+	"request": {
+		"body": {
+			"data": {
+				"RichTextAreaField": null
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_data": {
+				"RichTextAreaField": null,
+				"SearchCriteria": { }
+			}
+		}
+	}
+}

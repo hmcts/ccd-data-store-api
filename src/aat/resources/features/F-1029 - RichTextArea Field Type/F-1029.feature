@@ -33,6 +33,30 @@ Feature: F-1029: Support for the RichTextArea field type
      Then a negative response is received
       And the response has all other details as expected
 
+  @S-1029.5 #AC-2
+    Scenario: must get a negative response when a non-string value is submitted against a RichTextArea field
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a token for case creation] as in [S-1029_GetCreateToken]
+
+     When a request is prepared with appropriate values
+      And the request [contains a number where the RichTextArea field expects a string]
+      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+
+     Then a negative response is received
+      And the response has all other details as expected
+
+  @S-1029.6 #AC-2
+    Scenario: must create a case successfully when an optional RichTextArea field is null
+    Given a user with [an active profile in CCD]
+      And a successful call [to create a token for case creation] as in [S-1029_GetCreateToken]
+
+     When a request is prepared with appropriate values
+      And the request [contains a null value for the RichTextArea field]
+      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+
+     Then a positive response is received
+      And the response has all other details as expected
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
