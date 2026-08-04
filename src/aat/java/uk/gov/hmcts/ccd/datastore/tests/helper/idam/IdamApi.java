@@ -10,23 +10,17 @@ import java.util.List;
 
 public interface IdamApi {
 
-    @RequestLine("POST /oauth2/authorize")
-    @Headers({"Authorization: {authorization}", "Content-Type: application/x-www-form-urlencoded"})
-    @Body("response_type={response_type}&redirect_uri={redirect_uri}&client_id={client_id}")
-    AuthenticateUserResponse authenticateUser(@Param("authorization") String authorization,
-                                              @Param("response_type") String responseType,
-                                              @Param("client_id") String clientId,
-                                              @Param("redirect_uri") String redirectUri);
-
-    @RequestLine("POST /oauth2/token")
+    @RequestLine("POST /o/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
-    @Body("code={code}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}"
-        + "&redirect_uri={redirect_uri}")
-    TokenExchangeResponse exchangeCode(@Param("code") String code,
-                                       @Param("grant_type") String grantType,
+    @Body("grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}"
+        + "&redirect_uri={redirect_uri}&scope={scope}&username={username}&password={password}")
+    TokenResponse generateOpenIdToken(@Param("grant_type") String grantType,
                                        @Param("client_id") String clientId,
                                        @Param("client_secret") String clientSecret,
-                                       @Param("redirect_uri") String redirectUri);
+                                       @Param("redirect_uri") String redirectUri,
+                                       @Param("scope") String scope,
+                                       @Param("username") String username,
+                                       @Param("password") String password);
 
     @RequestLine("GET /o/userinfo")
     @Headers("Authorization: Bearer {access_token}")
@@ -41,13 +35,47 @@ public interface IdamApi {
         }
     }
 
-    class TokenExchangeResponse {
-
+    class TokenResponse {
         @JsonProperty("access_token")
         private String accessToken;
 
+        @JsonProperty("expires_in")
+        private String expiresIn;
+
+        @JsonProperty("id_token")
+        private String idToken;
+
+        @JsonProperty("refresh_token")
+        private String refreshToken;
+
+        @JsonProperty("scope")
+        private String scope;
+
+        @JsonProperty("token_type")
+        private String tokenType;
+
         public String getAccessToken() {
             return accessToken;
+        }
+
+        public String getExpiresIn() {
+            return expiresIn;
+        }
+
+        public String getIdToken() {
+            return idToken;
+        }
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public String getTokenType() {
+            return tokenType;
         }
     }
 

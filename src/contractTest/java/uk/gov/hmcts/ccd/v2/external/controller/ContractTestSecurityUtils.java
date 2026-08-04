@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -8,16 +9,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
-import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserRequest;
-import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
-import uk.gov.hmcts.reform.idam.client.models.ExchangeCodeRequest;
-import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
-import java.util.Base64;
 import java.util.HashMap;
 
 @Service
@@ -35,9 +34,10 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     @Value("${auth.provider.client.secret}")
     private String authClientSecret;
 
-    private static final String BASIC = "Basic ";
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CODE = "code";
+    @Value("${auth.provider.client.scope}")
+    private String authScope;
+
+    private static final String GRANT_TYPE = "password";
 
     private HashMap<String, UserCredentials> caseTypeUserCredentials = new HashMap<>();
     private HashMap<String, UserCredentials> eventUserCredentials = new HashMap<>();
@@ -98,29 +98,18 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     }
 
     private String getIdamOauth2Token(String username, String password) {
-        String basicAuthHeader = getBasicAuthHeader(username, password);
 
         log.info("Client ID: {} . Authenticating...", authClientId);
 
-        AuthenticateUserResponse authenticateUserResponse = idamClient.authenticateUser(
-            basicAuthHeader, new AuthenticateUserRequest(CODE, authClientId, authRedirectUrl)
+        log.info("Authenticated. Exchanging...");
+        TokenResponse tokenExchangeResponse = idamClient.generateOpenIdToken(
+            new TokenRequest(authClientId, authClientSecret, GRANT_TYPE, authRedirectUrl, username, password, authScope,
+                null, null)
         );
 
-        log.info("Authenticated. Exchanging...");
-        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(
-            new ExchangeCodeRequest(authenticateUserResponse.getCode(),
-                AUTHORIZATION_CODE,
-                authRedirectUrl,
-                authClientId,
-                authClientSecret));
 
         log.info("Getting AccessToken...");
-        return tokenExchangeResponse.getAccessToken();
-    }
-
-    private String getBasicAuthHeader(String username, String password) {
-        String authorisation = username + ":" + password;
-        return BASIC + Base64.getEncoder().encodeToString(authorisation.getBytes());
+        return tokenExchangeResponse.accessToken;
     }
 
     class UserCredentials {
