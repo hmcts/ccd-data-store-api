@@ -21,7 +21,7 @@
 				"summary": "",
 				"description": ""
 			},
-			"event_token" : "${[scenarioContext][childContexts][F-044-Prerequisite_StopProgress][testData][actualResponse][body][token]}"
+			"event_token" : "${[scenarioContext][childContexts][F-044-Prerequisite][testData][actualResponse][body][token]}"
 		}
 	},
 

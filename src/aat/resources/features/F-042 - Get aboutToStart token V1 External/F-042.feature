@@ -11,6 +11,7 @@ Background: Load test data for the scenario
 Scenario: Trigger the aboutToStart callback event for a caseworker for a new case which has not been started yet.
 
     Given a user with [an active profile in CCD],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
@@ -41,6 +42,7 @@ Scenario: Trigger the aboutToStart callback event for a caseworker for an invali
 Scenario: Trigger the aboutToStart callback event for a caseworker for an invalid Jurisdiction ID
 
     Given a user with [an active profile in CCD],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
@@ -56,6 +58,7 @@ Scenario: Trigger the aboutToStart callback event for a caseworker for an invali
 Scenario: Return error code 422 when an event request could not be processed.
 
     Given a user with [an active profile in CCD],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
       And a successful call [to fire a START_PROGRESS event on the case just created] as in [S-249_Update_Case_State],
 
