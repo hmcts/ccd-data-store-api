@@ -94,6 +94,50 @@ class CaseAccessServiceTest {
     }
 
     @Nested
+    @DisplayName("when user has a pui-case-manager role")
+    class WhenUserHasAPuiCaseManagerRole {
+
+        private final String[] roles = {
+            "something-pui-case-manager",
+            "pui-case-manager"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(roles);
+        }
+
+        @Test
+        @DisplayName("should give GRANTED access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
+            assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
+    @DisplayName("when user has a solicitor role")
+    class WhenUserHasASolicitorRole {
+
+        private final String[] roles = {
+            "somethingThatIsNotASolicitor",
+            "solicitor"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(roles);
+        }
+
+        @Test
+        @DisplayName("should give GRANTED access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(userInfo(roles));
+            assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
     @DisplayName("when user is a solicitor")
     class WhenSolicitor {
 
