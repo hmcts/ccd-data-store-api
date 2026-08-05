@@ -5,7 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.TextCodec;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -14,6 +18,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
+
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -93,6 +99,48 @@ class EventTokenServiceTest {
 
         assertDoesNotThrow(() -> eventTokenService.validateToken(
             token, UID, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition));
+    }
+
+    @Test
+    @DisplayName("should validate token when case id claim uses case reference")
+    void shouldValidateTokenWhenCaseIdClaimUsesCaseReference() {
+        CaseDetails referencedCase = newCaseDetails()
+            .withId("441")
+            .withReference(1785925516698138L)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withJurisdiction(JURISDICTION_ID)
+            .build();
+
+        String token = eventTokenService.generateToken(
+            UID, referencedCase, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
+
+        assertDoesNotThrow(() -> eventTokenService.validateToken(
+            token, UID, referencedCase, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition));
+    }
+
+    @Test
+    @DisplayName("should validate legacy token when case id claim uses internal entity id")
+    void shouldValidateLegacyTokenWhenCaseIdClaimUsesInternalEntityId() {
+        CaseDetails referencedCase = newCaseDetails()
+            .withId("441")
+            .withReference(1785925516698138L)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withJurisdiction(JURISDICTION_ID)
+            .build();
+
+        String legacyToken = Jwts.builder()
+            .setId("legacy-token")
+            .setSubject(UID)
+            .setIssuedAt(new Date())
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(TOKEN_SECRET))
+            .claim(EventTokenProperties.CASE_ID, "441")
+            .claim(EventTokenProperties.EVENT_ID, EVENT_ID)
+            .claim(EventTokenProperties.CASE_TYPE_ID, CASE_TYPE_ID)
+            .claim(EventTokenProperties.JURISDICTION_ID, JURISDICTION_ID)
+            .compact();
+
+        assertDoesNotThrow(() -> eventTokenService.validateToken(
+            legacyToken, UID, referencedCase, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition));
     }
 
     @Test

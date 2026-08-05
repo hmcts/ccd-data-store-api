@@ -64,7 +64,7 @@ public class EventTokenService {
             .setSubject(uid)
             .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
-            .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
+            .claim(EventTokenProperties.CASE_ID, getCaseIdClaimValue(caseDetails))
             .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
             .claim(EventTokenProperties.JURISDICTION_ID, jurisdictionDefinition.getId())
@@ -166,7 +166,7 @@ public class EventTokenService {
                                              final JurisdictionDefinition jurisdictionDefinition,
                                              final CaseTypeDefinition caseTypeDefinition) {
         return isNullOrMatchingEventTokenClaim(eventTokenProperties.getEventId(), event.getId())
-            && isNullOrMatchingEventTokenClaim(eventTokenProperties.getCaseId(), toString(caseDetails.getId()))
+            && isNullOrMatchingCaseIdClaim(eventTokenProperties.getCaseId(), caseDetails)
             && isNullOrMatchingEventTokenClaim(
                 eventTokenProperties.getJurisdictionId(), jurisdictionDefinition.getId())
             && isNullOrMatchingEventTokenClaim(eventTokenProperties.getCaseTypeId(), caseTypeDefinition.getId())
@@ -175,6 +175,18 @@ public class EventTokenService {
 
     private boolean isNullOrMatchingEventTokenClaim(final String claimValue, final String expectedValue) {
         return claimValue == null || claimValue.equalsIgnoreCase(expectedValue);
+    }
+
+    private String getCaseIdClaimValue(final CaseDetails caseDetails) {
+        if (caseDetails.getReferenceAsString() != null) {
+            return caseDetails.getReferenceAsString();
+        }
+        return caseDetails.getId();
+    }
+
+    private boolean isNullOrMatchingCaseIdClaim(final String claimValue, final CaseDetails caseDetails) {
+        return isNullOrMatchingEventTokenClaim(claimValue, toString(caseDetails.getId()))
+            || isNullOrMatchingEventTokenClaim(claimValue, caseDetails.getReferenceAsString());
     }
 
     private void applyRevision(String revisionClaim,
