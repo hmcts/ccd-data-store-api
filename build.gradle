@@ -12,6 +12,7 @@ plugins {
     id 'org.sonarqube' version '7.3.0.8198'
     id 'com.github.kt3k.coveralls' version '2.12.2'
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
+    id 'com.diffplug.spotless' version '8.8.0'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'info.solidsoft.pitest' version '1.19.0'
     id 'uk.gov.hmcts.java' version '0.12.68'
@@ -102,6 +103,25 @@ tasks.register("printSuppressionFile") {
 
 application {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
+}
+
+spotless {
+    enforceCheck false
+    ratchetFrom 'origin/master'
+
+    java {
+        target 'src/**/*.java'
+        removeUnusedImports()
+        forbidWildcardImports()
+
+        googleJavaFormat('1.36.1')
+                .aosp()
+                .reflowLongStrings()
+                .formatJavadoc(true)
+                .reorderImports(true)
+
+        trimTrailingWhitespace()
+    }
 }
 
 sourceSets {
