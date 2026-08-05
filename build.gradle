@@ -42,7 +42,7 @@ ext {
     elasticVersion = '9.4.4'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.6'
-    beftaFwVersion = '9.2.7'
+    beftaFwVersion = '9.2.9'
     ccdTestDefinitionVersion = '7.26.9'
     limits = [
             'instruction': 90,
@@ -328,7 +328,7 @@ dependencies {
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
     implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.2'
-    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.1'
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.3'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.3'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.0'
 
@@ -348,7 +348,7 @@ dependencies {
 
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
     testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.13'
 
     // TEST DEPENDENCIES
     testImplementation libraries.junit5
