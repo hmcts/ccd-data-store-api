@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import jakarta.inject.Inject;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +44,8 @@ import static uk.gov.hmcts.ccd.TestFixtures.caseDataFromJsonString;
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final String CASE_FIELD_JSON = "tests/CaseDataValidator_CaseField.json";
     private static final String CASE_FIELD_DYNAMIC_JSON = "tests/CaseDataValidator_DynamicLists.json";
+    private static final String RICH_TEXT_AREA_FIELD = "RichTextAreaField";
+    private static final String RICH_TEXT_AREA = "RichTextArea";
 
     @Inject
     private CaseDataValidator caseDataValidator;
@@ -411,6 +415,27 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final ValidationContext validationContext = getValidationContextDynamicFields(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 0, result.size());
+    }
+
+    @Test
+    public void validRichTextAreaValue() throws Exception {
+        final String data = """
+            {
+              "RichTextAreaField": "<p><strong>Order</strong></p>"
+            }""";
+        final Map<String, JsonNode> values = caseDataFromJsonString(data);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(
+            new CaseFieldDefinitionBuilder(RICH_TEXT_AREA_FIELD)
+                .withType(RICH_TEXT_AREA)
+                .withMin(10)
+                .build()
+        ));
+
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
+
+        assertTrue(result.isEmpty(), result.toString());
     }
 
     @Test
