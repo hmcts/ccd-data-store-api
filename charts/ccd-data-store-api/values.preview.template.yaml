@@ -52,10 +52,10 @@ java:
       initdb:
         scripts:
           init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role-assignment" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
 ccd:
   enabled: true
@@ -216,8 +216,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_user => "{{ .Values.postgresql.auth.username}}"
+          jdbc_password => "{{ .Values.postgresql.auth.password}}"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
