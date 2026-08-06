@@ -12,22 +12,26 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.MacAlgorithm;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EventTokenService {
+    private static final MacAlgorithm SIGNATURE_ALGORITHM = Jwts.SIG.HS256;
+    private static final String SIGNATURE_KEY_JCA_NAME = "HmacSHA256";
+
     private static final CaseDetails EMPTY_CASE = new CaseDetails();
 
     static {
@@ -45,8 +49,8 @@ public class EventTokenService {
                              final ApplicationParams applicationParams,
                              final CaseService caseService) {
         this.randomKeyGenerator = randomKeyGenerator;
-        byte[] keyBytes = Decoders.BASE64.decode(applicationParams.getTokenSecret());
-        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+        byte[] keyBytes = applicationParams.getTokenSecret().getBytes(StandardCharsets.UTF_8);
+        this.secretKey = new SecretKeySpec(keyBytes, SIGNATURE_KEY_JCA_NAME);
         this.isValidateTokenClaims = applicationParams.isValidateTokenClaims();
         this.caseService = caseService;
     }
@@ -68,7 +72,7 @@ public class EventTokenService {
             .id(randomKeyGenerator.generate())
             .subject(uid)
             .issuedAt(new Date())
-            .signWith(secretKey)
+            .signWith(secretKey, SIGNATURE_ALGORITHM)
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
             .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())

@@ -256,7 +256,7 @@ public class ApplicationParams {
     @Value("${validation.dynamic-list.value-max-length}")
     private Integer validationDynamicListValueMaxLength;
 
-    @Value("${token.claim.validation.enabled}")
+    @Value("${token.claim.validation.enabled:false}")
     private boolean validateTokenClaims;
 
     public static String encode(final String stringToEncode) {
