@@ -15,7 +15,7 @@ Feature: F-1029: Support for the RichTextArea field type
 
      When a request is prepared with appropriate values
       And the request [contains a RichTextArea field populated with rich text mark-up]
-      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
 
      Then a positive response is received
       And the response has all other details as expected
@@ -28,7 +28,7 @@ Feature: F-1029: Support for the RichTextArea field type
      When a request is prepared with appropriate values
       And the request [contains a RichTextArea field with a Min of 10 configured against it]
       And the request [contains a value for that field which is shorter than the configured minimum]
-      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
 
      Then a negative response is received
       And the response has all other details as expected
@@ -40,7 +40,7 @@ Feature: F-1029: Support for the RichTextArea field type
 
      When a request is prepared with appropriate values
       And the request [contains a number where the RichTextArea field expects a string]
-      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
 
      Then a negative response is received
       And the response has all other details as expected
@@ -52,7 +52,7 @@ Feature: F-1029: Support for the RichTextArea field type
 
      When a request is prepared with appropriate values
       And the request [contains a null value for the RichTextArea field]
-      And it is submitted to call the [Submit Case Creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
 
      Then a positive response is received
       And the response has all other details as expected
@@ -71,7 +71,7 @@ Feature: F-1029: Support for the RichTextArea field type
       And the request [contains a case Id that has just been created as in F-1029_CreateCasePreRequisiteCaseworker]
       And the request [contains an event token for the case just created above]
       And the request [contains a new value for the RichTextArea field]
-      And it is submitted to call the [Submit event creation as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
 
      Then a positive response is received
       And the response has all other details as expected
@@ -87,7 +87,7 @@ Feature: F-1029: Support for the RichTextArea field type
 
      When a request is prepared with appropriate values
       And the request [contains a case Id that has just been created as in F-1029_CreateCasePreRequisiteCaseworker]
-      And it is submitted to call the [Get case details as Case worker (v1_ext caseworker)] operation of [CCD Data Store]
+      And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
 
      Then a positive response is received
       And the response [contains the RichTextArea value exactly as it was submitted]
