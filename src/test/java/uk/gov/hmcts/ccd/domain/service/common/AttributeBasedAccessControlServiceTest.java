@@ -15,7 +15,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_DELETE;
@@ -124,6 +128,45 @@ class AttributeBasedAccessControlServiceTest {
             .hasAccessControlList(accessProfiles, CAN_CREATE, accessControlLists);
 
         assertTrue(hasAccess);
+    }
+
+    @Test
+    void shouldTreatNullReadOnlyAsNotReadOnly() {
+        // AccessProfile.readOnly is a Boolean. Every production construction site sets it (AuthorisationMapper via
+        // BooleanUtils.isTrue, CaseAccessService and RoleAssignmentService with a literal false), but the model
+        // permits null - AccessProfile(String) leaves it unset. Auto-unboxing a null used to throw NPE here.
+        Set<AccessProfile> accessProfiles = Collections.singleton(AccessProfile.builder()
+            .accessProfile(ACCESS_PROFILE_1)
+            .build());
+        List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
+
+        assertNull(accessProfiles.iterator().next().getReadOnly());
+        assertTrue(attributeBasedAccessControlService
+            .hasAccessControlList(accessProfiles, CAN_CREATE, accessControlLists));
+        assertTrue(attributeBasedAccessControlService
+            .hasAccessControlList(accessProfiles, CAN_DELETE, accessControlLists));
+    }
+
+    @Test
+    void shouldNotMutateSuppliedAccessControlListsWhenDowngradingToReadOnly() {
+        // The read-only downgrade must build new ACLs rather than edit the caller's, which are shared definition
+        // objects. hasAccessControlList is also handed an immutable Stream.toList() result internally, so any
+        // attempt to mutate would fail outright.
+        Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
+        List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
+        AccessControlList supplied = accessControlLists.getFirst();
+
+        assertFalse(attributeBasedAccessControlService
+            .hasAccessControlList(accessProfiles, CAN_DELETE, accessControlLists));
+
+        assertAll(
+            () -> assertEquals(1, accessControlLists.size()),
+            () -> assertSame(supplied, accessControlLists.getFirst()),
+            () -> assertTrue(supplied.isCreate()),
+            () -> assertTrue(supplied.isRead()),
+            () -> assertTrue(supplied.isUpdate()),
+            () -> assertTrue(supplied.isDelete())
+        );
     }
 
     private Set<AccessProfile> createAccessProfiles(boolean readOnly, String... accessProfiles) {

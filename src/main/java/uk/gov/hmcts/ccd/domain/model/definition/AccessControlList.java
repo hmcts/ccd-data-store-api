@@ -70,10 +70,14 @@ public class AccessControlList implements Serializable {
             return true;
         }
 
-        if (!(o instanceof AccessControlList that)) {
+        // Exact-class comparison, not instanceof: ComplexACL carries an extra listElementCode, so an instanceof
+        // check would make plainAcl.equals(complexAcl) true while complexAcl.equals(plainAcl) is false. That breaks
+        // the symmetry contract, and List.remove(Object) - used on ACL lists in CaseFieldDefinition - relies on it.
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
+        final AccessControlList that = (AccessControlList) o;
         return create == that.create
             && read == that.read
             && update == that.update
