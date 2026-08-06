@@ -52,10 +52,10 @@ java:
       initdb:
         scripts:
           init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role-assignment" WITH OWNER = {{ .Values.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = {{ .Values.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = {{ .Values.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = {{ .Values.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role-assignment" WITH OWNER = {{ .Values.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
 ccd:
   enabled: true
