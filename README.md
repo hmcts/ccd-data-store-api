@@ -12,7 +12,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets.
-  
+Repo-local workflow docs are indexed in `AGENTS.md`.
+
 ### Prerequisites
 
 - [Open JDK 21](https://openjdk.java.net/)
@@ -43,11 +44,16 @@ The following environment variables are required:
 | HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY        | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                                        |
 | HTTP_CLIENT_CONNECTION_TIMEOUT               | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html                            |
 | HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
-| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT        | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html      |
-| DRAFT_STORE_URL                              | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance.                                                                                    |
-| DRAFT_ENCRYPTION_KEY                         | - | Draft encryption key. The encryption key used by draft store to encrypt documents with.                                                                                             |
-| DRAFT_TTL_DAYS                               | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                           |
-| DRAFT_TTL_DAYS                               | - | Number of days after which the saved draft will be deleted if unmodified.                                                                                                           |
+| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
+| DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
+| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| CCD_CALLBACK_ALLOWED_HOSTS | localhost,127.0.0.1 | Comma-separated callback destination match patterns. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported. Invalid regex-like entries fail validation explicitly. Use environment-specific callback hosts or patterns (for example local Docker: `host.docker.internal`; preview/demo PR domains: `.*\\.demo\\.platform\\.hmcts\\.net,.*\\.preview\\.platform\\.hmcts\\.net`; AAT/pipeline: internal service DNS). |
+| CCD_CALLBACK_ALLOWED_HTTP_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to use `http` for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly; all other callback hosts must use `https`. |
+| CCD_CALLBACK_ALLOW_PRIVATE_HOSTS | localhost,127.0.0.1 | Comma-separated host match patterns allowed to resolve to private/local addresses for callbacks. Exact hosts, legacy `*.domain.tld`, `*`, and regex patterns are supported; invalid regex-like entries fail validation explicitly. |
+
+For callback hardening rollout guidance, allowlist pattern syntax, and environment examples (including preview/AAT allowlist hosts),
+see [`docs/api/security.md`](docs/api/security.md).
 
 The following environment variables are optional:
 
@@ -56,6 +62,7 @@ The following environment variables are optional:
 | ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
 | GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
 | ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
+
 
 ### Building
 

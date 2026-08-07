@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -12,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.Configurable;
 import org.apache.hc.core5.util.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.net.URI;
@@ -22,17 +25,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -51,6 +57,10 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    @Qualifier("callbackRestTemplate")
+    private RestTemplate callbackRestTemplate;
 
     private static final String RESPONSE_BODY = "{ \"test\": \"name\"}";
     private static final String URL = "/ng/itb";
@@ -80,6 +90,25 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             new RequestEntity<>(GET, URI.create(hostUrl + URL));
 
         assertThrows(ResourceAccessException.class, () -> restTemplate.exchange(request, String.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {301, 302, 303, 307, 308})
+    void callbackRestTemplateShouldNotFollowRedirects(final int redirectStatus) {
+        assertNotNull(callbackRestTemplate);
+        final String redirectUrl = "/ng/redirect-" + redirectStatus;
+        final String redirectTargetUrl = "/ng/redirect-target-" + redirectStatus;
+        stubFor(put(urlEqualTo(redirectUrl)).willReturn(aResponse()
+            .withStatus(redirectStatus)
+            .withHeader("Location", hostUrl + redirectTargetUrl)));
+
+        final RequestEntity<String> request =
+            new RequestEntity<>(PUT, URI.create(hostUrl + redirectUrl));
+
+        final ResponseEntity<String> response = callbackRestTemplate.exchange(request, String.class);
+
+        assertThat(response.getStatusCode().value(), is(redirectStatus));
+        verify(exactly(0), anyRequestedFor(urlEqualTo(redirectTargetUrl)));
     }
 
     @Disabled("for local dev only")
@@ -128,9 +157,34 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient", connectTimeout, readTimeout);
         RequestConfig config = ((Configurable) client).getConfig();
 
-        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
         assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
+        assertThat(config.isRedirectsEnabled(), is(true));
+    }
+
+    @Test
+    void callbackClientFactoryShouldDisableRedirects() {
+        final int connectTimeout = 500;
+        final int readTimeout = 5000;
+        RestTemplateConfiguration configuration = new RestTemplateConfiguration();
+        // Provide minimal defaults to satisfy the configuration wiring
+        ReflectionTestUtils.setField(configuration, "maxTotalHttpClient", 10);
+        ReflectionTestUtils.setField(configuration, "maxSecondsIdleConnection", 1);
+        ReflectionTestUtils.setField(configuration, "maxClientPerRoute", 2);
+        ReflectionTestUtils.setField(configuration, "validateAfterInactivity", 1);
+        ReflectionTestUtils.setField(configuration, "connectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "readTimeout", readTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "draftsCreateConnectionTimeout", connectTimeout);
+        ReflectionTestUtils.setField(configuration, "definitionStoreConnectionTimeout", connectTimeout);
+
+        Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClientWithRedirectsDisabled",
+            connectTimeout, readTimeout);
+        RequestConfig config = ((Configurable) client).getConfig();
+
+        assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
+        assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
+        assertThat(config.isRedirectsEnabled(), is(false));
     }
 
     @Test
@@ -151,7 +205,6 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
         Object client = ReflectionTestUtils.invokeMethod(configuration, "getHttpClient");
         RequestConfig config = ((Configurable) client).getConfig();
 
-        assertThat(config.getConnectTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
         assertThat(config.getResponseTimeout(), is(Timeout.ofMilliseconds(readTimeout)));
         assertThat(config.getConnectionRequestTimeout(), is(Timeout.ofMilliseconds(connectTimeout)));
     }

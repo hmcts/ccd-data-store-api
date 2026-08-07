@@ -93,9 +93,9 @@ class SecurityUtilsTest {
         final HttpHeaders headers = securityUtils.authorizationHeaders();
 
         assertAll(
-            () -> assertHeader(headers, "ServiceAuthorization", SERVICE_JWT),
-            () -> assertHeader(headers, "user-id", USER_ID),
-            () -> assertHeader(headers, "user-roles", "role1,role2")
+            () -> assertHeader(headers, SecurityUtils.SERVICE_AUTHORIZATION, SERVICE_JWT),
+            () -> assertHeader(headers, SecurityUtils.USER_ID, USER_ID),
+            () -> assertHeader(headers, SecurityUtils.USER_ROLES, "role1,role2")
         );
     }
 
