@@ -35,6 +35,17 @@
             }
           ],
           "percentage": 1
+        },
+        {
+          "telemetryType": "request",
+          "attributes": [
+            {
+              "key": "http.url",
+              "value": "https?://[^/]+/metrics/[^?]+\\?tag=cache:[^&]+$",
+              "matchType": "regexp"
+            }
+          ],
+          "percentage": 100
         }
       ]
     }
