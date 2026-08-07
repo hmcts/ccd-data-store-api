@@ -1,0 +1,17 @@
+{
+	"title": "should create an event token for STOP_PROGRESS event",
+	"_guid_": "F-044-Prerequisite_StopProgress",
+	"_extends_": "F-044-Prerequisite",
+
+	"request": {
+		"pathVariables": {
+			"etid": "STOP_PROGRESS"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"event_id": "STOP_PROGRESS"
+		}
+	}
+}

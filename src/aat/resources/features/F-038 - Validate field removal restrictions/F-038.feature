@@ -62,7 +62,8 @@ Scenario: must remove complex AddressUKField if sent null in the event data, unl
   Scenario: must add simple fields from AddressForeignField if not sent in the event data, if Read=False and Create=True
 
     Given a user with [an active profile in CCD],
-    And a case that has just been created as in [F-038-Case-Creation-Data],
+    And a successful call [to create a token for case creation] as in [F-038_Token_Creation],
+    And another successful call [to create a full case] as in [F-038-Case-Creation-Data],
     And a successful call [to get an event token for the case just created] as in [F-038-Base-PrivateCaseWorker-Prerequisite],
 
     When a request is prepared with appropriate values,
@@ -80,7 +81,8 @@ Scenario: must remove complex AddressUKField if sent null in the event data, unl
   Scenario: must add collection items from CollectionPermissionField if not sent in the event data, if Read=False and Create=True
 
     Given a user with [an active profile in CCD],
-    And a case that has just been created as in [F-038-Case-Creation-Data],
+    And a successful call [to create a token for case creation] as in [F-038_Token_Creation],
+    And another successful call [to create a full case] as in [F-038-Case-Creation-Data],
     And a successful call [to get an event token for the case just created] as in [F-038-Base-PrivateCaseWorker-Prerequisite],
 
     When a request is prepared with appropriate values,

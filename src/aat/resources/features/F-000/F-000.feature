@@ -12,7 +12,8 @@ Scenario: must return default user setting successfully for a user having a prof
 
     Given a successful call [to retrieve a user profile] as in [S-000-Prerequisite],
       And a user with [a detailed profile in CCD],
-      And a case that has just been created as in [Befta_Default_Full_Case_Creation_Data],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Default_Full_Case_Creation_Data],
 
      When a request is prepared with appropriate values,
       And the request [uses a uid that exists in IDAM],
