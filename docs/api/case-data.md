@@ -122,6 +122,16 @@ A `TextArea` value is a `string`. It contain `\n` to represent line breaks.
 }
 ```
 
+### RichTextArea
+
+A `RichTextArea` value is a `string`. CCD stores the rich text content as an opaque string and does not interpret the markup.
+
+```json
+{
+  "FieldId": "<p><strong>Order</strong></p>"
+}
+```
+
 ### FixedList
 
 A `FixedList` value is a `string` exactly matching the code of one the pre-defined options for that list.
@@ -349,4 +359,3 @@ Also shows the optional required OrganisationPolicyField field.
   }
 }
 ```
-
