@@ -39,7 +39,7 @@ ext {
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
     mockito = '5.21.0'
-    elasticVersion = '9.4.4'
+    elasticVersion = '9.5.0'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.6'
     beftaFwVersion = '9.2.10'
