@@ -55,6 +55,7 @@ public class CaseAuditEventRepository {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_CREATE_EVENT);
 
         query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
+        query.setMaxResults(1);
         List<CaseAuditEventEntity> auditEvents = query.getResultList();
 
         return (auditEvents == null || auditEvents.size() == 0)
