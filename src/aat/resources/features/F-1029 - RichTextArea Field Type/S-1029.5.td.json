@@ -1,36 +1,36 @@
 {
-	"title": "must reject a non-string value submitted against a RichTextArea field",
-	"_guid_": "S-1029.5",
-	"_extends_": "F-1029_CreateCaseBase",
-
-	"specs": [
-		"an active profile in CCD",
-		"contains a number where the RichTextArea field expects a string"
-	],
-
-	"prerequisites": [ {
-		"S-1029_GetCreateToken": "S-1029_GetCreateToken"
-	} ],
-
-	"request": {
-		"body": {
-			"data": {
-				"RichTextAreaField": 12345
-			}
-		}
-	},
-
-	"expectedResponse": {
-		"_extends_": "Common_422_Response",
-		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
-			"message": "Case data validation failed",
-			"details": {
-				"field_errors": [ {
-					"id": "RichTextAreaField",
-					"message": "number is not a string"
-				} ]
-			}
-		}
-	}
+  "title": "must reject a non-string value submitted against a RichTextArea field",
+  "_guid_": "S-1029.5",
+  "_extends_": "F-1029_CreateCaseNegativeBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains a number where the RichTextArea field expects a string"
+  ],
+  "prerequisites": [
+    {
+      "S-1029_GetCreateToken": "S-1029_GetCreateToken"
+    }
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "RichTextAreaField": 12345
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "message": "Case data validation failed",
+      "details": {
+        "field_errors": [
+          {
+            "id": "RichTextAreaField",
+            "message": "number is not a string"
+          }
+        ]
+      }
+    }
+  }
 }
