@@ -196,9 +196,15 @@ logstash:
   extraVolumes: |
     - name: logstash-lib
       emptyDir: {}
+    - name: postgresql-credentials
+      secret:
+        secretName: "{{ .Release.Name }}-postgresql"
   extraVolumeMounts: |
     - name: logstash-lib
       mountPath: /usr/share/logstash/ccd
+    - name: postgresql-credentials
+      mountPath: /etc/logstash/postgresql
+      readOnly: true
   logstashConfig:
     logstash.yml: |
       api.http.host: 0.0.0.0
@@ -216,8 +222,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "{{ .Values.postgresql.auth.username}}"
-          jdbc_password => "{{ .Values.postgresql.auth.password}}"
+          jdbc_user => "javapostgres"
+          jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
