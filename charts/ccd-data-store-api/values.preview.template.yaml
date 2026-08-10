@@ -48,6 +48,8 @@ java:
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
     enabled: true
+    auth:
+      username: javapostgres
     primary:
       initdb:
         scripts:
