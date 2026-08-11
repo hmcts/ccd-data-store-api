@@ -41,11 +41,22 @@
           "attributes": [
             {
               "key": "http.url",
-              "value": "https?://[^/]+/metrics/[^?]+\\?tag=cache:[^&]+$",
+              "value": "https?://[^/]+\\.service\\.core-compute-(?:perftest|prod)\\.internal/metrics/[^?]+\\?tag=cache:[^&]+$",
               "matchType": "regexp"
             }
           ],
           "percentage": 100
+        },
+        {
+          "telemetryType": "request",
+          "attributes": [
+            {
+              "key": "http.url",
+              "value": "https?://(?![^/]+\\.service\\.core-compute-(?:perftest|prod)\\.internal/)[^/]+/metrics/[^?]+\\?tag=cache:[^&]+$",
+              "matchType": "regexp"
+            }
+          ],
+          "percentage": 0
         }
       ]
     }
