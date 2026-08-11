@@ -108,7 +108,7 @@ public class CacheConfiguration extends CachingConfigurerSupport {
         cacheBuilder.maximumSize(applicationParams.getDefaultCacheMaxSize());
         log.debug("creating custom cache: name='{}'", cacheName);
         CaffeineCache caffeineCache = new CaffeineCache(cacheName, cacheBuilder.recordStats().build());
-        caffeineCacheManager.registerCustomCache(cacheName, cacheBuilder.build());
+        caffeineCacheManager.registerCustomCache(cacheName, caffeineCache.getNativeCache());
         log.debug("registering custom cache: name='{}'", cacheName);
 
         return caffeineCache;
