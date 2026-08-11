@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -35,19 +36,22 @@ public class MidEventCallback {
     private final EventTriggerService eventTriggerService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseService caseService;
+    private final TimeToLiveService timeToLiveService;
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
                             UIDefinitionRepository uiDefinitionRepository,
                             EventTriggerService eventTriggerService,
                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                    CaseDefinitionRepository caseDefinitionRepository,
-                            CaseService caseService) {
+                                CaseDefinitionRepository caseDefinitionRepository,
+                            CaseService caseService,
+                            TimeToLiveService timeToLiveService) {
         this.callbackInvoker = callbackInvoker;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseService = caseService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     @Transactional
@@ -85,6 +89,7 @@ public class MidEventCallback {
                 }
                 removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
                     event.getEventId());
+                applyTtlIncrementIfConfigured(currentOrNewCaseDetails, caseEventDefinition, caseTypeDefinition);
 
                 CaseDetails caseDetailsFromMidEventCallback =
                     callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
@@ -129,5 +134,14 @@ public class MidEventCallback {
                 + caseTypeDefinition.getId());
         }
         return caseEventDefinition;
+    }
+
+    private void applyTtlIncrementIfConfigured(CaseDetails caseDetails,
+                                               CaseEventDefinition caseEventDefinition,
+                                               CaseTypeDefinition caseTypeDefinition) {
+        if (timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)) {
+            caseDetails.setData(timeToLiveService.updateCaseDetailsWithTTL(
+                caseDetails.getData(), caseEventDefinition, caseTypeDefinition));
+        }
     }
 }

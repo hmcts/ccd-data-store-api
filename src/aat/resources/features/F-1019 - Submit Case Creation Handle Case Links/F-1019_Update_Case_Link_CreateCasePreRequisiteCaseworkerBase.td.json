@@ -8,7 +8,7 @@
 	"uri": "/cases/{cid}/events",
 
   "prerequisites" : [{
-    "Token_Creation": "S-1019_Get_Update_Token"
+    "Token_Creation": "S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase"
   }],
 
   "users": {

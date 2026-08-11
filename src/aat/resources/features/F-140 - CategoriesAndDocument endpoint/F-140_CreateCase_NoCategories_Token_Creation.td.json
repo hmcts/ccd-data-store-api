@@ -1,0 +1,27 @@
+{
+  "_guid_": "F-140_CreateCase_NoCategories_Token_Creation",
+  "_extends_": "F-140_CreateCase_Token_Creation",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "etid": "CREATE",
+      "ctid": "BEFTA_CASETYPE_2_1"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "jurisdiction": "BEFTA_JURISDICTION_2",
+        "case_type_id": "BEFTA_CASETYPE_2_1"
+      },
+      "event_id": "CREATE"
+    }
+  }
+}
