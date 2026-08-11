@@ -34,6 +34,7 @@ public class FieldTypeDefinition implements Serializable, Copyable<FieldTypeDefi
     public static final String DATE = "Date";
     public static final String DOCUMENT = "Document";
     public static final String TEXT = "Text";
+    public static final String RICH_TEXT_AREA = "RichTextArea";
     public static final String WAYS_TO_PAY = "WaysToPay";
     public static final String FLAG_LAUNCHER = "FlagLauncher";
     public static final String COMPONENT_LAUNCHER = "ComponentLauncher";
