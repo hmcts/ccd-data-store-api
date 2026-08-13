@@ -100,7 +100,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private AuditService auditService;
 
     @Autowired
-    @Qualifier("SimpleObjectMapper")
+    @Qualifier("simpleObjectMapper")
     ObjectMapper objectMapper;
 
     private static final String TIMESTAMP_AS_TEXT = "2018-08-19T16:02:42.010Z";

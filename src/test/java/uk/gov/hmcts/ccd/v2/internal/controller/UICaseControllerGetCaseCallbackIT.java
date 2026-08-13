@@ -64,7 +64,8 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
 
         final String jsonString = TestFixtures
             .fromFileAsString("__files/test-addressbook-get-case-callback.json")
-            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK);
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK)
+            .replace("${CALLBACK_URL}", hostUrl + "/callback/unused");
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
             .willReturn(okJson(jsonString).withStatus(200)));
@@ -190,7 +191,8 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
 
         final String jsonString = TestFixtures
             .fromFileAsString("__files/test-addressbook-get-case-callback_injected_data.json")
-            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK);
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK)
+            .replace("${CALLBACK_URL}", hostUrl + "/callback/unused");
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
             .willReturn(okJson(jsonString).withStatus(200)));
@@ -237,7 +239,8 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
 
         final String jsonString = TestFixtures
             .fromFileAsString("__files/test-addressbook-get-case-callback_injected_data.json")
-            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK);
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + GET_CASE_CALLBACK)
+            .replace("${CALLBACK_URL}", hostUrl + "/callback/unused");
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
             .willReturn(okJson(jsonString).withStatus(200)));

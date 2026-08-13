@@ -27,6 +27,8 @@ import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -40,6 +42,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -48,10 +52,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -338,6 +342,33 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         );
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {301, 302, 303, 307, 308})
+    void shouldRejectRedirectCallbackWithoutFollowingLocation(final int redirectStatus) {
+        final String redirectPath = "/test-callback-redirect-" + redirectStatus;
+        final String leakedSinkPath = "/leaked-sink-" + redirectStatus;
+        final String testUrl = hostUrl + redirectPath;
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId("test case type");
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId("TEST-EVENT");
+
+        stubFor(post(urlMatching(redirectPath + ".*"))
+            .willReturn(aResponse()
+                .withStatus(redirectStatus)
+                .withHeader("Location", "http://127.0.0.1:" + wiremockPort + leakedSinkPath)
+                .withHeader("Connection", "close")));
+
+        CallbackException exception = assertThrows(CallbackException.class, () ->
+            callbackService.sendSingleRequest(testUrl, TEST_CALLBACK_ABOUT_TO_START, caseEventDefinition, null,
+                caseDetails, false)
+        );
+
+        assertTrue(exception.getMessage().contains("redirect responses are not permitted"));
+        verify(exactly(1), postRequestedFor(urlMatching(redirectPath + ".*")));
+        verify(exactly(0), anyRequestedFor(urlMatching(leakedSinkPath + ".*")));
+    }
+
     @Test
     public void retryOnServerError() throws Exception {
         final String testUrl = hostUrl + "/test-callbackGrrrr";
@@ -474,13 +505,19 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);
         given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
+        given(applicationParams.getCallbackAllowedHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackAllowedHttpHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackAllowPrivateHosts()).willReturn(List.of("localhost"));
+        given(applicationParams.getCallbackPassthruHeaderContexts()).willReturn(Collections.emptyList());
+        given(applicationParams.getCcdCallbackLogControl()).willReturn(Collections.emptyList());
         given(restTemplate.exchange(anyString(), eq(POST), isA(HttpEntity.class), eq(String.class)))
             .willThrow(new RestClientException("Fail to process"));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
+        final CallbackUrlValidator callbackUrlValidator = new CallbackUrlValidator(applicationParams);
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
-            Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class),
-            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class));
+            applicationParams, Mockito.mock(AppInsights.class),
+            Mockito.mock(HttpServletRequest.class), Mockito.mock(ObjectMapper.class), callbackUrlValidator);
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
