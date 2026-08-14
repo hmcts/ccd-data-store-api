@@ -169,10 +169,11 @@ public class RoleAssignmentService implements AccessControl {
 
     private boolean isValidOrganisation(RoleAssignment roleAssignment) {
         final boolean isOrgRole = RoleType.ORGANISATION.name().equals(roleAssignment.getRoleType());
-        final Optional<String> caseId = roleAssignment.getAttributes().getCaseId();
+        final Optional<String> caseId = Optional.ofNullable(roleAssignment.getAttributes().getCaseId())
+            .flatMap(caseIdOptional -> caseIdOptional);
         return roleAssignment.isNotExpiredRoleAssignment()
             && isOrgRole
-            && (caseId == null || caseId.isEmpty());
+            && caseId.isEmpty();
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
