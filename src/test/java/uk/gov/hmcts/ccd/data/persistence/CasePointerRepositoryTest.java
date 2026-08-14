@@ -9,8 +9,11 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +47,12 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
+
+    @Inject
+    private SupplementaryDataRepository supplementaryDataRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     private CaseDetails originalCaseDetails;
     private Long currentCaseReference;
@@ -182,6 +191,47 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
             () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
+        );
+    }
+
+    @Test
+    void supplementaryDataOnlyUpdateShouldQueueRowWhoseExternalVersionHasNotAdvanced() {
+        // The DB trigger queues a case on `UPDATE OF ... supplementary_data`, but
+        // SetSupplementaryDataQueryBuilder writes only the supplementary_data column - it never touches `version`.
+        // The Logstash output indexes with version_type => "external", which requires a STRICTLY GREATER version,
+        // so a queued supplementary-data-only change is rejected by Elasticsearch with a 409 and, because the queue
+        // row is deleted by the poll itself, never retried.
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+        final int versionBeforeSupplementaryDataWrite = persisted.getVersion();
+
+        // Drain the row queued by the create so only the supplementary-data write is under test.
+        jdbcTemplate.update("DELETE FROM case_data_logstash_queue");
+
+        supplementaryDataRepository.setSupplementaryData(
+            persisted.getReferenceAsString(), "orgs_assigned_users.OrgA", 3);
+        em.flush();
+
+        Integer versionAfterSupplementaryDataWrite = jdbcTemplate.queryForObject(
+            "SELECT version FROM case_data WHERE id = ?", Integer.class, Long.valueOf(persisted.getId()));
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+
+        assertAll(
+            () -> assertThat(countQueuedRows(jdbcTemplate, persisted.getId()))
+                .as("the trigger fires on supplementary_data, so the case is queued for indexing")
+                .isZero(),
+            () -> assertThat(polledRows)
+                .as("the supplementary-data write really was picked up by the Logstash poll")
+                .hasSize(1),
+            () -> assertThat(polledRows.get(0).get("json_supplementary_data").toString())
+                .as("the polled row carries the new supplementary data")
+                .contains("OrgA"),
+            () -> assertThat(versionAfterSupplementaryDataWrite)
+                .as("case_data.version is NOT advanced by a supplementary-data-only write")
+                .isEqualTo(versionBeforeSupplementaryDataWrite),
+            () -> assertThat(((Number) polledRows.get(0).get("version")).intValue())
+                .as("so the external version sent to Elasticsearch is unchanged -> 409, change silently lost")
+                .isEqualTo(versionBeforeSupplementaryDataWrite)
         );
     }
 
