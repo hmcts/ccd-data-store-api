@@ -1,0 +1,39 @@
+{
+  "title": "must retrieve a case with its StaffUser value preserved",
+  "_guid_": "S-1031.2",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1031_CreateCasePreRequisiteCaseworker",
+    "contains the StaffUser value exactly as it was submitted"
+  ],
+  "prerequisites": [
+    {
+      "F-1031_CreateCasePreRequisiteCaseworker": "F-1031_CreateCasePreRequisiteCaseworker"
+    }
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1031_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+      "data": {
+        "StaffUser": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+        "SearchCriteria": {}
+      },
+      "data_classification": {
+        "StaffUser": "PUBLIC",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

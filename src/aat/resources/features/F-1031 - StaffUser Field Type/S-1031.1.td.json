@@ -1,0 +1,33 @@
+{
+  "title": "must create a case successfully when a StaffUser field is populated",
+  "_guid_": "S-1031.1",
+  "_extends_": "F-1031_CreateCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains a StaffUser field populated with an idamId"
+  ],
+  "prerequisites": [
+    {
+      "S-1031_GetCreateToken": "S-1031_GetCreateToken"
+    }
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "StaffUser": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "StaffUser": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+        "SearchCriteria": {}
+      },
+      "data_classification": {
+        "StaffUser": "PUBLIC",
+        "SearchCriteria": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}
