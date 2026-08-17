@@ -340,9 +340,9 @@ dependencies {
     implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: elasticVersion
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: elasticVersion
 
-//    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-//    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
@@ -361,7 +361,6 @@ dependencies {
     }
 
     testImplementation group: 'com.xebialabs.restito', name: 'restito', version: '1.1.2'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '6.0.1'
     testImplementation group: 'org.assertj', name: 'assertj-vavr', version: '0.5.1'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.3'
