@@ -1,6 +1,6 @@
 {
 	"_guid_": "Citizen_Full_Case_Creation_Data_Test",
-	"_extends_": "Citizen_Case_Creation_Base",
+	"_extends_": "Citizen_Case_Creation_Base_Test",
 
 	"request": {
 		"pathVariables": {

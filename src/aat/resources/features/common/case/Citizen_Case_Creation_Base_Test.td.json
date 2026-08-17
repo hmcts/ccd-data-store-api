@@ -1,0 +1,50 @@
+{
+	"_guid_": "Citizen_Case_Creation_Base_Test",
+
+	"productName": "CCD Data Store",
+	"operationName": "Submit case creation as Citizen",
+
+	"method": "POST",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+	"specs": [
+		"to create a full case as a citizen"
+	],
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCitizen3"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "OVERRIDE",
+			"ctid": "OVERRIDE"
+		},
+		"body": {
+			"data": null,
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"vary": "accept-encoding",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+		},
+    "body": ""
+	}
+}
