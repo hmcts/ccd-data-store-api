@@ -16,6 +16,11 @@
 	},
 
 	"expectedResponse": {
-    "body": ""
+    "body": {
+		"exception" : null,
+		"error" : null,
+		"message" : null,
+		"path" : null
+	}
 	}
 }

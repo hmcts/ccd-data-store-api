@@ -44,7 +44,6 @@
 			"Content-Encoding": "gzip",
 			"vary": "accept-encoding",
 			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
-		},
-    "body": ""
+		}
 	}
 }
