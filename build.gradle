@@ -34,7 +34,7 @@ ext {
     junit = '5.14.4'
     junitPlatform = '1.14.4'
     jjwt = '0.13.0'
-    appInsightsVersion = '2.6.4'
+    appInsightsVersion = '3.7.8'
     pactProviderVersion = '4.7.5'
     lombokVersion = '1.18.46'
     lombokBindingVersion = '0.2.0'
@@ -315,8 +315,7 @@ dependencies {
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
     implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: appInsightsVersion
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
     implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
@@ -482,6 +481,20 @@ task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
+    }
+}
+
+task printAuditLogFormatterTag {
+    dependsOn classes
+
+    doLast {
+        def urls = sourceSets.main.runtimeClasspath.files.collect { it.toURI().toURL() } as URL[]
+        def loader = new URLClassLoader(urls, Thread.currentThread().contextClassLoader)
+        try {
+            println loader.loadClass('uk.gov.hmcts.ccd.auditlog.AuditLogFormatter').getField('TAG').get(null)
+        } finally {
+            loader.close()
+        }
     }
 }
 
