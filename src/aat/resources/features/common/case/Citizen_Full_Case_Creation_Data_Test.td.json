@@ -17,10 +17,10 @@
 
 	"expectedResponse": {
     "body": {
-		"exception" : null,
-		"error" : null,
-		"message" : null,
-		"path" : null
+		"exception" : "",
+		"error" : "",
+		"message" : "",
+		"path" : ""
 	}
 	}
 }
