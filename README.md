@@ -109,6 +109,13 @@ As a result the following containers will get created and started:
  - Database exposing port `5452`
  - API exposing ports `4452`
 
+#### Local IDAM issuer
+
+The OIDC issuer in discovery metadata must use the same hostname as the configured
+`IDAM_OIDC_URL`. For host-based runs use `http://localhost:5000`; for Docker-based
+runs use `http://idam:5000`. A mismatch between these values causes issuer validation
+to fail.
+
 #### Handling database
 
 Database will get initiated when you run `docker-compose up` for the first time by execute all scripts from `database` directory.
