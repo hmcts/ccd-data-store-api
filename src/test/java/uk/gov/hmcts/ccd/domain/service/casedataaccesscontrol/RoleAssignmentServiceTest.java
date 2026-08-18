@@ -480,13 +480,156 @@ class RoleAssignmentServiceTest {
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
-                .willReturn(mockedRoleAssignments);
+                .willReturn(expectedResult);
 
             // WHEN
             final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
 
             // THEN
             assertThat(roleAssignments, is(expectedResult));
+        }
+
+        @Test
+        void shouldReturnActiveOrganisationAssignmentsWithoutCaseIdForCreate() {
+
+            // GIVEN
+            RoleAssignment expectedRoleAssignment = createOrganisationRoleAssignmentWithoutCaseId();
+            RoleAssignment expectedRoleAssignmentWithEmptyCaseId = createOrganisationRoleAssignmentWithEmptyCaseId();
+            givenRoleAssignmentsForCreate(expectedRoleAssignment, expectedRoleAssignmentWithEmptyCaseId);
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertEquals(
+                List.of(expectedRoleAssignment, expectedRoleAssignmentWithEmptyCaseId),
+                roleAssignments.getRoleAssignments()
+            );
+        }
+
+        @Test
+        void shouldExcludeCaseRoleAssignmentsForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(
+                createCaseRoleAssignmentWithCaseId(),
+                createCaseRoleAssignmentWithoutCaseId()
+            );
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
+        void shouldExcludeOrganisationAssignmentsWithCaseIdForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(createOrganisationRoleAssignmentWithCaseId());
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
+        void shouldExcludeExpiredOrganisationAssignmentsForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(createExpiredOrganisationRoleAssignmentWithoutCaseId());
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
+        void shouldOnlyReturnActiveOrganisationAssignmentsWithoutCaseIdForCreate() {
+
+            // GIVEN
+            RoleAssignment expectedRoleAssignment = createOrganisationRoleAssignmentWithoutCaseId();
+            givenRoleAssignmentsForCreate(
+                expectedRoleAssignment,
+                createCaseRoleAssignmentWithCaseId(),
+                createCaseRoleAssignmentWithoutCaseId(),
+                createOrganisationRoleAssignmentWithCaseId(),
+                createExpiredOrganisationRoleAssignmentWithoutCaseId()
+            );
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertEquals(List.of(expectedRoleAssignment), roleAssignments.getRoleAssignments());
+        }
+
+        private void givenRoleAssignmentsForCreate(RoleAssignment... roleAssignments) {
+            RoleAssignments roleAssignmentsResponse = RoleAssignments.builder()
+                .roleAssignments(Arrays.asList(roleAssignments))
+                .build();
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(roleAssignmentsResponse);
+        }
+
+        private RoleAssignment createOrganisationRoleAssignmentWithoutCaseId() {
+            return createRoleAssignment(RoleType.ORGANISATION, RoleAssignmentAttributes.builder().build(), false);
+        }
+
+        private RoleAssignment createOrganisationRoleAssignmentWithEmptyCaseId() {
+            return createRoleAssignment(
+                RoleType.ORGANISATION,
+                RoleAssignmentAttributes.builder().caseId(Optional.empty()).build(),
+                false
+            );
+        }
+
+        private RoleAssignment createOrganisationRoleAssignmentWithCaseId() {
+            return createRoleAssignment(
+                RoleType.ORGANISATION,
+                RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build(),
+                false
+            );
+        }
+
+        private RoleAssignment createExpiredOrganisationRoleAssignmentWithoutCaseId() {
+            return createRoleAssignment(RoleType.ORGANISATION, RoleAssignmentAttributes.builder().build(), true);
+        }
+
+        private RoleAssignment createCaseRoleAssignmentWithCaseId() {
+            return createRoleAssignment(
+                RoleType.CASE,
+                RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build(),
+                false
+            );
+        }
+
+        private RoleAssignment createCaseRoleAssignmentWithoutCaseId() {
+            return createRoleAssignment(RoleType.CASE, RoleAssignmentAttributes.builder().build(), false);
+        }
+
+        private RoleAssignment createRoleAssignment(RoleType roleType,
+                                                   RoleAssignmentAttributes attributes,
+                                                   boolean expired) {
+            final Instant currentTime = Instant.now();
+            final long oneHour = 3600000;
+            final Instant beginTime = expired ? currentTime.minusMillis(oneHour * 2) : currentTime.minusMillis(oneHour);
+            final Instant endTime = expired ? currentTime.minusMillis(oneHour) : currentTime.plusMillis(oneHour);
+            return RoleAssignment.builder()
+                .actorId(USER_ID)
+                .roleType(roleType.name())
+                .roleName("[CREATE_ACCESS_PROFILE]")
+                .attributes(attributes)
+                .beginTime(beginTime)
+                .endTime(endTime)
+                .build();
         }
     }
 
