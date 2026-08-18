@@ -40,6 +40,7 @@ java:
     #ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://ccd-data-store-api-pr-2844-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
+    TOKEN_CLAIM_VALIDATION_ENABLED: true
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
@@ -94,7 +95,7 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1826
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -222,7 +223,7 @@ logstash:
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
           jdbc_default_timezone => "UTC"
-          statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+          statement => "DELETE FROM case_data_logstash_queue USING case_data WHERE case_data_logstash_queue.case_data_id = case_data.id RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version"
           clean_run => false
           schedule => "* * * * * *"
         }
@@ -335,5 +336,10 @@ logstash:
               document_type => "_doc"
               document_id => "%{id}"
               timeout => 60
+              # External versioning configuration
+              version => "%{version}"
+              version_type => "external"
+              # Handle version conflicts gracefully
+              retry_on_conflict => 0
           }
       }

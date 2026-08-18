@@ -18,7 +18,7 @@
       "event": {
         "id": "createCase"
       },
-      "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][S-130.7_Get_Event_Trigger][testData][actualResponse][body][token]}",
       "event_data": {
         "TextField": "value1"
       }

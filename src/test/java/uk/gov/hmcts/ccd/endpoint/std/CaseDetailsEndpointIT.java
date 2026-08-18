@@ -112,7 +112,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponse
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings({"checkstyle:OperatorWrap", "checkstyle:FileTabCharacter"})
-public class CaseDetailsEndpointIT extends WireMockBaseTest {
+class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String UPLOAD_TIMESTAMP = "2000-02-29T00:00:00.000000000";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -250,7 +250,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + urlPortionForCaseType + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+        final String token = generateEventToken(template, UID, JURISDICTION, "TestAddressBookCaseTTL", caseReference,
             TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{"
@@ -591,7 +591,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         List<MessageQueueCandidate> messageQueueList =
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
-
         assertEquals(messageQueueList.getFirst().getMessageInformation().get("AdditionalData").get("Definition"),
             mapper.readTree("{\n"
                 + "    \"OtherAlias\": {\n"
@@ -795,61 +794,62 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
-        final JsonNode DATA = mapper.readTree("{\n"
-            + "  \"MoneyGBPField\": \"1000\",\n"
-            + "  \"FixedListField\": \"VALUE3\",\n"
-            + "  \"AddressUKField\": {\n"
-            + "    \"AddressLine1\": \"123 street name\",\n"
-            + "    \"AddressLine2\": \"\",\n"
-            + "    \"AddressLine3\": \"\",\n"
-            + "    \"PostTown\": \"town\",\n"
-            + "    \"County\": \"county\",\n"
-            + "    \"PostCode\": \"postcode\",\n"
-            + "    \"Country\": \"\"\n"
-            + "  },\n"
-            + "  \"ComplexField\": {\n"
-            + "    \"ComplexTextField\": \"text in complex\",\n"
-            + "    \"ComplexFixedListField\": \"VALUE3\",\n"
-            + "    \"ComplexNestedField\": {\n"
-            + "      \"NestedNumberField\": \"1\",\n"
-            + "      \"NestedCollectionTextField\": [\n"
-            + "        {\n"
-            + "          \"value\": \"collection of text in nested complex 1\",\n"
-            + "          \"id\": \"62c18dd8-d6d2-4378-b940-8614ee1ab25a\"\n"
-            + "        },\n"
-            + "        {\n"
-            + "          \"value\": \"collection of text  in nested complex 2\",\n"
-            + "          \"id\": \"4acd46b4-f292-4e5d-a436-16dcca6b2cfe\"\n"
-            + "        }\n"
-            + "      ]\n"
-            + "    }\n"
-            + "  },\n"
-            + "  \"DateTimeField\": \"2000-12-12T11:11:11.000\",\n"
-            + "  \"PhoneUKField\": \"07986542987\",\n"
-            + "  \"NumberField\": \"2\",\n"
-            + "  \"MultiSelectListField\": [\n"
-            + "    \"OPTION4\",\n"
-            + "    \"OPTION3\"\n"
-            + "  ],\n"
-            + "  \"YesOrNoField\": \"Yes\",\n"
-            + "  \"EmailField\": \"test@test.com\",\n"
-            + "  \"TextField\": \"text field\",\n"
-            + "  \"DateField\": \"2000-12-12\",\n"
-            + "  \"TextAreaField\": \"text area\",\n"
-            + "  \"CollectionField\": [\n"
-            + "    {\n"
-            + "      \"value\": \"collection field\",\n"
-            + "      \"id\": \"9af355b6-19ef-4a19-b5db-ad873772b478\"\n"
-            + "    },\n"
-            + "    {\n"
-            + "      \"value\": \"collection field 2\",\n"
-            + "      \"id\": \"7bce938e-7400-424f-86c9-c896ecbabc1f\"\n"
-            + "    }\n"
-            + "  ]\n"
-            + "}");
+        final JsonNode dataNode = mapper.readTree("""
+            {
+              "MoneyGBPField": "1000",
+              "FixedListField": "VALUE3",
+              "AddressUKField": {
+                "AddressLine1": "123 street name",
+                "AddressLine2": "",
+                "AddressLine3": "",
+                "PostTown": "town",
+                "County": "county",
+                "PostCode": "postcode",
+                "Country": ""
+              },
+              "ComplexField": {
+                "ComplexTextField": "text in complex",
+                "ComplexFixedListField": "VALUE3",
+                "ComplexNestedField": {
+                  "NestedNumberField": "1",
+                  "NestedCollectionTextField": [
+                    {
+                      "value": "collection of text in nested complex 1",
+                      "id": "62c18dd8-d6d2-4378-b940-8614ee1ab25a"
+                    },
+                    {
+                      "value": "collection of text  in nested complex 2",
+                      "id": "4acd46b4-f292-4e5d-a436-16dcca6b2cfe"
+                    }
+                  ]
+                }
+              },
+              "DateTimeField": "2000-12-12T11:11:11.000",
+              "PhoneUKField": "07986542987",
+              "NumberField": "2",
+              "MultiSelectListField": [
+                "OPTION4",
+                "OPTION3"
+              ],
+              "YesOrNoField": "Yes",
+              "EmailField": "test@test.com",
+              "TextField": "text field",
+              "DateField": "2000-12-12",
+              "TextAreaField": "text area",
+              "CollectionField": [
+                {
+                  "value": "collection field",
+                  "id": "9af355b6-19ef-4a19-b5db-ad873772b478"
+                },
+                {
+                  "value": "collection field 2",
+                  "id": "7bce938e-7400-424f-86c9-c896ecbabc1f"
+                }
+              ]
+            }""");
 
 
-        Map data = JacksonUtils.convertValue(DATA);
+        Map data = JacksonUtils.convertValue(dataNode);
         CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withEvent(anEvent().withEventId(eventId).build())
             .withData(data)
@@ -960,7 +960,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map expectedSanitizedData = mapper.readValue(sanitizedData.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("case_data").toString(), Map.class);
-
         assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet().containsAll(actualData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -1025,7 +1024,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
 
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            "MultipleSearchCriteriaAndSearchParties", TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1243,7 +1243,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            "MultipleSearchCriteriaAndSearchParties", TEST_EVENT_ID));
         caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1255,6 +1256,61 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         CaseDetails actualData = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseDetails.class);
 
         GlobalSearchTestFixture.assertGlobalSearchData(actualData.getData());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenTokenIsNull() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(null);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertThat(content, containsString("Missing start trigger token"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenTokenIsEmpty() throws Exception {
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken("");
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isBadRequest())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertThat(content, containsString("Missing start trigger token"));
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenTokenIsInvalid() throws Exception {
+        final String invalidToken = "eyJhbGciOiJIUzI1NiJ9.e0.KUFDva2DpGi-zmDrHrcMOPMC1DlaKodGHKHIsib3gTA";
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        caseDetailsToSave.setToken(invalidToken);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            ).andExpect(status().isForbidden())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertThat(content, containsString("Token is not valid"));
     }
 
     @Test
@@ -1271,35 +1327,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         ).andExpect(status().is(201))
             .andReturn();
 
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString())
-            .get("case_data").asText());
+        assertThat("Expected empty case data", mapper.readTree(mvcResult.getResponse().getContentAsString())
+            .get("case_data").asText(), is(""));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+        assertThat("Incorrect number of cases", caseDetailsList.size(), is(1));
 
         final CaseDetails savedCaseDetails = caseDetailsList.getFirst();
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
-            .getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
-        assertEquals("state3", savedCaseDetails.getState());
+        assertThat("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails
+            .getReference())), is(true));
+        assertThat("Incorrect Case Type", savedCaseDetails.getCaseTypeId(), is(CASE_TYPE));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().toString(), is("{}"));
+        assertThat(savedCaseDetails.getState(), is("state3"));
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+        assertThat("Incorrect number of case events", caseAuditEventList.size(), is(1));
 
         final AuditEvent caseAuditEvent = caseAuditEventList.getFirst();
-        assertEquals("123", caseAuditEvent.getUserId());
-        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
-        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
-        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
-        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
-        assertEquals("Case in state 3", caseAuditEvent.getStateName());
-        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
-        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", LONG_COMMENT, caseAuditEvent.getDescription());
-        assertEquals("Summary", SHORT_COMMENT, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
+        assertThat(caseAuditEvent.getUserId(), is("123"));
+        assertThat(caseAuditEvent.getCaseDataId(), is(savedCaseDetails.getId()));
+        assertThat(caseAuditEvent.getCaseTypeId(), is(savedCaseDetails.getCaseTypeId()));
+        assertThat(caseAuditEvent.getCaseTypeVersion(), is(Integer.valueOf(1)));
+        assertThat(caseAuditEvent.getStateId(), is(savedCaseDetails.getState()));
+        assertThat(caseAuditEvent.getStateName(), is("Case in state 3"));
+        assertThat(caseAuditEvent.getCreatedDate(), is(savedCaseDetails.getCreatedDate()));
+        assertThat(caseAuditEvent.getData(), is(savedCaseDetails.getData()));
+        assertThat("Event ID", caseAuditEvent.getEventId(), is(TEST_EVENT_ID));
+        assertThat("Description", caseAuditEvent.getDescription(), is(LONG_COMMENT));
+        assertThat("Summary", caseAuditEvent.getSummary(), is(SHORT_COMMENT));
+        assertThat(caseAuditEvent.getDataClassification().isEmpty(), is(true));
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 
@@ -2094,7 +2150,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "MultipleSearchCriteriaAndSearchParties", caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -2206,7 +2262,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, caseReference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "MultipleSearchCriteriaAndSearchParties", caseReference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -3634,7 +3690,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         JsonNode dataClassification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
         Map<Object,Object> actualData = mapper.readValue(caseData.toString(), Map.class);
-
         assertAll(() ->
             assertTrue("Incorrect Response Content", expectedSanitizedData.entrySet()
                 .containsAll(actualData.entrySet())),
@@ -3670,18 +3725,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(createEvent(CREATE_EVENT_ID, SUMMARY, DESCRIPTION));
 
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-                "  \"PersonFirstName\": \"First Name\",\n" +
-                "  \"PersonLastName\": \"Last Name\",\n" +
-                "  \"PersonAddress\": {\n" +
-                "    \"AddressLine1\": \"Address Line 1\",\n" +
-                "    \"AddressLine2\": \"Address Line 2\"\n" +
-                "  }\n" +
-                "}\n"
+            """
+                {
+                  "PersonFirstName": "First Name",
+                  "PersonLastName": "Last Name",
+                  "PersonAddress": {
+                    "AddressLine1": "Address Line 1",
+                    "AddressLine2": "Address Line 2"
+                  }
+                }
+                """
         );
-        Map data = JacksonUtils.convertValue(DATA);
+        Map<String, JsonNode> data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseNoReadCaseTypeAccess", CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
 
@@ -3702,7 +3760,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION,
+            "TestAddressBookCaseNoReadCaseTypeAccess", caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -3735,7 +3794,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION,
+            "TestAddressBookCaseNoReadFieldAccess", caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
         final JsonNode data = mapper.readTree("{" +
@@ -3857,26 +3917,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        String expected = "{  \n" +
-            "   \"case_details\":{  \n" +
-            "      \"id\":1504259907353610,\n" +
-            "      \"jurisdiction\":\"PROBATE\",\n" +
-            "      \"state\":\"CaseCreated\",\n" +
-            "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +
-            "      \"last_modified\":null,\n" +
-            "      \"security_classification\":\"PUBLIC\",\n" +
-            "      \"case_data\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"data_classification\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"after_submit_callback_response\":null,\n" +
-            "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null\n" +
-            "   },\n" +
-            "   \"event_id\":\"TEST_EVENT\"\n" +
-            "}";
+        String expected = """
+            { \s
+               "case_details":{ \s
+                  "id":1504259907353610,
+                  "jurisdiction":"PROBATE",
+                  "state":"CaseCreated",
+                  "case_type_id":"TestAddressBookCaseNoReadCaseTypeAccess",
+                  "last_modified":null,
+                  "security_classification":"PUBLIC",
+                  "case_data":{ \s
+
+                  },
+                  "data_classification":{ \s
+
+                  },
+                  "after_submit_callback_response":null,
+                  "callback_response_status_code":null,
+                  "callback_response_status":null
+               },
+               "event_id":"TEST_EVENT"
+            }""";
         String actual = mvcResult.getResponse().getContentAsString();
         assertAll(
             () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
@@ -3928,7 +3989,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "TestAddressBookCaseCaseLinks", reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -3999,7 +4060,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
         final String token = generateEventToken(template,
-            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+            UID, JURISDICTION, "TestAddressBookCaseCaseLinks", reference, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
@@ -5479,7 +5540,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
+    void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
         throws Exception {
         final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
@@ -5611,7 +5672,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
 
         caseDetailsToSave.setToken(token);
 
@@ -5668,7 +5730,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -5715,7 +5778,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            "TestAddressBookCaseCaseLinks", "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -5757,7 +5821,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
+    void shouldNotPerformActionWhenFieldsMissingAndReadFalseCreateTrueMismatch() throws Exception {
         final String caseReference = "1504259907353529";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
@@ -5867,7 +5931,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+    void shouldAddMissingFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
         final String caseReference = "1202264432028419";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
@@ -5978,7 +6042,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
+    void shouldAddMissingCollectionFieldsBackToDataWhenReadFalseCreateTrueMatch() throws Exception {
         final String caseReference = "6512245793128983";
         final String URL =
             "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_FILTERED
@@ -6113,7 +6177,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
+    void shouldAttachDocumentToCdamWhenCallbackIgnoreDocumentctionField() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases/" + caseReference + "/events";
@@ -6221,7 +6285,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
+    void shouldNotAttachDocumentToCdamWhenCallbackDeleteCollectionItemRemovingDocumentSubfield()
         throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
@@ -6338,7 +6402,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
+    void shouldNotAttachDocumentToCdamWhenCallbackReplacesCollectionItemRemovingDocumentSubfield()
         throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
@@ -6472,7 +6536,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_document_filter.sql"})
-    public void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
+    void shouldUpdateDocumentCategoryIdAndNotCallCdamForSystemEvent() throws Exception {
         final String caseReference = "1504259907353545";
         final String URL = "/documentData/caseref/" + caseReference;
 
@@ -6510,7 +6574,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
+    void shouldAttachDocumentToCdamWhenCallbackRetainsDocumentOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -6614,7 +6678,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
+    void shouldNotAttachDocumentToCdamWhenCallbackStripsDocumentSubfieldOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 
@@ -6736,7 +6800,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
+    void shouldNotAttachDocumentToCdamWhenCallbackReplaceDocumentSubfieldOnCaseCreation() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION
             + "/case-types/" + CASE_TYPE + "/cases";
 
