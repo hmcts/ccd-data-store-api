@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
     private Integer displayOrder = null;
     private String showCondition = null;
     private String displayContextParameter;
+    private String caseFieldSubfieldCode;
 
     @Schema
     @JsonProperty("case_field")
@@ -52,5 +54,16 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
 
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
+    }
+
+    @Schema
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("caseFieldSubfieldCode")
+    public String getCaseFieldSubfieldCode() {
+        return caseFieldSubfieldCode;
+    }
+
+    public void setCaseFieldSubfieldCode(String caseFieldSubfieldCode) {
+        this.caseFieldSubfieldCode = caseFieldSubfieldCode;
     }
 }

@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -52,6 +54,9 @@ public class CaseViewField implements CommonField {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("caseFieldSubfieldCode")
+    private String caseFieldSubfieldCode;
 
     public String getId() {
         return id;
@@ -213,11 +218,20 @@ public class CaseViewField implements CommonField {
         this.metadata = metadata;
     }
 
+    public String getCaseFieldSubfieldCode() {
+        return caseFieldSubfieldCode;
+    }
+
+    public void setCaseFieldSubfieldCode(String caseFieldSubfieldCode) {
+        this.caseFieldSubfieldCode = caseFieldSubfieldCode;
+    }
+
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
         CaseViewField caseViewField = createFrom(field.getCaseFieldDefinition(), data);
         caseViewField.setOrder(field.getDisplayOrder());
         caseViewField.setShowCondition(field.getShowCondition());
         caseViewField.setDisplayContextParameter(field.getDisplayContextParameter());
+        caseViewField.setCaseFieldSubfieldCode(normaliseCaseFieldSubfieldCode(field));
         return caseViewField;
     }
 
@@ -238,5 +252,19 @@ public class CaseViewField implements CommonField {
         caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 
         return caseViewField;
+    }
+
+    private static String normaliseCaseFieldSubfieldCode(CaseTypeTabField field) {
+        String caseFieldSubfieldCode = field.getCaseFieldSubfieldCode();
+        if (StringUtils.isBlank(caseFieldSubfieldCode)) {
+            return caseFieldSubfieldCode;
+        }
+
+        String caseFieldId = field.getCaseFieldDefinition().getId();
+        return StringUtils.isBlank(caseFieldId)
+            || caseFieldSubfieldCode.equals(caseFieldId)
+            || caseFieldSubfieldCode.startsWith(caseFieldId + ".")
+            ? caseFieldSubfieldCode
+            : caseFieldId + "." + caseFieldSubfieldCode;
     }
 }
