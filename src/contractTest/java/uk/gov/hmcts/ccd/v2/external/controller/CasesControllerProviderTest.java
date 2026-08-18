@@ -72,8 +72,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
-import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -226,15 +225,10 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
 
-        AuthenticateUserResponse authenticateUserResponse = new AuthenticateUserResponse("200");
+        TokenResponse tokenResponse = new TokenResponse("some access token",null, null, null, null, null);
 
-        stubFor(WireMock.post(urlMatching("/oauth2/authorize"))
-            .willReturn(okJson(objectMapper.writeValueAsString(authenticateUserResponse)).withStatus(200)));
-
-        TokenExchangeResponse tokenExchangeResponse = new TokenExchangeResponse("some access token");
-
-        stubFor(WireMock.post(urlMatching("/oauth2/token"))
-            .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(objectMapper.writeValueAsString(tokenResponse)).withStatus(200)));
         when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 

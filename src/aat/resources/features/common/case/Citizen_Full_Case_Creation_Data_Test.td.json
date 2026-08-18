@@ -1,0 +1,26 @@
+{
+	"_guid_": "Citizen_Full_Case_Creation_Data_Test",
+	"_extends_": "Citizen_Case_Creation_Base_Test",
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_2"
+		},
+		"body": {
+			"data": {
+				"_extends_": "Standard_Full_Case_Data"
+			},
+			"event_token": "${[scenarioContext][parentContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
+		}
+	},
+
+	"expectedResponse": {
+    "body": {
+		"exception" : "",
+		"error" : "",
+		"message" : "",
+		"path" : ""
+	}
+	}
+}
