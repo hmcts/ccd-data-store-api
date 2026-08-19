@@ -48,8 +48,6 @@ java:
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
     enabled: true
-    auth:
-      username: javapostgres
     primary:
       initdb:
         scripts:
@@ -207,6 +205,12 @@ logstash:
     - name: postgresql-credentials
       mountPath: /etc/logstash/postgresql
       readOnly: true
+  extraEnvs:
+    - name: POSTGRES_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Release.Name }}-postgresql"
+          key: username
   logstashConfig:
     logstash.yml: |
       api.http.host: 0.0.0.0
@@ -224,7 +228,7 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
+          jdbc_user => "${POSTGRES_USERNAME}"
           jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
