@@ -11,7 +11,7 @@ Background:
 Scenario: must return 200 if start event trigger is successful for a case
 
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation],
-      And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data_Test],
+      And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data],
       And a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
