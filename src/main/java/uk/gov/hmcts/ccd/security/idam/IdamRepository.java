@@ -20,21 +20,23 @@ import java.util.List;
 public class IdamRepository {
 
     private final IdamClient idamClient;
+    private final HmctsAccessClient hmctsAccessClient;
     private final ApplicationParams applicationParams;
 
     @Resource(name = "idamRepository")
     private IdamRepository selfInstance;
 
     @Autowired
-    public IdamRepository(IdamClient idamClient, ApplicationParams applicationParams) {
+    public IdamRepository(IdamClient idamClient, HmctsAccessClient hmctsAccessClient, ApplicationParams appParams) {
         this.idamClient = idamClient;
-        this.applicationParams = applicationParams;
+        this.hmctsAccessClient = hmctsAccessClient;
+        this.applicationParams = appParams;
     }
 
     @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
         try {
-            return idamClient.getUserInfo("Bearer " + jwtToken);
+            return hmctsAccessClient.getUserInfo("Bearer " + jwtToken);
         } catch (FeignException exception) {
             log.error("FeignException: retrieve user info: {} ", exception.getMessage());
 
@@ -71,7 +73,7 @@ public class IdamRepository {
     @Cacheable("systemUserTokenCache")
     public String getDataStoreSystemUserAccessToken() {
         log.info("Getting a fresh token for system account.");
-        return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
+        return hmctsAccessClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
     }
 }

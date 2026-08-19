@@ -13,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.security.idam.HmctsAccessClient;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -42,6 +43,9 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
     @MockitoBean
     private IdamClient idamClient;
 
+    @MockitoBean
+    private HmctsAccessClient hmctsAccessClient;
+
     // SpyBean and MockBean annotations mean that IdamRepository bean will automatically use
     // mocked/spied ApplicationParams and IdamClient beans
     @Autowired
@@ -67,13 +71,14 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
         // Set up initial expected behaviour for mock and spy beans
         when(applicationParams.getDataStoreSystemUserId()).thenReturn(TEST_SYS_USERNAME);
         when(applicationParams.getDataStoreSystemUserPassword()).thenReturn(TEST_SYS_PASSWORD);
-        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD)).thenReturn(TEST_SYS_ACCESS_TOKEN_ONE);
+        when(hmctsAccessClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD))
+                .thenReturn(TEST_SYS_ACCESS_TOKEN_ONE);
 
         // Before testing getDataStoreUserAccessToken method first
         // confirm that none of the mocked methods have been called
         verify(applicationParams, never()).getDataStoreSystemUserId();
         verify(applicationParams, never()).getDataStoreSystemUserPassword();
-        verify(idamClient, never()).getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD);
+        verify(hmctsAccessClient, never()).getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD);
 
         // Call getDataStoreUserAccessToken method for the first time.  No cached
         // value should be available so the mocked methods should be called once.
@@ -81,7 +86,8 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
         checkGetDataStoreUserAccessToken(1, TEST_SYS_ACCESS_TOKEN_ONE);
 
         // Change value returned by mock IdamClient to prove that cached value is returned
-        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD)).thenReturn(TEST_SYS_ACCESS_TOKEN_TWO);
+        when(hmctsAccessClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD))
+                .thenReturn(TEST_SYS_ACCESS_TOKEN_TWO);
 
         // Call getDataStoreUserAccessToken method for the second time.  Cached original value should be returned
         // and the mocked methods should still only have been called once.
@@ -107,7 +113,7 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
 
         verify(applicationParams, times(expectedNumInvocations)).getDataStoreSystemUserId();
         verify(applicationParams, times(expectedNumInvocations)).getDataStoreSystemUserPassword();
-        verify(idamClient, times(expectedNumInvocations)).getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD);
+        verify(hmctsAccessClient, times(expectedNumInvocations)).getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD);
         assertEquals("Unexpected Access Token value", expectedAccessToken, actualAccessToken);
     }
 

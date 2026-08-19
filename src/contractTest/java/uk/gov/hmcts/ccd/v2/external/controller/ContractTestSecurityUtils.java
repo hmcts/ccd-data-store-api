@@ -13,11 +13,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
 import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
 import java.util.HashMap;
+
+import uk.gov.hmcts.ccd.security.idam.HmctsAccessApi;
 
 @Service
 @Slf4j
@@ -42,13 +43,13 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     private HashMap<String, UserCredentials> caseTypeUserCredentials = new HashMap<>();
     private HashMap<String, UserCredentials> eventUserCredentials = new HashMap<>();
 
-    private final IdamApi idamClient;
+    private final HmctsAccessApi hmctsAccessApi;
 
     @Autowired
     public ContractTestSecurityUtils(AuthTokenGenerator authTokenGenerator,
-                                     IdamRepository idamRepository, IdamApi idamApi) {
+                                     IdamRepository idamRepository, HmctsAccessApi hmctsAccessApi) {
         super(authTokenGenerator, idamRepository);
-        this.idamClient = idamApi;
+        this.hmctsAccessApi = hmctsAccessApi;
     }
 
     @Override
@@ -102,7 +103,7 @@ public class ContractTestSecurityUtils extends SecurityUtils {
         log.info("Client ID: {} . Authenticating...", authClientId);
 
         log.info("Authenticated. Exchanging...");
-        TokenResponse tokenExchangeResponse = idamClient.generateOpenIdToken(
+        TokenResponse tokenExchangeResponse = hmctsAccessApi.generateOpenIdToken(
             new TokenRequest(authClientId, authClientSecret, GRANT_TYPE, authRedirectUrl, username, password, authScope,
                 null, null)
         );
