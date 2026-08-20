@@ -205,7 +205,7 @@ logstash:
     - name: postgresql-credentials
       mountPath: /etc/logstash/postgresql
       readOnly: true
-  extraEnvs:
+  extraEnvs: |
     - name: POSTGRES_USERNAME
       valueFrom:
         secretKeyRef:
