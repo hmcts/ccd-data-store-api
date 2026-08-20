@@ -24,6 +24,10 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
@@ -84,7 +88,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE", "ROLE1", "PRIVATE", "", "", null);
         RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "caseId1");
+            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "1111111111");
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment,
                 specificRoleAssignment),
@@ -92,7 +96,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
                 caseTypeDefinition);
         String expectedValue = " AND ( ( ( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction='Test' "
-            + "AND reference in (:references_1_specific) AND state in (:states_1_specific) "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_specific AS bigint[])))) "
+            + "AND state in (:states_1_specific) "
             + "AND security_classification in (:classifications_1_specific) ) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -103,27 +108,30 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE", "ROLE1", "PRIVATE", "", "", null);
         RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "caseId1");
+            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "1111111111");
 
         RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
             "CASE", "ROLE3", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+            Lists.newArrayList("auth1"), "1111111111");
 
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
-            "CASE", "ROLE4", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE4", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment),
             Maps.newHashMap(), caseTypeDefinition);
 
         String expectedValue =  " AND ( ( ( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) ) OR ( jurisdiction='Test' "
-            + "AND reference in (:references_1_specific) AND state in (:states_1_specific) "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_specific AS bigint[])))) "
+            + "AND state in (:states_1_specific) "
             + "AND security_classification in (:classifications_1_specific) ) ) OR ( ( jurisdiction='Test' "
             + "AND data #>> '{caseManagementLocation,region}'='reg1' "
             + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' "
-            + "AND reference in (:references_1_standard) AND state in (:states_1_standard) "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_standard AS bigint[])))) "
+            + "AND state in (:states_1_standard) "
             + "AND security_classification in (:classifications_1_standard) ) OR ( jurisdiction='Test' "
-            + "AND reference in (:references_1_challenged) AND state in (:states_1_challenged) "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_challenged AS bigint[])))) "
+            + "AND state in (:states_1_challenged) "
             + "AND security_classification in (:classifications_1_challenged) ) ) )";
 
         assertNotNull(query);
@@ -135,17 +143,17 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE", "ROLE1", "PRIVATE", "", "", null);
         RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
-            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "caseId1");
+            "CASE", "ROLE2", "PRIVATE", "Test", "", "", null, "1111111111");
 
         RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
             "CASE", "ROLE3", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+            Lists.newArrayList("auth1"), "1111111111");
 
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
-            "CASE", "ROLE4", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE4", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
 
         RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
-            "CASE", "ROLE5", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE5", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
 
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment,
@@ -155,14 +163,17 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String expectedValue =  " AND ( ( ( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) ) "
-            + "OR ( jurisdiction='Test' AND reference in (:references_1_specific) "
+            + "OR ( jurisdiction='Test' "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_specific AS bigint[])))) "
             + "AND state in (:states_1_specific) AND security_classification in (:classifications_1_specific) ) ) "
             + "OR ( ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,region}'='reg1' "
-            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' AND reference in (:references_1_standard) "
+            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_standard AS bigint[])))) "
             + "AND state in (:states_1_standard) AND security_classification in (:classifications_1_standard) ) "
-            + "OR ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+            + "OR ( jurisdiction='Test' "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_challenged AS bigint[])))) "
             + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
-            + "AND NOT reference in (:case_ids_excluded) ) )";
+            + "AND NOT reference = ANY(ARRAY(SELECT unnest(CAST(:case_ids_excluded AS bigint[])))) ) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -172,10 +183,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnChallengedAndExcludedOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
         RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
             "CASE", "ROLE1", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+            Lists.newArrayList("auth1"), "1111111111");
 
         RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
-            "CASE", "ROLE2", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE2", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(challengedRoleAssignment,
@@ -183,9 +194,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
                 Maps.newHashMap(),
                 caseTypeDefinition);
 
-        String expectedValue =  " AND ( ( ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+        String expectedValue =  " AND ( ( ( jurisdiction='Test' "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_challenged AS bigint[])))) "
             + "AND state in (:states_1_challenged) AND security_classification in (:classifications_1_challenged) ) ) "
-            + "AND NOT reference in (:case_ids_excluded) )";
+            + "AND NOT reference = ANY(ARRAY(SELECT unnest(CAST(:case_ids_excluded AS bigint[])))) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -197,7 +209,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "ROLE1", "PRIVATE", "", "", null);
 
         RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
-            "CASE", "ROLE2", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE2", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment, excludedRoleAssignment),
@@ -206,7 +218,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String expectedValue =  " AND ( ( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) ) "
-            + "AND NOT reference in (:case_ids_excluded) )";
+            + "AND NOT reference = ANY(ARRAY(SELECT unnest(CAST(:case_ids_excluded AS bigint[])))) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -216,14 +228,15 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnChallengedOrganisationalQueryWhenRoleAssignmentsGrantTypeExists() {
         RoleAssignment challengedRoleAssignment = createRoleAssignment(GrantType.CHALLENGED,
             "CASE", "ROLE1", "PRIVATE", "Test", "", "",
-            Lists.newArrayList("auth1"), "caseId1");
+            Lists.newArrayList("auth1"), "1111111111");
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(challengedRoleAssignment),
                 Maps.newHashMap(),
                 caseTypeDefinition);
 
-        String expectedValue = " AND ( ( ( jurisdiction='Test' AND reference in (:references_1_challenged) "
+        String expectedValue = " AND ( ( ( jurisdiction='Test' "
+            + "AND reference = ANY(ARRAY(SELECT unnest(CAST(:references_1_challenged AS bigint[])))) "
             + "AND state in (:states_1_challenged) "
             + "AND security_classification in (:classifications_1_challenged) ) ) )";
         assertNotNull(query);
@@ -233,16 +246,47 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     @Test
     void shouldReturnOnlyExcludedOrganisationalQuery() {
         RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
-            "CASE", "ROLE1", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+            "CASE", "ROLE1", "PRIVATE", "Test", "loc1", "reg1", null, "1111111111");
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(excludedRoleAssignment),
                 Maps.newHashMap(),
                 caseTypeDefinition);
 
-        String expectedValue =  " AND NOT reference in (:case_ids_excluded)";
+        String expectedValue =  " AND NOT reference = ANY(ARRAY(SELECT unnest(CAST(:case_ids_excluded AS bigint[]))))";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldNotExceedPostgresMaxParametersWithLargeNumberOfRoleAssignments() {
+        // Regression test for CCD-6129
+        // When a user has a large number of specific case role assignments (e.g. from a bulk grant),
+        // the generated SQL query must not exceed PostgreSQL's hard limit of 65,535 parameters.
+        // Previously the IN clause expanded each case reference into an individual parameter,
+        // causing PSQLException: PreparedStatement can have at most 65,535 parameters.
+        List<RoleAssignment> roleAssignments = new ArrayList<>();
+        for (int i = 0; i < 70000; i++) {
+            roleAssignments.add(createRoleAssignment(
+                GrantType.SPECIFIC,
+                "CASE",
+                "ROLE1",
+                "PRIVATE",
+                "Test",
+                "",
+                "",
+                null,
+                String.valueOf(i)
+            ));
+        }
+
+        Map<String, Object> params = Maps.newHashMap();
+        String result = accessControlGrantTypeQueryBuilder.createQuery(
+            roleAssignments, params, caseTypeDefinition
+        );
+
+        assertThat(result).contains("reference = ANY");
+        assertThat(result).doesNotContain("reference in (:");
     }
 }
