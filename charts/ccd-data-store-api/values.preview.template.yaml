@@ -205,11 +205,11 @@ logstash:
     - name: postgresql-credentials
       mountPath: /etc/logstash/postgresql
       readOnly: true
-  extraEnvs: |
+  extraEnvs:
     - name: POSTGRES_USERNAME
       valueFrom:
         secretKeyRef:
-          name: "{{ .Release.Name }}-postgresql"
+          name: "${SERVICE_NAME}-postgresql"
           key: username
   logstashConfig:
     logstash.yml: |
