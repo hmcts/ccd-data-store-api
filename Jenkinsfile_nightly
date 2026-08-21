@@ -6,7 +6,7 @@ properties([
     pipelineTriggers([cron('H 17 * * 1-5')])
 ])
 
-@Library("Infrastructure@2.4.0")
+@Library("Infrastructure@2.4.9")
 
 def type = "java"
 def product = "ccd"
@@ -61,6 +61,7 @@ def secrets = [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
         secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
+        secret('microservicekey-ccd-data', 'DATA_STORE_IDAM_KEY'),
         secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
     ]
 ]
