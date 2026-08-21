@@ -1,6 +1,5 @@
 global:
   postgresUsername: javapostgres
-  postgresSecret: ${SERVICE_NAME}-postgresql
 
 java:
   image: ${IMAGE_NAME}
