@@ -1,3 +1,7 @@
+global:
+  postgresUsername: javapostgres
+  postgresSecret: ${SERVICE_NAME}-postgresql
+
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
@@ -224,7 +228,7 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
+          jdbc_user => '{{ tpl .Values.global.postgresUsername $ }}'
           jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
