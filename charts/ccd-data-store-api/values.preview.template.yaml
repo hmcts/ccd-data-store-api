@@ -49,10 +49,7 @@ java:
   postgresql:
     enabled: true
     auth:
-      # username: javapostgres
-      # password: javapostgres
-      username: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
+      username: javapostgres
     primary:
       initdb:
         scripts:
@@ -227,7 +224,7 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "${POSTGRES_USER}"
+          jdbc_user => "javapostgres"
           jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
