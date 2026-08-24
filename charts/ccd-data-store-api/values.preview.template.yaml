@@ -32,7 +32,9 @@ java:
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_HMCTS_ACCESS_URL: https://idam-web-public.aat.platform.hmcts.net
+    IDAM_API_URL_BASE: "https://idam-public-web.aat.platform.hmcts.net" # Added for Befta tests to work with OIDC
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
@@ -86,7 +88,7 @@ ccd:
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
-    idamApiUrl: https://idam-web-public.aat.platform.hmcts.net
+    idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
