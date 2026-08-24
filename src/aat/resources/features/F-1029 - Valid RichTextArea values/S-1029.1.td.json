@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-1029.1",
+  "_extends_": "S-1029.1_Create_Case_Data",
+  "prerequisites": [
+    {
+      "Token_Creation": "S-1029.1_Create_Case_Data_Token_Creation"
+    }
+  ],
+  "title": "A new case is created with RichTextArea base type with valid tags",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "contains RichTextArea base type",
+    "RichTextField has tags that are allowed list",
+    "has the 201 CREATED code"
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,16 +56,23 @@ class RichTextAreaValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Some text", "<p><strong>Order</strong></p>", "xxx4"})
+    @ValueSource(strings = {"<p><strong>Order</strong></p>"})
     void validate_shouldBeValidWhenMinimumLengthRequirementMet(String value) {
         assertThat(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()), is(empty()));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>"})
+    void validate_invalidValuesShouldFailValidation(String value) {
+        assertThrows(BadRequestException.class, () ->
+            validate(NODE_FACTORY.textNode(value), caseField().withMin(1).build()));
+    }
+
     @Test
     void validate_shouldNotBeValidWhenMinimumLengthRequirementNotMet() {
-        List<ValidationResult> results = validate(NODE_FACTORY.textNode("xxx"), caseField().withMin(4).build());
+        List<ValidationResult> results = validate(NODE_FACTORY.textNode("<p>m</p>"), caseField().withMin(10).build());
 
-        assertSingleError(results, "requires a minimum length of 4");
+        assertSingleError(results, "requires a minimum length of 10");
     }
 
     @Test
@@ -73,7 +82,8 @@ class RichTextAreaValidatorTest {
             .withRegExp("\\d{4}-\\d{2}-\\d{2}")
             .build();
 
-        assertThat(validate(NODE_FACTORY.textNode("not-a-date-and-longer-than-four"), constrainedField), is(empty()));
+        assertThrows(BadRequestException.class, () ->
+            validate(NODE_FACTORY.textNode("not-a-date-and-longer-than-four"), constrainedField));
     }
 
     @Test
