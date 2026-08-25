@@ -12,13 +12,14 @@
     "contains a case with number field showing correctly",
     "has 201 return code",
     "contains correct values for case_data and data_classification",
-    "is of caseType where case_data has NumberField of 12.88"
+    "contains RichTextArea base type"
   ],
   "request": {
     "body": {
       "data": {
         "TextField": null,
         "TextAreaField": null,
+        "RichTextAreaField": "<p><strong>Allowed</strong></p>",
         "DateField": null,
         "PhoneField": null,
         "NumberField": 12.88,
@@ -127,6 +128,7 @@
           }
         },
         "TextAreaField": null,
+        "RichTextAreaField": "<p><strong>Allowed</strong></p>",
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": null,
@@ -190,6 +192,7 @@
           }
         },
         "TextAreaField": "PUBLIC",
+        "RichTextAreaField": "PUBLIC",
         "OrganisationPolicyField1": {
           "classification": "PUBLIC",
           "value": {

@@ -54,6 +54,7 @@
           }
         },
         "TextAreaField" : null,
+        "RichTextAreaField" : "<p><strong>Allowed</strong></p>",
         "OrganisationPolicyField1" : {
           "OrgPolicyCaseAssignedRole" : "[Claimant]",
           "OrgPolicyReference" : null,
@@ -117,6 +118,7 @@
           }
         },
         "TextAreaField": "PUBLIC",
+        "RichTextAreaField": "PUBLIC",
         "OrganisationPolicyField1": {
           "classification": "PUBLIC",
           "value": {
