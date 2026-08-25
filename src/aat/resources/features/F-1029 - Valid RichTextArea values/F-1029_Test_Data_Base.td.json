@@ -32,7 +32,7 @@
       "data": {
         "TextField": null,
         "TextAreaField": null,
-        "RichTextAreaField": null,
+        "RichTextAreaField": "<p><strong>Allowed</strong></p>",
         "DateField": null,
         "PhoneField": null,
         "NumberField": 12.88,
