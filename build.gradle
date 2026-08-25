@@ -43,7 +43,7 @@ ext {
     testContainersVersion = '2.0.5'
     cucumber = '7.34.7'
     beftaFwVersion = '9.2.10'
-    ccdTestDefinitionVersion = '7.26.7'
+    ccdTestDefinitionVersion = '7.26.9'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -243,7 +243,7 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
@@ -312,7 +312,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
