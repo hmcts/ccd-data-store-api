@@ -32,7 +32,8 @@ java:
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-    IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
+    LEGACY_IDAM_URL: https://idam-api.aat.platform.hmcts.net
+    IDAM_API_BASE_URL: https://idam-web-public.aat.platform.hmcts.net
     IDAM_HMCTS_ACCESS_URL: https://idam-web-public.aat.platform.hmcts.net
     IDAM_API_URL_BASE: "https://idam-public-web.aat.platform.hmcts.net" # Added for Befta tests to work with OIDC
     ELASTIC_SEARCH_ENABLED: true
