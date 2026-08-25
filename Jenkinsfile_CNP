@@ -110,6 +110,7 @@ env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
 env.IDAM_API_URL_BASE = "https://idam-public-web.aat.platform.hmcts.net"
+env.IDAM_URL_VALUE = "https://idam-public-web.aat.platform.hmcts.net"
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
