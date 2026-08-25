@@ -54,7 +54,6 @@
           }
         },
         "TextAreaField" : null,
-        "RichTextField" : "<p><strong>Order</strong></p>",
         "OrganisationPolicyField1" : {
           "OrgPolicyCaseAssignedRole" : "[Claimant]",
           "OrgPolicyReference" : null,
@@ -118,7 +117,6 @@
           }
         },
         "TextAreaField": "PUBLIC",
-        "RichTextField" : "PUBLIC",
         "OrganisationPolicyField1": {
           "classification": "PUBLIC",
           "value": {

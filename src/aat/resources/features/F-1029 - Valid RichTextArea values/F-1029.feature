@@ -23,7 +23,7 @@ Feature: F-1029: Validate RichTextArea base type accepts and displays valid tags
     When a request is prepared with appropriate values
     And the request [contains correctly configured event details]
     And the request [contains RichTextArea base type]
-    And the [RichTextField has tags that are allowed list]
+    And the [RichTextArea has tags that are allowed list]
     And it is submitted to [create a new case] operation of [CCD Data Store API]
     And the response [has the 201 CREATED code]
     Then a positive response is received
@@ -36,7 +36,7 @@ Feature: F-1029: Validate RichTextArea base type accepts and displays valid tags
     When a request to create a new case is prepared with appropriate values
     And the request [contains correctly configured event details]
     And the request [contains RichTextArea base type]
-    And the [RichTextField has tags that are outside of allowed list]
+    And the [RichTextArea has tags that are outside of allowed list]
     And it is submitted to [create a new case] operation of [CCD Data Store API]
     And the response [has the 400 Bad Request]
     Then a Negative response is received
@@ -48,7 +48,7 @@ Feature: F-1029: Validate RichTextArea base type accepts and displays valid tags
     When a request to create a new case is prepared with appropriate values
     And the request [contains correctly configured event details]
     And the request [contains RichTextArea base type]
-    And the [RichTextField has tags that are allowed list]
+    And the [RichTextArea has tags that are allowed list]
     And it is submitted to [create a new case] operation of [CCD Data Store API]
     And the response [has the 200 OK code]
     Then a positive response is received
@@ -61,7 +61,7 @@ Feature: F-1029: Validate RichTextArea base type accepts and displays valid tags
     When a request to create a new case is prepared with appropriate values
     And the request [contains correctly configured event details]
     And the request [contains RichTextArea base type]
-    And the [RichTextField has tags that are outside of allowed list]
+    And the [RichTextArea has tags that are outside of allowed list]
     And it is submitted to [create a new case] operation of [CCD Data Store API]
     And the response [has the 400 Bad Request]
     Then a Negative response is received
