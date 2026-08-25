@@ -12,7 +12,9 @@
     "contains a case with number field showing correctly",
     "has 201 return code",
     "contains correct values for case_data and data_classification",
-    "contains RichTextArea base type"
+    "contains correctly configured event details",
+    "contains RichTextArea base type",
+    "RichTextArea has tags that are allowed list"
   ],
   "request": {
     "body": {
