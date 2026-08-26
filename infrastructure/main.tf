@@ -91,6 +91,7 @@ module "postgresql_v15" {
   user_secret_name                   = azurerm_key_vault_secret.POSTGRES-USER-V15.name
   pass_secret_name                   = azurerm_key_vault_secret.POSTGRES-PASS-V15.name
   force_db_report_privileges_trigger = "2"
+  enable_write_group_access          = true
 
   pgsql_databases = [
     {
