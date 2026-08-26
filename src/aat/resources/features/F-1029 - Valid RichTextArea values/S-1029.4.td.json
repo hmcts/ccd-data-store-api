@@ -1,30 +1,35 @@
 {
-  "title": "must successfully update case with rich text field displaying as expected",
-  "_guid_": "S-1029.3",
-  "_extends_": "F-1029.3_Test_Data_Base",
+  "title": "must fail to update case when rich text has invalid tags",
+  "_guid_": "S-1029.4",
+  "_extends_": "Event_Creation_Caseworker_Base",
   "prerequisites": [
     {
-      "Token_Creation": "S-1029.3_Case_Update_Token_Creation"
+      "Token_Creation": "S-1029.4_Case_Update_Token_Creation"
     }
   ],
   "specs": [
     "an active profile in CCD",
     "contains a case with number field showing correctly",
-    "has 201 return code",
-    "contains correct values for case_data and data_classification",
+    "has 400 return code",
     "contains correctly configured event details",
     "contains RichTextArea base type",
-    "RichTextArea has tags that are allowed list"
+    "RichTextArea has tags that are outside of allowed list",
+    "contains an error message : Enter valid tags for RichTextArea field"
   ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][S-1029.3_Create_Case_Data][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][S-1029.4_Create_Case_Data][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "TextField": null,
         "TextAreaField": null,
-        "RichTextAreaField": "<p>Allowed</p>",
+        "RichTextAreaField": "<z>Not Allowed</z>",
         "DateField": null,
         "PhoneField": null,
         "NumberField": 12.88,
@@ -79,14 +84,16 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_400_Response",
     "body": {
-      "id": "[[ANYTHING_PRESENT]]",
-      "case_data": {
-        "RichTextAreaField": "<p>Allowed</p>"
-      },
-      "data_classification": {
-        "RichTextAreaField": "PUBLIC"
-      }
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Enter valid tags for RichTextArea field",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }
+

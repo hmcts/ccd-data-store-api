@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-1029.3_Case_Update_Token_Creation",
+  "_extends_": "StartEvent_v1Ext_Caseworker__PositiveResponse_Base",
+  "specs": [
+    "As a prerequisite"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][parentContext][childContexts][S-1029.3_Create_Case_Data][testData][actualResponse][body][id]}",
+      "etid": "updateCase"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "version": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_MasterCaseType",
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "data_classification": "[[ANYTHING_PRESENT]]"
+      },
+      "event_id": "updateCase"
+    }
+  }
+}
+

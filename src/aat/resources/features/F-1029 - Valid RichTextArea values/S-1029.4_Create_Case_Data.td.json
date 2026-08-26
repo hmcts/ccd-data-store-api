@@ -1,0 +1,10 @@
+{
+  "_guid_": "S-1029.4_Create_Case_Data",
+  "_extends_": "S-1029.1_Create_Case_Data",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][S-1029.4_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}
+
