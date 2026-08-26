@@ -1,18 +1,70 @@
 {
 	"_guid_": "S-1029.2_Create_Case_Data",
-  "_extends_": "F-1029.2_Test_Data_Base",
+  "_extends_": "F-1029_Test_Data_Base",
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][S-1029.2_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "RichTextAreaField": "<z><strong>Allowed</strong></z>",
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": 12.88,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][siblingContexts][S-1029.2_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true,
+      "draft_id": null
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_400_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANYTHING_PRESENT]]",
