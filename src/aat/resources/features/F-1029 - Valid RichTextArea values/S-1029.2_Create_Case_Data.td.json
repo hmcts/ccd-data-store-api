@@ -1,0 +1,26 @@
+{
+	"_guid_": "S-1029.2_Create_Case_Data",
+  "_extends_": "F-1029.2_Test_Data_Base",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][S-1029.2_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Enter valid tags for RichTextArea field",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

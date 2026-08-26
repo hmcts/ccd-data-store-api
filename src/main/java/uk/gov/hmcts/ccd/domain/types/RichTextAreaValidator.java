@@ -68,7 +68,7 @@ public class RichTextAreaValidator implements BaseTypeValidator {
 
         if (!containsTagPair(value) || !listener.getErrors().isEmpty()) {
             throw new BadRequestException(
-                "HTML contains elements or attributes that are not allowed"
+                "Enter valid tags for RichTextArea field"
             );
         }
     }

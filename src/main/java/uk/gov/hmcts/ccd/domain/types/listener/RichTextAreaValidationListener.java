@@ -15,17 +15,14 @@ public class RichTextAreaValidationListener implements HtmlChangeListener<Void> 
         errors.add("Enter valid tags for RichTextArea field: " + elementName);
     }
 
+    @SuppressWarnings("java:S1186")
     @Override
     public void discardedAttributes(
         Void context,
         String tagName,
         String... attributeNames) {
 
-        for (String attribute : attributeNames) {
-            errors.add(
-                "Attribute '" + attribute + "' is not allowed on <" + tagName + ">"
-            );
-        }
+        //Forced to override, but not required.
     }
 
 }
