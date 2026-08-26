@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,43 +51,43 @@ class RichTextAreaValidatorTest {
 
     @ParameterizedTest
     @MethodSource("validEmptyValues")
-    void validate_shouldBeValidWhenNullOrEmpty(JsonNode value) {
+    void validateShouldBeValidWhenNullOrEmpty(JsonNode value) {
         assertThat(validate(value, caseField().build()), is(empty()));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"<p><strong>Order</strong></p>"})
-    void validate_shouldBeValidWhenMinimumLengthRequirementMet(String value) {
+    void validateShouldBeValidWhenMinimumLengthRequirementMet(String value) {
         assertThat(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()), is(empty()));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>"})
-    void validate_invalidValuesShouldFailValidation(String value) {
-        assertThrows(BadRequestException.class, () ->
-            validate(NODE_FACTORY.textNode(value), caseField().withMin(1).build()));
+    void validateInvalidValuesShouldFailValidation(String value) {
+        JsonNode node = NODE_FACTORY.textNode(value);
+        CaseFieldDefinition field = caseField().withMin(1).build();
+        assertThatThrownBy(() -> validate(node, field)).isInstanceOf(BadRequestException.class);
     }
 
     @Test
-    void validate_shouldNotBeValidWhenMinimumLengthRequirementNotMet() {
+    void validateShouldNotBeValidWhenMinimumLengthRequirementNotMet() {
         List<ValidationResult> results = validate(NODE_FACTORY.textNode("<p>m</p>"), caseField().withMin(10).build());
 
         assertSingleError(results, "requires a minimum length of 10");
     }
 
     @Test
-    void validate_shouldIgnoreMaximumLengthAndRegexRequirements() {
+    void validateShouldIgnoreMaximumLengthAndRegexRequirements() {
         CaseFieldDefinition constrainedField = caseField()
             .withMax(4)
             .withRegExp("\\d{4}-\\d{2}-\\d{2}")
             .build();
-
-        assertThrows(BadRequestException.class, () ->
-            validate(NODE_FACTORY.textNode("not-a-date-and-longer-than-four"), constrainedField));
+        JsonNode node = NODE_FACTORY.textNode("not-a-date-and-longer-than-four");
+        assertThatThrownBy(() -> validate(node, constrainedField)).isInstanceOf(BadRequestException.class);
     }
 
     @Test
-    void validate_shouldBeInvalidWhenValueProvidedIsNotText() {
+    void validateShouldBeInvalidWhenValueProvidedIsNotText() {
         List<ValidationResult> results = validate(NODE_FACTORY.numberNode(2), caseField().build());
 
         assertSingleError(results, "number is not a string");
