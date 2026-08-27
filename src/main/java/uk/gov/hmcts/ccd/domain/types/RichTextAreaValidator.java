@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class RichTextAreaValidator implements BaseTypeValidator {
     static final String TYPE_ID = "RichTextArea";
 
-    @Value("${html.policy.allowed.whitelist.tags:b}")
+    @Value("${html.policy.allowed.whitelist.tags: p,strong, br}")
     private String[] allowedWhitelistTags;
 
     private static final Pattern HTML_TAG_PAIR =

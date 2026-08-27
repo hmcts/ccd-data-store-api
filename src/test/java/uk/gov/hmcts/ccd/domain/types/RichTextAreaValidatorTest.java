@@ -29,8 +29,8 @@ class RichTextAreaValidatorTest {
 
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
-    private static final String[] ALLOWED_WHITELIST_TAGS =
-        {"p", "br", "strong",};
+    private static final String[] ALLOWED_WHITELIST_TAGS = {"p", "br", "strong"};
+
 
     private final RichTextAreaValidator validator = new RichTextAreaValidator();
 

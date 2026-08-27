@@ -422,7 +422,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void validRichTextAreaValue() throws Exception {
         final String data = """
             {
-              "RichTextAreaField": "<p><strong>Order</strong></p>"
+              "RichTextAreaField": "<p>Order</p>"
             }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(data);
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
