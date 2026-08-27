@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -95,7 +97,6 @@ class RoleAssignmentServiceTest {
     @InjectMocks
     private RoleAssignmentService roleAssignmentService;
 
-
     @Nested
     @DisplayName("createCaseRoleAssignments()")
     @SuppressWarnings("ConstantConditions")
@@ -129,9 +130,9 @@ class RoleAssignmentServiceTest {
 
             // WHEN
             RoleAssignments roleAssignments = roleAssignmentService.createCaseRoleAssignments(caseDetails,
-                                                                                              USER_ID,
-                                                                                              roles,
-                                                                                              replaceExisting);
+                USER_ID,
+                roles,
+                replaceExisting);
 
             // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
@@ -170,9 +171,9 @@ class RoleAssignmentServiceTest {
 
             // WHEN
             RoleAssignments roleAssignments = roleAssignmentService.createCaseRoleAssignments(caseDetails,
-                                                                                              USER_ID_2,
-                                                                                              roles,
-                                                                                              replaceExisting);
+                USER_ID_2,
+                roles,
+                replaceExisting);
 
             // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
@@ -209,7 +210,7 @@ class RoleAssignmentServiceTest {
                 () -> assertEquals(expectedUserId, actualRoleRequest.getAssignerId()),
                 () -> assertEquals(RoleAssignmentRepository.DEFAULT_PROCESS, actualRoleRequest.getProcess()),
                 () -> assertEquals(expectedCaseDetails.getReference() + "-" + expectedUserId,
-                        actualRoleRequest.getReference()),
+                    actualRoleRequest.getReference()),
                 () -> assertEquals(expectedReplaceExisting, actualRoleRequest.isReplaceExisting())
             );
         }
@@ -444,7 +445,6 @@ class RoleAssignmentServiceTest {
         return RoleAssignments.builder().roleAssignments(roleAssignments).build();
     }
 
-
     @Nested
     @DisplayName("getRoleAssignments()")
     class GetRoleAssignments {
@@ -475,7 +475,7 @@ class RoleAssignmentServiceTest {
         void shouldGetRoleAssignmentsForCreate() {
 
             // GIVEN
-            final var expectedResult =  new RoleAssignments();
+            final var expectedResult = new RoleAssignments();
             expectedResult.setRoleAssignments(new ArrayList<>());
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
@@ -550,6 +550,45 @@ class RoleAssignmentServiceTest {
         }
 
         @Test
+        void shouldExcludeExpiredCaseRoleAssignmentsWithoutCaseIdForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(createExpiredCaseRoleAssignmentWithoutCaseId());
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
+        void shouldExcludeExpiredCaseRoleAssignmentsWithCaseIdForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(createExpiredCaseRoleAssignmentWithCaseId());
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
+        void shouldExcludeExpiredOrganisationAssignmentsWithCaseIdForCreate() {
+
+            // GIVEN
+            givenRoleAssignmentsForCreate(createExpiredOrganisationRoleAssignmentWithCaseId());
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertTrue(roleAssignments.getRoleAssignments().isEmpty());
+        }
+
+        @Test
         void shouldOnlyReturnActiveOrganisationAssignmentsWithoutCaseIdForCreate() {
 
             // GIVEN
@@ -603,6 +642,14 @@ class RoleAssignmentServiceTest {
             return createRoleAssignment(RoleType.ORGANISATION, RoleAssignmentAttributes.builder().build(), true);
         }
 
+        private RoleAssignment createExpiredOrganisationRoleAssignmentWithCaseId() {
+            return createRoleAssignment(
+                RoleType.ORGANISATION,
+                RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build(),
+                true
+            );
+        }
+
         private RoleAssignment createCaseRoleAssignmentWithCaseId() {
             return createRoleAssignment(
                 RoleType.CASE,
@@ -615,9 +662,21 @@ class RoleAssignmentServiceTest {
             return createRoleAssignment(RoleType.CASE, RoleAssignmentAttributes.builder().build(), false);
         }
 
+        private RoleAssignment createExpiredCaseRoleAssignmentWithCaseId() {
+            return createRoleAssignment(
+                RoleType.CASE,
+                RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build(),
+                true
+            );
+        }
+
+        private RoleAssignment createExpiredCaseRoleAssignmentWithoutCaseId() {
+            return createRoleAssignment(RoleType.CASE, RoleAssignmentAttributes.builder().build(), true);
+        }
+
         private RoleAssignment createRoleAssignment(RoleType roleType,
-                                                   RoleAssignmentAttributes attributes,
-                                                   boolean expired) {
+                                                    RoleAssignmentAttributes attributes,
+                                                    boolean expired) {
             final Instant currentTime = Instant.now();
             final long oneHour = 3600000;
             final Instant beginTime = expired ? currentTime.minusMillis(oneHour * 2) : currentTime.minusMillis(oneHour);
@@ -632,7 +691,6 @@ class RoleAssignmentServiceTest {
                 .build();
         }
     }
-
 
     @Nested
     @DisplayName("findRoleAssignmentsByCasesAndUsers()")
@@ -658,7 +716,6 @@ class RoleAssignmentServiceTest {
         }
 
     }
-
 
     @Nested
     @DisplayName("getCaseReferencesForAGivenUser(String userId)")
@@ -703,7 +760,6 @@ class RoleAssignmentServiceTest {
         }
 
     }
-
 
     @Nested
     @DisplayName("getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition)")
@@ -789,7 +845,7 @@ class RoleAssignmentServiceTest {
     }
 
     /**
-     *  Create test role assignments: single case with two case-roles.
+     * Create test role assignments: single case with two case-roles.
      */
     private RoleAssignments createTestRoleAssignments(String caseId) {
         final Instant currentTIme = Instant.now();
@@ -812,7 +868,7 @@ class RoleAssignmentServiceTest {
     }
 
     /**
-     *  Create multiple test role assignments: two cases each with two case-roles.
+     * Create multiple test role assignments: two cases each with two case-roles.
      */
     private RoleAssignments createTestRoleAssignmentsMultipleCases() {
         List<RoleAssignment> roleAssignments = new ArrayList<>();
