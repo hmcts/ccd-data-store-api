@@ -14,19 +14,14 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 @Named
 @Singleton
 public class RichTextAreaValidator implements BaseTypeValidator {
     static final String TYPE_ID = "RichTextArea";
 
-    @Value("${html.policy.allowed.whitelist.tags: p,strong, br}")
+    @Value("${html.policy.allowed.whitelist.tags}")
     private String[] allowedWhitelistTags;
-
-    private static final Pattern HTML_TAG_PAIR =
-        Pattern.compile("<([A-Za-z][A-Za-z0-9]*)\\b[^>]*>[\\s\\S]*?</\\1>");
-
 
     @Override
     public BaseType getType() {
@@ -65,17 +60,13 @@ public class RichTextAreaValidator implements BaseTypeValidator {
         final PolicyFactory policyDefinition = new HtmlPolicyBuilder()
             .allowElements(allowedWhitelistTags).toFactory();
 
-        RichTextAreaValidationListener listener = new RichTextAreaValidationListener();
-        policyDefinition.sanitize(value, listener, null);
+        RichTextAreaValidationListener listener = new RichTextAreaValidationListener(allowedWhitelistTags);
+        String sanitized = policyDefinition.sanitize(value, listener, null);
 
-        if (!containsTagPair(value) || !listener.getErrors().isEmpty()) {
+        if (!listener.getErrors().isEmpty() || !sanitized.contains("<")) {
             throw new BadRequestException(
                 "Enter valid tags for RichTextArea field"
             );
         }
-    }
-
-    private boolean containsTagPair(String input) {
-        return input != null && HTML_TAG_PAIR.matcher(input).find();
     }
 }

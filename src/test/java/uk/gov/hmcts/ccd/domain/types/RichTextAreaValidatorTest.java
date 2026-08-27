@@ -29,7 +29,7 @@ class RichTextAreaValidatorTest {
 
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
-    private static final String[] ALLOWED_WHITELIST_TAGS = {"p", "br", "strong"};
+    private static final String[] ALLOWED_WHITELIST_TAGS = {"p", "br", "strong", "ul", "li", "hr"};
 
 
     private final RichTextAreaValidator validator = new RichTextAreaValidator();
@@ -57,15 +57,22 @@ class RichTextAreaValidatorTest {
         assertTrue(validate(value, caseField().build()).isEmpty());
     }
 
+
     @ParameterizedTest
-    @ValueSource(strings = {"<p><strong>Order</strong></p>", "<p>Order</p>",
-        "<p>Order</p><p>Order</p>", "<p>Order</p><br><p>Order</p>"})
+    @ValueSource(strings = {"<p><strong>Order</strong></p>",
+        "<p>Order</p>",
+        "<p>Order</p><p>Order</p>",
+        "<p>Order</p><br><p>Order</p>",
+        "<p>a<br>b</p>",
+        "<p>x</p><hr>",
+        "<hr>",
+        "<ul><li>a</li></ul><br>"})
     void validateShouldBeValidWhenMinimumLengthRequirementMet(String value) {
         assertTrue(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()).isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>"})
+    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>" })
     void validateInvalidValuesShouldFailValidation(String value) {
         JsonNode node = NODE_FACTORY.textNode(value);
         CaseFieldDefinition field = caseField().withMin(1).build();
@@ -74,7 +81,8 @@ class RichTextAreaValidatorTest {
 
     @Test
     void validateShouldNotBeValidWhenMinimumLengthRequirementNotMet() {
-        List<ValidationResult> results = validate(NODE_FACTORY.textNode("<p>m</p>"), caseField().withMin(10).build());
+        List<ValidationResult> results = validate(NODE_FACTORY.textNode("<p>m</p>"),
+            caseField().withMin(10).build());
 
         assertSingleError(results, "requires a minimum length of 10");
     }
