@@ -1,9 +1,9 @@
 {
-	"_guid_": "S-1029.1_Create_Case_Data",
-  "_extends_": "F-1029_Test_Data_Base",
+	"_guid_": "S-1030.1_Create_Case_Data",
+  "_extends_": "F-1030_Test_Data_Base",
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][S-1029.1_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][siblingContexts][S-1030.1_Create_Case_Data_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

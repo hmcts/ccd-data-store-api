@@ -1,37 +1,100 @@
 {
-	"_guid_": "F-1029.3_Test_Data_Base",
-  "_extends_": "Event_Creation_Caseworker_Base",
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+  "title": "must successfully create case with number field displaying as expected",
+  "_guid_": "S-1030.1",
+  "_extends_": "F-1030_Test_Data_Base",
+  "prerequisites": [
+    {
+      "Token_Creation": "F-1030_Case_Data_Create_Token_Creation"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains a case with number field showing correctly",
+    "has 201 return code",
+    "contains correct values for case_data and data_classification",
+    "contains correctly configured event details",
+    "contains RichTextArea base type",
+    "RichTextArea has tags that are allowed list"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "RichTextAreaField": "<p><strong>Allowed</strong></p>",
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": 12.88,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true,
+      "draft_id": null
     }
   },
-
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
-      "_extends_": "Common_Response_Headers"
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
     },
-    "body" : {
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_MASTER",
-      "case_type_id" : "FT_MasterCaseType",
-      "state" : "CaseUpdated",
-
-      "version" : 1,
-      "created_date" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "last_modified" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "last_state_modified_date" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "security_classification" : "PUBLIC",
-      "supplementary_data" : null,
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "callback_error_message" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "version": 0,
+      "case_type_id": "FT_MasterCaseType",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
       "case_data": {
         "AddressField": {
           "AddressLine1": null,
@@ -67,7 +130,7 @@
           }
         },
         "TextAreaField": null,
-        "RichTextAreaField": "<p>Allowed</p>",
+        "RichTextAreaField": "<p><strong>Allowed</strong></p>",
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": null,
@@ -156,7 +219,14 @@
           "classification": "PUBLIC",
           "value": []
         }
-      }
+      },
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "callback_error_message": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
     }
   }
 }

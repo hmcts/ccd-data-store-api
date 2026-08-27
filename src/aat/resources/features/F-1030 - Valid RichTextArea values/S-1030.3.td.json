@@ -1,10 +1,10 @@
 {
   "title": "must successfully update case with rich text field displaying as expected",
-  "_guid_": "S-1029.3",
-  "_extends_": "F-1029.3_Test_Data_Base",
+  "_guid_": "S-1030.3",
+  "_extends_": "F-1030.3_Test_Data_Base",
   "prerequisites": [
     {
-      "Token_Creation": "S-1029.3_Case_Update_Token_Creation"
+      "Token_Creation": "S-1030.3_Case_Update_Token_Creation"
     }
   ],
   "specs": [
@@ -18,7 +18,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][S-1029.3_Create_Case_Data][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][S-1030.3_Create_Case_Data][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {

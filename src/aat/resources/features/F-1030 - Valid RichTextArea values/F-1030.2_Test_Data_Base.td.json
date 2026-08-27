@@ -1,6 +1,6 @@
 {
   "title": "should create a case",
-	"_guid_": "F-1029.2_Test_Data_Base",
+	"_guid_": "F-1030.2_Test_Data_Base",
 	"productName": "CCD Data Store",
 	"operationName": "Submit Case Creation as Caseworker",
 	"method": "POST",
@@ -82,7 +82,7 @@
 				"summary": "",
 				"description": ""
       },
-			"event_token": "${[scenarioContext][childContexts][F-1029.2_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][childContexts][F-1030.2_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
       "ignore_warning": true,
 			"draft_id": null
 		}

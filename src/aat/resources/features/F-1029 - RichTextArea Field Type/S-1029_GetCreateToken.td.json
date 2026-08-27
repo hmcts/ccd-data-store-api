@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1029_Case_Data_Create_Token_Creation",
+  "_guid_": "S-1029_GetCreateToken",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
     "to create a token for case creation",
@@ -7,13 +7,11 @@
   ],
   "users": {
     "invokingUser": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
       "etid": "createCase"
@@ -21,7 +19,10 @@
   },
   "expectedResponse": {
     "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
       "case_details": {
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_MasterCaseType",
         "case_data": {
           "DynamicList": {
             "value": {
@@ -62,8 +63,7 @@
         },
         "data_classification": {
           "DynamicList": "PUBLIC"
-        },
-        "supplementary_data": null
+        }
       },
       "event_id": "createCase"
     }
