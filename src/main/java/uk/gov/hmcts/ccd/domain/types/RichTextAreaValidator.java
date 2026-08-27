@@ -75,7 +75,7 @@ public class RichTextAreaValidator implements BaseTypeValidator {
         }
     }
 
-    public boolean containsTagPair(String input) {
+    private boolean containsTagPair(String input) {
         return input != null && HTML_TAG_PAIR.matcher(input).find();
     }
 }

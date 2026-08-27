@@ -18,12 +18,9 @@ import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,24 +48,24 @@ class RichTextAreaValidatorTest {
 
     @Test
     void getType() {
-        assertThat(validator.getType(), is(BaseType.get("RichTextArea")));
+        assertEquals(BaseType.get("RichTextArea"), validator.getType());
     }
 
     @ParameterizedTest
     @MethodSource("validEmptyValues")
     void validateShouldBeValidWhenNullOrEmpty(JsonNode value) {
-        assertThat(validate(value, caseField().build()), is(empty()));
+        assertTrue(validate(value, caseField().build()).isEmpty());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"<p><strong>Order</strong></p>", "<p>Order</p>",
         "<p>Order</p><p>Order</p>", "<p>Order</p><br><p>Order</p>"})
     void validateShouldBeValidWhenMinimumLengthRequirementMet(String value) {
-        assertThat(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()), is(empty()));
+        assertTrue(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()).isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>"})
+    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>"})
     void validateInvalidValuesShouldFailValidation(String value) {
         JsonNode node = NODE_FACTORY.textNode(value);
         CaseFieldDefinition field = caseField().withMin(1).build();
@@ -118,8 +115,8 @@ class RichTextAreaValidatorTest {
     }
 
     private static void assertSingleError(List<ValidationResult> results, String errorMessage) {
-        assertThat(results, hasSize(1));
-        assertThat(results.get(0).getFieldId(), equalTo(FIELD_ID));
-        assertThat(results.get(0).getErrorMessage(), equalTo(errorMessage));
+        assertEquals(1, results.size());
+        assertEquals(FIELD_ID, results.get(0).getFieldId());
+        assertEquals(errorMessage, results.get(0).getErrorMessage());
     }
 }
