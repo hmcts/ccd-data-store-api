@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RichTextAreaValidationListener implements HtmlChangeListener<Void> {
 
-    @Value("${html.policy.allowed.whitelist.tags}")
+    @Value("${html.policy.allowed.whitelist.tags: b,blockquote,br,em,h1,h2,h3,h4,h5,h6,hr,i,li,ol,p,strong,u,ul}")
     private String[] allowedWhitelistTags;
 
     @Getter

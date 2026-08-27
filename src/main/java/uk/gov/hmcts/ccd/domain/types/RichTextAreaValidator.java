@@ -20,7 +20,7 @@ import java.util.Locale;
 public class RichTextAreaValidator implements BaseTypeValidator {
     static final String TYPE_ID = "RichTextArea";
 
-    @Value("${html.policy.allowed.whitelist.tags}")
+    @Value("${html.policy.allowed.whitelist.tags: b,blockquote,br,em,h1,h2,h3,h4,h5,h6,hr,i,li,ol,p,strong,u,ul}")
     private String[] allowedWhitelistTags;
 
     @Override
