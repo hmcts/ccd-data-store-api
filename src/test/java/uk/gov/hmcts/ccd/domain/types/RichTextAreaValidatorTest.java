@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -31,11 +32,15 @@ class RichTextAreaValidatorTest {
 
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
+    private static final String[] ALLOWED_WHITELIST_TAGS =
+        {"p", "br", "strong",};
 
     private final RichTextAreaValidator validator = new RichTextAreaValidator();
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(validator, "allowedWhitelistTags", ALLOWED_WHITELIST_TAGS);
+
         FieldTypeDefinition richTextAreaType = baseTypeDefinition();
         CaseDefinitionRepository definitionRepository = mock(CaseDefinitionRepository.class);
 
@@ -56,7 +61,8 @@ class RichTextAreaValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"<p><strong>Order</strong></p>"})
+    @ValueSource(strings = {"<p><strong>Order</strong></p>", "<p>Order</p>",
+        "<p>Order</p><p>Order</p>", "<p>Order</p><br><p>Order</p>"})
     void validateShouldBeValidWhenMinimumLengthRequirementMet(String value) {
         assertThat(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()), is(empty()));
     }
