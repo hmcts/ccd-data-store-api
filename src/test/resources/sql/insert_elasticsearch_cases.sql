@@ -26,4 +26,3 @@ VALUES (6, 'AAT', 'AUTOTEST1', 'IN_PROGRESS', 'PUBLIC', '{}', '{}', '15894600562
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
 VALUES (7, 'MAPPER', 'AUTOTEST1', 'TODO', 'PUBLIC', '{}', '{}', '1588870615652827');
-
