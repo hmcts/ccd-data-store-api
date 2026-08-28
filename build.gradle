@@ -254,7 +254,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
-    implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                       // spring-cloud-starter-openfeign
+    implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'                       // spring-cloud-starter-openfeign
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.12'         // spring-cloud-starter-openfeign
     implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.12'            // service-auth-provider-java-client
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
