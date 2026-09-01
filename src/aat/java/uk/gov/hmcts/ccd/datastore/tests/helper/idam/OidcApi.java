@@ -8,7 +8,7 @@ import feign.RequestLine;
 
 import java.util.List;
 
-public interface HmctsAccessApi {
+public interface OidcApi {
 
     @RequestLine("POST /o/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")

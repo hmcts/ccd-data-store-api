@@ -36,8 +36,6 @@ class IdamRepositoryTest {
     @Mock
     private IdamClient idamClient;
     @Mock
-    private HmctsAccessClient hmctsAccessClient;
-    @Mock
     private ApplicationParams applicationParams;
 
     @InjectMocks
@@ -53,7 +51,7 @@ class IdamRepositoryTest {
     @DisplayName("Get user info if token is passed")
     void shouldGetUserInfo() {
         UserInfo userInfo = UserInfo.builder().build();
-        given(hmctsAccessClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
         UserInfo result = idamRepository.getUserInfo(TEST_USER_TOKEN);
         assertThat(result).isSameAs(userInfo);
     }
@@ -66,7 +64,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
 
-        given(hmctsAccessClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
         Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
@@ -77,7 +75,7 @@ class IdamRepositoryTest {
             .BadRequest("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
-        given(hmctsAccessClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
         Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
@@ -88,7 +86,7 @@ class IdamRepositoryTest {
             .InternalServerError("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
-        given(hmctsAccessClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
         Assert.assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
@@ -99,7 +97,7 @@ class IdamRepositoryTest {
             .ServiceUnavailable("myUniqueExceptionMessage",
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
-        given(hmctsAccessClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
         Assert.assertThrows(ServiceException.class,
             () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
@@ -142,6 +140,6 @@ class IdamRepositoryTest {
         String password = "aPassword";
         given(applicationParams.getDataStoreSystemUserId()).willReturn(userId);
         given(applicationParams.getDataStoreSystemUserPassword()).willReturn(password);
-        given(hmctsAccessClient.getAccessToken(userId, password)).willReturn(TEST_USER_TOKEN);
+        given(idamClient.getAccessToken(userId, password)).willReturn(TEST_USER_TOKEN);
     }
 }

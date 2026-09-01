@@ -38,6 +38,5 @@ java:
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
-    IDAM_API_URL_BASE: "https://idam-public-web.aat.platform.hmcts.net"
     SPRING_APPLICATION_JSON: |
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}

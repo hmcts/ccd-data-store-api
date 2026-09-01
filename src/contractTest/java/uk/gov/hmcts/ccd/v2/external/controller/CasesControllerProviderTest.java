@@ -225,7 +225,7 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
 
-        TokenResponse tokenResponse = new TokenResponse("some access token",null, null, null, null, null);
+        TokenResponse tokenResponse = new TokenResponse("some access token", null, null, null, null, null);
 
         stubFor(WireMock.post(urlMatching("/o/token"))
             .willReturn(okJson(objectMapper.writeValueAsString(tokenResponse)).withStatus(200)));

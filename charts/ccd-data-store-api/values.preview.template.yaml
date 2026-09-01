@@ -34,7 +34,7 @@ java:
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     LEGACY_IDAM_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_BASE_URL: https://idam-web-public.aat.platform.hmcts.net
-    IDAM_HMCTS_ACCESS_URL: https://idam-web-public.aat.platform.hmcts.net
+    IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
     IDAM_API_URL_BASE: "https://idam-public-web.aat.platform.hmcts.net" # Added for Befta tests to work with OIDC
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
