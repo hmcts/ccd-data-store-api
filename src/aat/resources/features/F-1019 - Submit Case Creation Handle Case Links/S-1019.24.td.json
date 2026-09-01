@@ -15,7 +15,7 @@
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][token]}"
     }
   }
 }
