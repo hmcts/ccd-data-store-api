@@ -110,14 +110,10 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         }
 
         final String effectiveCaseTypeId = StringUtils.isNotBlank(pageId)
-            ? resolveEffectiveCaseTypeIdForMidEvent(operationContext, content)
+            ? verifyEventAccessBeforeMidEvent(operationContext, content)
             : operationContext.caseTypeId();
 
         callMidEventCallback(effectiveCaseTypeId, content, pageId);
-
-        if (StringUtils.isNotBlank(pageId)) {
-            verifyEventAccessAfterMidEvent(operationContext, content);
-        }
 
         if (applicationParams.getExcludeVerifyAccessCaseTypesForValidate()
             .stream()
@@ -150,36 +146,19 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         }
     }
 
-    private String resolveEffectiveCaseTypeIdForMidEvent(OperationContext operationContext, CaseDataContent content) {
+    private String verifyEventAccessBeforeMidEvent(OperationContext operationContext, CaseDataContent content) {
         String urlCaseTypeId = operationContext.caseTypeId();
 
         if (StringUtils.isEmpty(content.getCaseReference())) {
             if (hasUnresolvedCaseIdInEventToken(content)) {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");
             }
+            CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(urlCaseTypeId);
+            verifyCreateCaseEventAccess(content, caseTypeDefinition);
             return urlCaseTypeId;
         }
 
-        CaseDetails existingCaseDetails = getCaseOperation.execute(content.getCaseReference())
-            .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
-
-        if (!existingCaseDetails.getCaseTypeId().equalsIgnoreCase(urlCaseTypeId)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
-        }
-
-        return existingCaseDetails.getCaseTypeId();
-    }
-
-    private void verifyEventAccessAfterMidEvent(OperationContext operationContext, CaseDataContent content) {
-        String urlCaseTypeId = operationContext.caseTypeId();
-
-        if (StringUtils.isEmpty(content.getCaseReference())) {
-            CaseTypeDefinition caseTypeDefinition = getCaseDefinitionType(urlCaseTypeId);
-            verifyCreateCaseEventAccess(content, caseTypeDefinition);
-            return;
-        }
-
-        verifyUpdateCaseEventAccess(operationContext, content);
+        return verifyUpdateCaseEventAccess(operationContext, content);
     }
 
     private boolean hasUnresolvedCaseIdInEventToken(CaseDataContent content) {
