@@ -744,8 +744,9 @@ class RoleAssignmentServiceTest {
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID);
 
             // THEN
-            assertThat(resultCases).hasSize(2);
-            assertThat(resultCases).containsAll(caseIds);
+            assertThat(resultCases)
+                .hasSize(2)
+                .containsAll(caseIds);
         }
 
     }
