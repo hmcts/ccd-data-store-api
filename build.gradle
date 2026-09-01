@@ -43,7 +43,7 @@ ext {
     testContainersVersion = '2.0.5'
     cucumber = '7.34.7'
     beftaFwVersion = '9.2.10'
-    ccdTestDefinitionVersion = '7.26.0-rc1'
+    ccdTestDefinitionVersion = '7.26.0-rc2'
     limits = [
             'instruction': 90,
             'branch'     : 85,
