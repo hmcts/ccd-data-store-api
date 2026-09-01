@@ -222,7 +222,7 @@ class RoleAssignmentServiceTest {
                 .collect(Collectors.toMap(RoleAssignmentResource::getRoleName, role -> role));
 
             expectedRoles.forEach(roleName -> assertAll(
-                () -> assertThat(roleMap.containsKey(roleName)).isTrue(),
+                () -> assertThat(roleMap).containsKey(roleName),
                 () -> assertCorrectlyPopulatedRoleAssignment(
                     expectedCaseDetails,
                     expectedUserId,
@@ -380,7 +380,7 @@ class RoleAssignmentServiceTest {
                 .collect(Collectors.toMap(query -> query.getActorId().get(0), query -> query));
 
             expectedDeleteRequests.forEach(expectedDeleteRequest -> assertAll(
-                () -> assertThat(queryMapByUser.containsKey(expectedDeleteRequest.getUserId())).isTrue(),
+                () -> assertThat(queryMapByUser).containsKey(expectedDeleteRequest.getUserId()),
                 () -> assertCorrectlyPopulatedRoleAssignmentQuery(
                     expectedDeleteRequest,
                     queryMapByUser.get(expectedDeleteRequest.getUserId())
@@ -745,7 +745,7 @@ class RoleAssignmentServiceTest {
 
             // THEN
             assertThat(resultCases).hasSize(2);
-            assertThat(resultCases.containsAll(caseIds)).isTrue();
+            assertThat(resultCases).containsAll(caseIds);
         }
 
     }
