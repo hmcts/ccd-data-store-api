@@ -79,6 +79,17 @@ class RestTemplateConfiguration {
         return restTemplate;
     }
 
+    @Bean(name = "callbackRestTemplate")
+    public RestTemplate callbackRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory requestFactory =
+            new HttpComponentsClientHttpRequestFactory(
+                getHttpClientWithRedirectsDisabled(connectionTimeout, readTimeout));
+        LOG.info("callbackRestTemplate connectionTimeout: {}, readTimeout: {}", connectionTimeout, readTimeout);
+        restTemplate.setRequestFactory(requestFactory);
+        return restTemplate;
+    }
+
     @Bean(name = "documentRestTemplate")
     public RestTemplate documentRestTemplate() {
 
@@ -134,6 +145,12 @@ class RestTemplateConfiguration {
     }
 
     private HttpClient getHttpClient(final int connectTimeout, final int readTimeout) {
+        return getHttpClient(connectTimeout, readTimeout, true);
+    }
+
+    private HttpClient getHttpClient(final int connectTimeout,
+                                     final int readTimeout,
+                                     final boolean redirectsEnabled) {
         PoolingHttpClientConnectionManager cm = buildConnectionManager(connectTimeout, readTimeout);
         connectionManagers.add(cm);
 
@@ -142,13 +159,21 @@ class RestTemplateConfiguration {
                          .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeout))
                          .setResponseTimeout(Timeout.ofMilliseconds(readTimeout))
                          .setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+                         .setRedirectsEnabled(redirectsEnabled)
                          .build();
 
-        return HttpClientBuilder.create()
-                                .useSystemProperties()
-                                .setDefaultRequestConfig(config)
-                                .setConnectionManager(cm)
-                                .build();
+        HttpClientBuilder builder = HttpClientBuilder.create()
+                                                     .useSystemProperties()
+                                                     .setDefaultRequestConfig(config)
+                                                     .setConnectionManager(cm);
+        if (!redirectsEnabled) {
+            builder.disableRedirectHandling();
+        }
+        return builder.build();
+    }
+
+    private HttpClient getHttpClientWithRedirectsDisabled(final int connectTimeout, final int readTimeout) {
+        return getHttpClient(connectTimeout, readTimeout, false);
     }
 
     private PoolingHttpClientConnectionManager buildConnectionManager(final int connectTimeout,

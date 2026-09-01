@@ -40,7 +40,7 @@ public class TimeToLiveService {
     private final CaseDataService caseDataService;
 
     @Autowired
-    public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+    public TimeToLiveService(@Qualifier("defaultObjectMapper") ObjectMapper objectMapper,
                              ApplicationParams applicationParams,
                              CaseDataService caseDataService) {
         this.objectMapper = objectMapper;

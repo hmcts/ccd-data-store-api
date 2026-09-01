@@ -125,7 +125,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldFailFastOnConnectTimeout() {
+    public void aboutToSubmitShouldRejectNonAllowlistedHostFast() {
         String unreachableUrl = "http://10.255.255.1:9/unreachable-callback";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
@@ -136,10 +136,10 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
                 caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
         Duration duration = Duration.between(start, Instant.now());
 
-        MatcherAssert.assertThat("connect timeout should not wait for default 30s",
+        MatcherAssert.assertThat("non-allowlisted host should fail fast",
             duration.toMillis() < 2_000L);
-        MatcherAssert.assertThat("exception should mention unsuccessful callback",
-            ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
+        MatcherAssert.assertThat("exception should mention callback host validation",
+            ex.getMessage(), CoreMatchers.containsString("host is not allowlisted"));
     }
 
 }

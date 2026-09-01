@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityUtils {
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String USER_ID = "user-id";
+    public static final String USER_ROLES = "user-roles";
 
     private static final String AUD_CLAIM = "aud";
     private static final String BEARER = "Bearer ";
@@ -39,8 +41,8 @@ public class SecurityUtils {
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(SERVICE_AUTHORIZATION, getServiceAuthorization());
-        headers.add("user-id", getUserId());
-        headers.add("user-roles", getUserRolesHeader());
+        headers.add(USER_ID, getUserId());
+        headers.add(USER_ROLES, getUserRolesHeader());
 
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             headers.add(HttpHeaders.AUTHORIZATION, getUserBearerToken());

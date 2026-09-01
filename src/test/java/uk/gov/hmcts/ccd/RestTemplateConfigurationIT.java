@@ -40,17 +40,18 @@ class RestTemplateConfigurationIT {
                 // Force creation of all RestTemplate beans to register managers.
                 context.getBean("definitionStoreRestTemplate");
                 context.getBean("restTemplate");
+                context.getBean("callbackRestTemplate");
                 context.getBean("documentRestTemplate");
                 context.getBean("createDraftRestTemplate");
                 context.getBean("draftsRestTemplate");
 
                 constructedRef.set(connectionManagers.constructed());
-                assertThat(constructedRef.get()).hasSize(5);
+                assertThat(constructedRef.get()).hasSize(6);
             });
 
             // After the run block, the context is closed and @PreDestroy should have fired.
             List<PoolingHttpClientConnectionManager> createdManagers = constructedRef.get();
-            assertThat(createdManagers).hasSize(5);
+            assertThat(createdManagers).hasSize(6);
             createdManagers.forEach(cm -> verify(cm).close());
         }
     }
@@ -68,6 +69,8 @@ class RestTemplateConfigurationIT {
                     .getRequestFactory();
                 context.getBean("restTemplate", org.springframework.web.client.RestTemplate.class)
                     .getRequestFactory();
+                context.getBean("callbackRestTemplate", org.springframework.web.client.RestTemplate.class)
+                    .getRequestFactory();
                 context.getBean("documentRestTemplate", org.springframework.web.client.RestTemplate.class)
                     .getRequestFactory();
                 context.getBean("createDraftRestTemplate", org.springframework.web.client.RestTemplate.class)
@@ -76,12 +79,12 @@ class RestTemplateConfigurationIT {
                     .getRequestFactory();
 
                 constructedRef.set(connectionManagers.constructed());
-                assertThat(constructedRef.get()).hasSize(5);
+                assertThat(constructedRef.get()).hasSize(6);
             });
 
             // Context closed; @PreDestroy should close all managers.
             List<PoolingHttpClientConnectionManager> createdManagers = constructedRef.get();
-            assertThat(createdManagers).hasSize(5);
+            assertThat(createdManagers).hasSize(6);
             createdManagers.forEach(cm -> verify(cm).close());
         }
     }
