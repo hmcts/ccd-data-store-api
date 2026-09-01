@@ -1,0 +1,38 @@
+{
+	"title": "must create a case successfully when a RichTextArea field is populated with rich text mark-up",
+	"_guid_": "S-1029.1",
+	"_extends_": "F-1029_CreateCaseBase",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a RichTextArea field populated with rich text mark-up"
+	],
+
+	"prerequisites": [ {
+		"S-1029_GetCreateToken": "S-1029_GetCreateToken"
+	} ],
+
+	"request": {
+		"body": {
+			"data": {
+				"RichTextAreaField": "<h2>Heading</h2><p>Some <strong>bold</strong> and <em>italic</em> text.</p><ul><li>One</li><li>Two</li></ul>",
+				"RichTextAreaMinField": "<p>A value which is comfortably longer than the configured minimum.</p>"
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_data": {
+				"RichTextAreaField": "<h2>Heading</h2><p>Some <strong>bold</strong> and <em>italic</em> text.</p><ul><li>One</li><li>Two</li></ul>",
+				"RichTextAreaMinField": "<p>A value which is comfortably longer than the configured minimum.</p>",
+				"SearchCriteria": { }
+			},
+			"data_classification": {
+				"RichTextAreaField": "PUBLIC",
+				"RichTextAreaMinField": "PUBLIC",
+				"SearchCriteria": "[[ANYTHING_PRESENT]]"
+			}
+		}
+	}
+}
