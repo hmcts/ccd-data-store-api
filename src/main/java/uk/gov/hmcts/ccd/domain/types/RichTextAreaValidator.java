@@ -20,16 +20,16 @@ import java.util.Locale;
 public class RichTextAreaValidator implements BaseTypeValidator {
     static final String TYPE_ID = "RichTextArea";
 
-    @Value("${html.policy.allowed.whitelist.tags}")
+    @Value("${html.policy.allowed.whitelist.tags: b,blockquote,br,em,h1,h2,h3,h4,h5,h6,hr,i,li,ol,p,strong,u,ul}")
     private String[] allowedWhitelistTags;
 
-    @Value("${html.policy.allowed.whitelist.attributes}")
+    @Value("${html.policy.allowed.whitelist.attributes: class,title,lang,dir,style,align}")
     private String[] allowedWhitelistAttributes;
 
-    @Value("${html.policy.allowed.whitelist.attributes.ol}")
+    @Value("${html.policy.allowed.whitelist.attributes.ol: start,reversed,type,data-indent}")
     private String[] allowedWhitelistAttributesOl;
 
-    @Value("${html.policy.allowed.whitelist.attributes.li}")
+    @Value("${html.policy.allowed.whitelist.attributes.li: value}")
     private String[] allowedWhitelistAttributesLi;
 
     @Override
