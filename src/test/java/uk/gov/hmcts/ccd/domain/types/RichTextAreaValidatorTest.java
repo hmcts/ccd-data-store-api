@@ -141,7 +141,7 @@ class RichTextAreaValidatorTest {
 
     private static void assertSingleError(List<ValidationResult> results, String errorMessage) {
         assertEquals(1, results.size());
-        assertEquals(FIELD_ID, results.get(0).getFieldId());
-        assertEquals(errorMessage, results.get(0).getErrorMessage());
+        assertEquals(FIELD_ID, results.getFirst().getFieldId());
+        assertEquals(errorMessage, results.getFirst().getErrorMessage());
     }
 }

@@ -24,7 +24,7 @@ public class RichTextAreaValidationListener implements HtmlChangeListener<Void> 
     public void discardedAttributes(
         Void context,
         @NonNull String tagName,
-        String @NonNull ... attributeNames) {
+        @NonNull String... attributeNames) {
 
         for (String attributeName : attributeNames) {
             if (attributeName != null) {
