@@ -105,3 +105,6 @@ java:
     CCD_MULTIPARTY_EVENTS: "*"
     CCD_MULTIPARTY_LOG_LEVEL: INFO
     CCD_ALLOWED_WHITELIST_TAGS: 'b,blockquote,br,em,h1,h2,h3,h4,h5,h6,hr,i,li,ol,p,strong,u,ul'
+    CCD_ALLOWED_WHITELIST_ATTRIBUTES: 'class,title,lang,dir,style,align'
+    CCD_ALLOWED_WHITELIST_ATTRIBUTES_OL: 'start,reversed,type,data-indent'
+    CCD_ALLOWED_WHITELIST_ATTRIBUTES_LI: 'value'

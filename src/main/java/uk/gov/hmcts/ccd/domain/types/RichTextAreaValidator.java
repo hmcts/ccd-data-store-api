@@ -20,8 +20,17 @@ import java.util.Locale;
 public class RichTextAreaValidator implements BaseTypeValidator {
     static final String TYPE_ID = "RichTextArea";
 
-    @Value("${html.policy.allowed.whitelist.tags: b,blockquote,br,em,h1,h2,h3,h4,h5,h6,hr,i,li,ol,p,strong,u,ul}")
+    @Value("${html.policy.allowed.whitelist.tags}")
     private String[] allowedWhitelistTags;
+
+    @Value("${html.policy.allowed.whitelist.attributes}")
+    private String[] allowedWhitelistAttributes;
+
+    @Value("${html.policy.allowed.whitelist.attributes.ol}")
+    private String[] allowedWhitelistAttributesOl;
+
+    @Value("${html.policy.allowed.whitelist.attributes.li}")
+    private String[] allowedWhitelistAttributesLi;
 
     @Override
     public BaseType getType() {
@@ -58,9 +67,16 @@ public class RichTextAreaValidator implements BaseTypeValidator {
 
     private void validateHtml(String value) {
         final PolicyFactory policyDefinition = new HtmlPolicyBuilder()
-            .allowElements(allowedWhitelistTags).toFactory();
+            .allowElements(allowedWhitelistTags)
+            .allowAttributes(allowedWhitelistAttributes)
+            .globally()
+            .allowAttributes(allowedWhitelistAttributesOl)
+            .onElements("ol")
+            .allowAttributes(allowedWhitelistAttributesLi)
+            .onElements("li")
+            .toFactory();
 
-        RichTextAreaValidationListener listener = new RichTextAreaValidationListener(allowedWhitelistTags);
+        RichTextAreaValidationListener listener = new RichTextAreaValidationListener();
         String sanitized = policyDefinition.sanitize(value, listener, null);
 
         if (!listener.getErrors().isEmpty() || !sanitized.contains("<")) {
