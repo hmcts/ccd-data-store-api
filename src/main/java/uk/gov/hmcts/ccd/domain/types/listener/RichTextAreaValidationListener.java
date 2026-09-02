@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types.listener;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.owasp.html.HtmlChangeListener;
 
 import java.util.ArrayList;
@@ -12,8 +14,8 @@ public class RichTextAreaValidationListener implements HtmlChangeListener<Void> 
     private final List<String> errors = new ArrayList<>();
 
     @Override
-    public void discardedTag(Void context, String elementName) {
-        if (elementName != null) {
+    public void discardedTag(Void context, @NonNull String elementName) {
+        if (StringUtils.isNotEmpty(elementName)) {
             errors.add("Enter valid tags for RichTextArea field: " + elementName);
         }
     }
@@ -21,12 +23,9 @@ public class RichTextAreaValidationListener implements HtmlChangeListener<Void> 
     @Override
     public void discardedAttributes(
         Void context,
-        String tagName,
-        String... attributeNames) {
+        @NonNull String tagName,
+        String @NonNull ... attributeNames) {
 
-        if (attributeNames == null) {
-            return;
-        }
         for (String attributeName : attributeNames) {
             if (attributeName != null) {
                 errors.add("Enter valid attributes for RichTextArea field: " + tagName + "[" + attributeName + "]");

