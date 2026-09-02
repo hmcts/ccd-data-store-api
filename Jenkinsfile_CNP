@@ -193,6 +193,15 @@ withPipeline(type, product, component) {
         ]
     }
 
+    // Set IDAM_API_URL_BASE post high-level data setup where it may have been overridden
+    before('smoketest:preview') {
+        env.IDAM_API_URL_BASE = "https://idam-public-web.aat.platform.hmcts.net"
+    }
+
+    before('smoketest:aat') {
+        env.IDAM_API_URL_BASE = "https://idam-public-web.aat.platform.hmcts.net"
+    }
+
     afterAlways('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
         publishHTML target: [
