@@ -99,8 +99,6 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
-env.IDAM_API_URL_BASE = "https://idam-public-web.aat.platform.hmcts.net"
-env.IDAM_URL_VALUE = "https://idam-public-web.aat.platform.hmcts.net"
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
@@ -274,6 +272,11 @@ withNightlyPipeline(type, product, component) {
     afterAlways('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+    }
+
+    // Set IDAM_API_URL_BASE post high-level data setup where it would have been overridden
+    before('fullFunctionalTest') {
+        env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
     }
 
     enableFullFunctionalTest(200)
