@@ -3,23 +3,21 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.anyString;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
@@ -34,16 +32,14 @@ class RoleAssignmentCategoryServiceTest {
     private IdamRepository idamRepository;
 
     @Mock
-    private RoleAssignmentService roleAssignmentService;
+    private RoleAssignmentRepository roleAssignmentRepository;
+
+    @Mock
+    private RoleAssignmentsMapper roleAssignmentsMapper;
 
     @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
-    @BeforeEach
-    void setUp() {
-        given(roleAssignmentService.getRoleAssignments(anyString()))
-            .willReturn(RoleAssignments.builder().roleAssignments(emptyList()).build());
-    }
 
     @Nested
     @DisplayName("getRoleCategory()")

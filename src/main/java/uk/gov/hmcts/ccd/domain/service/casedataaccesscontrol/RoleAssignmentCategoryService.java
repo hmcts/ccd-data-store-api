@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
 import java.util.Collections;
@@ -29,17 +33,21 @@ public class RoleAssignmentCategoryService {
     private static final List<String> ENFORCEMENT_ROLES = List.of("bailiff-manager", "bailiff");
 
     private final IdamRepository idamRepository;
+    private final RoleAssignmentRepository roleAssignmentRepository;
+    private final RoleAssignmentsMapper roleAssignmentsMapper;
 
-    private final RoleAssignmentService roleAssignmentService;
-
-    public RoleAssignmentCategoryService(IdamRepository idamRepository, RoleAssignmentService roleAssignmentService) {
+    public RoleAssignmentCategoryService(IdamRepository idamRepository,
+                                           @Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
+                                           RoleAssignmentRepository roleAssignmentRepository,
+                                           RoleAssignmentsMapper roleAssignmentsMapper) {
         this.idamRepository = idamRepository;
-        this.roleAssignmentService = roleAssignmentService;
+        this.roleAssignmentRepository = roleAssignmentRepository;
+        this.roleAssignmentsMapper = roleAssignmentsMapper;
     }
 
     public RoleCategory getRoleCategory(String userId) {
         List<String> idamUserRoles = idamRepository.getUserRoles(userId);
-        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(userId);
+
 
         if (hasProfessionalRole(idamUserRoles)) {
             return PROFESSIONAL;
@@ -47,7 +55,7 @@ public class RoleAssignmentCategoryService {
             return CITIZEN;
         } else if (hasJudicialRole(idamUserRoles)) {
             return JUDICIAL;
-        } else if (hasEnforcementRole(roleAssignments)) {
+        } else if (hasEnforcementRole(userId)) {
             return ENFORCEMENT;
         } else {
             return LEGAL_OPERATIONS;
@@ -66,7 +74,13 @@ public class RoleAssignmentCategoryService {
         return roles.stream().anyMatch(role -> JUDICIAL_ROLE.matcher(role).matches());
     }
 
-    private boolean hasEnforcementRole(RoleAssignments roleAssignments) {
+    private boolean hasEnforcementRole(String userId) {
+        RoleAssignments roleAssignments;
+        try {
+            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository.getRoleAssignments(userId));
+        } catch (ResourceNotFoundException ex) {
+            return false;
+        }
         List<RoleAssignment> assignments = roleAssignments == null || roleAssignments.getRoleAssignments() == null
             ? Collections.emptyList()
             : roleAssignments.getRoleAssignments();
