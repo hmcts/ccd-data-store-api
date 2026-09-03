@@ -11,7 +11,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure@cve-dashboard")
+@Library("Infrastructure@2.4.9")
 
 import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
@@ -71,6 +71,7 @@ def secrets = [
         secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
         secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
         secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
+        secret('microservicekey-ccd-data', 'DATA_STORE_IDAM_KEY'),
         secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY')
     ]
 ]
@@ -118,7 +119,7 @@ env.BEFTA_USER_TOKEN_CACHE_TTL_SECONDS = "1"
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 
 withPipeline(type, product, component) {
-    enableCveDashboardIngestion()
+    // enableCveDashboardIngestion()
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
         enablePactAs([
