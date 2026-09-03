@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseAccessGroupWithId;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -148,6 +149,9 @@ class SubmitCaseTransactionNewCaseTest {
     @Mock
     private SynchronisedCaseProcessor synchronisedCaseProcessor;
 
+    @Mock
+    private DateCaseClosedService dateCaseClosedService;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -183,7 +187,8 @@ class SubmitCaseTransactionNewCaseTest {
             decentralisedSubmitCaseTransaction,
             resolver,
             casePointerRepository,
-            synchronisedCaseProcessor
+            synchronisedCaseProcessor,
+            dateCaseClosedService
         );
 
         idamUser = buildIdamUser();

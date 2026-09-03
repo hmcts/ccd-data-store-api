@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.google.common.base.Strings;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -12,8 +11,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.ClosedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
@@ -32,10 +36,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +64,7 @@ public class UICaseSearchController {
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final CaseSearchResultViewGenerator caseSearchResultViewGenerator;
     private final ElasticsearchSortService elasticsearchSortService;
+    private final ClosedCaseSearchOperation closedCaseSearchOperation;
     private final CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
 
     @Autowired
@@ -66,11 +75,13 @@ public class UICaseSearchController {
         ElasticsearchQueryHelper elasticsearchQueryHelper,
         CaseSearchResultViewGenerator caseSearchResultViewGenerator,
         ElasticsearchSortService elasticsearchSortService,
+        @Qualifier("authorised") ClosedCaseSearchOperation closedCaseSearchOperation,
         CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseSearchResultViewGenerator = caseSearchResultViewGenerator;
         this.elasticsearchSortService = elasticsearchSortService;
+        this.closedCaseSearchOperation = closedCaseSearchOperation;
         this.crossCaseTypeSearchRequestHelper = crossCaseTypeSearchRequestHelper;
     }
 
@@ -175,6 +186,34 @@ public class UICaseSearchController {
         log.debug("Internal searchCases execution completed in {} millisecs...", between.toMillis());
 
         return ResponseEntity.ok(new CaseSearchResultViewResource(caseSearchResultView));
+    }
+
+    @LogAudit(operationType = AuditOperationType.GET_CLOSED_CASES)
+    @GetMapping(path = "/getClosedCases/{date}")
+    @Operation(description = "Retrieve closed cases from date_case_closed by state changed date.")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Success"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Date is not valid."
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = V2.Error.CASE_DATA_NOT_FOUND + ": no closed cases are accessible to the user for the given date."
+    )
+    public ResponseEntity<DateCaseClosedResponse> getClosedCases(
+        @Parameter(
+            name = "date", description = "UTC calendar date in ISO format to avoid BST edge-case misses.",
+            required = true
+        )
+        @PathVariable("date")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate closedCasesDate) {
+        if (closedCasesDate.isAfter(LocalDate.now(ZoneOffset.UTC))) {
+            throw new BadSearchRequest("Date is not valid");
+        }
+        return ResponseEntity.ok(closedCaseSearchOperation.execute(closedCasesDate));
     }
 
     public static String buildCaseIds(ResponseEntity<CaseSearchResultViewResource> response) {

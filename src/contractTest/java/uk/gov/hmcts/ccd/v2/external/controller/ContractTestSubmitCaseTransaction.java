@@ -8,6 +8,9 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.persistence.CasePointerRepository;
+import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
+import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -15,8 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
-import uk.gov.hmcts.ccd.decentralised.service.DecentralisedCreateCaseEventService;
-import uk.gov.hmcts.ccd.decentralised.service.SynchronisedCaseProcessor;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -43,12 +44,13 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              DecentralisedCreateCaseEventService decentralisedCreateCaseEventService,
                                              PersistenceStrategyResolver resolver,
                                              CasePointerRepository creator,
-                                             SynchronisedCaseProcessor synchronisedCaseProcessor) {
+                                             SynchronisedCaseProcessor synchronisedCaseProcessor,
+                                             DateCaseClosedService dateCaseClosedService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
             caseDataAccessControl, messageService, caseDocumentService, applicationParams,
             caseAccessGroupUtils, caseDocumentTimestampService, decentralisedCreateCaseEventService, resolver, creator,
-            synchronisedCaseProcessor);
+            synchronisedCaseProcessor, dateCaseClosedService);
 
     }
 }

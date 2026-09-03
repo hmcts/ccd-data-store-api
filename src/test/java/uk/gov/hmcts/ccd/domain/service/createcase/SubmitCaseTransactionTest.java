@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
@@ -110,6 +111,8 @@ class SubmitCaseTransactionTest {
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
     @Mock
+    private DateCaseClosedService dateCaseClosedService;
+    @Mock
     private CaseTypeService caseTypeService;
     @Mock
     private CallbackInvoker callbackInvoker;
@@ -186,7 +189,8 @@ class SubmitCaseTransactionTest {
             decentralisedSubmitCaseTransaction,
             resolver,
             casePointerRepository,
-            synchronisedCaseProcessor
+            synchronisedCaseProcessor,
+            dateCaseClosedService
         );
 
         idamUser = buildIdamUser();
@@ -473,6 +477,20 @@ class SubmitCaseTransactionTest {
         verify(caseDataAccessControl).grantAccess(caseDetails, IDAM_ID);
         verify(caseDocumentService).attachCaseDocuments(
             eq("12345"), eq("TestType"), eq("TestJurisdiction"), anyList());
+    }
+
+    @Test
+    @DisplayName("should update date case closed after case is submitted")
+    void shouldUpdateDateCaseClosedAfterCaseIsSubmitted() {
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING,
+            null);
+
+        verify(dateCaseClosedService).updateForNewCase(savedCaseDetails, caseTypeDefinition);
     }
 
     private void assertAuditEventProxyByUser(final AuditEvent auditEvent) {
