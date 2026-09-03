@@ -333,7 +333,7 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     And     a successful call [create case to case link] as in [F-1019_Create_Case_Link]
 
    # get event token to update prerequisite case
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase],
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_AfterCreateCaseLink_CreateCasePreRequisiteCaseworkerBase],
     When    a request is prepared with appropriate values
 
     And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD Data Store],
