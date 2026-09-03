@@ -26,9 +26,9 @@ public class IdamRepository {
     private IdamRepository selfInstance;
 
     @Autowired
-    public IdamRepository(IdamClient idamClient, ApplicationParams applicationParams) {
+    public IdamRepository(IdamClient idamClient, ApplicationParams appParams) {
         this.idamClient = idamClient;
-        this.applicationParams = applicationParams;
+        this.applicationParams = appParams;
     }
 
     @Cacheable(value = "userInfoCache")
