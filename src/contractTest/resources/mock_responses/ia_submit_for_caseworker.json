@@ -21,6 +21,11 @@
     "appellantDateOfBirth": "1990-12-07",
     "uploadAddendumEvidenceLegalRepActionAvailable": "No",
     "legalRepCompanyAddress": {
+      "AddressLine3": "",
+      "AddressLine2": "",
+      "AddressLine1": "",
+      "Country": "",
+      "PostTown": "",
       "PostCode": ""
     },
     "legalRepCompanyName": "",

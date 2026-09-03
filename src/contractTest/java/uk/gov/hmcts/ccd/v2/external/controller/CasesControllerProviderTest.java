@@ -524,13 +524,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(eventTokenService.generateToken(anyString(),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn("");
 
         when(eventTokenService.generateToken(anyString(),
             isA(CaseDetails.class),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn("");
         return caseDetails;
     }
 }
