@@ -43,7 +43,7 @@ ext {
     testContainersVersion = '2.0.5'
     cucumber = '7.34.7'
     beftaFwVersion = '9.2.10'
-    ccdTestDefinitionVersion = '7.26.10'
+    ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -67,7 +67,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.12'
+        force 'net.bytebuddy:byte-buddy:1.18.13'
     }
 }
 
@@ -250,8 +250,8 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9.1'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.6.3'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.6.3'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'                       // spring-cloud-starter-openfeign
