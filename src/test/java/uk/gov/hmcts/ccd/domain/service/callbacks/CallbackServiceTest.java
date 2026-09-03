@@ -200,6 +200,7 @@ class CallbackServiceTest {
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
 
         verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+        verify(appinsights).trackCallbackDependency(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
     }
 
     @Test
@@ -214,6 +215,7 @@ class CallbackServiceTest {
             callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         } catch (CallbackException ex) {
             verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("400"), any(Duration.class));
+            verify(appinsights).trackCallbackDependency(eq(CALLBACK_TYPE), eq(URL), eq("400"), any(Duration.class));
         }
 
     }
