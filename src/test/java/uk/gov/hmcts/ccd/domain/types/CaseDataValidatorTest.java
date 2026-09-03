@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 import jakarta.inject.Inject;
@@ -421,7 +422,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void validRichTextAreaValue() throws Exception {
         final String data = """
             {
-              "RichTextAreaField": "<p><strong>Order</strong></p>"
+              "RichTextAreaField": "<p>Order</p>"
             }""";
         final Map<String, JsonNode> values = caseDataFromJsonString(data);
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -436,6 +437,26 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
 
         assertTrue(result.isEmpty(), result.toString());
+    }
+
+    @Test
+    public void invalidRichTextAreaValue() throws Exception {
+        final String data = """
+            {
+              "RichTextAreaField": "<z>Order</z>"
+            }""";
+        final Map<String, JsonNode> values = caseDataFromJsonString(data);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(List.of(
+            new CaseFieldDefinitionBuilder(RICH_TEXT_AREA_FIELD)
+                .withType(RICH_TEXT_AREA)
+                .withMin(10)
+                .build()
+        ));
+
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
+
+        assertThrows(BadRequestException.class, () -> caseDataValidator.validate(validationContext));
     }
 
     @Test

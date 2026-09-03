@@ -1,0 +1,35 @@
+{
+	"title": "should create an event token for the case just created",
+	"_guid_": "S-1029_GetUpdateToken",
+	"_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
+
+	"specs": [
+		"to get an event token for the case just created",
+		"As a prerequisite"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][siblingContexts][F-1029_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": "[[ANYTHING_PRESENT]]",
+			"event_id": "updateCase"
+		}
+	}
+}
