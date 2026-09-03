@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,20 +49,23 @@ public class CriterionFactory {
                 result.add(new MetaDataCriterion(CaseDetailsEntity.STATE_FIELD_COL, s)));
 
         ifPresentAndNotBlank(metadata.getCreatedDate(), cd ->
-                result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.CREATED_DATE_FIELD_COL + ")", cd)));
+                result.add(buildDateRangeCriterion(CaseDetailsEntity.CREATED_DATE_FIELD_COL, cd)));
 
         ifPresentAndNotBlank(metadata.getLastModifiedDate(), lm ->
-                result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_MODIFIED_FIELD_COL + ")", lm)));
+                result.add(buildDateRangeCriterion(CaseDetailsEntity.LAST_MODIFIED_FIELD_COL, lm)));
 
         ifPresentAndNotBlank(metadata.getLastStateModifiedDate(), lsm ->
-            result.add(new MetaDataCriterion(
-                "date(" + CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL + ")", lsm)));
+            result.add(buildDateRangeCriterion(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL, lsm)));
 
         ifPresentAndNotBlank(metadata.getSecurityClassification(), sc ->
                 result.add(new MetaDataCriterion(
                     CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL, sc.toUpperCase())));
 
         return result;
+    }
+
+    private Criterion buildDateRangeCriterion(String field, String soughtValue) {
+        return new DateRangeMetaDataCriterion(field, LocalDate.parse(soughtValue));
     }
 
     private void ifPresentAndNotBlank(Optional<String> metadata, Consumer<String> metadataConsumer) {

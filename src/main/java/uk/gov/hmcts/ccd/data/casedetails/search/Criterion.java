@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import jakarta.persistence.Query;
+
 public abstract class Criterion {
 
     protected static final String TOKEN_SEPARATOR = ".";
@@ -28,6 +30,10 @@ public abstract class Criterion {
     }
 
     public abstract String buildClauseString(String operation);
+
+    public void bindParameters(Query query) {
+        query.setParameter(buildParameterId(), getSoughtValue());
+    }
 
     protected String makeCaseInsensitive(String in) {
         return "TRIM( UPPER ( " + in + "))";
