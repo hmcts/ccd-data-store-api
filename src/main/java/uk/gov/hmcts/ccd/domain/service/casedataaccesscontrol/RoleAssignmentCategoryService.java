@@ -77,7 +77,8 @@ public class RoleAssignmentCategoryService {
     private boolean hasEnforcementRole(String userId) {
         RoleAssignments roleAssignments;
         try {
-            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository.getRoleAssignments(userId));
+            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository
+                .getRoleAssignments(userId));
         } catch (ResourceNotFoundException ex) {
             return false;
         }
