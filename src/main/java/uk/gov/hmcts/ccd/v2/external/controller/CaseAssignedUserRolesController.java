@@ -55,8 +55,26 @@ import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
+/*
+ * NOTE: Explicitly set produces media types (application/hal+json and application/json) at class level,
+ * so every endpoint in this controller inherits them, to bypass a Spring Framework concurrency issue in
+ * AbstractJackson2HttpMessageConverter (Issue #36090).
+ *
+ * Although response bodies may suppress _links (via @JsonIgnore), we explicitly declare both media types
+ * for two critical reasons:
+ * 1. CRASH PREVENTION: Declaring explicit media types forces Spring to select the specific converter (fast path)
+ *    instead of iterating over all converters to discover supported types. The iteration path triggers an
+ *    ArrayIndexOutOfBoundsException on a corrupted LinkedHashMap during concurrent startup (Lazy Initialisation
+ *    race condition).
+ * 2. COMPATIBILITY: It preserves the default Content-Type header (application/hal+json) expected by existing
+ *    clients while maintaining backwards compatibility with services requesting Accept: application/json.
+ *    Response payloads remain identical across both media types.
+ *
+ * WARNING: DO NOT remove this class-level produces configuration, and do not add a method-level produces
+ * override that narrows it, without verifying that the upstream Spring fix has been applied.
+ */
 @RestController
-@RequestMapping(path = "/")
+@RequestMapping(path = "/", produces = {MediaTypes.HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
 @ConditionalOnProperty(value = "ccd.conditional-apis.case-assigned-users-and-roles.enabled", havingValue = "true")
 public class CaseAssignedUserRolesController {
 
@@ -198,27 +216,8 @@ public class CaseAssignedUserRolesController {
      *             `414 URI Too Long` issues, see <a href="https://tools.hmcts.net/jira/browse/CCD-3588">CCD-3588</a>.
      */
     @Deprecated(forRemoval = true)
-    /*
-      NOTE: Explicitly set to application/hal+json to bypass a Spring Framework concurrency problem
-      in AbstractJackson2HttpMessageConverter (Issue #36090).
-      * Although the response bodies may suppress _links (via @JsonIgnore), we strictly enforce
-      the HAL media type here for two critical reasons:
-      * 1. CRASH PREVENTION: It forces Spring to select the specific HAL converter (fast path)
-      instead of iterating over all converters to discover supported types. The iteration
-      path triggers an ArrayIndexOutOfBoundsException on a corrupted LinkedHashMap
-      during concurrent startup (Lazy Initialization race condition).
-      * 2. COMPATIBILITY: It preserves the existing Content-Type header (application/hal+json)
-      that clients expect, preventing contract breakage.
-      * NOTE: GET /case-users additionally produces application/json to maintain backwards
-      compatibility with consuming services that send Accept: application/json. This is safe
-      as the response body is identical in both cases — HAL-specific _links are suppressed
-      via @JsonIgnore on CaseAssignedUserRolesResource.
-      * WARNING: DO NOT change this to MediaType.APPLICATION_JSON_VALUE or remove it
-      without verifying that the upstream apps fix has been applied.
-     */
     @GetMapping(
-        path = "/case-users",
-        produces = {MediaTypes.HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE}
+        path = "/case-users"
     )
     @Operation(
         summary = "Get Case-Assigned Users and Roles",
@@ -335,7 +334,7 @@ public class CaseAssignedUserRolesController {
             Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles =
-            caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).collect(Collectors.toList());
+            caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).toList();
 
         /// case-users: must be none empty
         if (caseUserRoles.isEmpty()) {
