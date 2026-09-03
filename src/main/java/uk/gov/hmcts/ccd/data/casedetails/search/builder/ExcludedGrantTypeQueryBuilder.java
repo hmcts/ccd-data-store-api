@@ -24,6 +24,8 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class ExcludedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
 
+    public static final String CASE_IDS_EXCLUDED_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "case_ids_excluded";
+
     @Autowired
     public ExcludedGrantTypeQueryBuilder(AccessControlService accessControlService,
                                          CaseDataAccessControl caseDataAccessControl,
@@ -56,9 +58,8 @@ public class ExcludedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
             .collect(Collectors.toSet());
 
         if (!caseReferences.isEmpty()) {
-            String paramName = "case_ids_excluded";
-            params.put(paramName, caseReferences);
-            return String.format(QUERY, REFERENCE, paramName);
+            params.put(CASE_IDS_EXCLUDED_PARAM, caseReferences);
+            return String.format(QUERY, REFERENCE, CASE_IDS_EXCLUDED_PARAM);
         }
         return EMPTY;
     }
