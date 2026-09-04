@@ -6,5 +6,6 @@ public enum RoleCategory {
     LEGAL_OPERATIONS,
     ADMIN,
     PROFESSIONAL,
-    CITIZEN
+    CITIZEN,
+    ENFORCEMENT
 }
