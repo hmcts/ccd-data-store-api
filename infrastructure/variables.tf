@@ -22,6 +22,18 @@ variable "common_tags" {
   type = map(string)
 }
 
+variable "extra_tags" {
+  description = "Additional tags merged on top of common_tags, without replacing tags the pipeline injects."
+  type        = map(string)
+  default     = {}
+}
+
+variable "service_criticality" {
+  description = "Service criticality rating from 1-5, passed to the postgresql_v15 module. Ratings >= 4 enroll the server in the immutable backup vault."
+  type        = number
+  default     = 1
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
