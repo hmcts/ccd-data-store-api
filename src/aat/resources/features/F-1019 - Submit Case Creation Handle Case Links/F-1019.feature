@@ -355,9 +355,10 @@ Feature: F-1019: Submit Case Creation Handle Case Links
     # Create cases needed for linking
     And   a successful call [to create a case] as in [F-1019_CreateAnotherCasePreRequisiteCaseworkerBase]
 
-    # get event token to update case to link to Another
-    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase],
+    # get event token to update Another
+    And a successful call [to get an event token for the case just created] as in [S-1019_Get_Update_Token_CreateAnotherCasePreRequisiteCaseworkerBase],
     When    a request is prepared with appropriate values
+    And     the request [contains the standard CaseLinks field with Case Reference values]
 
     And it is submitted to call the [submit event for an existing case (V2)] operation of [CCD Data Store],
     When    a request is prepared with appropriate values

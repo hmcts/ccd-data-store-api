@@ -9,11 +9,5 @@
     "create case to case link",
     "contains the standard CaseLinks field with Case Reference values",
     "As a prerequisite"
-  ],
-
-  "request": {
-    "body": {
-      "event_token": "${[scenarioContext][childContexts][S-1019_Get_Update_Token_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][token]}"
-    }
-  }
+  ]
 }
