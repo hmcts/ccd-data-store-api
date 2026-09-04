@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.ArrayList;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -76,6 +78,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRe
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDefinition;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
@@ -329,7 +332,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             .direction("DESC")
             .build());
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap())
         );
     }
@@ -355,7 +358,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
         // injection vulnerability
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(IllegalArgumentException.class, () ->
             caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap()));
     }
 
@@ -859,6 +862,59 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(caseDetails.getId(), equalTo(id));
         assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         assertThat(caseDetails.getReference(), equalTo(caseReference));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql"
+    })
+    public void searchWithParams_shouldNotExceedPostgresMaxParametersWithLargeNumberOfRoleAssignments()
+        throws Exception {
+        // Regression test for CCD-6129
+        // Verifies that a user with a large number of specific case-level role assignments
+        // does not cause PSQLException: PreparedStatement can have at most 65,535 parameters
+        String userId = "123";
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("mappings/bookcase-definition.json");
+        caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
+
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
+            .willReturn(okJson(defaultObjectMapper.writeValueAsString(caseTypeDefinition))
+                .withStatus(200)));
+
+        // Create 70,000 role assignments to simulate a user with a large number of specific case assignments
+        List<RoleAssignmentResource> roleAssignmentRecords = new ArrayList<>();
+        for (int i = 0; i < 70000; i++) {
+            roleAssignmentRecords.add(createRoleAssignmentRecord(
+                "assignment_" + i,
+                String.valueOf(1504254784737847L + i),
+                "TestAddressBookCase",
+                JURISDICTION,
+                "[CREATOR]",
+                userId,
+                false));
+        }
+
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+            .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                createRoleAssignmentResponse(roleAssignmentRecords)))
+                .withStatus(200)));
+
+        CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+        caseStateDefinition.setId("CaseCreated");
+
+        when(accessControlService
+            .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+            .thenReturn(asList(caseStateDefinition), asList());
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+
+        // Should complete without throwing PSQLException
+        assertDoesNotThrow(() ->
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams)
+        );
     }
 
 }
