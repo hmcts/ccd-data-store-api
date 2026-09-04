@@ -37,8 +37,13 @@ final class RichTextAreaDefinitionVerifier {
     }
 
     static void verify(JsonPath jsonPath) {
-        REQUIRED_RICH_TEXT_AREA_FIELDS.forEach(fieldId -> verifyRequiredRichTextAreaField(jsonPath, fieldId));
+        verifyVisibleFields(jsonPath);
+        REQUIRED_RICH_TEXT_AREA_FIELDS.forEach(fieldId -> verifyCaseworkerCrudAccess(jsonPath, fieldId));
         REQUIRED_RICH_TEXT_AREA_EVENTS.forEach(eventId -> verifyRequiredRichTextAreaEvent(jsonPath, eventId));
+    }
+
+    static void verifyVisibleFields(JsonPath jsonPath) {
+        REQUIRED_RICH_TEXT_AREA_FIELDS.forEach(fieldId -> verifyRequiredRichTextAreaField(jsonPath, fieldId));
     }
 
     private static void verifyRequiredRichTextAreaField(JsonPath jsonPath, String fieldId) {
@@ -49,13 +54,11 @@ final class RichTextAreaDefinitionVerifier {
                 + fieldId + " after data setup.");
         }
 
-        String fieldType = jsonPath.getString(fieldPath + ".field_type.id");
+        String fieldType = jsonPath.getString(fieldPath + ".field_type.type");
         if (!RICH_TEXT_AREA_TYPE.equals(fieldType)) {
             throw new IllegalStateException(MASTER_CASE_TYPE + " field " + fieldId
                 + " must be type " + RICH_TEXT_AREA_TYPE + " after data setup but was " + fieldType + ".");
         }
-
-        verifyCaseworkerCrudAccess(jsonPath, fieldId);
     }
 
     private static void verifyCaseworkerCrudAccess(JsonPath jsonPath, String fieldId) {

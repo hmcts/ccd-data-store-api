@@ -15,6 +15,12 @@ class RichTextAreaDefinitionVerifierTest {
     }
 
     @Test
+    void shouldAcceptVisibleFieldsWithoutDefinitionAclOrEventMappings() {
+        assertThatCode(() -> RichTextAreaDefinitionVerifier.verifyVisibleFields(JsonPath.from(visibleFields())))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
     void shouldRejectDefinitionMissingRichTextAreaField() {
         String definition = validDefinition().replace(
             "\"id\": \"RichTextAreaMinField\"",
@@ -24,6 +30,18 @@ class RichTextAreaDefinitionVerifierTest {
         assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("missing required RichTextArea field RichTextAreaMinField");
+    }
+
+    @Test
+    void shouldRejectDefinitionWhenFieldBaseTypeIsWrong() {
+        String definition = validDefinition().replace(
+            "\"type\": \"RichTextArea\"",
+            "\"type\": \"Text\""
+        );
+
+        assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("must be type RichTextArea after data setup but was Text");
     }
 
     @Test
@@ -44,7 +62,31 @@ class RichTextAreaDefinitionVerifierTest {
 
         assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("event createCase is missing required RichTextArea field RichTextAreaMinField");
+            .hasMessageContaining("is missing required RichTextArea field RichTextAreaMinField");
+    }
+
+    private String visibleFields() {
+        return """
+            {
+              "case_fields": [
+                {
+                  "id": "RichTextAreaField",
+                  "field_type": {
+                    "id": "RichTextArea",
+                    "type": "RichTextArea"
+                  }
+                },
+                {
+                  "id": "RichTextAreaMinField",
+                  "field_type": {
+                    "id": "RichTextAreaMinField-3c359e9e-3b68-43a7-9948-2001ac9b4daf",
+                    "type": "RichTextArea",
+                    "min": 10
+                  }
+                }
+              ]
+            }
+            """;
     }
 
     private String validDefinition() {
@@ -54,7 +96,8 @@ class RichTextAreaDefinitionVerifierTest {
                 {
                   "id": "RichTextAreaField",
                   "field_type": {
-                    "id": "RichTextArea"
+                    "id": "RichTextArea",
+                    "type": "RichTextArea"
                   },
                   "acls": [
                     {
@@ -69,7 +112,9 @@ class RichTextAreaDefinitionVerifierTest {
                 {
                   "id": "RichTextAreaMinField",
                   "field_type": {
-                    "id": "RichTextArea"
+                    "id": "RichTextAreaMinField-3c359e9e-3b68-43a7-9948-2001ac9b4daf",
+                    "type": "RichTextArea",
+                    "min": 10
                   },
                   "acls": [
                     {
