@@ -11,8 +11,7 @@ subnet_suffix     = "expanded"
 enable_schema_ownership = true
 kv_subscription         = "DCD-CNP-Prod"
 
-service_criticality = 5
-
 extra_tags = {
-  "bcdr-risk-status" = "v1-unsupported"
+  "bcdr-risk-status"    = "v1-unsupported"
+  "service_criticality" = "5"
 }
