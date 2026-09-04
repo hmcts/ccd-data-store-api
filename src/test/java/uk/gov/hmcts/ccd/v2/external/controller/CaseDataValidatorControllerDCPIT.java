@@ -46,6 +46,11 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.validateContent;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
     private static final String VALIDATE = "/case-types/DCP/validate?pageId=UPDATEfirst";
+    private static final String DCP_CASE_REFERENCE = "1587051668000989";
+    private static final String DCP_JURISDICTION = "DCPTest1";
+    private static final String DCP_CASE_TYPE = "DCP";
+    private static final String DCP_UPDATE_EVENT = "UPDATE";
+    private static final String DCP_USER_ID = "123";
     private static final int NUMBER_OF_CASES = 2;
 
     @Inject
@@ -79,15 +84,16 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
     public void shouldValidateWithFormattedDCPValues() throws Exception {
         assertCaseDataResultSetSize();
 
+        final String eventToken = generateEventToken(template, DCP_USER_ID, DCP_JURISDICTION, DCP_CASE_TYPE,
+            DCP_CASE_REFERENCE, DCP_UPDATE_EVENT);
+
         final MvcResult result = mockMvc.perform(post(VALIDATE)
-            .content(validateContent())
+            .content(validateContent(eventToken))
             .contentType(MediaType.APPLICATION_JSON)
             .header(AUTHORIZATION, "Bearer user1")
             .header(V2.EXPERIMENTAL_HEADER, "true"))
             .andExpect(status().is(200))
             .andReturn();
-
-        assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         CaseDataResource caseDataResource = mapper.readValue(content, CaseDataResource.class);
@@ -128,8 +134,11 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
     public void shouldFail() throws Exception {
         assertCaseDataResultSetSize();
 
+        final String eventToken = generateEventToken(template, DCP_USER_ID, DCP_JURISDICTION, DCP_CASE_TYPE,
+            DCP_CASE_REFERENCE, DCP_UPDATE_EVENT);
+
         final MvcResult result = mockMvc.perform(post(VALIDATE)
-            .content(invalidValidateContent())
+            .content(invalidValidateContent(eventToken))
             .contentType(MediaType.APPLICATION_JSON)
             .header(AUTHORIZATION, "Bearer user1")
             .header(V2.EXPERIMENTAL_HEADER, "true"))

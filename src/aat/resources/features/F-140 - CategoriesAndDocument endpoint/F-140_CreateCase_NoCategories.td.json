@@ -9,7 +9,7 @@
   ],
   "prerequisites": [
     {
-      "Token_Creation": "F-140_CreateCase_Token_Creation"
+      "Token_Creation": "F-140_CreateCase_NoCategories_Token_Creation"
     }
   ],
   "users": {

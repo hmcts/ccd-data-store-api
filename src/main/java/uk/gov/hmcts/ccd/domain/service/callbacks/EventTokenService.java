@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import com.google.common.collect.Maps;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.impl.TextCodec;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -12,21 +22,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
-import java.util.Date;
-
 import javax.crypto.SecretKey;
-
-import com.google.common.collect.Maps;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.TextCodec;
-import io.jsonwebtoken.security.Keys;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.Date;
 
 @Service
 public class EventTokenService {
@@ -67,7 +64,7 @@ public class EventTokenService {
             .setSubject(uid)
             .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
-            .claim(EventTokenProperties.CASE_ID, caseDetails.getId())
+            .claim(EventTokenProperties.CASE_ID, getCaseIdClaimValue(caseDetails))
             .claim(EventTokenProperties.EVENT_ID, event.getId())
             .claim(EventTokenProperties.CASE_TYPE_ID, caseTypeDefinition.getId())
             .claim(EventTokenProperties.JURISDICTION_ID, jurisdictionDefinition.getId())
@@ -134,16 +131,8 @@ public class EventTokenService {
         try {
             final EventTokenProperties eventTokenProperties = parseToken(token);
 
-            if (!(eventTokenProperties.getEventId() == null
-                || eventTokenProperties.getEventId().equalsIgnoreCase(event.getId())
-                && eventTokenProperties.getCaseId() == null
-                || eventTokenProperties.getCaseId().equalsIgnoreCase(caseDetails.getId().toString())
-                && eventTokenProperties.getJurisdictionId() == null
-                || eventTokenProperties.getJurisdictionId().equalsIgnoreCase(jurisdictionDefinition.getId())
-                && eventTokenProperties.getCaseTypeId() == null
-                || eventTokenProperties.getCaseTypeId().equalsIgnoreCase(caseTypeDefinition.getId())
-                && eventTokenProperties.getUid() == null
-                || eventTokenProperties.getUid().equalsIgnoreCase(uid))) {
+            if (!areEventTokenClaimsValid(eventTokenProperties,
+                uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition)) {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");
             }
 
@@ -168,6 +157,36 @@ public class EventTokenService {
         }
 
         return object.toString();
+    }
+
+    private boolean areEventTokenClaimsValid(final EventTokenProperties eventTokenProperties,
+                                             final String uid,
+                                             final CaseDetails caseDetails,
+                                             final CaseEventDefinition event,
+                                             final JurisdictionDefinition jurisdictionDefinition,
+                                             final CaseTypeDefinition caseTypeDefinition) {
+        return isNullOrMatchingEventTokenClaim(eventTokenProperties.getEventId(), event.getId())
+            && isNullOrMatchingCaseIdClaim(eventTokenProperties.getCaseId(), caseDetails)
+            && isNullOrMatchingEventTokenClaim(
+                eventTokenProperties.getJurisdictionId(), jurisdictionDefinition.getId())
+            && isNullOrMatchingEventTokenClaim(eventTokenProperties.getCaseTypeId(), caseTypeDefinition.getId())
+            && isNullOrMatchingEventTokenClaim(eventTokenProperties.getUid(), uid);
+    }
+
+    private boolean isNullOrMatchingEventTokenClaim(final String claimValue, final String expectedValue) {
+        return claimValue == null || claimValue.equalsIgnoreCase(expectedValue);
+    }
+
+    private String getCaseIdClaimValue(final CaseDetails caseDetails) {
+        if (caseDetails.getReferenceAsString() != null) {
+            return caseDetails.getReferenceAsString();
+        }
+        return caseDetails.getId();
+    }
+
+    private boolean isNullOrMatchingCaseIdClaim(final String claimValue, final CaseDetails caseDetails) {
+        return isNullOrMatchingEventTokenClaim(claimValue, toString(caseDetails.getId()))
+            || isNullOrMatchingEventTokenClaim(claimValue, caseDetails.getReferenceAsString());
     }
 
     private void applyRevision(String revisionClaim,

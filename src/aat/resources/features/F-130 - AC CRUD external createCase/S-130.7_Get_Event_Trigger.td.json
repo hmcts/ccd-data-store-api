@@ -1,0 +1,14 @@
+{
+  "_guid_" : "S-130.7_Get_Event_Trigger",
+  "_extends_" : "F-130_Get_Event_Token_Base",
+
+  "uri": "/case-types/FT_CRUD_2/event-triggers/{etid}",
+
+  "expectedResponse": {
+    "body" : {
+      "case_details" : {
+        "case_type_id" : "FT_CRUD_2"
+      }
+    }
+  }
+}

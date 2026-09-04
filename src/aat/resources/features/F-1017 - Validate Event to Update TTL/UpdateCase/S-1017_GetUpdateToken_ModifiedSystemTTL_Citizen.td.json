@@ -1,0 +1,16 @@
+{
+  "_guid_": "S-1017_GetUpdateToken_ModifiedSystemTTL_Citizen",
+  "_extends_": "S-1017_GetUpdateSuspendedCaseTokenCitizen",
+
+  "request": {
+    "pathVariables": {
+      "etid": "updateMidEventModifiedSystemTTL"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "updateMidEventModifiedSystemTTL"
+    }
+  }
+}
