@@ -5,6 +5,9 @@ import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 
 import java.util.Locale;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     public HighLevelDataSetupApp(CcdEnvironment dataSetupEnvironment) {
@@ -19,7 +22,23 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public synchronized void loadDataIfNotLoadedVeryRecently() {
+        super.loadDataIfNotLoadedVeryRecently();
+        verifyRichTextAreaDefinitionIsAvailable();
+    }
+
+    private void verifyRichTextAreaDefinitionIsAvailable() {
+        RestAssured.useRelaxedHTTPSValidation();
+
+        Response response = asAutoTestImporter()
+            .when()
+            .get("/api/data/case-type/{caseTypeId}", RichTextAreaDefinitionVerifier.MASTER_CASE_TYPE);
+
+        RichTextAreaDefinitionVerifier.verify(response);
     }
 
 }
