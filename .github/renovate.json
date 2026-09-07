@@ -9,13 +9,17 @@
   "automergeSchedule": ["* 14-18 * * 1-4"],
   "packageRules": [
     {
+      "description": "Prioritise BEFTA and CCD test definition updates",
       "matchManagers": ["gradle"],
       "matchDepNames": [
         "ccd-test-definitions",
         "befta-fw"
       ],
-      "matchCurrentValue": "!/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
-      "enabled": false
+      "prPriority": 100,
+      "schedule": ["at any time"],
+      "automerge": false,
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": null
     }
   ]
 }
