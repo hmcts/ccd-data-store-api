@@ -3,31 +3,44 @@ package uk.gov.hmcts.ccd.datastore.befta;
 import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class RichTextAreaDefinitionVerifierTest {
+class DefinitionReadinessVerifierTest {
+
+    private static final DefinitionReadinessSpec SPEC = new DefinitionReadinessSpec(
+        "FT_MasterCaseType",
+        "createCase",
+        "caseworker-befta_master",
+        List.of(
+            new DefinitionReadinessSpec.RequiredField("RichTextAreaField", "RichTextArea"),
+            new DefinitionReadinessSpec.RequiredField("RichTextAreaMinField", "RichTextArea")
+        ),
+        List.of("createCase", "updateCase")
+    );
 
     @Test
-    void shouldAcceptDefinitionWithRequiredRichTextAreaConfiguration() {
-        assertThatCode(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(validDefinition())))
+    void shouldAcceptDefinitionWithRequiredConfiguration() {
+        assertThatCode(() -> DefinitionReadinessVerifier.verify(JsonPath.from(validDefinition()), SPEC))
             .doesNotThrowAnyException();
     }
 
     @Test
     void shouldAcceptVisibleFieldsWithoutDefinitionAclOrEventMappings() {
-        assertThatCode(() -> RichTextAreaDefinitionVerifier.verifyVisibleFields(JsonPath.from(visibleFields())))
+        assertThatCode(() -> DefinitionReadinessVerifier.verifyVisibleFields(JsonPath.from(visibleFields()), SPEC))
             .doesNotThrowAnyException();
     }
 
     @Test
-    void shouldRejectDefinitionMissingRichTextAreaField() {
+    void shouldRejectDefinitionMissingRequiredField() {
         String definition = validDefinition().replace(
             "\"id\": \"RichTextAreaMinField\"",
             "\"id\": \"OtherField\""
         );
 
-        assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
+        assertThatThrownBy(() -> DefinitionReadinessVerifier.verify(JsonPath.from(definition), SPEC))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("missing required RichTextArea field RichTextAreaMinField");
     }
@@ -39,7 +52,7 @@ class RichTextAreaDefinitionVerifierTest {
             "\"type\": \"Text\""
         );
 
-        assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
+        assertThatThrownBy(() -> DefinitionReadinessVerifier.verify(JsonPath.from(definition), SPEC))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("must be type RichTextArea after data setup but was Text");
     }
@@ -48,7 +61,7 @@ class RichTextAreaDefinitionVerifierTest {
     void shouldRejectDefinitionMissingCaseworkerCrudAccess() {
         String definition = validDefinition().replace("\"update\": true", "\"update\": false");
 
-        assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
+        assertThatThrownBy(() -> DefinitionReadinessVerifier.verify(JsonPath.from(definition), SPEC))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("must grant CRUD to caseworker-befta_master");
     }
@@ -60,7 +73,7 @@ class RichTextAreaDefinitionVerifierTest {
             "\"case_field_id\": \"OtherField\""
         );
 
-        assertThatThrownBy(() -> RichTextAreaDefinitionVerifier.verify(JsonPath.from(definition)))
+        assertThatThrownBy(() -> DefinitionReadinessVerifier.verify(JsonPath.from(definition), SPEC))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("is missing required RichTextArea field RichTextAreaMinField");
     }
