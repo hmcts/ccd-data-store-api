@@ -7,17 +7,23 @@ final class DefinitionReadinessSpec {
     private final String caseTypeId;
     private final String dataStoreReadinessEventId;
     private final String accessRole;
+    private final String userEmail;
+    private final String userPasswordEnvironmentVariable;
     private final List<RequiredField> requiredFields;
     private final List<String> definitionEventIds;
 
     DefinitionReadinessSpec(String caseTypeId,
                             String dataStoreReadinessEventId,
                             String accessRole,
+                            String userEmail,
+                            String userPasswordEnvironmentVariable,
                             List<RequiredField> requiredFields,
                             List<String> definitionEventIds) {
         this.caseTypeId = caseTypeId;
         this.dataStoreReadinessEventId = dataStoreReadinessEventId;
         this.accessRole = accessRole;
+        this.userEmail = userEmail;
+        this.userPasswordEnvironmentVariable = userPasswordEnvironmentVariable;
         this.requiredFields = List.copyOf(requiredFields);
         this.definitionEventIds = List.copyOf(definitionEventIds);
     }
@@ -32,6 +38,14 @@ final class DefinitionReadinessSpec {
 
     String accessRole() {
         return accessRole;
+    }
+
+    String userEmail() {
+        return userEmail;
+    }
+
+    String userPasswordEnvironmentVariable() {
+        return userPasswordEnvironmentVariable;
     }
 
     List<RequiredField> requiredFields() {

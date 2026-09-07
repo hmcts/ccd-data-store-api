@@ -21,14 +21,16 @@ import io.restassured.specification.RequestSpecification;
 
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
-    private static final String BEFTA_MASTER_CASEWORKER_EMAIL = "master.caseworker@gmail.com";
-    private static final String BEFTA_MASTER_CASEWORKER_PASSWORD_ENV = "CCD_BEFTA_MASTER_CASEWORKER_PWD";
+    private static final String MASTER_CASEWORKER_EMAIL = "master.caseworker@gmail.com";
+    private static final String CASEWORKER_AUTOTEST_PASSWORD_ENV = "CCD_CASEWORKER_AUTOTEST_PASSWORD";
     private static final int DATA_STORE_READINESS_ATTEMPTS = 45;
     private static final long DATA_STORE_READINESS_POLL_INTERVAL_MILLIS = 1_000L;
     private static final DefinitionReadinessSpec RICH_TEXT_AREA_READINESS_SPEC = new DefinitionReadinessSpec(
         "FT_MasterCaseType",
         "createCase",
         "caseworker-befta_master",
+        MASTER_CASEWORKER_EMAIL,
+        CASEWORKER_AUTOTEST_PASSWORD_ENV,
         List.of(
             new DefinitionReadinessSpec.RequiredField("RichTextAreaField", "RichTextArea"),
             new DefinitionReadinessSpec.RequiredField("RichTextAreaMinField", "RichTextArea")
@@ -72,12 +74,12 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     private void waitUntilDataStoreDefinitionIsReady(DefinitionReadinessSpec spec) {
-        Supplier<RequestSpecification> asBeftaMasterCaseworker = asBeftaMasterCaseworker();
+        Supplier<RequestSpecification> asReadinessUser = asReadinessUser(spec);
         RuntimeException lastFailure = null;
 
         for (int attempt = 1; attempt <= DATA_STORE_READINESS_ATTEMPTS; attempt++) {
             try {
-                Response response = asBeftaMasterCaseworker.get()
+                Response response = asReadinessUser.get()
                     .given()
                     .pathParam("caseTypeId", spec.caseTypeId())
                     .pathParam("triggerId", spec.dataStoreReadinessEventId())
@@ -112,17 +114,17 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         DefinitionReadinessVerifier.verifyVisibleFields(response.jsonPath(), spec);
     }
 
-    private Supplier<RequestSpecification> asBeftaMasterCaseworker() {
+    private Supplier<RequestSpecification> asReadinessUser(DefinitionReadinessSpec spec) {
         DefaultTestAutomationAdapter adapter = new DefaultTestAutomationAdapter();
         UserData caseworker = new UserData(
-            BEFTA_MASTER_CASEWORKER_EMAIL,
-            EnvironmentVariableUtils.getRequiredVariable(BEFTA_MASTER_CASEWORKER_PASSWORD_ENV)
+            spec.userEmail(),
+            EnvironmentVariableUtils.getRequiredVariable(spec.userPasswordEnvironmentVariable())
         );
 
         try {
             adapter.authenticate(caseworker, UserTokenProviderConfig.DEFAULT_INSTANCE.getClientId());
         } catch (ExecutionException e) {
-            throw new IllegalStateException("Could not authenticate " + BEFTA_MASTER_CASEWORKER_EMAIL
+            throw new IllegalStateException("Could not authenticate " + spec.userEmail()
                 + " for Data Store definition readiness check.", e);
         }
 

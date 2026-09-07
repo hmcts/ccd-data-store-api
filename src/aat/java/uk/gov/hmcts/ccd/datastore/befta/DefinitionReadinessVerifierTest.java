@@ -14,6 +14,8 @@ class DefinitionReadinessVerifierTest {
         "FT_MasterCaseType",
         "createCase",
         "caseworker-befta_master",
+        "master.caseworker@gmail.com",
+        "CCD_CASEWORKER_AUTOTEST_PASSWORD",
         List.of(
             new DefinitionReadinessSpec.RequiredField("RichTextAreaField", "RichTextArea"),
             new DefinitionReadinessSpec.RequiredField("RichTextAreaMinField", "RichTextArea")
