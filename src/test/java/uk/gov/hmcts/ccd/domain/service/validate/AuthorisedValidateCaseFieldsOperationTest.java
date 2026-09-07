@@ -68,7 +68,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 class AuthorisedValidateCaseFieldsOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -185,7 +184,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(any(), any(), any())).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(anyString(), any(), any(), any())).thenReturn(true);
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), any())).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(anyString(), any(), any(), any())).thenReturn(true);
 
         when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate()).thenReturn(List.of());
@@ -1070,23 +1068,37 @@ class AuthorisedValidateCaseFieldsOperationTest {
     }
 
     @Test
-    @DisplayName("should throw when create field access is denied before mid event")
-    void shouldThrowWhenCreateFieldAccessDenied() {
+    @DisplayName("should verify create event access before invoking mid event callback")
+    void shouldVerifyCreateEventAccessBeforeInvokingMidEventCallback() {
         CaseDataContent content = new CaseDataContent();
         attachEvent(content);
         content.setCaseReference("");
         content.setData(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
 
-        when(accessControlService.canAccessCaseFieldsWithCriteria(any(), any(), any(), eq(CAN_CREATE)))
-            .thenReturn(false);
+        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
+
+        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
+        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(filteredData);
+        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
+            .thenReturn(JacksonUtils.convertValue(filteredData));
 
         OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext));
+        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
 
-        assertEquals(NO_FIELD_FOUND, exception.getMessage());
-        verify(midEventCallback, never()).invoke(anyString(), any(), any());
+        InOrder inOrder = inOrder(accessControlService, eventTriggerService, eventTokenService, midEventCallback);
+        inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(
+            eq(EVENT_ID), any(), any(), eq(CAN_CREATE));
+        inOrder.verify(eventTriggerService).isPreStateValid(null, caseEventDefinition);
+        inOrder.verify(eventTokenService).validateToken(
+            eq(EVENT_TOKEN),
+            eq("user-id"),
+            eq(caseEventDefinition),
+            any(),
+            any());
+        inOrder.verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+        verify(accessControlService, never()).canAccessCaseFieldsWithCriteria(any(), any(), any(), any());
     }
 
     @Test
@@ -1160,40 +1172,6 @@ class AuthorisedValidateCaseFieldsOperationTest {
             any(),
             any(),
             eq(true));
-    }
-
-    @Test
-    @DisplayName("should verify create field access before invoking mid event callback")
-    void shouldVerifyCreateFieldAccessBeforeInvokingMidEventCallback() {
-        CaseDataContent content = new CaseDataContent();
-        attachEvent(content);
-        content.setCaseReference("");
-        content.setData(Map.of("field1", JSON_NODE_FACTORY.textNode("value1")));
-
-        when(midEventCallback.invoke(eq(CASE_TYPE_ID), eq(content), eq(PAGE_ID))).thenReturn(emptyMap());
-
-        ObjectNode filteredData = new ObjectNode(JSON_NODE_FACTORY);
-        when(accessControlService.filterCaseFieldsByAccess(any(), any(), any(), any(), anyBoolean()))
-            .thenReturn(filteredData);
-        when(conditionalFieldRestorer.restoreConditionalFields(any(), any(), any(), any()))
-            .thenReturn(JacksonUtils.convertValue(filteredData));
-
-        OperationContext operationContext = new OperationContext(CASE_TYPE_ID, content, PAGE_ID);
-
-        authorisedValidateCaseFieldsOperation.validateCaseDetails(operationContext);
-
-        InOrder inOrder = inOrder(accessControlService, eventTriggerService, eventTokenService, midEventCallback);
-        inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(
-            eq(EVENT_ID), any(), any(), eq(CAN_CREATE));
-        inOrder.verify(eventTriggerService).isPreStateValid(null, caseEventDefinition);
-        inOrder.verify(eventTokenService).validateToken(
-            eq(EVENT_TOKEN),
-            eq("user-id"),
-            eq(caseEventDefinition),
-            any(),
-            any());
-        inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(), any(), any(), eq(CAN_CREATE));
-        inOrder.verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
     }
 
     private static void attachEvent(CaseDataContent content) {

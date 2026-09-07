@@ -42,7 +42,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 @Service
 @Slf4j
@@ -234,7 +233,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
         CaseEventDefinition caseEventDefinition = findCaseEvent(caseTypeDefinition, content.getEvent().getEventId());
         validateCreatePreState(caseEventDefinition);
         validateCreateEventToken(content, caseEventDefinition, caseTypeDefinition);
-        verifyCreateCaseFieldsAccess(content, caseTypeDefinition, userRoles);
     }
 
     private String verifyUpdateCaseEventAccess(OperationContext operationContext, CaseDataContent content) {
@@ -322,21 +320,6 @@ public class AuthorisedValidateCaseFieldsOperation implements ValidateCaseFields
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition,
             persistenceStrategyResolver.isDecentralised(existingCaseDetails));
-    }
-
-    private void verifyCreateCaseFieldsAccess(CaseDataContent content,
-                                              CaseTypeDefinition caseTypeDefinition,
-                                              Set<AccessProfile> accessProfiles) {
-        if (content.getData() == null) {
-            return;
-        }
-        if (!accessControlService.canAccessCaseFieldsWithCriteria(
-            JacksonUtils.convertValueJsonNode(content.getData()),
-            caseTypeDefinition.getCaseFieldDefinitions(),
-            accessProfiles,
-            CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_FIELD_FOUND);
-        }
     }
 
     private void verifyCaseTypeAndStateAccessForUpdate(CaseDetails existingCaseDetails,
