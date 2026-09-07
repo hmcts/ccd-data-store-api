@@ -178,6 +178,9 @@ public class RoleAssignmentService implements AccessControl {
 
         final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
+        if (roleAssignments == null || roleAssignments.getRoleAssignments() == null) {
+            return List.of();
+        }
         return roleAssignments.getRoleAssignments().stream()
             .filter(this::isValidRoleAssignment)
             .map(roleAssignment ->
