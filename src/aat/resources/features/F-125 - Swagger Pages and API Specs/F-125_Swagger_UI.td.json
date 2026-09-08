@@ -18,7 +18,7 @@
       "Content-Type" : "text/html"
     },
     "body" : {
-      "__plainTextValue__": "${[scenarioContext][customValues][contains Swagger UI]}"
+      "__plainTextValue__": "${[scenarioContext][customValues][contains Swagger UI and does not contain Failed to load remote configuration]}"
     }
   }
 }

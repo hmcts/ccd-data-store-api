@@ -1,0 +1,12 @@
+{
+	"_guid_": "F-144_Case_Data_Create",
+	"_extends_": "F-144_CreateCasePreRequisiteCaseworker_Multiple_Orgs",
+	"specs": [
+		"to create a full case"
+	],
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	}
+}

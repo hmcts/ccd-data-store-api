@@ -224,6 +224,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             } catch (CallbackException ex) {
                 // Exception occurred, e.g. call back service is unavailable
                 savedCaseDetails.setIncompleteCallbackResponse();
+                savedCaseDetails.setCallbackErrorMessage(ex.getMessage());
             }
         }
     }

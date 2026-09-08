@@ -1,0 +1,20 @@
+{
+  "_guid_": "UnRegister_All_Doc_Echo_Stubs_By_Metadata",
+  "_extends_": "UnRegister_Dynamic_Stub_By_Metadata",
+  "specs": [
+    "to unregister all S-1046 callback stubs from the ccd-test-stubs service",
+    "As a prerequisite"
+  ],
+  "request": {
+    "body": {
+      "matchesJsonPath": {
+        "expression": "$.testId",
+        "contains": "S-1046"
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {}
+  }
+}

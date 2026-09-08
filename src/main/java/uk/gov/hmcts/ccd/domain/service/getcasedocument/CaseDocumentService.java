@@ -13,9 +13,12 @@ import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_HASH;
@@ -138,4 +141,22 @@ public class CaseDocumentService {
         }
     }
 
+    public List<DocumentHashToken> filterDocumentHashesAgainstSavedData(
+        final List<DocumentHashToken> documentHashes,
+        final Map<String, JsonNode> savedData) {
+
+        if (documentHashes.isEmpty()) {
+            return documentHashes;
+        }
+
+        final Set<String> savedDocumentIds = caseDocumentUtils.findDocumentIds(savedData);
+
+        if (savedDocumentIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return documentHashes.stream()
+            .filter(hash -> savedDocumentIds.contains(hash.getId()))
+            .collect(Collectors.toList());
+    }
 }

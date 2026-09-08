@@ -1,0 +1,99 @@
+{
+  "title": "must fail to update case when rich text has invalid tags",
+  "_guid_": "S-1030.4",
+  "_extends_": "Event_Creation_Caseworker_Base",
+  "prerequisites": [
+    {
+      "Token_Creation": "S-1030.4_Case_Update_Token_Creation"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains a case with number field showing correctly",
+    "has 400 return code",
+    "contains correctly configured event details",
+    "contains RichTextArea base type",
+    "RichTextArea has tags that are outside of allowed list",
+    "contains an error message : Enter valid tags for RichTextArea field"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-1030.4_Create_Case_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "RichTextAreaField": "<z>Not Allowed</z>",
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": 12.88,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "message": "Enter valid tags for RichTextArea field",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+

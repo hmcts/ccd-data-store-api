@@ -1,0 +1,40 @@
+{
+  "title": "GET /case-users returns 200 when the Accept header is application/hal+json",
+  "_guid_": "S-6996.1",
+  "_extends_": "F-103_Get_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - with an active profile",
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users",
+    "is made by Jamal with the Case ID of C1 & Dil's User ID, requesting application/hal+json",
+    "contains the list of case roles just granted to Dil, as per above"
+  ],
+
+  "users": {
+    "userRichard": {
+      "_extends_": "F-103_User_Richard"
+    },
+    "userDil": {
+      "_extends_": "F-103_User_Dil"
+    },
+    "invokingUser": {
+      "_extends_": "F-103_User_Jamal"
+    }
+  },
+
+  "request" : {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Accept": "application/hal+json"
+    },
+    "queryParams": {
+      "case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+      "user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "S-597_expectedResponse"
+  }
+}

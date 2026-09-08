@@ -1,14 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.util.List;
-import java.util.Optional;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -26,9 +29,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessCont
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-
-import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
-import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
 
 public class CaseFieldDefinitionTest {
 

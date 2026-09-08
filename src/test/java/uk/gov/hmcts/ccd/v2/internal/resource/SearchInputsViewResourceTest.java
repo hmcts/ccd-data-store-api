@@ -8,9 +8,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
+import static uk.gov.hmcts.ccd.util.FieldTestUtil.field;
+import static uk.gov.hmcts.ccd.util.FieldTestUtil.simpleField;
 
 import org.springframework.hateoas.Link;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 
 import java.util.List;
@@ -19,6 +26,8 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
+import uk.gov.hmcts.ccd.util.FieldTestUtil;
 import uk.gov.hmcts.ccd.util.PathFromUrlUtil;
 
 class SearchInputsViewResourceTest {
@@ -51,4 +60,42 @@ class SearchInputsViewResourceTest {
         assertThat(PathFromUrlUtil.getActualPath(self.get().getHref()), equalTo(LINK_SELF));
     }
 
+    @Test
+    @DisplayName("should workbasket inputs with complex and Collection field")
+    void shouldWorkbasketInputsWithComplexCollectionField() {
+
+        TestBuildersUtil.FieldTypeBuilder fieldTypeBuilder = aFieldType();
+        fieldTypeBuilder.withType(COLLECTION);
+        fieldTypeBuilder.withComplexField(simpleField("Three", 1));
+        fieldTypeBuilder.withComplexField(simpleField("One", 2));
+        fieldTypeBuilder.withComplexField(simpleField("Two", 3));
+        FieldTypeDefinition collectionComplexFieldTypeDefinition = fieldTypeBuilder
+            .build();
+
+        Field field = field(FieldTestUtil.COLLECTION_FIELD, aFieldType()
+            .withType(COLLECTION)
+            .withCollectionFieldType(collectionComplexFieldTypeDefinition)
+            .build());
+        SearchInput searchInput3 = aSearchInput().withField(field).build();
+
+        Field field1 = field(FieldTestUtil.COMPLEX_FIELD, aFieldType().withId(FieldTestUtil.COMPLEX_FIELD)
+            .withType(FieldTypeDefinition.COMPLEX).withComplexField(
+                newCaseField().withId("OtherNestedField")
+                    .withFieldType(FieldTestUtil.fieldType("Date")).build()).build());
+        SearchInput searchInput4 = aSearchInput().withField(field1).build();
+
+        SearchInput[] searchInputs1 = new SearchInput[]{
+            searchInput3, searchInput4
+        };
+        final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs1, CASE_TYPE_ID);
+
+        List<SearchInputsViewResource.SearchInputView> searchInputsResult =
+            Lists.newArrayList(resource.getSearchInputs());
+        assertAll(
+            () -> assertThat(resource.getSearchInputs(), not(sameInstance(this.searchInputs))),
+            () -> assertThat(searchInputsResult, hasItems(hasProperty("field",
+                    hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),
+                hasProperty("field", hasProperty("id", is(FieldTestUtil.COMPLEX_FIELD)))))
+        );
+    }
 }

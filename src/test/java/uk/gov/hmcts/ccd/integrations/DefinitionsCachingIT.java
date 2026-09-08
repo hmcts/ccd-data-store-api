@@ -153,7 +153,7 @@ public class DefinitionsCachingIT {
 
 
     @Test
-    public void testJurisdictionListsAreCached() {
+    void testJurisdictionListsAreCached() {
         verify(caseDefinitionRepository, times(0)).getJurisdiction(JURISDICTION_ID_1);
         cachedCaseDefinitionRepository.getJurisdiction(JURISDICTION_ID_1);
         verify(caseDefinitionRepository, times(1)).getJurisdiction(JURISDICTION_ID_1);
@@ -165,7 +165,7 @@ public class DefinitionsCachingIT {
 
     @Disabled
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testJurisdictionDefinitionPreventCacheManipulation() {
+    void testJurisdictionDefinitionPreventCacheManipulation() {
         doReturn(List.of(createJurisdictionDefinition(JURISDICTION_ID_1))).when(this.caseDefinitionRepository)
             .retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_4)));
 
@@ -186,21 +186,21 @@ public class DefinitionsCachingIT {
 
     @Disabled
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testJurisdictionDefinitionListPreventCacheManipulation() {
+    void testJurisdictionDefinitionListPreventCacheManipulation() {
         var expectedJurisdictionDefinitionList = Arrays.asList(createJurisdictionDefinition(JURISDICTION_ID_1),
             createJurisdictionDefinition(JURISDICTION_ID_2));
         doReturn(expectedJurisdictionDefinitionList).when(this.caseDefinitionRepository)
             .retrieveJurisdictions(Optional.of(Collections.emptyList()));
 
         var jurisdictionDefinitionListFirstAttempt = caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
-        assertNotNull(jurisdictionDefinitionListFirstAttempt.get(0).getCaseTypeDefinitions());
-        jurisdictionDefinitionListFirstAttempt.get(0).setCaseTypeDefinitions(null);
-        assertNull(jurisdictionDefinitionListFirstAttempt.get(0).getCaseTypeDefinitions());
+        assertNotNull(jurisdictionDefinitionListFirstAttempt.getFirst().getCaseTypeDefinitions());
+        jurisdictionDefinitionListFirstAttempt.getFirst().setCaseTypeDefinitions(null);
+        assertNull(jurisdictionDefinitionListFirstAttempt.getFirst().getCaseTypeDefinitions());
 
         var jurisdictionDefinitionListSecondAttempt = caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
 
         assertAll(
-            () -> assertNotNull(jurisdictionDefinitionListSecondAttempt.get(0).getCaseTypeDefinitions()),
+            () -> assertNotNull(jurisdictionDefinitionListSecondAttempt.getFirst().getCaseTypeDefinitions()),
             () -> assertNotEquals(jurisdictionDefinitionListFirstAttempt.stream().map(Object::hashCode).toList(),
                 jurisdictionDefinitionListSecondAttempt.stream().map(Object::hashCode).toList()),
             () -> assertEquals(expectedJurisdictionDefinitionList.stream().map(JurisdictionDefinition::getId).toList(),
@@ -213,7 +213,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
+    void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
         assertEquals(3, applicationParams.getJurisdictionTTLSecs());
 
         verify(caseDefinitionRepository, times(0)).retrieveJurisdictions(Optional.of(List.of(JURISDICTION_ID_2)));
@@ -243,7 +243,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testCaseDefinitionLatestVersionsAreCached() {
+    void testCaseDefinitionLatestVersionsAreCached() {
         assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
@@ -255,7 +255,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
+    void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
         assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
 
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
@@ -285,7 +285,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testCaseDefinitionAreCached() {
+    void testCaseDefinitionAreCached() {
 
         cachedCaseDefinitionRepository.getCaseType(ID_1);
         cachedCaseDefinitionRepository.getCaseType(ID_1);
@@ -296,7 +296,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testWorkbasketInputDefinitionsAreCached() {
+    void testWorkbasketInputDefinitionsAreCached() {
 
         doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway)
             .getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
@@ -309,7 +309,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testWorkbasketResultAreCached() {
+    void testWorkbasketResultAreCached() {
 
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
 
@@ -321,7 +321,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testSearchResultAreCached() {
+    void testSearchResultAreCached() {
 
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
 
@@ -333,7 +333,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testCaseTabsAreCached() {
+    void testCaseTabsAreCached() {
 
         doReturn(caseTypeTabsDefinition).when(this.httpUIDefinitionGateway).getCaseTypeTabsCollection(VERSION_1, ID_1);
 
@@ -345,7 +345,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testSearchInputDefinitionsAreCached() {
+    void testSearchInputDefinitionsAreCached() {
 
         doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway)
             .getSearchInputFieldDefinitions(VERSION_1, ID_1);
@@ -358,7 +358,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testWizardPageDefinitionsAreCached() {
+    void testWizardPageDefinitionsAreCached() {
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
@@ -367,15 +367,15 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testWizardPageDefinitionsPreventCacheManipulation() {
+    void testWizardPageDefinitionsPreventCacheManipulation() {
         var wizardPagesFirstAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
-        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.getFirst();
         //change cached data
         wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
         Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
 
         var wizardPagesSecondAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
-        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.getFirst();
 
         Assert.assertFalse(wizardPageSecondAttempt.getWizardPageFields().isEmpty());
 
@@ -383,7 +383,7 @@ public class DefinitionsCachingIT {
         Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
 
         var wizardPagesThirdAttempt = uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
-        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.getFirst();
 
         Assert.assertFalse(wizardPageThirdAttempt.getWizardPageFields().isEmpty());
 
@@ -392,20 +392,20 @@ public class DefinitionsCachingIT {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void testWizardPageDefinitionsFailWithCacheManipulationWithoutDeepCopy() {
+    void testWizardPageDefinitionsFailWithCacheManipulationWithoutDeepCopy() {
         var wizardPagesFirstAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
-        var wizardPageFirstAttempt = wizardPagesFirstAttempt.get(0);
+        var wizardPageFirstAttempt = wizardPagesFirstAttempt.getFirst();
         //change cached data
         wizardPagesFirstAttempt.forEach(wizardPage -> wizardPage.setWizardPageFields(null));
         Assert.assertNull(wizardPageFirstAttempt.getWizardPageFields());
 
         var wizardPagesSecondAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
-        var wizardPageSecondAttempt = wizardPagesSecondAttempt.get(0);
+        var wizardPageSecondAttempt = wizardPagesSecondAttempt.getFirst();
 
         Assert.assertNull(wizardPageSecondAttempt.getWizardPageFields());
 
         var wizardPagesThirdAttempt = cachedUIDefinitionGateway.getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
-        var wizardPageThirdAttempt = wizardPagesThirdAttempt.get(0);
+        var wizardPageThirdAttempt = wizardPagesThirdAttempt.getFirst();
 
         Assert.assertNull(wizardPageThirdAttempt.getWizardPageFields());
 
@@ -419,7 +419,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testBannersCached() {
+    void testBannersCached() {
         List<String> jurisdictionIds = new ArrayList<>();
         jurisdictionIds.add("123");
         BannersResult bannersResult = new BannersResult(bannersList);

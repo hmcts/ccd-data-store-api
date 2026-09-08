@@ -26,7 +26,9 @@
       "CaseTypeID": "FT_MasterCaseType"
     },
     "body": {
-      "data": {},
+      "data": {
+        "TextField": "S-1041-payload"
+      },
       "event": {
         "id": "documentHashCallback",
         "summary": "",
@@ -77,6 +79,7 @@
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,
+      "callback_error_message" : null,
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null
     }

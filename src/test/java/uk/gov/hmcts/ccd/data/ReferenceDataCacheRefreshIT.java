@@ -133,10 +133,19 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
 
     private void verifyWiremockInvocation(final String path, final int count) {
         final RequestPattern requestPattern = getRequestedFor(urlPathEqualTo(path)).build();
-        final VerificationResult verificationResult = wireMockServer.countRequestsMatching(requestPattern);
-        assertThat(verificationResult)
-            .isNotNull()
-            .satisfies(result -> assertThat(result.getCount()).isGreaterThanOrEqualTo(count));
+
+        await()
+            .atMost(Durations.FIVE_SECONDS)
+            .untilAsserted(() -> {
+                final VerificationResult verificationResult = wireMockServer.countRequestsMatching(requestPattern);
+
+                assertThat(verificationResult)
+                    .isNotNull();
+
+                assertThat(verificationResult.getCount())
+                    .as("Expected WireMock path %s to be called at least %s times", path, count)
+                    .isGreaterThanOrEqualTo(count);
+            });
     }
 
     private void cacheContainsInitialReferenceData() {

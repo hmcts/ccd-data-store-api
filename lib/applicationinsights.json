@@ -4,6 +4,25 @@
     "name": "ccd-data-store-api"
   },
   "preview": {
+    "processors": [
+      {
+        "type": "attribute",
+        "actions": [
+          {
+            "key": "url.query",
+            "pattern": "(?i)(?<name>case(?:\\.|%2e)[^=&]+)=[^&]*",
+            "replace": "${name}=REDACTED",
+            "action": "mask"
+          },
+          {
+            "key": "http.url",
+            "pattern": "(?i)(?<name>case(?:\\.|%2e)[^=&]+)=[^&]*",
+            "replace": "${name}=REDACTED",
+            "action": "mask"
+          }
+        ]
+      }
+    ],
     "sampling": {
       "overrides": [
         {
