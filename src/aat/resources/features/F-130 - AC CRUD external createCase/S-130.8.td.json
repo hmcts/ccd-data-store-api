@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-130.8",
+  "_extends_": "F-130_Get_Event_Token_Base",
+  "title": "User cannot start case creation without CaseEvent C Access",
+
+  "specs": [
+    "with no C access to create an event",
+    "contains HTTP 404 status code",
+    "contains an error stating that the case event cannot be found"
+  ],
+
+  "uri": "/case-types/FT_CRUD_5/event-triggers/{etid}",
+
+  "request": {
+    "pathVariables": {
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No event found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+
+

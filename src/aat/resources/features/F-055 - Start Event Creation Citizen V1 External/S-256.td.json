@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-256",
+  "_extends_": "F-055_Base_Test_Data",
+  "title": "must return 404 when an authenticated citizen no longer has access to start the event",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+

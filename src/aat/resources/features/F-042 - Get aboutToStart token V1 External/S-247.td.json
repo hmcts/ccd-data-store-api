@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-247",
+  "_extends_": "F-042_Test_Data_Base",
+  "title": "Trigger the aboutToStart callback event for a caseworker without event create access",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "etid": "event1",
+      "cid": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No event found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
+
