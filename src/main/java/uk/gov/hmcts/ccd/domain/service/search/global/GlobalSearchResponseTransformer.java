@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -20,20 +21,20 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.Suppleme
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_CATEGORY;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_LOCATION;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_NAME_HMCTS_INTERNAL;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.NextHearingDetailsFields.HEARING_DATE_TIME;
 
 @SuppressWarnings("squid:S1075") // paths below are not URI path literals
 @Named
@@ -44,6 +45,7 @@ public class GlobalSearchResponseTransformer {
     private static final String CATEGORY_NAME_PATH = CATEGORY_VALUE_PATH + "/" + DynamicListValidator.LABEL;
     private static final String BASE_LOCATION_ID_PATH = "/" + CaseManagementLocationFields.BASE_LOCATION;
     private static final String REGION_ID_PATH = "/" + CaseManagementLocationFields.REGION;
+    private static final String NEXT_HEARING_DATE_PATH = "/" + HEARING_DATE_TIME;
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDataAccessControl caseDataAccessControl;
@@ -81,7 +83,7 @@ public class GlobalSearchResponseTransformer {
         Optional<JurisdictionDefinition> optionalJurisdiction =
             optionalCaseType.map(CaseTypeDefinition::getJurisdictionDefinition);
         // clear jurisdiction loaded from case type if ID doesn't match value from case details
-        if (!StringUtils.equals(optionalJurisdiction.map(JurisdictionDefinition::getId).orElse(null), jurisdictionId)) {
+        if (!Objects.equals(optionalJurisdiction.map(JurisdictionDefinition::getId).orElse(null), jurisdictionId)) {
             optionalJurisdiction = Optional.empty();
         }
         final String caseTypeName = optionalCaseType
@@ -107,6 +109,7 @@ public class GlobalSearchResponseTransformer {
             .ccdCaseTypeId(caseTypeId)
             .ccdCaseTypeName(caseTypeName)
             .caseNameHmctsInternal(findValue(caseData, CASE_NAME_HMCTS_INTERNAL))
+            .nextHearingDate(findValue(caseData, NEXT_HEARING_DETAILS, NEXT_HEARING_DATE_PATH))
             .hmctsServiceId(serviceId)
             .hmctsServiceShortDescription(serviceLookup.getServiceShortDescription(serviceId))
             .baseLocationId(baseLocationId)
@@ -129,10 +132,11 @@ public class GlobalSearchResponseTransformer {
 
         final Optional<JsonNode> optionalJsonNode = Optional.ofNullable(jsonNodeMap.get(parentKey));
         return optionalJsonNode.map(node -> {
-            if (node.isContainerNode()) {
-                return Optional.ofNullable(node.at(childPath)).map(JsonNode::asText).orElse(null);
+            if (childPath != null && node.isContainerNode()) {
+                final JsonNode childNode = node.at(childPath);
+                return childNode.isMissingNode() || childNode.isNull() ? null : childNode.asText();
             }
-            return node.asText();
+            return node.isNull() ? null : node.asText();
         }).orElse(null);
     }
 
@@ -142,8 +146,8 @@ public class GlobalSearchResponseTransformer {
 
         // get values from collection list
         return optionalJsonNode.map(node -> StreamSupport.stream(node.spliterator(), false)
-            .map(x -> x.get(CollectionValidator.VALUE).asText())
-            .collect(Collectors.toUnmodifiableList()))
+                .map(x -> x.get(CollectionValidator.VALUE).asText())
+                .toList())
             .orElse(emptyList());
     }
 

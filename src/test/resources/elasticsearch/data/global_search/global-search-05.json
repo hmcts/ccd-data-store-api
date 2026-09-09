@@ -1,20 +1,20 @@
 {
-    "reference": 3333444411112222,
+    "reference": 5555666677778888,
     "data": {
         "caseManagementCategory": {
             "value": {
                 "code": "987",
-                "label": "Category label Order-01"
+                "label": "Category label Order-05"
             }
         },
         "caseManagementLocation": {
             "baseLocation": "123",
             "region": "1"
         },
-        "caseNameHmctsInternal": "Name Internal 03",
+        "caseNameHmctsInternal": "Name Internal 05",
         "nextHearingDetails": {
-            "hearingID": "2000000003",
-            "hearingDateTime": "2026-10-13T09:30:00.000"
+            "hearingID": "2000000005",
+            "hearingDateTime": "not-a-date"
         },
         "SearchCriteria": {
             "OtherCaseReferences": [
@@ -64,7 +64,7 @@
     "last_state_modified_date": "2021-09-27T13:34:23.092Z",
     "security_classification": "PUBLIC",
     "state": "CaseCreated",
-    "created_date": "2021-09-02T13:34:23.092Z",
+    "created_date": "2021-09-04T13:34:23.092Z",
     "last_modified": "2021-09-27T13:34:23.094Z",
     "case_type_id": "GlobalSearch"
 }
