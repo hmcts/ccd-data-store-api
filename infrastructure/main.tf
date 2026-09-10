@@ -78,11 +78,10 @@ module "postgresql_v15" {
 
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
-  common_tags          = var.common_tags
+  common_tags          = merge(var.common_tags, var.extra_tags)
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
-
   # Setup Access for reporting and JiT perms.
   force_user_permissions_trigger     = "2"
   enable_db_report_privileges        = true
