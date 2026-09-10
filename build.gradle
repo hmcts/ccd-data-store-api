@@ -901,6 +901,12 @@ task runProviderPactVerification(type:Test) {
     if (project.hasProperty('pact.verifier.publishResults')) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
     }
+    if (project.hasProperty('pactbroker.consumers')) {
+        systemProperty 'pactbroker.consumers', project.property('pactbroker.consumers')
+    }
+    if (project.hasProperty('pactbroker.enablePending')) {
+        systemProperty 'pactbroker.enablePending', project.property('pactbroker.enablePending')
+    }
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
     include "uk/gov/hmcts/ccd/**"
