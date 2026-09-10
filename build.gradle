@@ -36,12 +36,12 @@ ext {
     jjwt = '0.13.0'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.7.5'
-    lombokVersion = '1.18.46'
+    lombokVersion = '1.18.48'
     lombokBindingVersion = '0.2.0'
-    mockito = '5.21.0'
+    mockito = '5.23.0'
     elasticVersion = '9.5.1'
     testContainersVersion = '2.0.5'
-    cucumber = '7.34.7'
+    cucumber = '7.34.8'
     beftaFwVersion = '9.2.10'
     ccdTestDefinitionVersion = '7.26.12_CCD-6251-SNAPSHOT'
     limits = [
@@ -243,13 +243,13 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9.1'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.19'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.6.3'                 // applicationinsights-logging-logback
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.6.3'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
@@ -314,7 +314,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
