@@ -52,8 +52,8 @@ import static org.mockito.Mockito.mock;
 @TestPropertySource(properties = {
     "spring.datasource.url=jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5050}/"
         + "${DATA_STORE_DB_NAME:ccd_data}?stringtype=unspecified",
-    "spring.datasource.username=${DATA_STORE_DB_USERNAME:ccd}",
-    "spring.datasource.password=${DATA_STORE_DB_PASSWORD:ccd}",
+    "spring.datasource.username=${DATA_STORE_DB_USERNAME:}",
+    "spring.datasource.password=${DATA_STORE_DB_PASSWORD:}",
     "spring.datasource.hikari.maximum-pool-size=5",
     "spring.datasource.hikari.minimum-idle=2",
     "spring.jpa.hibernate.ddl-auto=none",

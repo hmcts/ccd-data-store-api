@@ -27,7 +27,7 @@ The following environment variables are required:
 | DATA_STORE_DB_PORT                           | 5432 | Port for database                                                                                                                                                                   |
 | DATA_STORE_DB_USERNAME                       | - | Username for database                                                                                                                                                               |
 | DATA_STORE_DB_PASSWORD                       | - | Password for database                                                                                                                                                               |
-| DATA_STORE_TOKEN_SECRET                      | `<random string>` | Secret for generating internal JWT tokens for events                                                                                                                                |
+| DATA_STORE_TOKEN_SECRET                      | - | Secret for generating internal JWT tokens for events; supply it through the local environment or managed secret store                                                               |
 | DATA_STORE_IDAM_KEY                          | - | Definition store's IDAM S2S micro-service secret key. This must match the IDAM instance it's being run against.                                                                     |
 | DATA_STORE_S2S_AUTHORISED_SERVICES           | ccd_gw | Authorised micro-service names for S2S calls                                                                                                                                        |
 | IDAM_USER_URL                                | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance.                                              |
@@ -72,6 +72,18 @@ To build project please execute the following:
 
 ### Running
 
+For standalone local Docker use, first create the ignored environment file:
+
+```bash
+./scripts/setup-local-secrets.sh
+```
+
+The script refuses to overwrite an existing `.env`. Start the stack with the environment file explicitly:
+
+```bash
+docker compose --env-file .env up
+```
+
 If you want your code to become available to other Docker projects (e.g. for local environment testing), you need to build the image:
 
 ```bash
@@ -96,6 +108,13 @@ As a result the following containers will get created and started:
 
  - Database exposing port `5452`
  - API exposing ports `4452`
+
+#### Local IDAM issuer
+
+The OIDC issuer in discovery metadata must use the same hostname as the configured
+`IDAM_OIDC_URL`. For host-based runs use `http://localhost:5000`; for Docker-based
+runs use `http://idam:5000`. A mismatch between these values causes issuer validation
+to fail.
 
 #### Handling database
 
