@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -126,7 +125,6 @@ import static org.mockito.Mockito.when;
 })
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-@IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
