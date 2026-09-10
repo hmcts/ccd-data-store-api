@@ -12,6 +12,10 @@
             "region": "1"
         },
         "caseNameHmctsInternal": "Name Internal 02",
+        "nextHearingDetails": {
+            "hearingID": "2000000002",
+            "hearingDateTime": "2026-10-11T09:30:00.000"
+        },
         "SearchCriteria": {
             "OtherCaseReferences": [
                 {
@@ -44,6 +48,13 @@
             }
         },
         "caseNameHmctsInternal": "PUBLIC",
+        "nextHearingDetails": {
+            "classification": "PUBLIC",
+            "value": {
+                "hearingID": "PUBLIC",
+                "hearingDateTime": "PUBLIC"
+            }
+        },
         "SearchCriteria": {
             "classification": "PUBLIC",
             "value": {

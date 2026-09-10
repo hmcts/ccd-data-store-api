@@ -38,6 +38,10 @@
     "baseLocation": "321"
   },
   "caseNameHmctsInternal": "Internal case name",
+  "nextHearingDetails": {
+    "hearingID": "2000000001",
+    "hearingDateTime": "2026-10-12T09:30:00.000"
+  },
   "caseManagementCategory": {
     "value": {
       "code": "CATEGORY-A",
