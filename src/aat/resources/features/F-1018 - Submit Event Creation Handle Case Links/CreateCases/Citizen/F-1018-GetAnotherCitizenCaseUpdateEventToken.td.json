@@ -1,0 +1,5 @@
+{
+	"title": "should create an event token for the another citizen case prerequisite",
+	"_guid_": "F-1018-GetAnotherCitizenCaseUpdateEventToken",
+	"_extends_": "F-1018-GetCitizenUpdateEventTokenBase"
+}

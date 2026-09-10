@@ -39,7 +39,8 @@ Scenario: must return 401 when request does not provide valid authentication cre
 @S-156
 Scenario: must return 404 when request provides authentic credentials without authorised access to the operation
 
-    Given a case that has just been created as in [S-156_Case_Creation_Data],
+    Given a successful call [to create a token for case creation] as in [S-156_Token_Creation],
+      And another successful call [to create a full case] as in [S-156_Case_Creation_Data],
       And a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,

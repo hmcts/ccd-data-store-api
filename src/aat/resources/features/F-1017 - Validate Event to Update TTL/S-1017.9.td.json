@@ -5,7 +5,7 @@
   "title": "TTL.OverrideTTL changed after returning from Mid Event Callback and Validate Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1017_GetUpdateSuspendedCaseToken"
+    "Token_Creation": "S-1017_GetUpdateToken_ModifiedOverrideTTL"
   } ],
 
   "specs": [

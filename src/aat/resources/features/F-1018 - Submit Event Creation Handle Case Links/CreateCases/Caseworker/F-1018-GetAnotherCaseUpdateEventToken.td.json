@@ -1,0 +1,11 @@
+{
+	"title": "should create an event token for the another case prerequisite",
+	"_guid_": "F-1018-GetAnotherCaseUpdateEventToken",
+	"_extends_": "F-1018-GetUpdateEventToken",
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][siblingContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+		}
+	}
+}
