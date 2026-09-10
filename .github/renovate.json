@@ -21,7 +21,7 @@
       "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
       "prPriority": 100,
       "schedule": ["at any time"],
-      "automerge": false,
+      "automerge": true,
       "dependencyDashboardApproval": false,
       "minimumReleaseAge": null
     }
