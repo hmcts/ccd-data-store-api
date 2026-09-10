@@ -15,6 +15,16 @@ Feature: F-131: Create Event External API CRUD Tests
     And the response has all other details as expected.
 
 
+  @S-131.6
+  Scenario: User cannot start event creation with missing CaseEvent C Access
+    Given a case that has just been created as in [F-131_CreateCase],
+    And a user [with no C access to create an event]
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
+    Then a negative response is received
+    And the response has all other details as expected.
+
+
   @S-131.2
   Scenario: User cannot create event with missing CaseField C Access for a new field
     Given a case that has just been created as in [F-131_CreateCase],
