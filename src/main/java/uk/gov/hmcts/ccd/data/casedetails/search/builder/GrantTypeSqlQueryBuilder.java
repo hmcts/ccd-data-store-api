@@ -24,6 +24,10 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String QUERY = "%s in (:%s)";
 
+    // Used for reference lists to avoid PostgreSQL's 65,535 parameter limit
+    // = ANY() treats the entire array as a single parameter unlike IN which expands each element
+    public static final String QUERY_ANY = "%s = ANY(ARRAY(SELECT unnest(CAST(:%s AS bigint[]))))";
+
     public static final String EMPTY = "";
 
     public static final String SECURITY_CLASSIFICATION = "security_classification";
@@ -123,11 +127,14 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                                           int index) {
         if (allRoleAssignmentsHaveCaseReference(searchRoleAssignments)) {
             String referencesParam = String.format(REFERENCES_PARAM, index, paramName);
-            params.put(referencesParam, searchRoleAssignments.stream()
+            Long[] caseReferences = searchRoleAssignments.stream()
                 .map(SearchRoleAssignment::getCaseReference)
-                .collect(Collectors.toList()));
+                .filter(ref -> ref != null && ref.matches("\\d+"))
+                .map(Long::parseLong)
+                .toArray(Long[]::new);
+            params.put(referencesParam, caseReferences);
             parentQuery = parentQuery + getOperator(parentQuery, AND)
-                + String.format(QUERY, REFERENCE, referencesParam);
+                + String.format(QUERY_ANY, REFERENCE, referencesParam);
         }
         return parentQuery;
     }
