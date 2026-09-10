@@ -7,7 +7,7 @@ plugins {
     id 'idea'
     id 'eclipse'
     id 'org.springframework.boot' version '3.5.16'
-    id 'com.github.ben-manes.versions' version '0.54.0'
+    id 'com.github.ben-manes.versions' version '0.61.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '7.3.0.8198'
     id 'com.github.kt3k.coveralls' version '2.12.2'
@@ -36,14 +36,14 @@ ext {
     jjwt = '0.13.0'
     appInsightsVersion = '2.6.4'
     pactProviderVersion = '4.7.5'
-    lombokVersion = '1.18.46'
+    lombokVersion = '1.18.48'
     lombokBindingVersion = '0.2.0'
-    mockito = '5.21.0'
+    mockito = '5.23.0'
     elasticVersion = '9.5.1'
     testContainersVersion = '2.0.5'
-    cucumber = '7.34.7'
+    cucumber = '7.34.8'
     beftaFwVersion = '9.2.10'
-    ccdTestDefinitionVersion = '7.26.10'
+    ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -67,7 +67,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.12'
+        force 'net.bytebuddy:byte-buddy:1.18.13'
     }
 }
 
@@ -243,20 +243,20 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9.1'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.27'                 // applicationinsights-logging-logback
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.27'              // applicationinsights-logging-logback
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.19'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.6.3'                 // applicationinsights-logging-logback
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.6.3'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'                       // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.12'         // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.12'            // service-auth-provider-java-client
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.14'         // spring-cloud-starter-openfeign
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.14'            // service-auth-provider-java-client
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
@@ -306,7 +306,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.9.0'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
@@ -314,7 +314,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
@@ -329,7 +329,7 @@ dependencies {
     implementation group: 'io.vavr', name: 'vavr', version: '0.11.0'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
-    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.6.2'
+    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.7.0'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.4'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.3'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.1'
