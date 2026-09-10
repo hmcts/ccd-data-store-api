@@ -30,13 +30,16 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     },
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No event found",
-      "path": "[[ANYTHING_PRESENT]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "No case type found",
+      "path" : "/case-types/FT_CRUD/event-triggers/createCase",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null,
+      "timestamp" : "[[ANYTHING_PRESENT]]"
     }
   }
 }
