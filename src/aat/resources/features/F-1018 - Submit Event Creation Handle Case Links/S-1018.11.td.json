@@ -37,7 +37,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1018-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][S-1018.11-GetUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },

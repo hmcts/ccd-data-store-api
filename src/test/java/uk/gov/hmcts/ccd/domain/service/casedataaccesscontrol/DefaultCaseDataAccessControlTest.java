@@ -85,7 +85,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.CHALLENGED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
@@ -920,9 +919,9 @@ class DefaultCaseDataAccessControlTest {
     }
 
     private List<AccessControlList> createAccessControlList() {
-        AccessControlList accessControlList = new AccessControlList();
-        accessControlList.setAccessProfile(ROLE_NAME_1);
-
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile(ROLE_NAME_1)
+            .build();
         return Lists.newArrayList(accessControlList);
     }
 
@@ -938,7 +937,7 @@ class DefaultCaseDataAccessControlTest {
     private RoleAssignment createRoleAssignmentAndRoleMatchingResult(String roleName,
                                                                      String grantType) {
 
-        return builder()
+        return RoleAssignment.builder()
             .roleName(roleName)
             .actorId(ACTOR_ID_1)
             .grantType(grantType)

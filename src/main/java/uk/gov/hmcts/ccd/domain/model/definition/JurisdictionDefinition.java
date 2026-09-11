@@ -99,7 +99,7 @@ public class JurisdictionDefinition implements Serializable, Copyable<Jurisdicti
         copy.setLiveFrom(this.liveFrom != null ? new Date(this.liveFrom.getTime()) : null);
         copy.setLiveUntil(this.liveUntil != null ? new Date(this.liveUntil.getTime()) : null);
         copy.setCaseTypeDefinitions(this.caseTypeDefinitions != null
-            ? createCopyList(this.caseTypeDefinitions) : null);
+            ? createDeepCopyList(this.caseTypeDefinitions) : null);
 
         return copy;
     }
