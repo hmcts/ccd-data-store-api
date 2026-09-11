@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-151_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve banner information for the jurisdictions",
+
+  "method": "GET",
+  "uri": "/internal/banners",
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "queryParams": {
+      "ids": "AUTOTEST1"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
