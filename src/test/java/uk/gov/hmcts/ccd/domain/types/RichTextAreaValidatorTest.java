@@ -32,9 +32,9 @@ class RichTextAreaValidatorTest {
     private static final String[] ALLOWED_WHITELIST_TAGS = {"b","blockquote","br",
         "em","h1","h2","h3","h4","h5","h6","hr","i","li","ol","p","strong","u","ul"};
     private static final String[] ALLOWED_WHITELIST_ATTRIBUTES =
-        {"class","title","lang","dir","style","align"};
+        {"class","title","lang","dir","style","align","data-indent"};
     private static final String[] ALLOWED_WHITELIST_ATTRIBUTES_OL =
-        {"start","reversed","type","data-indent"};
+        {"start","reversed","type"};
     private static final String[] ALLOWED_WHITELIST_ATTRIBUTES_LI = {"value"};
 
 
