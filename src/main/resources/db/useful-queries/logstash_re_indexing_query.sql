@@ -1,71 +1,78 @@
--- -Assumptions:
+-- Assumptions:
 -- 1. General data-store cleanup performed (removing all case_types older than X months)
--- 1. Deletion of all ES indexes performed (curl -XDELETE <ES node IP address>:9200/_all;)
---     (ES node IP address details can be found here: 
---     https://tools.hmcts.net/confluence/display/RCCD/Connecting+to+and+deleting+data+from+CCD+Data+Store+and+CCD+Definition+Store)
--- 2. ES re-indexing triggered via ccd-admin-web 
---     (note, this only creates the static indexes i.e place holders)
-
--- 3. Run the below script. This will loop through each Jurisdiction starting with the most cases 
---    and update the marked_by_logstash field to false in batches of 1000
--- 4. Once a row is markes as false, an automatic job is triggered perform logstash indexing
+-- 2. Deletion of all ES indexes performed (curl -XDELETE <ES node IP address>:9200/_all;)
+--    ES node IP address details can be found here:
+--    https://tools.hmcts.net/confluence/display/RCCD/Connecting+to+and+deleting+data+from+CCD+Data+Store+and+CCD+Definition+Store
+-- 3. ES re-indexing triggered via ccd-admin-web
+--    This only creates the static index placeholders.
+-- 4. Run the below script. This queues non-pointer case_data rows in case_data_logstash_queue
+--    by jurisdiction, in batches of 1000.
+-- 5. Logstash will consume and delete queued rows as part of the normal indexing pipeline.
 
 DO $$
 DECLARE
     batch_size INT := 1000;
-    rows_updated INT;
-    total_updated INT;
+    rows_queued INT;
+    total_queued INT;
     current_jurisdiction TEXT;
     start_time TIMESTAMP;
     end_time TIMESTAMP;
 BEGIN
-    RAISE NOTICE 'Starting batch update...';
-   
+    RAISE NOTICE 'Starting batch queueing...';
+
+    DROP TABLE IF EXISTS CaseDataToIndex;
+
+    CREATE TEMP TABLE CaseDataToIndex ON COMMIT DROP AS
+        SELECT id, jurisdiction
+        FROM case_data
+        WHERE NOT (data = '{}'::jsonb AND state = '');
+
+    CREATE INDEX case_data_to_index_jurisdiction_id_idx
+        ON CaseDataToIndex (jurisdiction, id);
+
     DROP TABLE IF EXISTS JurisdictionsToIndex;
 
-    -- Create a temp table with jurisdictions sorted by count descending
-    CREATE TEMP TABLE JurisdictionsToIndex AS
+    CREATE TEMP TABLE JurisdictionsToIndex ON COMMIT DROP AS
         SELECT jurisdiction
-        FROM (
-            SELECT jurisdiction, COUNT(*) AS count
-            FROM case_data
-            GROUP BY jurisdiction
-            ORDER BY count DESC
-        ) sub;
+        FROM CaseDataToIndex
+        GROUP BY jurisdiction
+        ORDER BY COUNT(*) DESC;
 
-    -- Loop through each jurisdiction
     FOR current_jurisdiction IN
         SELECT jurisdiction FROM JurisdictionsToIndex
     LOOP
-        total_updated := 0;
+        total_queued := 0;
         start_time := clock_timestamp();
         RAISE NOTICE 'Processing jurisdiction: %', current_jurisdiction;
 
         LOOP
-            -- Batch update for current jurisdiction
             WITH batch AS (
                 SELECT id
-                FROM case_data
-                WHERE marked_by_logstash = true
-                  AND jurisdiction = current_jurisdiction
+                FROM CaseDataToIndex
+                WHERE jurisdiction = current_jurisdiction
+                ORDER BY id
                 LIMIT batch_size
                 FOR UPDATE SKIP LOCKED
+            ),
+            queued AS (
+                INSERT INTO case_data_logstash_queue (case_data_id)
+                SELECT id FROM batch
+                RETURNING case_data_id
             )
-            UPDATE case_data
-            SET marked_by_logstash = false
-            WHERE id IN (SELECT id FROM batch);
+            DELETE FROM CaseDataToIndex pending
+            USING queued
+            WHERE pending.id = queued.case_data_id;
 
-            -- Correctly get number of rows updated
-            GET DIAGNOSTICS rows_updated = ROW_COUNT;
+            GET DIAGNOSTICS rows_queued = ROW_COUNT;
 
-            EXIT WHEN rows_updated = 0;
-            total_updated := total_updated + rows_updated;
+            EXIT WHEN rows_queued = 0;
+            total_queued := total_queued + rows_queued;
         END LOOP;
 
         end_time := clock_timestamp();
-        RAISE NOTICE 'Jurisdiction %: updated %, Time taken: % seconds',
-                     current_jurisdiction, total_updated, end_time - start_time;
+        RAISE NOTICE 'Jurisdiction %: queued %, Time taken: % seconds',
+                     current_jurisdiction, total_queued, end_time - start_time;
     END LOOP;
 
-    RAISE NOTICE 'Batch update complete.';
+    RAISE NOTICE 'Batch queueing complete.';
 END $$;
