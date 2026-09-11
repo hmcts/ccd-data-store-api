@@ -187,6 +187,10 @@ logstash:
   imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
+  # Claims older than this duration are eligible for retry.
+  extraEnvs:
+    - name: LOGSTASH_QUEUE_CLAIM_TIMEOUT
+      value: "5 minutes"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctsprod.azurecr.io/curl:7.70.0
@@ -223,7 +227,10 @@ logstash:
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
           jdbc_default_timezone => "UTC"
-          statement => "DELETE FROM case_data_logstash_queue USING case_data WHERE case_data_logstash_queue.case_data_id = case_data.id RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version"
+          parameters => {
+            "claim_timeout" => "${LOGSTASH_QUEUE_CLAIM_TIMEOUT}"
+          }
+          statement => "WITH candidates AS (SELECT id FROM case_data_logstash_queue WHERE claimed_at IS NULL OR claimed_at < clock_timestamp() - CAST(:claim_timeout AS interval) ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 100), claimed AS (UPDATE case_data_logstash_queue q SET claim_token = md5(random()::text || clock_timestamp()::text), claimed_at = clock_timestamp() FROM candidates c WHERE q.id = c.id RETURNING q.id AS logstash_queue_id, q.case_data_id, q.claim_token) SELECT claimed.logstash_queue_id, claimed.claim_token, case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version FROM claimed JOIN case_data ON claimed.case_data_id = case_data.id"
           clean_run => false
           schedule => "* * * * * *"
         }
