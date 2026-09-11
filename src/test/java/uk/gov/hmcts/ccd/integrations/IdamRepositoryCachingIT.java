@@ -67,7 +67,8 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
         // Set up initial expected behaviour for mock and spy beans
         when(applicationParams.getDataStoreSystemUserId()).thenReturn(TEST_SYS_USERNAME);
         when(applicationParams.getDataStoreSystemUserPassword()).thenReturn(TEST_SYS_PASSWORD);
-        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD)).thenReturn(TEST_SYS_ACCESS_TOKEN_ONE);
+        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD))
+                .thenReturn(TEST_SYS_ACCESS_TOKEN_ONE);
 
         // Before testing getDataStoreUserAccessToken method first
         // confirm that none of the mocked methods have been called
@@ -81,7 +82,8 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
         checkGetDataStoreUserAccessToken(1, TEST_SYS_ACCESS_TOKEN_ONE);
 
         // Change value returned by mock IdamClient to prove that cached value is returned
-        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD)).thenReturn(TEST_SYS_ACCESS_TOKEN_TWO);
+        when(idamClient.getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD))
+                .thenReturn(TEST_SYS_ACCESS_TOKEN_TWO);
 
         // Call getDataStoreUserAccessToken method for the second time.  Cached original value should be returned
         // and the mocked methods should still only have been called once.

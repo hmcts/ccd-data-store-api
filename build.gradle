@@ -42,7 +42,7 @@ ext {
     elasticVersion = '9.5.1'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.8'
-    beftaFwVersion = '9.2.10'
+    beftaFwVersion = '9.2.7_CCD-7454-SNAPSHOT3'
     ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
@@ -310,7 +310,7 @@ dependencies {
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.1.0-CCD-8220'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
@@ -819,17 +819,20 @@ task smoke(type: JavaExec) {
         into "$buildDir/test-results/test"
     }
 
-    generateCucumberReports.enabled = true
+    generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     args = ['--plugin', "json:${rootDir}/target/cucumber.json",
             '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
             '--tags', '@Smoke and not @Ignore',
             '--glue', 'uk.gov.hmcts.befta.player',
-            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 
+            'src/aat/resources/features'
+    ]
     jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
     finalizedBy {
+        generateCucumberReports.enabled = true
         generateCucumberReports {
             doLast{
                 delete "${rootDir}/BEFTA Report for Smoke Tests/"
