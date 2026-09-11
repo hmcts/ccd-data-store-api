@@ -33,12 +33,20 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
     private static final String CASE_STATE = "CaseCreated";
     private static final String LOGSTASH_POLL_STATEMENT =
-        "DELETE FROM case_data_logstash_queue USING case_data "
-            + "WHERE case_data_logstash_queue.case_data_id = case_data.id "
-            + "RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, "
-            + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
-            + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
-            + "as json_supplementary_data, version";
+        "WITH candidates AS ("
+            + "SELECT id FROM case_data_logstash_queue "
+            + "WHERE claimed_at IS NULL OR claimed_at < clock_timestamp() - interval '5 minutes' "
+            + "ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 100), "
+            + "claimed AS ("
+            + "UPDATE case_data_logstash_queue q "
+            + "SET claim_token = md5(random()::text || clock_timestamp()::text), "
+            + "claimed_at = clock_timestamp() FROM candidates c WHERE q.id = c.id "
+            + "RETURNING q.id AS logstash_queue_id, q.case_data_id, q.claim_token) "
+            + "SELECT claimed.logstash_queue_id, claimed.claim_token, case_data.id, created_date, "
+            + "last_modified, jurisdiction, case_type_id, state, last_state_modified_date, "
+            + "data::TEXT as json_data, data_classification::TEXT as json_data_classification, "
+            + "reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version "
+            + "FROM claimed JOIN case_data ON claimed.case_data_id = case_data.id";
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -170,8 +178,8 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    void logstashPollingShouldDeleteQueuedRowsAndReturnLatestLiveCaseVersion() {
-        // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
+    void logstashPollingShouldClaimQueuedRowsAndReturnLatestLiveCaseVersion() {
+        // Proves the Logstash DB poll contract: rows are claimed and remain available for acknowledgement.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
 
@@ -190,17 +198,39 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
                 == updated.getVersion())).isTrue(),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
-            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2),
+            () -> assertThat(polledRows).allMatch(row -> row.get("claim_token") != null)
         );
     }
 
     @Test
-    void supplementaryDataOnlyUpdateShouldQueueRowWhoseExternalVersionHasNotAdvanced() {
-        // The DB trigger queues a case on `UPDATE OF ... supplementary_data`, but
-        // SetSupplementaryDataQueryBuilder writes only the supplementary_data column - it never touches `version`.
-        // The Logstash output indexes with version_type => "external", which requires a STRICTLY GREATER version,
-        // so a queued supplementary-data-only change is rejected by Elasticsearch with a 409 and, because the queue
-        // row is deleted by the poll itself, never retried.
+    void logstashPollingShouldReclaimExpiredClaim() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+
+        jdbcTemplate.update("UPDATE case_data_logstash_queue "
+                + "SET claim_token = ?, claimed_at = clock_timestamp() - interval '6 minutes' "
+                + "WHERE case_data_id = ?", "expired-token", Long.valueOf(persisted.getId()));
+
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+
+        assertThat(polledRows).hasSize(1);
+        assertThat(polledRows.get(0).get("claim_token")).isNotEqualTo("expired-token");
+    }
+
+    @Test
+    void secondLogstashPollShouldNotClaimAnActiveRowAgain() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+
+        assertThat(jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT)).hasSize(1);
+        assertThat(jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT)).isEmpty();
+        assertThat(countQueuedRows(jdbcTemplate, persisted.getId())).isOne();
+    }
+
+    @Test
+    void supplementaryDataOnlyUpdateShouldQueueRowWithAdvancedExternalVersion() {
+        // The supplementary-data update must advance the external version so Elasticsearch accepts the queued write.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
         final int versionBeforeSupplementaryDataWrite = persisted.getVersion();
@@ -219,7 +249,7 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
         assertAll(
             () -> assertThat(countQueuedRows(jdbcTemplate, persisted.getId()))
                 .as("the trigger fires on supplementary_data, so the case is queued for indexing")
-                .isZero(),
+                .isEqualTo(1),
             () -> assertThat(polledRows)
                 .as("the supplementary-data write really was picked up by the Logstash poll")
                 .hasSize(1),
@@ -227,11 +257,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
                 .as("the polled row carries the new supplementary data")
                 .contains("OrgA"),
             () -> assertThat(versionAfterSupplementaryDataWrite)
-                .as("case_data.version is NOT advanced by a supplementary-data-only write")
-                .isEqualTo(versionBeforeSupplementaryDataWrite),
+                .as("case_data.version advances for a supplementary-data-only write")
+                .isEqualTo(versionBeforeSupplementaryDataWrite + 1),
             () -> assertThat(((Number) polledRows.get(0).get("version")).intValue())
-                .as("so the external version sent to Elasticsearch is unchanged -> 409, change silently lost")
-                .isEqualTo(versionBeforeSupplementaryDataWrite)
+                .as("the external version sent to Elasticsearch is advanced")
+                .isEqualTo(versionBeforeSupplementaryDataWrite + 1)
         );
     }
 

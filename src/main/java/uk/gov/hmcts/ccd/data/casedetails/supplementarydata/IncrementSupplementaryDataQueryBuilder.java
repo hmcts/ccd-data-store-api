@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class IncrementSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
     @SuppressWarnings("checkstyle:LineLength") //don't want to break long SQL statement
     private static final String INC_UPDATE_QUERY = "UPDATE case_data SET "
+            + "version = version + 1, "
             + "supplementary_data= (CASE"
             + " WHEN COALESCE(supplementary_data, '{}') = '{}' "
             + "     THEN COALESCE(supplementary_data, '{}') || :json_value\\:\\:jsonb"
