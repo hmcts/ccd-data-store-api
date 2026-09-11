@@ -26,14 +26,14 @@ public class IdamHelper {
 
     public AuthenticatedUser authenticate(String email, String password) {
         return users.computeIfAbsent(email, e -> {
-            final String accessToken = getIdamOauth2Token(email, password);
+            final String accessToken = getIdamOidcToken(email, password);
             final OidcApi.IdamUser user = oidcApi.getUser(accessToken);
 
             return new AuthenticatedUser(user.getUid(), email, accessToken, user.getRoles());
         });
     }
 
-    public String getIdamOauth2Token(String username, String password) {
+    public String getIdamOidcToken(String username, String password) {
         OidcApi.TokenResponse tokenResponse = oidcApi.generateOpenIdToken(
             GRANT_TYPE,
             oauth2.getClientId(),

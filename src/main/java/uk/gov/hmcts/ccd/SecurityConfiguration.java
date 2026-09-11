@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
+import uk.gov.hmcts.ccd.security.IdamSecurityConfig;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
@@ -36,6 +36,8 @@ import java.util.function.Function;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import uk.gov.hmcts.ccd.security.MultiIssuerValidator;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -43,16 +45,14 @@ public class SecurityConfiguration {
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
 
-    @Value("${oidc.issuer}")
-    private String issuerOverride;
-
+    private final IdamSecurityConfig idamSecurityConfig;
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
-    private CustomHeadersFilter customHeadersFilter;
-    private JwtAuthenticationConverter jwtAuthenticationConverter;
-    private ApplicationParams applicationParams;
+    private final CustomHeadersFilter customHeadersFilter;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
@@ -77,7 +77,9 @@ public class SecurityConfiguration {
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
                                  final SecurityUtils securityUtils,
                                  final ApplicationParams applicationParams,
+                                 final IdamSecurityConfig idamSecurityConfig,
                                  @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
+        this.idamSecurityConfig = idamSecurityConfig;
         this.applicationParams = applicationParams;
         this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
@@ -117,15 +119,15 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(AppInsights appInsights) {
+    public JwtDecoder jwtDecoder(AppInsights appInsights) {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
-        // FIXME : enable `withIssuer` once idam migration done RDM-8094
-        // OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
+        OAuth2TokenValidator<Jwt> multiIssuerValidation = 
+            new MultiIssuerValidator(idamSecurityConfig.getAllowedIssuers());
+        OAuth2TokenValidator<Jwt> validator = 
+            new DelegatingOAuth2TokenValidator<>(withTimestamp, multiIssuerValidation);
 
         jwtDecoder.setJwtValidator(validator);
         return new AppInsightsJwtDecoder(jwtDecoder, appInsights);

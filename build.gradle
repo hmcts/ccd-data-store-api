@@ -819,17 +819,20 @@ task smoke(type: JavaExec) {
         into "$buildDir/test-results/test"
     }
 
-    generateCucumberReports.enabled = true
+    generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     args = ['--plugin', "json:${rootDir}/target/cucumber.json",
             '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
             '--tags', '@Smoke and not @Ignore',
             '--glue', 'uk.gov.hmcts.befta.player',
-            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 
+            'src/aat/resources/features'
+    ]
     jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
     finalizedBy {
+        generateCucumberReports.enabled = true
         generateCucumberReports {
             doLast{
                 delete "${rootDir}/BEFTA Report for Smoke Tests/"
