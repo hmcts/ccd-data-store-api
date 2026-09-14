@@ -514,6 +514,23 @@ class RoleAssignmentServiceTest {
             assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
         }
 
+        @Test
+        void shouldReturnEmptyWhenRoleAssignmentsAreMissing() {
+
+            // GIVEN
+            given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
+                .willReturn(mockedRoleAssignmentResponse);
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(new RoleAssignments());
+
+            // WHEN
+            final List<CaseAssignedUserRole> caseAssignedUserRole =
+                roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+
+            // THEN
+            assertTrue(caseAssignedUserRole.isEmpty());
+        }
+
     }
 
 
