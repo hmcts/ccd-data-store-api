@@ -1,6 +1,6 @@
 {
   "_guid_": "S-130.8",
-  "_extends_": "F-130_Get_Event_Token_Base",
+  "_extends_": "F-130_Test_Data_Base",
   "title": "User cannot start case creation without CaseEvent C Access",
 
   "specs": [
@@ -11,7 +11,13 @@
 
   "uri": "/case-types/FT_CRUD_5/event-triggers/{etid}",
 
+  "method": "GET",
+
   "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Experimental": "true"
+    },
     "pathVariables": {
       "etid": "createCase"
     }
@@ -33,5 +39,4 @@
     }
   }
 }
-
 

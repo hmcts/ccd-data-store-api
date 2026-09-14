@@ -1,6 +1,6 @@
 {
   "_guid_" : "S-131.6",
-  "_extends_" : "F-131_Token_Creation_Base",
+  "_extends_" : "F-131_Test_Data_Base",
   "title": "User cannot start event creation with missing CaseEvent C Access",
 
   "specs" : [
@@ -8,8 +8,14 @@
     "contains HTTP 404 status code"
   ],
 
+  "method": "GET",
+  "uri": "/cases/{caseId}/event-triggers/{etid}",
+
   "request": {
     "_extends_": "Common_Request",
+    "headers": {
+      "Experimental": "true"
+    },
     "pathVariables": {
       "etid": "event1",
       "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
@@ -33,4 +39,3 @@
     }
   }
 }
-
