@@ -43,7 +43,7 @@ ext {
     elasticVersion = '9.5.1'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.8'
-    beftaFwVersion = '9.2.7_CCD-7454-SNAPSHOT3'
+    beftaFwVersion = '9.2.7_CCD-7454-SNAPSHOT4'
     ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
