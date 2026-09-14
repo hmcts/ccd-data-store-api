@@ -30,7 +30,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -89,6 +92,8 @@ class AuthorisedGetUserProfileOperationTest {
 
         when(caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(any()))
             .thenReturn(accessProfiles);
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(any()))
+            .thenReturn(accessProfiles);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
         classUnderTest =
@@ -126,7 +131,9 @@ class AuthorisedGetUserProfileOperationTest {
             () ->
                 assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getStates().size(), is(3)),
             () ->
-                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
+                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4)),
+            () -> verify(caseDataAccessControl, atLeastOnce()).generateAccessProfilesByCaseTypeId(any()),
+            () -> verify(caseDataAccessControl, never()).generateOrganisationalAccessProfilesByCaseTypeId(any())
         );
     }
 
@@ -153,7 +160,9 @@ class AuthorisedGetUserProfileOperationTest {
             () ->
                 assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getStates().size(), is(3)),
             () ->
-                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
+                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4)),
+            () -> verify(caseDataAccessControl, atLeastOnce()).generateOrganisationalAccessProfilesByCaseTypeId(any()),
+            () -> verify(caseDataAccessControl, never()).generateAccessProfilesByCaseTypeId(any())
         );
     }
 
