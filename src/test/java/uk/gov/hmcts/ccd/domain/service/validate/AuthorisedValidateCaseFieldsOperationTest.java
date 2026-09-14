@@ -14,10 +14,12 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
@@ -30,6 +32,10 @@ import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -54,6 +60,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -832,6 +841,65 @@ class AuthorisedValidateCaseFieldsOperationTest {
         verify(caseAccessService, atLeast(1)).getAccessProfilesByCaseReference(CASE_REFERENCE);
         verify(caseAccessService, never()).getCaseCreationRoles(anyString());
         verify(midEventCallback).invoke(CASE_TYPE_ID, content, PAGE_ID);
+    }
+
+    @Test
+    @DisplayName("should send submitted data to the callback when the token supplies the case reference")
+    void shouldSendSubmittedDataToCallbackWhenTokenSuppliesCaseReference() {
+        CaseDataContent content = new CaseDataContent();
+        attachEvent(content);
+        content.setToken(EVENT_TOKEN);
+        content.setData(new HashMap<>(Map.of("name", JSON_NODE_FACTORY.textNode("Submitted"))));
+        when(eventTokenService.parseToken(EVENT_TOKEN)).thenReturn(new EventTokenProperties(
+            "user-id", CASE_REFERENCE, "BEFTA_MASTER", EVENT_ID, CASE_TYPE_ID,
+            "case-version", "Open", "1", "1"));
+
+        CaseDetails storedCase = new CaseDetails();
+        storedCase.setReference(Long.valueOf(CASE_REFERENCE));
+        storedCase.setCaseTypeId(CASE_TYPE_ID);
+        storedCase.setState("Open");
+        Map<String, JsonNode> storedData = Map.of("name", JSON_NODE_FACTORY.textNode("Stored"),
+            "storedOnly", JSON_NODE_FACTORY.textNode("Retained"));
+        storedCase.setData(new HashMap<>(storedData));
+        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(storedCase));
+
+        CaseService realCaseService = spy(new CaseService(new CaseDataService(), caseDetailsRepository, null));
+        doReturn(storedCase).when(realCaseService).getCaseDetails("BEFTA_MASTER", CASE_REFERENCE);
+        UIDefinitionRepository uiDefinitions = mock(UIDefinitionRepository.class);
+        WizardPage page = new WizardPage();
+        page.setId(PAGE_ID);
+        page.setCallBackURLMidEvent("http://mid-event");
+        when(uiDefinitions.getWizardPageCollection(CASE_TYPE_ID, EVENT_ID)).thenReturn(List.of(page));
+        CallbackInvoker callbackInvoker = mock(CallbackInvoker.class);
+        TimeToLiveService ttlService = mock(TimeToLiveService.class);
+        MidEventCallback realMidEventCallback = new MidEventCallback(callbackInvoker, uiDefinitions,
+            eventTriggerService, caseDefinitionRepository, realCaseService, ttlService);
+        AuthorisedValidateCaseFieldsOperation operation = new AuthorisedValidateCaseFieldsOperation(
+            accessControlService, caseDefinitionRepository, caseAccessService, validateCaseFieldsOperation,
+            conditionalFieldRestorer, applicationParams, realMidEventCallback, getCaseOperation,
+            eventTokenService, caseDetailsRepository, eventTriggerService, userRepository,
+            persistenceStrategyResolver);
+        // Isolate callback construction from response field access filtering.
+        when(applicationParams.getExcludeVerifyAccessCaseTypesForValidate()).thenReturn(List.of(CASE_TYPE_ID));
+        Map<String, JsonNode> expectedData = Map.of("name", JSON_NODE_FACTORY.textNode("Submitted"),
+            "storedOnly", JSON_NODE_FACTORY.textNode("Retained"));
+        when(callbackInvoker.invokeMidEventCallback(eq(page), any(), eq(caseEventDefinition), any(), any(), any()))
+            .thenAnswer(invocation -> {
+                CaseDetails before = invocation.getArgument(3);
+                CaseDetails current = invocation.getArgument(4);
+                assertEquals(storedData, before.getData());
+                assertEquals(expectedData, current.getData());
+                return current;
+            });
+
+        Map<String, JsonNode> result = operation.validateCaseDetails(
+            new OperationContext(CASE_TYPE_ID, content, PAGE_ID));
+
+        assertEquals(CASE_REFERENCE, content.getCaseReference());
+        assertEquals(JacksonUtils.convertValueJsonNode(expectedData), result.get(DATA));
+        assertEquals(storedData, storedCase.getData());
+        verify(callbackInvoker).invokeMidEventCallback(eq(page), any(), eq(caseEventDefinition), any(), any(), any());
+        verify(caseAccessService, never()).getCaseCreationRoles(anyString());
     }
 
     @Test

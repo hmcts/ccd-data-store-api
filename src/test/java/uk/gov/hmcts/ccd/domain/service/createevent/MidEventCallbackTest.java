@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
@@ -36,8 +38,10 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -475,6 +479,74 @@ class MidEventCallbackTest {
         midEventCallback.invoke(CASE_TYPE_ID, content, "createCase1");
 
         verify(timeToLiveService).updateCaseDetailsWithTTL(populatedData, caseEventDefinition, caseTypeDefinition);
+    }
+
+    @Test
+    @DisplayName("should preserve TTL values before filtering without mutating the stored case")
+    void shouldApplyTtlIncrementBeforeRemovingLaterPageFields() throws Exception {
+        WizardPage laterPage = createWizardPage("laterPage");
+        laterPage.setOrder(2);
+        laterPage.setWizardPageFields(Lists.newArrayList(createWizardPageField("TTL")));
+        given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
+            .willReturn(asList(wizardPageWithCallback, laterPage));
+        wizardPageWithCallback.setOrder(1);
+
+        Map<String, JsonNode> existingData = JacksonUtils.convertValue(MAPPER.readTree(
+            """
+                {
+                  "field1": "value1",
+                  "TTL": {
+                    "Suspended": "Yes",
+                    "OverrideTTL": "2035-06-15",
+                    "SystemTTL": "2030-01-01"
+                  }
+                }"""));
+        JsonNode originalData = MAPPER.valueToTree(existingData);
+        CaseDetails existingCaseDetails = caseDetails(existingData);
+        CaseDataContent content = newCaseDataContent()
+            .withEvent(event)
+            .withData(Map.of("field1", new TextNode("updated")))
+            .withCaseReference(CASE_REFERENCE)
+            .withIgnoreWarning(IGNORE_WARNINGS)
+            .build();
+
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willReturn(existingCaseDetails);
+        CaseService realCaseService = new CaseService(
+            new CaseDataService(), null, null);
+        given(caseService.clone(any())).willAnswer(invocation ->
+            realCaseService.clone(invocation.getArgument(0)));
+        given(caseService.populateCurrentCaseDetailsWithEventFields(eq(content), any()))
+            .willAnswer(invocation -> realCaseService.populateCurrentCaseDetailsWithEventFields(
+                invocation.getArgument(0), invocation.getArgument(1)));
+
+        given(timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)).willReturn(true);
+        given(timeToLiveService.updateCaseDetailsWithTTL(any(), eq(caseEventDefinition), eq(caseTypeDefinition)))
+            .willAnswer(invocation -> {
+                Map<String, JsonNode> currentData = invocation.getArgument(0);
+                assertThat(currentData.get("TTL"), is(originalData.get("TTL")));
+                // Mutate a nested value to verify that the before snapshot is deeply isolated.
+                ((ObjectNode) currentData.get("TTL"))
+                    .put("SystemTTL", "2031-01-01");
+                return currentData;
+            });
+        given(callbackInvoker.invokeMidEventCallback(eq(wizardPageWithCallback),
+            eq(caseTypeDefinition), eq(caseEventDefinition), any(), any(), eq(IGNORE_WARNINGS)))
+            .willAnswer(invocation -> {
+                CaseDetails before = invocation.getArgument(3);
+                CaseDetails current = invocation.getArgument(4);
+                assertThat(MAPPER.valueToTree(before.getData()), is(originalData));
+                assertThat(MAPPER.valueToTree(existingCaseDetails.getData()), is(originalData));
+                assertThat(current.getData(), is(Map.of("field1", new TextNode("updated"))));
+                return current;
+            });
+
+        Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID, content, "createCase1");
+
+        assertThat(result, is(Map.of("field1", new TextNode("updated"))));
+        assertThat(MAPPER.valueToTree(existingCaseDetails.getData()), is(originalData));
+        verify(timeToLiveService).updateCaseDetailsWithTTL(any(), eq(caseEventDefinition), eq(caseTypeDefinition));
+        verify(callbackInvoker).invokeMidEventCallback(eq(wizardPageWithCallback), eq(caseTypeDefinition),
+            eq(caseEventDefinition), any(), any(), eq(IGNORE_WARNINGS));
     }
 
     private Map<String, JsonNode> createData() {

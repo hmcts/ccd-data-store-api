@@ -77,19 +77,19 @@ public class MidEventCallback {
                     caseDetails = caseService.clone(caseDetails);
                     caseDetailsBefore = caseService.clone(caseDetails);
                     currentOrNewCaseDetails =
-                        caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
+                        caseService.populateCurrentCaseDetailsWithData(content, caseDetails);
                 } else {
                     currentOrNewCaseDetails =
                         caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
                         content.getData());
                     if (content.getEventData() != null) {
                         currentOrNewCaseDetails =
-                            caseService.populateCurrentCaseDetailsWithEventFields(content, currentOrNewCaseDetails);
+                            caseService.populateCurrentCaseDetailsWithData(content, currentOrNewCaseDetails);
                     }
                 }
+                applyTtlIncrementIfConfigured(currentOrNewCaseDetails, caseEventDefinition, caseTypeDefinition);
                 removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
                     event.getEventId());
-                applyTtlIncrementIfConfigured(currentOrNewCaseDetails, caseEventDefinition, caseTypeDefinition);
 
                 CaseDetails caseDetailsFromMidEventCallback =
                     callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
