@@ -85,8 +85,10 @@ Feature: F-108: Elasticsearch external endpoint
 
   @S-911
   Scenario: should NOT return any cases for a role with read access on case types but lower security classification than the case types
-    Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
-    And a case that has just been created as in [Private_Case_Creation_Autotest2_Data],
+    Given a successful call [to create a token for case creation] as in [Private_Case_Creation_Autotest1_Data_Token_Creation],
+    And another successful call [to create a full case] as in [Private_Case_Creation_Autotest1_Data],
+    And a successful call [to create a token for case creation] as in [Private_Case_Creation_Autotest2_Data_Token_Creation],
+    And another successful call [to create a full case] as in [Private_Case_Creation_Autotest2_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [public security classification access],
     When the request [is configured to search for both the previously created cases],
