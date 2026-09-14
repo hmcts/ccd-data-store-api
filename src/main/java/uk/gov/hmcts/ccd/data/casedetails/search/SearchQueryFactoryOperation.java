@@ -76,9 +76,7 @@ public class SearchQueryFactoryOperation {
             return Optional.empty();
         }
 
-        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
-        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
-        String queryString = String.format(queryToFormat, whereClausePart, sortClause);
+        String queryString = buildQueryString(isCountQuery, whereClausePart, metadata);
 
         Query query;
         if (isCountQuery) {
@@ -133,7 +131,16 @@ public class SearchQueryFactoryOperation {
     }
 
     private void addParameters(final Query query, List<Criterion> criteria) {
-        criteria.forEach(criterion -> query.setParameter(criterion.buildParameterId(), criterion.getSoughtValue()));
+        criteria.forEach(criterion -> criterion.bindParameters(query));
+    }
+
+    private String buildQueryString(boolean isCountQuery, String whereClausePart, MetaData metadata) {
+        if (isCountQuery) {
+            return String.format(MAIN_COUNT_QUERY, whereClausePart);
+        }
+
+        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
+        return String.format(MAIN_QUERY, whereClausePart, sortClause);
     }
 
     private String toClauses(final List<Criterion> criteria) {

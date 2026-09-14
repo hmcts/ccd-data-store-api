@@ -33,9 +33,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
         ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
         FIND_BY_CASE_DATA_ID_HQL
-            + " AND cae.createdDate = "
-            + "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
-            + CaseAuditEventEntity.CASE_DATA_ID + ")"
+            + " ORDER BY cae.createdDate ASC"
         ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =
         FIND_BY_ID_HQL
