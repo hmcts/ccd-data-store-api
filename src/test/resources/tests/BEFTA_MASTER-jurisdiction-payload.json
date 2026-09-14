@@ -5486,6 +5486,13 @@
           "description":"Update a case modifying Suspended TTL",
           "acls":[
             {
+              "role":"citizen",
+              "create":true,
+              "read":true,
+              "update":true,
+              "delete":true
+            },
+            {
               "role":"caseworker-befta_master",
               "create":true,
               "read":true,
@@ -5502,6 +5509,13 @@
           "name":"Update modified SystemTTL",
           "description":"Update a case modifying System TTL",
           "acls":[
+            {
+              "role":"citizen",
+              "create":true,
+              "read":true,
+              "update":true,
+              "delete":true
+            },
             {
               "role":"caseworker-befta_master",
               "create":true,
@@ -5520,6 +5534,13 @@
           "description":"Update a case modifying Override TTL",
           "acls":[
             {
+              "role":"citizen",
+              "create":true,
+              "read":true,
+              "update":true,
+              "delete":true
+            },
+            {
               "role":"caseworker-befta_master",
               "create":true,
               "read":true,
@@ -5536,6 +5557,13 @@
           "name":"Update with no TTL Increment",
           "description":"Update a case with no TTL increment value present",
           "acls":[
+            {
+              "role":"citizen",
+              "create":true,
+              "read":true,
+              "update":true,
+              "delete":true
+            },
             {
               "role":"caseworker-befta_master",
               "create":true,
@@ -5647,6 +5675,13 @@
           "name":"Update a case",
           "description":"Update a case",
           "acls":[
+            {
+              "role":"citizen",
+              "create":true,
+              "read":true,
+              "update":true,
+              "delete":true
+            },
             {
               "role":"caseworker-befta_master",
               "create":true,
