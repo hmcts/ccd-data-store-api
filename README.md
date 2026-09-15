@@ -62,6 +62,7 @@ processing. Changes should be applied consistently to all Logstash agents.
 | Name                                         | Default            | Description                                   |
 |----------------------------------------------|--------------------|-----------------------------------------------|
 | ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
+| LOGSTASH_OUTAGE_FTA_ENABLED                 | false              | Enable the opt-in F-7841 test that temporarily blocks writes to the AAT private-case Elasticsearch index to verify Logstash lease recovery. Set only in a dedicated/isolated AAT run. |
 | GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
 | ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
 
