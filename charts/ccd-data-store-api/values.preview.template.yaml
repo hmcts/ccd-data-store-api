@@ -33,8 +33,8 @@ java:
     USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
-    IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net # Added for Befta tests to work with OIDC
-    OIDC_ALLOWED_ISSUERS: "https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat1.internal:8443/openam/oauth2/realms/root/realms/hmcts,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
+    IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+    OIDC_ALLOWED_ISSUERS: "https://idam-web-public.aat.platform.hmcts.net/o,https://hmcts-access.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
