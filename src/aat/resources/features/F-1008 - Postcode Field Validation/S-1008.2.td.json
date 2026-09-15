@@ -1,0 +1,58 @@
+{
+  "_guid_": "S-1008.2",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation",
+  "title": "An invalid postcode in a Postcode field is rejected",
+
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on the postcode field",
+    "contains a value that is not a valid UK postcode in the Postcode field",
+    "is rejected with an unprocessable entity error"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "method": "POST",
+  "uri": "case-types/{CaseTypeID}/cases",
+
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+    },
+    "pathVariables": {
+      "CaseTypeID": "FT_Regex"
+    },
+    "body": {
+      "data": {
+        "TextField": "ABC",
+        "PostcodeField": "12345"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1008_Postcode_Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 422,
+    "responseMessage": "[[ANYTHING_PRESENT]]",
+    "headers": {
+      "_extends_": "Common_Response_Headers"
+    },
+    "body": {
+      "message": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
