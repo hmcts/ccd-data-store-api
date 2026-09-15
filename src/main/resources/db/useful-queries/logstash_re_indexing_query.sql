@@ -6,66 +6,19 @@
 -- 2. ES re-indexing triggered via ccd-admin-web 
 --     (note, this only creates the static indexes i.e place holders)
 
--- 3. Run the below script. This will loop through each Jurisdiction starting with the most cases 
---    and update the marked_by_logstash field to false in batches of 1000
--- 4. Once a row is markes as false, an automatic job is triggered perform logstash indexing
+-- 3. Run the below script after the target Elasticsearch indexes have been removed.
+--    It repopulates the queue in batches so Logstash can re-index all cases.
+-- 4. Queue rows are leased by Logstash and become eligible for retry when their lease expires.
+--    The preview deployment defaults LOGSTASH_QUEUE_CLAIM_TIMEOUT to 5 minutes; adjust it through
+--    the Logstash deployment configuration if normal indexing can take longer.
 
-DO $$
-DECLARE
-    batch_size INT := 1000;
-    rows_updated INT;
-    total_updated INT;
-    current_jurisdiction TEXT;
-    start_time TIMESTAMP;
-    end_time TIMESTAMP;
-BEGIN
-    RAISE NOTICE 'Starting batch update...';
-   
-    DROP TABLE IF EXISTS JurisdictionsToIndex;
+-- Run once per re-index. Re-running creates additional queue attempts by design.
+INSERT INTO case_data_logstash_queue (case_data_id)
+SELECT id
+FROM case_data
+WHERE NOT (data = '{}'::jsonb AND state = '');
 
-    -- Create a temp table with jurisdictions sorted by count descending
-    CREATE TEMP TABLE JurisdictionsToIndex AS
-        SELECT jurisdiction
-        FROM (
-            SELECT jurisdiction, COUNT(*) AS count
-            FROM case_data
-            GROUP BY jurisdiction
-            ORDER BY count DESC
-        ) sub;
-
-    -- Loop through each jurisdiction
-    FOR current_jurisdiction IN
-        SELECT jurisdiction FROM JurisdictionsToIndex
-    LOOP
-        total_updated := 0;
-        start_time := clock_timestamp();
-        RAISE NOTICE 'Processing jurisdiction: %', current_jurisdiction;
-
-        LOOP
-            -- Batch update for current jurisdiction
-            WITH batch AS (
-                SELECT id
-                FROM case_data
-                WHERE marked_by_logstash = true
-                  AND jurisdiction = current_jurisdiction
-                LIMIT batch_size
-                FOR UPDATE SKIP LOCKED
-            )
-            UPDATE case_data
-            SET marked_by_logstash = false
-            WHERE id IN (SELECT id FROM batch);
-
-            -- Correctly get number of rows updated
-            GET DIAGNOSTICS rows_updated = ROW_COUNT;
-
-            EXIT WHEN rows_updated = 0;
-            total_updated := total_updated + rows_updated;
-        END LOOP;
-
-        end_time := clock_timestamp();
-        RAISE NOTICE 'Jurisdiction %: updated %, Time taken: % seconds',
-                     current_jurisdiction, total_updated, end_time - start_time;
-    END LOOP;
-
-    RAISE NOTICE 'Batch update complete.';
-END $$;
+-- Expired claims are automatically eligible for retry by the Logstash claim query.
+SELECT COUNT(*) AS queued_for_reindex
+FROM case_data_logstash_queue
+WHERE claimed_at IS NULL;

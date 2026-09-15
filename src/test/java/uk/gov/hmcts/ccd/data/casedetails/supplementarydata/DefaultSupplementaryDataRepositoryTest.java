@@ -55,6 +55,22 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldAdvanceCaseVersionWhenSettingSupplementaryData() {
+        assumeDataInitialised();
+        Integer before = template.queryForObject("SELECT version FROM case_data WHERE reference = ?",
+            Integer.class, "1504259907353529");
+
+        supplementaryDataRepository.setSupplementaryData("1504259907353529",
+            "orgs_assigned_users.organisationA", 32);
+
+        Integer after = template.queryForObject("SELECT version FROM case_data WHERE reference = ?",
+            Integer.class, "1504259907353529");
+        assertEquals(before + 1, after);
+    }
+
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
         {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryDataWhenSupplementaryDataColumnEmpty() {
@@ -140,6 +156,22 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
         Map<String, Object> responseMap = response.getResponse();
         assertTrue(responseMap.containsKey("orgs_assigned_users.organisationA"));
         assertEquals(13, responseMap.get("orgs_assigned_users.organisationA"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void shouldAdvanceCaseVersionWhenIncrementingSupplementaryData() {
+        assumeDataInitialised();
+        Integer before = template.queryForObject("SELECT version FROM case_data WHERE reference = ?",
+            Integer.class, "1504259907353529");
+
+        supplementaryDataRepository.incrementSupplementaryData("1504259907353529",
+            "orgs_assigned_users.organisationA", 3);
+
+        Integer after = template.queryForObject("SELECT version FROM case_data WHERE reference = ?",
+            Integer.class, "1504259907353529");
+        assertEquals(before + 1, after);
     }
 
     @Test

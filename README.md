@@ -51,9 +51,18 @@ The following environment variables are required:
 
 The following environment variables are optional:
 
+### Logstash queue claim timeout
+
+`LOGSTASH_QUEUE_CLAIM_TIMEOUT` controls how long a Logstash queue row remains
+claimed before it becomes eligible for retry. The default is `5 minutes`.
+Values use PostgreSQL interval syntax, for example `15 minutes` or `1 hour`.
+Set this longer than the maximum expected indexing duration to avoid duplicate
+processing. Changes should be applied consistently to all Logstash agents.
+
 | Name                                         | Default            | Description                                   |
 |----------------------------------------------|--------------------|-----------------------------------------------|
 | ELASTIC_SEARCH_FTA_ENABLED                 | true/false/not set | Enable ElasticSearch FTA (Functional Tests).  |
+| LOGSTASH_OUTAGE_FTA_ENABLED                 | false              | Enable the opt-in F-7841 test that temporarily blocks writes to the AAT private-case Elasticsearch index to verify Logstash lease recovery. Set only in a dedicated/isolated AAT run. |
 | GROUP_ACCESS_ENABLED                         | true/false/not set | Enable group access Tesing (Funtional Tests). |
 | ENABLE_CASE_GROUP_ACCESS_FILTERING           | true/false         | Enable case group access filtering.           |
 
