@@ -23,7 +23,7 @@
 		},
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case type found",
+      "message": "No event found",
       "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
