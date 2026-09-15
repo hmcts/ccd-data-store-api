@@ -84,7 +84,10 @@ Scenario: must return 409 when case is altered out of the transaction
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-283
+# After the event token validation fix(ccd-5521), we get the same error in the token creation process since the token
+# creation has to be with the same eventId; STOP_PROGRESS, which is not valid for the event process. That's why S-283
+# is not a valid scenario anymore
+@S-283 @Ignore
 Scenario: must return 422 when event submission has failed
 
     Given a user with [an active profile in CCD],

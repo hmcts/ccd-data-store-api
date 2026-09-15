@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ACCESS_PROFILES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getTagFieldDefinition;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
@@ -168,10 +167,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseFieldDefinition noteWithCreatePermissionWithoutReadPermission() {
-        AccessControlList deletePermission = new AccessControlList();
-        deletePermission.setAccessProfile("caseworker-probate-loa1");
-        deletePermission.setCreate(true);
-        deletePermission.setRead(false);
+        AccessControlList deletePermission = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseFieldDefinition note = newCaseField()
             .withId("Note")
@@ -206,10 +206,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseFieldDefinition tagsWithCreatePermissionWithoutReadPermission() {
-        AccessControlList controlList = new AccessControlList();
-        controlList.setAccessProfile("caseworker-probate-loa1");
-        controlList.setCreate(true);
-        controlList.setRead(false);
+        AccessControlList controlList = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseFieldDefinition tags = getTagFieldDefinition();
         tags.setAccessControlLists(List.of(controlList));
@@ -367,10 +368,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseFieldDefinition noteWithNestedFieldsWithCreateAndWithoutReadPermission() {
-        AccessControlList controlList = new AccessControlList();
-        controlList.setAccessProfile("caseworker-probate-loa1");
-        controlList.setCreate(true);
-        controlList.setRead(false);
+        AccessControlList controlList = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseFieldDefinition note = noteWithNestedFieldsWithoutCreateAndReadPermission();
         note.setAccessControlLists(List.of(controlList));
@@ -461,10 +463,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseFieldDefinition caseCategoryFieldWithCreateWithoutReadPermission() {
-        AccessControlList accessControlList = new AccessControlList();
-        accessControlList.setAccessProfile("caseworker-probate-loa1");
-        accessControlList.setCreate(true);
-        accessControlList.setRead(false);
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseFieldDefinition caseCategory = caseCategoryFieldWithoutCreateAndReadPermission();
         caseCategory.setAccessControlLists(List.of(accessControlList));
@@ -538,10 +541,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseFieldDefinition generatedCaseDocumentsFieldWithCreateWithoutReadPermission() {
-        AccessControlList accessControlList = new AccessControlList();
-        accessControlList.setAccessProfile("caseworker-probate-loa1");
-        accessControlList.setCreate(true);
-        accessControlList.setRead(false);
+        AccessControlList accessControlList = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseFieldDefinition document = generatedCaseDocumentsFieldWithoutCreateAndReadPermission();
         document.setAccessControlLists(List.of(accessControlList));
@@ -2470,12 +2474,12 @@ class ConditionalFieldRestorerTest {
                     .build())
                 .build())
             .withOrder(1)
-            .withAcl(anAcl()
-                .withRole("caseworker-probate-loa1")
-                .withCreate(true)
-                .withUpdate(false)
-                .withDelete(false)
-                .withRead(false)
+            .withAcl(AccessControlList.builder()
+                .accessProfile("caseworker-probate-loa1")
+                .create(true)
+                .read(false)
+                .update(false)
+                .delete(false)
                 .build())
             .build();
         Map<String, JsonNode> newData = getJsonMapNode("""
@@ -2579,12 +2583,12 @@ class ConditionalFieldRestorerTest {
                     .build())
                 .build())
             .withOrder(1)
-            .withAcl(anAcl()
-                .withRole("caseworker-probate-loa1")
-                .withCreate(false)
-                .withUpdate(false)
-                .withDelete(false)
-                .withRead(false)
+            .withAcl(AccessControlList.builder()
+                .accessProfile("caseworker-probate-loa1")
+                .create(false)
+                .read(false)
+                .update(false)
+                .delete(false)
                 .build())
             .build();
         Map<String, JsonNode> newData = getJsonMapNode("""
@@ -3958,10 +3962,11 @@ class ConditionalFieldRestorerTest {
     }
 
     private CaseTypeDefinition caseTypeDefinitionWithNestedListWithCreatePermissionWithoutReadPermission() {
-        AccessControlList controlList = new AccessControlList();
-        controlList.setAccessProfile("caseworker-probate-loa1");
-        controlList.setCreate(true);
-        controlList.setRead(false);
+        AccessControlList controlList = AccessControlList.builder()
+            .accessProfile("caseworker-probate-loa1")
+            .create(true)
+            .read(false)
+            .build();
 
         CaseTypeDefinition caseTypeDefinition = caseDefinitionWithNestedList();
         caseTypeDefinition.getCaseFieldDefinitions().getFirst().setAccessControlLists(List.of(controlList));
