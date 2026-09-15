@@ -45,11 +45,12 @@ class JwksPropertiesTest {
         void rejectsCacheRefreshTimeoutBelowRetrievalWorstCase() {
             // 2000 + 5000 = 7000ms worst case for retrieval; a waiter given 6000ms always gives up first. This is
             // the production failure mode, and the check exists, so it cannot be reintroduced by configuration.
-            assertThatThrownBy(() -> productionDefaults()
+            Builder builder = productionDefaults()
                 .connectTimeoutMs(2000)
                 .readTimeoutMs(5000)
-                .cacheRefreshTimeoutMs(6000)
-                .build())
+                .cacheRefreshTimeoutMs(6000);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-refresh-timeout-ms (6000)")
                 .hasMessageContaining("2000 + 5000 = 7000");
@@ -58,11 +59,12 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a cache refresh timeout exactly equal to the retrieval worst case")
         void rejectsCacheRefreshTimeoutEqualToRetrievalWorstCase() {
-            assertThatThrownBy(() -> productionDefaults()
+            Builder builder = productionDefaults()
                 .connectTimeoutMs(2000)
                 .readTimeoutMs(5000)
-                .cacheRefreshTimeoutMs(7000)
-                .build())
+                .cacheRefreshTimeoutMs(7000);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-refresh-timeout-ms");
         }
@@ -70,10 +72,11 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a rate limit interval that is not shorter than the cache TTL")
         void rejectsRateLimitAboveCacheTtl() {
-            assertThatThrownBy(() -> productionDefaults()
+            Builder builder = productionDefaults()
                 .cacheTtlMs(30_000)
-                .rateLimitMinIntervalMs(30_000)
-                .build())
+                .rateLimitMinIntervalMs(30_000);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("rate-limit-min-interval-ms");
         }
@@ -81,11 +84,12 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a refresh-ahead window that does not fit inside the cache TTL")
         void rejectsRefreshAheadExceedingCacheTtl() {
-            assertThatThrownBy(() -> productionDefaults()
+            Builder builder = productionDefaults()
                 .cacheTtlMs(60_000)
                 .refreshAheadTimeMs(55_000)
-                .cacheRefreshTimeoutMs(10_000)
-                .build())
+                .cacheRefreshTimeoutMs(10_000);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("refresh-ahead-time-ms plus oidc.jwks.cache-refresh-timeout-ms");
         }
@@ -93,10 +97,11 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects an outage tolerance that expires no later than the cache itself")
         void rejectsOutageToleranceBelowCacheTtl() {
-            assertThatThrownBy(() -> productionDefaults()
+            Builder builder = productionDefaults()
                 .cacheTtlMs(300_000)
-                .outageToleranceMs(300_000)
-                .build())
+                .outageToleranceMs(300_000);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("outage-tolerance-ms");
         }
@@ -109,7 +114,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects an infinite connect timeout")
         void rejectsZeroConnectTimeout() {
-            assertThatThrownBy(() -> productionDefaults().connectTimeoutMs(0).build())
+            Builder builder = productionDefaults().connectTimeoutMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("connect-timeout-ms")
                 .hasMessageContaining("infinite");
@@ -118,7 +125,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects an infinite read timeout")
         void rejectsZeroReadTimeout() {
-            assertThatThrownBy(() -> productionDefaults().readTimeoutMs(0).build())
+            Builder builder = productionDefaults().readTimeoutMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("read-timeout-ms")
                 .hasMessageContaining("infinite");
@@ -127,7 +136,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a blank URI")
         void rejectsBlankUri() {
-            assertThatThrownBy(() -> productionDefaults().uri("  ").build())
+            Builder builder = productionDefaults().uri("  ");
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("oidc.jwks.uri must be set");
         }
@@ -135,7 +146,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero size limit")
         void rejectsZeroSizeLimit() {
-            assertThatThrownBy(() -> productionDefaults().sizeLimitBytes(0).build())
+            Builder builder = productionDefaults().sizeLimitBytes(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("size-limit-bytes");
         }
@@ -143,7 +156,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero cache TTL")
         void rejectsZeroCacheTtl() {
-            assertThatThrownBy(() -> productionDefaults().cacheTtlMs(0).build())
+            Builder builder = productionDefaults().cacheTtlMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-ttl-ms");
         }
@@ -151,7 +166,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero cache refresh timeout")
         void rejectsZeroCacheRefreshTimeout() {
-            assertThatThrownBy(() -> productionDefaults().cacheRefreshTimeoutMs(0).build())
+            Builder builder = productionDefaults().cacheRefreshTimeoutMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-refresh-timeout-ms must be greater than 0");
         }
@@ -159,7 +176,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero refresh-ahead time")
         void rejectsZeroRefreshAheadTime() {
-            assertThatThrownBy(() -> productionDefaults().refreshAheadTimeMs(0).build())
+            Builder builder = productionDefaults().refreshAheadTimeMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("refresh-ahead-time-ms must be greater than 0");
         }
@@ -167,7 +186,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero rate limit interval")
         void rejectsZeroRateLimitInterval() {
-            assertThatThrownBy(() -> productionDefaults().rateLimitMinIntervalMs(0).build())
+            Builder builder = productionDefaults().rateLimitMinIntervalMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("rate-limit-min-interval-ms must be greater than 0");
         }
@@ -175,7 +196,9 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a zero outage tolerance")
         void rejectsZeroOutageTolerance() {
-            assertThatThrownBy(() -> productionDefaults().outageToleranceMs(0).build())
+            Builder builder = productionDefaults().outageToleranceMs(0);
+
+            assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("outage-tolerance-ms must be greater than 0");
         }

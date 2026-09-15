@@ -190,8 +190,7 @@ class JwkSourceRecoveryIT {
 
         assertThat(decodeDurationsMs)
             .as("expected enough requests to have been served while the slow retrieval was in flight")
-            .hasSizeGreaterThan(5);
-        assertThat(decodeDurationsMs)
+            .hasSizeGreaterThan(5)
             .as("no request may wait on the %dms retrieval; durations were %s", endpointDelayMs, decodeDurationsMs)
             .allSatisfy(duration -> assertThat(duration).isLessThan(endpointDelayMs / 2L));
 

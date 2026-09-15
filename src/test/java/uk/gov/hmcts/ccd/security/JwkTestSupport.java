@@ -164,6 +164,8 @@ final class JwkTestSupport {
 
         @Override
         public void trackTrace(String message, Map<String, String> customProperties, SeverityLevel severityLevel) {
+            // Intentionally a no-op: these tests only assert on trackEvent calls, so traces are discarded
+            // rather than accumulated in an unused collection.
         }
 
         List<TrackedEvent> events() {
