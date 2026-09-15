@@ -1,6 +1,12 @@
 {
   "_guid_": "S-130.8",
-  "_extends_": "F-130_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
   "title": "User cannot start case creation without CaseEvent C Access",
 
   "specs": [
@@ -31,7 +37,7 @@
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No event found",
+      "message": "No case type found",
       "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
@@ -39,4 +45,3 @@
     }
   }
 }
-
