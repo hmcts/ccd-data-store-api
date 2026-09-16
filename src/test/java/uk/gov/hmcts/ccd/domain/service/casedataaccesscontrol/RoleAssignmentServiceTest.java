@@ -531,6 +531,23 @@ class RoleAssignmentServiceTest {
             assertTrue(caseAssignedUserRole.isEmpty());
         }
 
+        @Test
+        void shouldReturnEmptyWhenMappedRoleAssignmentsAreNull() {
+
+            // GIVEN
+            given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
+                .willReturn(mockedRoleAssignmentResponse);
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(null);
+
+            // WHEN
+            final List<CaseAssignedUserRole> caseAssignedUserRole =
+                roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+
+            // THEN
+            assertTrue(caseAssignedUserRole.isEmpty());
+        }
+
     }
 
 
