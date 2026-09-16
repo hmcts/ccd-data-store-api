@@ -200,8 +200,12 @@ public class UICaseSearchController {
         description = "Date is not valid."
     )
     @ApiResponse(
+        responseCode = "403",
+        description = "User does not have the disposer-payment-user role."
+    )
+    @ApiResponse(
         responseCode = "404",
-        description = V2.Error.CASE_DATA_NOT_FOUND + ": no closed cases are accessible to the user for the given date."
+        description = V2.Error.CASE_DATA_NOT_FOUND + ": no closed cases found for the given date."
     )
     public ResponseEntity<DateCaseClosedResponse> getClosedCases(
         @Parameter(
