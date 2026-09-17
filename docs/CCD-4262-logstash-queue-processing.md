@@ -22,6 +22,41 @@ rows are inserted. The recovery query never updates `case_data`.
 Operational monitoring must alert on Elasticsearch output failures, including
 non-retryable failures and DLQ routing, so the affected window is known promptly.
 
+## Release gate: operational alert and manual-requeue smoke test
+
+The Logstash pipeline enables its dead-letter queue and indexes non-retryable
+entries into `ccd-logstash-dead-letter`. Before production rollout, the platform
+monitoring owner must create and test an alert for new documents in that index
+and for Logstash Elasticsearch output failures. Record the alert URL, receiving
+team, and test timestamp in the change ticket; this repository cannot create an
+environment-level alert.
+
+Run this smoke test in an isolated preview deployment after the alert is active:
+
+1. Create an AAT private case and add supplementary data; record the case ID and
+   the UTC start/end time.
+2. Block writes to the AAT private Elasticsearch index, wait for Logstash to poll
+   the queue, then restore writes. Confirm the failure is visible in Logstash and
+   the DLQ/dead-letter index where the failure is non-retryable.
+3. In the Data Store PostgreSQL pod, re-queue only that case, substituting the
+   recorded case ID:
+
+   ```sql
+   INSERT INTO case_data_logstash_queue (case_data_id)
+   SELECT id FROM case_data cd
+   WHERE cd.reference = :case_reference
+     AND NOT EXISTS (
+       SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
+     );
+   ```
+
+4. Confirm the queue row is consumed and `/searchCases` returns the case with the
+   expected supplementary data. Confirm the alert fired and was received by its
+   owner, then attach the evidence to the ticket.
+
+This is a manual environment smoke test by design: Option 2 deliberately has no
+automatic retry after the queue row has been deleted.
+
 ## Deferred design
 
 Lease/claim processing is deferred. It must include a post-Elasticsearch ACK and

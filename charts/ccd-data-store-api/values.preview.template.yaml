@@ -215,6 +215,10 @@ logstash:
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
         queue.type: persisted
+      - pipeline.id: index-dead-letter-to-es
+        path.config: "/usr/share/logstash/pipeline/dead_letter_indexing_pipeline.conf"
+        pipeline.workers: 1
+        dead_letter_queue.enable: false
   logstashPipeline:
     01_input.conf: |
       input  {
@@ -356,4 +360,27 @@ logstash:
               # Handle version conflicts gracefully
               retry_on_conflict => 0
           }
+      }
+    dead_letter_indexing_pipeline.conf: |
+      input {
+        dead_letter_queue {
+          path => "${LOGSTASH_HOME}/data/dead_letter_queue"
+          commit_offsets => true
+          pipeline_id => "main"
+        }
+      }
+      filter {
+        ruby { code => "event.set('failed_case', event.to_json())" }
+        prune { whitelist_names => [ "^failed_case$" ] }
+        ruby { code => "event.set('timestamp', event.get('[@metadata][dead_letter_queue][entry_time]'))" }
+        mutate {
+          add_field => { "reason" => "%{[@metadata][dead_letter_queue][reason]}" }
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["http://{{ .Release.Name }}-es-master:9200"]
+          sniffing => false
+          index => "ccd-logstash-dead-letter"
+        }
       }

@@ -44,6 +44,12 @@ class LogstashPipelineConfigurationTest {
             () -> assertTrue(
                 previewValues.contains("DELETE FROM case_data_logstash_queue q"),
                 "Queue rows must have a terminal state after they are read"
+            ),
+            () -> assertTrue(
+                previewValues.contains("dead_letter_queue.enable: true")
+                    && previewValues.contains("pipeline.id: index-dead-letter-to-es")
+                    && previewValues.contains("index => \"ccd-logstash-dead-letter\""),
+                "Preview Logstash must route non-retryable Elasticsearch failures to the dead-letter index"
             )
         );
     }
