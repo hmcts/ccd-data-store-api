@@ -71,11 +71,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             @Override
             public synchronized void loadDataIfNotLoadedVeryRecently() {
                 super.loadDataIfNotLoadedVeryRecently();
-                try {
-                    IdamTestingSupportUserCreator.createUsersInIdam();
-                } catch (Exception e) {
-                    BeftaUtils.defaultLog("Error creating test users in IDAM.", e);
-                }
+                IdamTestingSupportUserCreator.createUsersInIdam();
             }
 
         };

@@ -23,13 +23,14 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Creates IDAM test users from JSON files under {@code idamUsers/}, using the IDAM Testing Support API.
- * See am-org-role-mapping-service {@code OrmTestDataLoader} for the original pattern.
+ * Uses PUT /test/idam/users/{userId} so existing users are updated (including password) on conflict.
  */
 public final class IdamTestingSupportUserCreator {
 
     private static final String IDAM_USERS_RESOURCE_DIR = "idamUsers";
-    private static final String CREATE_USER_PATH = "/test/idam/users";
+    private static final String CREATE_OR_UPDATE_USER_PATH = "/test/idam/users/{userId}";
     private static final String IDAM_USER_PROVISIONER_TD = "features/common/users/BeftaMasterCaseworker.td.json";
+    private static final String UNRESOLVED_PLACEHOLDER_PREFIX = "[[$";
 
     private IdamTestingSupportUserCreator() {
     }
@@ -44,7 +45,9 @@ public final class IdamTestingSupportUserCreator {
 
         File idamUsersDir = BeftaUtils.getFileFromResource(IDAM_USERS_RESOURCE_DIR);
         if (!idamUsersDir.exists() || !idamUsersDir.isDirectory()) {
-            BeftaUtils.defaultLog("Skipping user creation in IDAM as " + IDAM_USERS_RESOURCE_DIR + " was not found.");
+            BeftaUtils.defaultLog(
+                "Skipping user creation in IDAM as " + IDAM_USERS_RESOURCE_DIR + " was not found at "
+                    + idamUsersDir.getAbsolutePath());
             return;
         }
 
@@ -52,47 +55,81 @@ public final class IdamTestingSupportUserCreator {
 
         FileFilter fileFilter = file -> !file.isDirectory() && file.getName().endsWith(".json");
         File[] jsonFiles = idamUsersDir.listFiles(fileFilter);
-        if (jsonFiles == null) {
+        if (jsonFiles == null || jsonFiles.length == 0) {
+            BeftaUtils.defaultLog("No IDAM user JSON files under " + idamUsersDir.getAbsolutePath());
             return;
         }
 
         for (File jsonFile : jsonFiles) {
-            createUserFromFile(jsonFile, idamTsUrl, provisioner.getAccessToken());
+            createOrUpdateUserFromFile(jsonFile, idamTsUrl, provisioner.getAccessToken());
         }
     }
 
-    private static void createUserFromFile(File jsonFile, String idamTsUrl, String accessToken) {
+    private static void createOrUpdateUserFromFile(File jsonFile, String idamTsUrl, String accessToken) {
         JsonNode requestJson;
 
         try {
             requestJson = JsonUtils.readObjectFromJsonFile(jsonFile.getPath(), JsonNode.class);
-            updateNodeValueFromEnvironmentVariable(requestJson, "password");
-            JsonNode userNode = requestJson.findValue("user");
-            if (userNode != null) {
-                updateNodeValueFromEnvironmentVariable(userNode, "email");
-            }
+            resolvePlaceholdersInRequest(requestJson);
         } catch (IOException e) {
             throw new RuntimeException("Error loading user data from: " + jsonFile.getPath(), e);
         }
 
+        JsonNode userNode = requestJson.get("user");
+        if (userNode == null || userNode.get("id") == null || StringUtils.isBlank(userNode.get("id").asText())) {
+            throw new RuntimeException("IDAM user JSON must contain user.id: " + jsonFile.getPath());
+        }
+        String userId = userNode.get("id").asText();
+        String email = userNode.has("email") ? userNode.get("email").asText() : userId;
+
         Response response = RestAssured
             .given(new RequestSpecBuilder().setBaseUri(idamTsUrl).build())
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            .pathParam("userId", userId)
             .body(requestJson)
             .contentType(ContentType.JSON)
             .when()
-            .post(CREATE_USER_PATH);
+            .put(CREATE_OR_UPDATE_USER_PATH);
 
-        if (response.getStatusCode() == HttpStatus.CREATED.value()) {
-            BeftaUtils.defaultLog("IDAM user created from: " + jsonFile.getPath());
-        } else if (response.getStatusCode() == HttpStatus.CONFLICT.value()) {
-            BeftaUtils.defaultLog("IDAM user already exists for: " + jsonFile.getPath());
+        if (response.getStatusCode() == HttpStatus.OK.value()) {
+            BeftaUtils.defaultLog(
+                "IDAM user created or updated from: " + jsonFile.getPath() + " (email=" + email + ", id=" + userId + ")");
         } else {
-            BeftaUtils.defaultLog("Error when creating IDAM user from: " + jsonFile.getPath());
-            String message = "Call to create IDAM user failed with response body: " + response.body().prettyPrint();
+            BeftaUtils.defaultLog("Error when creating/updating IDAM user from: " + jsonFile.getPath()
+                + " (email=" + email + ", id=" + userId + ")");
+            String message = "Call to create/update IDAM user failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
             throw new RuntimeException(message);
         }
+    }
+
+    private static void resolvePlaceholdersInRequest(JsonNode requestJson) {
+        if (!requestJson.isObject()) {
+            return;
+        }
+        ObjectNode root = (ObjectNode) requestJson;
+        if (root.has("password")) {
+            root.put("password", resolveRequiredValue(root.get("password").asText(), "password"));
+        }
+        JsonNode userNode = root.get("user");
+        if (userNode != null && userNode.isObject() && userNode.has("email")) {
+            ((ObjectNode) userNode).put(
+                "email",
+                resolveRequiredValue(userNode.get("email").asText(), "user.email")
+            );
+        }
+    }
+
+    private static String resolveRequiredValue(String rawValue, String fieldDescription) {
+        String value = EnvironmentVariableUtils.resolvePossibleVariable(rawValue);
+        if (StringUtils.isBlank(value) || value.contains(UNRESOLVED_PLACEHOLDER_PREFIX)) {
+            throw new RuntimeException(
+                "Unresolved environment variable for IDAM user field '" + fieldDescription + "'. "
+                    + "Ensure Jenkins Key Vault secrets are mapped (e.g. CCD_DISPOSER_PAYMENT_USER_EMAIL). "
+                    + "Raw value: " + rawValue
+            );
+        }
+        return value;
     }
 
     private static UserData getIdamUserProvisioner() {
@@ -105,8 +142,8 @@ public final class IdamTestingSupportUserCreator {
             );
 
             provisioner = new UserData(
-                EnvironmentVariableUtils.resolvePossibleVariable(userJson.findValue("username").asText()),
-                EnvironmentVariableUtils.resolvePossibleVariable(userJson.findValue("password").asText())
+                resolveRequiredValue(userJson.get("username").asText(), "provisioner.username"),
+                resolveRequiredValue(userJson.get("password").asText(), "provisioner.password")
             );
         } catch (IOException e) {
             throw new RuntimeException("Error loading user data for IDAM user provisioning", e);
@@ -119,14 +156,5 @@ public final class IdamTestingSupportUserCreator {
         }
 
         return provisioner;
-    }
-
-    private static void updateNodeValueFromEnvironmentVariable(JsonNode parentNode, String fieldName) {
-        JsonNode fieldNode = parentNode.findValue(fieldName);
-        if (fieldNode == null || !parentNode.isObject()) {
-            return;
-        }
-        String value = EnvironmentVariableUtils.resolvePossibleVariable(fieldNode.asText());
-        ((ObjectNode) parentNode).put(fieldName, value);
     }
 }
