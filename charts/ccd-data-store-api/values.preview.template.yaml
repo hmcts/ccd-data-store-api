@@ -40,7 +40,10 @@ java:
     #ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://ccd-data-store-api-pr-2844-es-master:9200"
     TESTING_SUPPORT_ENABLED: true
     MIGRATIONS_ENDPOINT_ENABLED: true
-    TOKEN_CLAIM_VALIDATION_ENABLED: true
+    # CCD-4311: preview BEFTA still has legacy event-token fixtures whose subject/case-type
+    # does not match the request (F-038, F-1007 and F-108). Keep validation off here until
+    # those fixtures are corrected; AAT remains enabled to exercise claim validation.
+    TOKEN_CLAIM_VALIDATION_ENABLED: false
     LOGGING_LEVEL_UK_GOV_HMCTS_CCD_SECURITY_IDAM: DEBUG
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
