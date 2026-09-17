@@ -1,24 +1,30 @@
--- -Assumptions:
--- 1. General data-store cleanup performed (removing all case_types older than X months)
--- 1. Deletion of all ES indexes performed (curl -XDELETE <ES node IP address>:9200/_all;)
---     (ES node IP address details can be found here: 
---     https://tools.hmcts.net/confluence/display/RCCD/Connecting+to+and+deleting+data+from+CCD+Data+Store+and+CCD+Definition+Store)
--- 2. ES re-indexing triggered via ccd-admin-web 
---     (note, this only creates the static indexes i.e place holders)
+-- Re-queue case data for Elasticsearch re-indexing without updating case_data.
+--
+-- Run after recreating the target Elasticsearch indexes. The loop inserts at most
+-- 1000 queue rows at a time and does not duplicate work already waiting in the queue.
+-- Narrow the SELECT with a jurisdiction, case type, reference list or time window
+-- when recovering a known Elasticsearch failure window.
+DO $$
+DECLARE
+    rows_queued integer;
+BEGIN
+    LOOP
+        WITH candidates AS (
+            SELECT cd.id
+            FROM case_data cd
+            WHERE NOT (cd.data = '{}'::jsonb AND cd.state = '')
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM case_data_logstash_queue q
+                  WHERE q.case_data_id = cd.id
+              )
+            ORDER BY cd.id
+            LIMIT 1000
+        )
+        INSERT INTO case_data_logstash_queue (case_data_id)
+        SELECT id FROM candidates;
 
--- 3. Run the below script after the target Elasticsearch indexes have been removed.
---    It repopulates the queue in batches so Logstash can re-index all cases.
--- 4. Queue rows are leased by Logstash and become eligible for retry when their lease expires.
---    The preview deployment defaults LOGSTASH_QUEUE_CLAIM_TIMEOUT to 5 minutes; adjust it through
---    the Logstash deployment configuration if normal indexing can take longer.
-
--- Run once per re-index. Re-running creates additional queue attempts by design.
-INSERT INTO case_data_logstash_queue (case_data_id)
-SELECT id
-FROM case_data
-WHERE NOT (data = '{}'::jsonb AND state = '');
-
--- Expired claims are automatically eligible for retry by the Logstash claim query.
-SELECT COUNT(*) AS queued_for_reindex
-FROM case_data_logstash_queue
-WHERE claimed_at IS NULL;
+        GET DIAGNOSTICS rows_queued = ROW_COUNT;
+        EXIT WHEN rows_queued = 0;
+    END LOOP;
+END $$;

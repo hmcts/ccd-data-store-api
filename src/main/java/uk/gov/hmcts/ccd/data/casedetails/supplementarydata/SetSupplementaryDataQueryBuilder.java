@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
 
     private static final String SET_UPDATE_QUERY = "UPDATE case_data SET "
-        + "version = version + 1, "
         + "supplementary_data= (CASE"
         + "        WHEN COALESCE(supplementary_data, '{}') = '{}' "
         + "        THEN COALESCE(supplementary_data, '{}') || :json_value\\:\\:jsonb"
@@ -23,7 +22,6 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         + "WHERE reference = :reference";
 
     private static final String SET_UPDATE_QUERY_TEXT = "UPDATE case_data SET "
-        + "version = version + 1, "
         + "supplementary_data= (CASE"
         + "        WHEN COALESCE(supplementary_data, '{}') = '{}' "
         + "        THEN COALESCE(supplementary_data, '{}') || :json_value\\:\\:jsonb"

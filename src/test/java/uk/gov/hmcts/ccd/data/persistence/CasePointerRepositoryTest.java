@@ -33,20 +33,15 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
     private static final String CASE_STATE = "CaseCreated";
     private static final String LOGSTASH_POLL_STATEMENT =
-        "WITH candidates AS ("
-            + "SELECT id FROM case_data_logstash_queue "
-            + "WHERE claimed_at IS NULL OR claimed_at < clock_timestamp() - interval '5 minutes' "
-            + "ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 100), "
-            + "claimed AS ("
-            + "UPDATE case_data_logstash_queue q "
-            + "SET claim_token = md5(random()::text || clock_timestamp()::text), "
-            + "claimed_at = clock_timestamp() FROM candidates c WHERE q.id = c.id "
-            + "RETURNING q.id AS logstash_queue_id, q.case_data_id, q.claim_token) "
-            + "SELECT claimed.logstash_queue_id, claimed.claim_token, case_data.id, created_date, "
-            + "last_modified, jurisdiction, case_type_id, state, last_state_modified_date, "
-            + "data::TEXT as json_data, data_classification::TEXT as json_data_classification, "
-            + "reference, security_classification, supplementary_data::TEXT as json_supplementary_data, version "
-            + "FROM claimed JOIN case_data ON claimed.case_data_id = case_data.id";
+        "WITH candidates AS (SELECT q.id FROM case_data_logstash_queue q ORDER BY q.id "
+            + "FOR UPDATE SKIP LOCKED LIMIT 1000) "
+            + "DELETE FROM case_data_logstash_queue q USING candidates c, case_data "
+            + "WHERE q.id = c.id AND q.case_data_id = case_data.id "
+            + "RETURNING q.id AS version, case_data.id, created_date, last_modified, "
+            + "jurisdiction, case_type_id, state, "
+            + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
+            + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
+            + "as json_supplementary_data";
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -178,8 +173,8 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    void logstashPollingShouldClaimQueuedRowsAndReturnLatestLiveCaseVersion() {
-        // Proves the Logstash DB poll contract: rows are claimed and remain available for acknowledgement.
+    void logstashPollingShouldDeleteQueuedRowsAndReturnQueueIdsAsExternalVersions() {
+        // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
 
@@ -187,6 +182,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
         CaseDetails updated = caseDetailsRepository.set(persisted);
 
         assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2);
+        List<Long> queuedIds = jdbcTemplate.queryForList(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ? ORDER BY id",
+            Long.class,
+            Long.valueOf(updated.getId())
+        );
 
         List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
 
@@ -194,43 +194,18 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(polledRows).hasSize(2),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())))
                 .isTrue(),
-            () -> assertThat(polledRows.stream().allMatch(row -> ((Number) row.get("version")).intValue()
-                == updated.getVersion())).isTrue(),
+            () -> assertThat(polledRows).extracting(row -> ((Number) row.get("version")).longValue())
+                .containsExactlyInAnyOrderElementsOf(queuedIds),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
-            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2),
-            () -> assertThat(polledRows).allMatch(row -> row.get("claim_token") != null)
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
         );
     }
 
     @Test
-    void logstashPollingShouldReclaimExpiredClaim() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
-
-        jdbcTemplate.update("UPDATE case_data_logstash_queue "
-                + "SET claim_token = ?, claimed_at = clock_timestamp() - interval '6 minutes' "
-                + "WHERE case_data_id = ?", "expired-token", Long.valueOf(persisted.getId()));
-
-        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
-
-        assertThat(polledRows).hasSize(1);
-        assertThat(polledRows.get(0).get("claim_token")).isNotEqualTo("expired-token");
-    }
-
-    @Test
-    void secondLogstashPollShouldNotClaimAnActiveRowAgain() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
-
-        assertThat(jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT)).hasSize(1);
-        assertThat(jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT)).isEmpty();
-        assertThat(countQueuedRows(jdbcTemplate, persisted.getId())).isOne();
-    }
-
-    @Test
-    void supplementaryDataOnlyUpdateShouldQueueRowWithAdvancedExternalVersion() {
-        // The supplementary-data update must advance the external version so Elasticsearch accepts the queued write.
+    void supplementaryDataOnlyUpdateShouldUseItsQueueIdAsExternalVersion() {
+        // Supplementary-data-only writes intentionally do not change case_data.version. The queue id is monotonic,
+        // so it must be used as the external Elasticsearch version.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
         final int versionBeforeSupplementaryDataWrite = persisted.getVersion();
@@ -244,12 +219,17 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
 
         Integer versionAfterSupplementaryDataWrite = jdbcTemplate.queryForObject(
             "SELECT version FROM case_data WHERE id = ?", Integer.class, Long.valueOf(persisted.getId()));
+        Long queuedExternalVersion = jdbcTemplate.queryForObject(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Long.class,
+            Long.valueOf(persisted.getId())
+        );
         List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
 
         assertAll(
             () -> assertThat(countQueuedRows(jdbcTemplate, persisted.getId()))
                 .as("the trigger fires on supplementary_data, so the case is queued for indexing")
-                .isEqualTo(1),
+                .isZero(),
             () -> assertThat(polledRows)
                 .as("the supplementary-data write really was picked up by the Logstash poll")
                 .hasSize(1),
@@ -257,11 +237,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
                 .as("the polled row carries the new supplementary data")
                 .contains("OrgA"),
             () -> assertThat(versionAfterSupplementaryDataWrite)
-                .as("case_data.version advances for a supplementary-data-only write")
-                .isEqualTo(versionBeforeSupplementaryDataWrite + 1),
+                .as("case_data.version is NOT advanced by a supplementary-data-only write")
+                .isEqualTo(versionBeforeSupplementaryDataWrite),
             () -> assertThat(((Number) polledRows.get(0).get("version")).intValue())
-                .as("the external version sent to Elasticsearch is advanced")
-                .isEqualTo(versionBeforeSupplementaryDataWrite + 1)
+                .as("the external version is the monotonic queue row id")
+                .isEqualTo(queuedExternalVersion.intValue())
         );
     }
 
