@@ -82,6 +82,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
@@ -2253,13 +2254,17 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             globalSearchRequest.setSearchCriteria(searchCriteria);
 
             // ACT
-            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+            String responseJson = executeRequestAsString(globalSearchRequest,
                 AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED, NEXT_HEARING_DATE_ROLE);
+            GlobalSearchResponsePayload result = mapper.readValue(responseJson, GlobalSearchResponsePayload.class);
+            JsonNode responseBody = mapper.readTree(responseJson);
 
             // ASSERT
             assertAll(
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
-                () -> assertThat(result.getResults().size(), is(1))
+                () -> assertThat(result.getResults().size(), is(1)),
+                () -> assertThat(responseBody.at("/results/0/nextHearingDate").asText(),
+                    is("2026-10-12T09:30:00.000"))
             );
             GlobalSearchResponsePayload.Result result1 = result.getResults().getFirst();
             assertAll(
@@ -2286,6 +2291,33 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 // verify lookup data from: `/resources/mappings/jurisdiction_autotest1.json`
                 () -> assertThat(result1.getCcdJurisdictionId(), is(JURISDICTION_GLOBAL_SEARCH)),
                 () -> assertThat(result1.getCcdJurisdictionName(), is("Auto Test 1"))
+            );
+        }
+
+        @DisplayName("Criteria: should omit missing and malformed next hearing dates from the response")
+        @Test
+        void shouldOmitUnavailableNextHearingDates() throws Exception {
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(
+                REFERENCE_GLOBAL_SEARCH_04,
+                REFERENCE_GLOBAL_SEARCH_07
+            ));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            String responseJson = executeRequestAsString(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED, NEXT_HEARING_DATE_ROLE);
+            JsonNode results = mapper.readTree(responseJson).path("results");
+
+            assertAll(
+                () -> assertThat(results.size(), is(2)),
+                () -> assertThat(results.findValuesAsText("caseReference"),
+                    hasItem(REFERENCE_GLOBAL_SEARCH_04)),
+                () -> assertThat(results.findValuesAsText("caseReference"),
+                    hasItem(REFERENCE_GLOBAL_SEARCH_07)),
+                () -> assertThat(results.findValues("nextHearingDate").isEmpty(), is(true))
             );
         }
 
@@ -2530,19 +2562,24 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         private GlobalSearchResponsePayload executeRequest(GlobalSearchRequestPayload globalSearchRequest,
                                                            String... roles) throws Exception {
 
+            return mapper.readValue(executeRequestAsString(globalSearchRequest, roles),
+                GlobalSearchResponsePayload.class);
+        }
+
+        private String executeRequestAsString(GlobalSearchRequestPayload globalSearchRequest,
+                                              String... roles) throws Exception {
+
             MockUtils.setSecurityAuthorities(authentication, roles);
 
             MockHttpServletRequestBuilder postRequest = post(GlobalSearchEndpoint.GLOBAL_SEARCH_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsBytes(globalSearchRequest));
 
-            return ElasticsearchTestHelper.executeRequest(
-                postRequest,
-                200,
-                mapper,
-                mockMvc,
-                GlobalSearchResponsePayload.class
-            );
+            return mockMvc.perform(postRequest)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         }
     }
 }

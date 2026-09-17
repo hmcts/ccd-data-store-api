@@ -78,6 +78,23 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         );
     }
 
+    private static Stream<String> provideValidNextHearingDates() {
+        return Stream.of(
+            "2026-10-12T09:30:00.000",
+            "2026-10-12T09:30:00",
+            "2026-10-12T09:30"
+        );
+    }
+
+    private static Stream<String> provideInvalidNextHearingDates() {
+        return Stream.of(
+            "2026-10-12T09:30:00Z",
+            "2026-10-12T09:30:00+01:00",
+            "2026-10-12T09:30:00-05:00",
+            "not-a-date"
+        );
+    }
+
     @Test
     void testShouldMapState() {
         // GIVEN
@@ -286,12 +303,17 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
             .satisfies(result -> assertThat(result.getCaseNameHmctsInternal()).isEqualTo("Internal case name"));
     }
 
-    @Test
-    void testShouldMapNextHearingDate() {
+    @ParameterizedTest
+    @MethodSource("provideValidNextHearingDates")
+    void testShouldMapValidNextHearingDate(final String nextHearingDate) {
         // GIVEN
         stubAccessMetadata();
+        final Map<String, JsonNode> caseData = Map.of(
+            "nextHearingDetails",
+            mapper.createObjectNode().put("hearingDateTime", nextHearingDate)
+        );
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withData(CASE_DATA)
+            .withData(caseData)
             .withSupplementaryData(emptyMap())
             .build();
 
@@ -302,7 +324,31 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         // THEN
         assertThat(actualResult)
             .isNotNull()
-            .satisfies(result -> assertThat(result.getNextHearingDate()).isEqualTo("2026-10-12T09:30:00.000"));
+            .satisfies(result -> assertThat(result.getNextHearingDate()).isEqualTo(nextHearingDate));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidNextHearingDates")
+    void testShouldMapInvalidNextHearingDateAsNull(final String nextHearingDate) {
+        // GIVEN
+        stubAccessMetadata();
+        final Map<String, JsonNode> caseData = Map.of(
+            "nextHearingDetails",
+            mapper.createObjectNode().put("hearingDateTime", nextHearingDate)
+        );
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(caseData)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getNextHearingDate()).isNull());
     }
 
     @ParameterizedTest

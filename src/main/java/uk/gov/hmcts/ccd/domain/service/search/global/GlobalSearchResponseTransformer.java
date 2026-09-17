@@ -21,6 +21,8 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.Suppleme
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +111,7 @@ public class GlobalSearchResponseTransformer {
             .ccdCaseTypeId(caseTypeId)
             .ccdCaseTypeName(caseTypeName)
             .caseNameHmctsInternal(findValue(caseData, CASE_NAME_HMCTS_INTERNAL))
-            .nextHearingDate(findValue(caseData, NEXT_HEARING_DETAILS, NEXT_HEARING_DATE_PATH))
+            .nextHearingDate(findDateTimeValue(caseData, NEXT_HEARING_DETAILS, NEXT_HEARING_DATE_PATH))
             .hmctsServiceId(serviceId)
             .hmctsServiceShortDescription(serviceLookup.getServiceShortDescription(serviceId))
             .baseLocationId(baseLocationId)
@@ -138,6 +140,22 @@ public class GlobalSearchResponseTransformer {
             }
             return node.isNull() ? null : node.asText();
         }).orElse(null);
+    }
+
+    private String findDateTimeValue(@NonNull final Map<String, JsonNode> jsonNodeMap,
+                                     @NonNull final String parentKey,
+                                     @NonNull final String childPath) {
+        final String value = findValue(jsonNodeMap, parentKey, childPath);
+        if (value == null) {
+            return null;
+        }
+
+        try {
+            LocalDateTime.parse(value);
+            return value;
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
     }
 
     private List<String> getOtherReferences(@NonNull final Map<String, JsonNode> data) {
