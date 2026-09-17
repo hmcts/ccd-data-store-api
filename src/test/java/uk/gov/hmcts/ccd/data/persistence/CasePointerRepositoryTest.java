@@ -207,13 +207,13 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
 
     @Test
     void logstashPollingShouldLeaveRowsBeyondItsBatchForTheNextPoll() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
 
         persisted.setData(Map.of("foo", mapper.valueToTree("baz")));
         persisted = caseDetailsRepository.set(persisted);
         persisted.setData(Map.of("foo", mapper.valueToTree("qux")));
         CaseDetails updated = caseDetailsRepository.set(persisted);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
 
         List<Map<String, Object>> firstBatch = jdbcTemplate.queryForList(logstashPollStatement(2));
 
