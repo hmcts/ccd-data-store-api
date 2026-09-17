@@ -15,7 +15,7 @@ class LogstashPipelineConfigurationTest {
         Path.of("charts/ccd-data-store-api/values.preview.template.yaml");
 
     @Test
-    void previewLogstashPipelineShouldUseCaseDataVersionForExternalDocumentVersion() throws IOException {
+    void previewLogstashPipelineShouldUseQueueIdForExternalDocumentVersion() throws IOException {
         String previewValues = Files.readString(PREVIEW_VALUES);
 
         assertAll(
@@ -25,15 +25,15 @@ class LogstashPipelineConfigurationTest {
             ),
             () -> assertTrue(
                 previewValues.contains("version => \"%{version}\""),
-                "Preview Logstash output must use case_data.version as the external version"
+                "Preview Logstash output must use the queue row version as the external version"
             ),
             () -> assertTrue(
                 previewValues.contains("version_type => \"external\""),
                 "Preview Logstash output must use Elasticsearch external versioning"
             ),
             () -> assertTrue(
-                !previewValues.contains("version => \"%{[@metadata][version]}\""),
-                "Preview Logstash output must not use queue metadata as an external version"
+                previewValues.contains("case_data_logstash_queue.id AS version"),
+                "Preview Logstash input must expose the monotonic queue row id as version"
             )
         );
     }

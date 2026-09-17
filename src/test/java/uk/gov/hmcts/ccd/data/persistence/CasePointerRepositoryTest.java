@@ -35,10 +35,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String LOGSTASH_POLL_STATEMENT =
         "DELETE FROM case_data_logstash_queue USING case_data "
             + "WHERE case_data_logstash_queue.case_data_id = case_data.id "
-            + "RETURNING case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, "
+            + "RETURNING case_data_logstash_queue.id AS version, case_data.id, created_date, last_modified, "
+            + "jurisdiction, case_type_id, state, "
             + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
             + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
-            + "as json_supplementary_data, version";
+            + "as json_supplementary_data";
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -170,7 +171,7 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    void logstashPollingShouldDeleteQueuedRowsAndReturnLatestLiveCaseVersion() {
+    void logstashPollingShouldDeleteQueuedRowsAndReturnQueueIdsAsExternalVersions() {
         // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
@@ -179,6 +180,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
         CaseDetails updated = caseDetailsRepository.set(persisted);
 
         assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2);
+        List<Long> queuedIds = jdbcTemplate.queryForList(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ? ORDER BY id",
+            Long.class,
+            Long.valueOf(updated.getId())
+        );
 
         List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
 
@@ -186,8 +192,8 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(polledRows).hasSize(2),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())))
                 .isTrue(),
-            () -> assertThat(polledRows.stream().allMatch(row -> ((Number) row.get("version")).intValue()
-                == updated.getVersion())).isTrue(),
+            () -> assertThat(polledRows).extracting(row -> ((Number) row.get("version")).longValue())
+                .containsExactlyInAnyOrderElementsOf(queuedIds),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
             () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
@@ -195,12 +201,9 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    void supplementaryDataOnlyUpdateShouldQueueRowWhoseExternalVersionHasNotAdvanced() {
-        // The DB trigger queues a case on `UPDATE OF ... supplementary_data`, but
-        // SetSupplementaryDataQueryBuilder writes only the supplementary_data column - it never touches `version`.
-        // The Logstash output indexes with version_type => "external", which requires a STRICTLY GREATER version,
-        // so a queued supplementary-data-only change is rejected by Elasticsearch with a 409 and, because the queue
-        // row is deleted by the poll itself, never retried.
+    void supplementaryDataOnlyUpdateShouldUseItsQueueIdAsExternalVersion() {
+        // Supplementary-data-only writes intentionally do not change case_data.version. The queue id is monotonic,
+        // so it must be used as the external Elasticsearch version.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
         final int versionBeforeSupplementaryDataWrite = persisted.getVersion();
@@ -214,6 +217,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
 
         Integer versionAfterSupplementaryDataWrite = jdbcTemplate.queryForObject(
             "SELECT version FROM case_data WHERE id = ?", Integer.class, Long.valueOf(persisted.getId()));
+        Long queuedExternalVersion = jdbcTemplate.queryForObject(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Long.class,
+            Long.valueOf(persisted.getId())
+        );
         List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
 
         assertAll(
@@ -230,8 +238,8 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
                 .as("case_data.version is NOT advanced by a supplementary-data-only write")
                 .isEqualTo(versionBeforeSupplementaryDataWrite),
             () -> assertThat(((Number) polledRows.get(0).get("version")).intValue())
-                .as("so the external version sent to Elasticsearch is unchanged -> 409, change silently lost")
-                .isEqualTo(versionBeforeSupplementaryDataWrite)
+                .as("the external version is the monotonic queue row id")
+                .isEqualTo(queuedExternalVersion.intValue())
         );
     }
 
