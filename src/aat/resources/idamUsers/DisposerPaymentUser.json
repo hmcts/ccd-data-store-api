@@ -1,5 +1,5 @@
 {
-  "password": "[[$CCD_DISPOSER_PAYMENT_USER_PASSWORD]]",
+  "activationSecretPhrase": "[[$CCD_DISPOSER_PAYMENT_USER_PASSWORD]]",
   "user": {
     "id": "c8f4e2a1-6b3d-4e9f-a2c1-5d7e8f901234",
     "email": "[[$CCD_DISPOSER_PAYMENT_USER_EMAIL]]",
@@ -8,8 +8,6 @@
     "displayName": "CCD Disposer Payment FTA",
     "roleNames": [
       "disposer-payment-user"
-    ],
-    "accountStatus": "ACTIVE",
-    "recordType": "LIVE"
+    ]
   }
 }

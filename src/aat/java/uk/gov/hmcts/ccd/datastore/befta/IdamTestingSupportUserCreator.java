@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,16 +20,18 @@ import uk.gov.hmcts.befta.util.JsonUtils;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Creates IDAM test users from JSON files under {@code idamUsers/}, using the IDAM Testing Support API.
- * Uses PUT /test/idam/users/{userId} so existing users are updated (including password) on conflict.
  */
 public final class IdamTestingSupportUserCreator {
 
     private static final String IDAM_USERS_RESOURCE_DIR = "idamUsers";
+    private static final String CREATE_USER_PATH = "/test/idam/users";
     private static final String CREATE_OR_UPDATE_USER_PATH = "/test/idam/users/{userId}";
+    private static final String GET_USER_BY_EMAIL_PATH = "/test/idam/users";
     private static final String IDAM_USER_PROVISIONER_TD = "features/common/users/BeftaMasterCaseworker.td.json";
     private static final String UNRESOLVED_PLACEHOLDER_PREFIX = "[[$";
 
@@ -76,33 +79,91 @@ public final class IdamTestingSupportUserCreator {
         }
 
         JsonNode userNode = requestJson.get("user");
-        if (userNode == null || userNode.get("id") == null || StringUtils.isBlank(userNode.get("id").asText())) {
-            throw new RuntimeException("IDAM user JSON must contain user.id: " + jsonFile.getPath());
+        if (userNode == null || !userNode.has("email")) {
+            throw new RuntimeException("IDAM user JSON must contain user.email: " + jsonFile.getPath());
         }
-        String userId = userNode.get("id").asText();
-        String email = userNode.has("email") ? userNode.get("email").asText() : userId;
+        String email = userNode.get("email").asText();
+        String configuredUserId = userNode.has("id") ? userNode.get("id").asText() : null;
 
-        Response response = RestAssured
-            .given(new RequestSpecBuilder().setBaseUri(idamTsUrl).build())
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        Optional<String> existingUserId = lookupExistingUserIdByEmail(idamTsUrl, accessToken, email);
+        boolean userAlreadyExists = existingUserId.isPresent();
+        String userId = existingUserId.orElse(configuredUserId);
+
+        if (StringUtils.isBlank(userId)) {
+            throw new RuntimeException(
+                "IDAM user JSON must contain user.id when email is not yet registered: " + jsonFile.getPath()
+            );
+        }
+
+        if (configuredUserId != null && !configuredUserId.equals(userId)) {
+            BeftaUtils.defaultLog(
+                "IDAM user id from email lookup (" + userId + ") differs from JSON id (" + configuredUserId + ")");
+            ((ObjectNode) userNode).put("id", userId);
+        }
+
+        Response response = userAlreadyExists
+            ? putCreateOrUpdateUser(idamTsUrl, accessToken, userId, requestJson)
+            : postCreateUser(idamTsUrl, accessToken, requestJson);
+
+        int status = response.getStatusCode();
+        if (status == HttpStatus.OK.value() || status == HttpStatus.CREATED.value()) {
+            BeftaUtils.defaultLog(
+                "IDAM user created or updated from: " + jsonFile.getPath()
+                    + " (email=" + email + ", id=" + userId + ", http=" + status + ")");
+        } else {
+            failCreateOrUpdate(jsonFile, email, userId, response);
+        }
+    }
+
+    private static Optional<String> lookupExistingUserIdByEmail(
+        String idamTsUrl, String accessToken, String email) {
+        Response response = authorisedRequest(idamTsUrl, accessToken)
+            .queryParam("email", email)
+            .when()
+            .get(GET_USER_BY_EMAIL_PATH);
+
+        if (response.getStatusCode() == HttpStatus.OK.value()) {
+            JsonNode body = response.as(JsonNode.class);
+            if (body.has("id") && StringUtils.isNotBlank(body.get("id").asText())) {
+                return Optional.of(body.get("id").asText());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Response postCreateUser(String idamTsUrl, String accessToken, JsonNode requestJson) {
+        return authorisedRequest(idamTsUrl, accessToken)
+            .body(requestJson)
+            .contentType(ContentType.JSON)
+            .when()
+            .post(CREATE_USER_PATH);
+    }
+
+    private static Response putCreateOrUpdateUser(
+        String idamTsUrl, String accessToken, String userId, JsonNode requestJson) {
+        return authorisedRequest(idamTsUrl, accessToken)
             .pathParam("userId", userId)
             .body(requestJson)
             .contentType(ContentType.JSON)
             .when()
             .put(CREATE_OR_UPDATE_USER_PATH);
+    }
 
-        if (response.getStatusCode() == HttpStatus.OK.value()) {
-            BeftaUtils.defaultLog(
-                "IDAM user created or updated from: " + jsonFile.getPath()
-                    + " (email=" + email + ", id=" + userId + ")");
-        } else {
-            BeftaUtils.defaultLog("Error when creating/updating IDAM user from: " + jsonFile.getPath()
-                + " (email=" + email + ", id=" + userId + ")");
-            String message = "Call to create/update IDAM user failed with response body: "
-                + response.body().prettyPrint();
-            message += "\nand http code: " + response.statusCode();
-            throw new RuntimeException(message);
-        }
+    private static RequestSpecification authorisedRequest(String idamTsUrl, String accessToken) {
+        return RestAssured
+            .given(new RequestSpecBuilder().setBaseUri(idamTsUrl).build())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+    }
+
+    private static void failCreateOrUpdate(File jsonFile, String email, String userId, Response response) {
+        BeftaUtils.defaultLog("Error when creating/updating IDAM user from: " + jsonFile.getPath()
+            + " (email=" + email + ", id=" + userId + ")");
+        String message = "Call to create/update IDAM user failed with response body: "
+            + response.body().prettyPrint();
+        message += "\nand http code: " + response.statusCode();
+        message += "\nCommon causes: IDAM role not registered in AAT (check roleNames in JSON), "
+            + "or email already linked to a different user id than user.id in JSON.";
+        throw new RuntimeException(message);
     }
 
     private static void resolvePlaceholdersInRequest(JsonNode requestJson) {
