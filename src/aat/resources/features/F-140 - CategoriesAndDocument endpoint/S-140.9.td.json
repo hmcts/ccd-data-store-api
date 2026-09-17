@@ -21,7 +21,7 @@
 	"request": {
 		"_extends_": "Common_Request",
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-140_CreateCase_NoCategories][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][S-140.9_CreateCase_NoCategories][testData][actualResponse][body][id]}"
     }
 	},
 

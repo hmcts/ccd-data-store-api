@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-122.6",
-  "_extends_": "F-122-UpdateEventBase",
+  "_extends_": "F-122-UpdateEvent2Base",
   "title": "Sets the state defined with a matching post state condition using OR operator (End state: CaseAmended2)",
 
   "productName": "CCD data store",

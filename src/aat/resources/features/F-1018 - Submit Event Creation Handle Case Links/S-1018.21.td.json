@@ -27,7 +27,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1018-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][S-1018.21-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
