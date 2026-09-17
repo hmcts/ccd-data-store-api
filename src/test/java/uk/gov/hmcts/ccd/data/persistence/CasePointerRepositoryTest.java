@@ -32,9 +32,10 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
     private static final String CASE_STATE = "CaseCreated";
-    private static final String LOGSTASH_POLL_STATEMENT =
-        "WITH candidates AS (SELECT q.id FROM case_data_logstash_queue q ORDER BY q.id "
-            + "FOR UPDATE SKIP LOCKED LIMIT 1000) "
+
+    private static String logstashPollStatement(int batchSize) {
+        return "WITH candidates AS (SELECT q.id FROM case_data_logstash_queue q ORDER BY q.id "
+            + "FOR UPDATE SKIP LOCKED LIMIT " + batchSize + ") "
             + "DELETE FROM case_data_logstash_queue q USING candidates c, case_data "
             + "WHERE q.id = c.id AND q.case_data_id = case_data.id "
             + "RETURNING q.id AS version, case_data.id, created_date, last_modified, "
@@ -42,6 +43,8 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
             + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
             + "as json_supplementary_data";
+    }
+
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -188,7 +191,7 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             Long.valueOf(updated.getId())
         );
 
-        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(logstashPollStatement(1000));
 
         assertAll(
             () -> assertThat(polledRows).hasSize(2),
@@ -198,6 +201,26 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
                 .containsExactlyInAnyOrderElementsOf(queuedIds),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
+        );
+    }
+
+    @Test
+    void logstashPollingShouldLeaveRowsBeyondItsBatchForTheNextPoll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+
+        persisted.setData(Map.of("foo", mapper.valueToTree("baz")));
+        persisted = caseDetailsRepository.set(persisted);
+        persisted.setData(Map.of("foo", mapper.valueToTree("qux")));
+        CaseDetails updated = caseDetailsRepository.set(persisted);
+
+        List<Map<String, Object>> firstBatch = jdbcTemplate.queryForList(logstashPollStatement(2));
+
+        assertAll(
+            () -> assertThat(firstBatch).hasSize(2),
+            () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isOne(),
+            () -> assertThat(jdbcTemplate.queryForList(logstashPollStatement(2))).hasSize(1),
             () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
         );
     }
@@ -224,7 +247,7 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             Long.class,
             Long.valueOf(persisted.getId())
         );
-        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(logstashPollStatement(1000));
 
         assertAll(
             () -> assertThat(countQueuedRows(jdbcTemplate, persisted.getId()))
