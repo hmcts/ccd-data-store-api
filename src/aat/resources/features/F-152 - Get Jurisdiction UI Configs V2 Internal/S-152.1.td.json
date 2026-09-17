@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-152.1",
+  "_extends_": "F-152_Test_Data_Base",
+  "title": "must retrieve jurisdiction UI config information for the jurisdictions successfully",
+
+  "specs": [
+    "an active profile in CCD",
+    "code is HTTP-200 OK"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdiction-configs.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "configs": [
+        {
+          "id": "AUTOTEST1",
+          "name": "Auto Test 1",
+          "shuttered": false
+        }
+      ]
+    }
+  }
+}
