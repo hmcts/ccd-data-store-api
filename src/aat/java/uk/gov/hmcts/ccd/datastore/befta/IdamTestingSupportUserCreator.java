@@ -93,11 +93,13 @@ public final class IdamTestingSupportUserCreator {
 
         if (response.getStatusCode() == HttpStatus.OK.value()) {
             BeftaUtils.defaultLog(
-                "IDAM user created or updated from: " + jsonFile.getPath() + " (email=" + email + ", id=" + userId + ")");
+                "IDAM user created or updated from: " + jsonFile.getPath()
+                    + " (email=" + email + ", id=" + userId + ")");
         } else {
             BeftaUtils.defaultLog("Error when creating/updating IDAM user from: " + jsonFile.getPath()
                 + " (email=" + email + ", id=" + userId + ")");
-            String message = "Call to create/update IDAM user failed with response body: " + response.body().prettyPrint();
+            String message = "Call to create/update IDAM user failed with response body: "
+                + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
             throw new RuntimeException(message);
         }
