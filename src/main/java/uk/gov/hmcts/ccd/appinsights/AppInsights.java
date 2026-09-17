@@ -15,9 +15,6 @@ import java.util.Map;
 @Component
 public class AppInsights {
     private static final String MODULE = "CASE_DATA";
-    public static final String CASE_DEFINITION = "CASE_DEFINITION";
-    public static final String DOC_MANAGEMENT = "DOCUMENT_MANAGEMENT";
-    public static final String DRAFT_STORE = "DRAFT_STORE";
 
     public static final String TYPE = "Callback type";
     public static final String CALLBACK_DURATION = "Callback duration";
@@ -73,6 +70,19 @@ public class AppInsights {
 
     public void trackEvent(String name, Map<String, String> properties) {
         telemetry.trackEvent(name, properties, null);
+    }
+
+    /**
+     * Sends a custom event with numeric measurements alongside the string properties. The measurements land in
+     * {@code customMeasurements} rather than {@code customDimensions}, so they can be aggregated in a KQL query
+     * without a {@code todouble} conversion of a string.
+     *
+     * @param name       The event name.
+     * @param properties Named string values, searchable as {@code customDimensions}.
+     * @param metrics    Named numeric values, aggregatable as {@code customMeasurements}.
+     */
+    public void trackEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
+        telemetry.trackEvent(name, properties, metrics);
     }
 
     public void trackTrace(String message, Map<String, String> customProperties, SeverityLevel severityLevel) {
