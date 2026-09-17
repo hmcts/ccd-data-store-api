@@ -8,7 +8,8 @@ document to Elasticsearch. The deleted queue ID is the Elasticsearch external
 version, so a later queue entry always supersedes an earlier one.
 
 This removes the `case_data.marked_by_logstash` write contention addressed by
-CCD-4262 and gives each successful poll a terminal queue state.
+CCD-4262. Each claimed queue row has a terminal database state, but Elasticsearch
+delivery is not acknowledged.
 
 ## Failure recovery
 
@@ -29,33 +30,55 @@ entries into `ccd-logstash-dead-letter`. Before production rollout, the platform
 monitoring owner must create and test an alert for new documents in that index
 and for Logstash Elasticsearch output failures. Record the alert URL, receiving
 team, and test timestamp in the change ticket; this repository cannot create an
-environment-level alert.
+environment-level alert. Production rollout must not proceed until that evidence
+is recorded.
 
-Run this smoke test in an isolated preview deployment after the alert is active:
+Run this smoke test in an isolated preview deployment after the alert is active.
+The Jenkins hook is enabled for preview and runs after a successful preview smoke
+test when a case reference is supplied. It refuses any non-PR namespace. Set
+these build variables from the outage scenario's recorded case:
 
-1. Create an AAT private case and add supplementary data; record the case ID and
-   the UTC start/end time.
-2. Block writes to the AAT private Elasticsearch index, wait for Logstash to poll
+```
+LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE=<numeric case reference>
+LOGSTASH_MANUAL_REQUEUE_CASE_TYPE=AAT_PRIVATE
+LOGSTASH_MANUAL_REQUEUE_EXPECTED_SUPPLEMENTARY_DATA={"orgs_assigned_users":{"OrgA":22,"OrgB":1}}
+```
+
+Without `LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE`, normal preview builds log a
+skip. Supply the values only for the targeted release-gate run.
+
+It re-queues just that case in the preview PostgreSQL pod, waits for the queue
+row to be consumed, and verifies its Elasticsearch document contains the
+expected supplementary data. Do not supply a case reference in normal PR builds;
+this is a targeted release-gate smoke.
+
+The required preparation is:
+
+1. Create an `AAT_PRIVATE` case in the isolated preview deployment and add
+   supplementary data; record the case ID and the UTC start/end time.
+2. Block writes to that preview Elasticsearch index, wait for Logstash to poll
    the queue, then restore writes. Confirm the failure is visible in Logstash and
    the DLQ/dead-letter index where the failure is non-retryable.
-3. In the Data Store PostgreSQL pod, re-queue only that case, substituting the
-   recorded case ID:
+3. Enable the Jenkins hook with the recorded values above. It re-queues only that
+   case, waits for the queue row to be consumed, and verifies its Elasticsearch
+   document contains the expected supplementary data.
+4. Confirm the alert fired and was received by its owner, then attach the Jenkins
+   result and alert evidence to the ticket.
 
-   ```sql
-   INSERT INTO case_data_logstash_queue (case_data_id)
-   SELECT id FROM case_data cd
-   WHERE cd.reference = :case_reference
-     AND NOT EXISTS (
-       SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
-     );
-   ```
+For an operator-run fallback, re-queue only the recorded case in the Data Store
+PostgreSQL pod:
 
-4. Confirm the queue row is consumed and `/searchCases` returns the case with the
-   expected supplementary data. Confirm the alert fired and was received by its
-   owner, then attach the evidence to the ticket.
+```sql
+INSERT INTO case_data_logstash_queue (case_data_id)
+SELECT id FROM case_data cd
+WHERE cd.reference = :case_reference
+  AND NOT EXISTS (
+    SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
+  );
+```
 
-This is a manual environment smoke test by design: Option 2 deliberately has no
-automatic retry after the queue row has been deleted.
+This is a manually initiated, Jenkins-automated preview smoke: Option 2
+deliberately has no automatic retry after the queue row has been deleted.
 
 ## Deferred design
 
