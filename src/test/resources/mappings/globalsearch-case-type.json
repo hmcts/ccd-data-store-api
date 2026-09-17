@@ -1121,6 +1121,14 @@
             },
             {
               "role": "caseworker-autotest1-restricted",
+              "create": false,
+              "read": false,
+              "update": false,
+              "delete": false,
+              "listElementCode": "hearingDateTime"
+            },
+            {
+              "role": "caseworker-autotest1-next-hearing-date",
               "create": true,
               "read": true,
               "update": true,

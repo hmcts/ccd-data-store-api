@@ -188,6 +188,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
     private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
     private static final String REFERENCE_GLOBAL_SEARCH_07 = "5555666677778888";
+    private static final String NEXT_HEARING_DATE_ROLE = "caseworker-autotest1-next-hearing-date";
     private static final Long GLOBAL_DOCS_SIZE = 1000L;
     private static final BoolQueryBuilder baseQuery = boolQuery()
         .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
@@ -2232,7 +2233,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         }
 
-        @DisplayName("Criteria: should return case with lookup and ref-data populated")
+        @DisplayName("Criteria: should return case with lookup, ref-data and authorised next hearing date populated")
         @Test
         void shouldReturnCaseWithLookupAndRefDataPopulated() throws Exception {
 
@@ -2253,7 +2254,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             // ACT
             GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
-                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED, NEXT_HEARING_DATE_ROLE);
 
             // ASSERT
             assertAll(
@@ -2393,6 +2394,29 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             );
         }
 
+        @DisplayName("ES Filters: should hide next hearing date when only hearing ID is authorised")
+        @Test
+        void shouldHideNextHearingDateWhenOnlyHearingIdIsAuthorised() throws Exception {
+
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1)),
+                () -> assertThat(result.getResults().getFirst().getCaseReference(),
+                    is(REFERENCE_GLOBAL_SEARCH_01)),
+                () -> assertThat(result.getResults().getFirst().getNextHearingDate(), is(nullValue()))
+            );
+        }
+
         @ParameterizedTest(name = "Pagination: should apply Pagination: {0}")
         @ArgumentsSource(value = PaginationTestProvider.class)
         void shouldApplyPagination(String name,
@@ -2481,6 +2505,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             globalSearchRequest.setSortCriteria(sortCriteria);
 
             // ACT
+            // NEXT_HEARING_DATE_ROLE is intentionally omitted: sorting follows the existing Global Search policy
+            // and is applied before response fields are filtered by ACL.
             GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
                 AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
 
