@@ -30,7 +30,7 @@ Feature: F-135: Retrieve a Start Event Trigger Internal API CRUD Tests
 
   @S-135.3
   Scenario: User getting event trigger for Case with no CaseType U access gets error
-    Given a successful call [to create a token for case creation] as in [S-131.5_CreateCase_Token_Creation]
+    Given a successful call [to create a token for case creation] as in [F-135_CreateCase_Token_Creation]
     And a case that has just been created as in [F-135.3_CreateCase],
     And a user [with no case type U access to update a case],
     When a request is prepared with appropriate values,
@@ -39,5 +39,4 @@ Feature: F-135: Retrieve a Start Event Trigger Internal API CRUD Tests
     Then a negative response is received,
     And the response [contains HTTP 404 status code],
     And the response has all other details as expected.
-
 

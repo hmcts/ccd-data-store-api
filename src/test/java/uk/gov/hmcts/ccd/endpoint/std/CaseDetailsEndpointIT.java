@@ -3452,30 +3452,30 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn404WhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
-        shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess("caseworkers");
+        shouldReturn404WhenGetTokenForStartCaseWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn404WhenGetTokenForStartCaseWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
-        shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess("citizens");
+        shouldReturn404WhenGetTokenForStartCaseWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
+    void shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
         throws Exception {
-        shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccess("caseworkers");
+        shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
+    void shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccessForCitizen()
         throws Exception {
-        shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
+        shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
     @Test
@@ -3506,41 +3506,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("citizens");
     }
 
-    private void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess(String userRole)
+    private void shouldReturn404WhenGetTokenForStartCaseWithNoCaseTypeReadAccess(String userRole)
         throws Exception {
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/event-triggers/" + CREATE_EVENT_ID + "/token";
 
         final MvcResult mvcResult = mockMvc.perform(get(url).contentType(JSON_CONTENT_TYPE))
-            .andExpect(status().is(200))
+            .andExpect(status().is(404))
             .andReturn();
-
-        String expected = "{  \n" +
-            "   \"case_details\":{  \n" +
-            "      \"id\":null,\n" +
-            "      \"jurisdiction\":\"PROBATE\",\n" +
-            "      \"state\":null,\n" +
-            "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +
-            "      \"created_date\":null,\n" +
-            "      \"last_modified\":null,\n" +
-            "      \"security_classification\":null,\n" +
-            "      \"case_data\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"data_classification\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"after_submit_callback_response\":null,\n" +
-            "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null\n" +
-            "   },\n" +
-            "   \"event_id\":\"Create2\"\n" +
-            "}";
-        String actual = mvcResult.getResponse().getContentAsString();
-        assertAll(
-            () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
-            () -> assertThat(MAPPER.readTree(actual).has("token"), is(true))
-        );
+        assertEquals("No case type found",
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
     }
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateFieldAccess(String userRole) throws Exception {
@@ -3847,43 +3822,17 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn200WithNoCaseDataWhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
+    private void shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
         throws Exception {
         final String reference = "1504259907353610";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
 
         final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
-            .andExpect(status().is(200))
+            .andExpect(status().is(404))
             .andReturn();
-
-        String expected = "{  \n" +
-            "   \"case_details\":{  \n" +
-            "      \"id\":1504259907353610,\n" +
-            "      \"jurisdiction\":\"PROBATE\",\n" +
-            "      \"state\":\"CaseCreated\",\n" +
-            "      \"case_type_id\":\"TestAddressBookCaseNoReadCaseTypeAccess\",\n" +
-            "      \"last_modified\":null,\n" +
-            "      \"security_classification\":\"PUBLIC\",\n" +
-            "      \"case_data\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"data_classification\":{  \n" +
-            "\n" +
-            "      },\n" +
-            "      \"after_submit_callback_response\":null,\n" +
-            "      \"callback_response_status_code\":null,\n" +
-            "      \"callback_response_status\":null\n" +
-            "   },\n" +
-            "   \"event_id\":\"TEST_EVENT\"\n" +
-            "}";
-        String actual = mvcResult.getResponse().getContentAsString();
-        assertAll(
-            () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
-            () -> assertThat("Token is not present", MAPPER.readTree(actual).has("token"), is(true)),
-            () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details")
-                .has("created_date"), is(true))
-        );
+        assertEquals("No case type found",
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
     }
 
     private void shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent(String userRole)
