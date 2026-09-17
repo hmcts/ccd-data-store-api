@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -179,7 +180,7 @@ public class RoleAssignmentService implements AccessControl {
         final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
         if (roleAssignments == null || roleAssignments.getRoleAssignments() == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         return roleAssignments.getRoleAssignments().stream()
             .filter(this::isValidRoleAssignment)
