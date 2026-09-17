@@ -205,6 +205,7 @@ withPipeline(type, product, component) {
         if (env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED == 'true'
             && env.LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE) {
             steps.sh './scripts/logstash-manual-requeue-smoke.sh'
+            steps.archiveArtifacts artifacts: 'Logstash Manual Requeue Smoke/evidence.md', onlyIfSuccessful: true
         } else if (env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED == 'true') {
             echo 'Logstash manual-requeue smoke skipped: no case reference was supplied.'
         }

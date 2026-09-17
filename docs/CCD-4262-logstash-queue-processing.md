@@ -65,6 +65,14 @@ The required preparation is:
 4. Confirm the alert fired and was received by its owner, then attach the Jenkins
    result and alert evidence to the ticket.
 
+Jenkins archives `Logstash Manual Requeue Smoke/evidence.md`, which records the
+case, queue ID, Elasticsearch verification, and UTC completion time. Add the
+following platform-owned evidence to the same change ticket:
+
+- Elasticsearch write-block start/end time and the Logstash failure;
+- the DLQ/dead-letter document; and
+- alert URL, receiving team, fired timestamp, and receipt confirmation.
+
 For an operator-run fallback, re-queue only the recorded case in the Data Store
 PostgreSQL pod:
 

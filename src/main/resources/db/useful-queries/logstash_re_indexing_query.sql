@@ -1,7 +1,8 @@
 -- Re-queue case data for Elasticsearch re-indexing without updating case_data.
 --
 -- Run after recreating the target Elasticsearch indexes. Each execution inserts at
--- most 1000 queue rows and does not duplicate work already waiting in the queue.
+-- most 1000 queue rows and avoids duplicating work already waiting in the queue.
+-- A concurrent case update can still add its own queue row; that represents the newer write.
 -- Re-run it until it inserts zero rows; separate executions avoid one large transaction.
 -- Narrow the SELECT with a jurisdiction, case type, reference list or time window
 -- when recovering a known Elasticsearch failure window.

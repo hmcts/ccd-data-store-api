@@ -38,12 +38,16 @@ case_data_id="$(psql "SELECT id FROM case_data WHERE reference = ${LOGSTASH_MANU
   echo "No unique case_data row found for reference ${LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE}." >&2; exit 1;
 }
 
-psql "INSERT INTO case_data_logstash_queue (case_data_id)
+queue_id="$(psql "INSERT INTO case_data_logstash_queue (case_data_id)
 SELECT id FROM case_data cd
 WHERE cd.id = ${case_data_id}
   AND NOT EXISTS (
     SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
-  );"
+  )
+RETURNING id;")"
+[[ "${queue_id}" =~ ^[0-9]+$ ]] || {
+  echo "No queue row was inserted; the case is already queued or was updated concurrently." >&2; exit 1;
+}
 
 for _ in {1..90}; do
   remaining="$(psql "SELECT count(*) FROM case_data_logstash_queue WHERE case_data_id = ${case_data_id};")"
@@ -66,3 +70,24 @@ else
 fi
 
 echo "Manual requeue smoke passed for case ${LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE}."
+
+evidence_dir="Logstash Manual Requeue Smoke"
+mkdir -p "${evidence_dir}"
+cat > "${evidence_dir}/evidence.md" <<EOF
+# CCD-4262 manual-requeue smoke evidence
+
+- UTC completion: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+- Jenkins branch: ${BRANCH_NAME}
+- Preview namespace: ${TEAM_NAMESPACE}
+- Case reference: ${LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE}
+- Case data ID: ${case_data_id}
+- Inserted queue ID: ${queue_id}
+- Elasticsearch index: ${index}
+- Result: queue row consumed and Elasticsearch supplementary data verified
+
+Complete separately in the change ticket:
+
+- Elasticsearch write-block start/end time and Logstash failure evidence
+- DLQ document evidence
+- Alert URL, receiving team, fired timestamp, and receipt confirmation
+EOF
