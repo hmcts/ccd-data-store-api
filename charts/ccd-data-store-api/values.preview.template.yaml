@@ -323,9 +323,12 @@ ccd-definition-store-api:
     devcpuLimits: 4000m
     environment:
       DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
+      DEFINITION_STORE_DB_NAME: definition-store
       DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
       DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
       DEFINITION_STORE_DB_OPTIONS: ""
+      IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+      USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
       ELASTIC_SEARCH_FAIL_ON_IMPORT: true
       DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
       ELASTIC_SEARCH_ENABLED: true
