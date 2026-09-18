@@ -2,7 +2,7 @@
 --
 -- Run after recreating the target Elasticsearch indexes. Each execution inserts at
 -- most 1000 queue rows and avoids duplicating work already waiting in the queue.
--- A concurrent case update can still add its own queue row; that represents the newer write.
+-- The unique queue constraint also makes concurrent recovery executions safe.
 -- Re-run it until it inserts zero rows; separate executions avoid one large transaction.
 -- Narrow the SELECT with a jurisdiction, case type, reference list or time window
 -- when recovering a known Elasticsearch failure window.
@@ -19,4 +19,5 @@ WITH candidates AS (
     LIMIT 1000
 )
 INSERT INTO case_data_logstash_queue (case_data_id)
-SELECT id FROM candidates;
+SELECT id FROM candidates
+ON CONFLICT (case_data_id) DO NOTHING;

@@ -14,6 +14,8 @@ class LogstashPipelineConfigurationTest {
 
     private static final Path PREVIEW_VALUES =
         Path.of("charts/ccd-data-store-api/values.preview.template.yaml");
+    private static final Path COALESCING_MIGRATION =
+        Path.of("src/main/resources/db/migration/V20260918_0000__CCD-4262_coalesce_logstash_queue_rows.sql");
 
     @Test
     void previewLogstashPipelineShouldDeleteBoundedQueueBatchesUsingQueueIdsAsExternalVersions() throws IOException {
@@ -55,6 +57,27 @@ class LogstashPipelineConfigurationTest {
                     && previewValues.contains("pipeline.id: index-dead-letter-to-es")
                     && previewValues.contains("index => \"ccd-logstash-dead-letter\""),
                 "Preview Logstash must route non-retryable Elasticsearch failures to the dead-letter index"
+            )
+        );
+    }
+
+    @Test
+    void coalescingMigrationShouldDiscardLegacyPointerRowsAndEnforceOneOutstandingRow() throws IOException {
+        String migration = Files.readString(COALESCING_MIGRATION);
+
+        assertAll(
+            () -> assertTrue(
+                migration.contains("JOIN public.case_data cd")
+                    && migration.contains("WHERE NOT (cd.data = '{}'::jsonb AND cd.state = '')"),
+                "Backlog coalescing must not re-queue legacy case pointers"
+            ),
+            () -> assertTrue(
+                migration.contains("UNIQUE (case_data_id)"),
+                "The queue must permit only one outstanding row per case"
+            ),
+            () -> assertTrue(
+                migration.contains("ON CONFLICT (case_data_id) DO NOTHING"),
+                "The trigger must coalesce concurrent updates"
             )
         );
     }

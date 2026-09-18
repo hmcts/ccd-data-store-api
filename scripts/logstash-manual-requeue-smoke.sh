@@ -44,6 +44,7 @@ WHERE cd.id = ${case_data_id}
   AND NOT EXISTS (
     SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
   )
+ON CONFLICT (case_data_id) DO NOTHING
 RETURNING id;")"
 [[ "${queue_id}" =~ ^[0-9]+$ ]] || {
   echo "No queue row was inserted; the case is already queued or was updated concurrently." >&2; exit 1;

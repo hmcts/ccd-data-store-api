@@ -5,10 +5,12 @@
 Use a bounded plain-delete queue poll. Logstash selects up to 1000 queue rows in
 ID order, locks only those queue rows, deletes them, and sends the current case
 document to Elasticsearch. The deleted queue ID is the Elasticsearch external
-version, so a later queue entry always supersedes an earlier one.
+version, so a later queue entry always supersedes an earlier one. A unique queue
+constraint and the trigger coalesce repeated writes into one outstanding row per
+case; the poll therefore indexes the current state once for a hot case.
 
 This removes the `case_data.marked_by_logstash` write contention addressed by
-CCD-4262. Each claimed queue row has a terminal database state, but Elasticsearch
+CCD-4262. Each selected queue row has a terminal database state, but Elasticsearch
 delivery is not acknowledged.
 
 ## Failure recovery
@@ -32,6 +34,20 @@ and for Logstash Elasticsearch output failures. Record the alert URL, receiving
 team, and test timestamp in the change ticket; this repository cannot create an
 environment-level alert. Production rollout must not proceed until that evidence
 is recorded.
+
+### Platform-operated alert test (outside application test scope)
+
+This mandatory release test is owned by Platform monitoring, not BEFTA or the
+application test suite: alert rules and notification routes are managed outside
+this repository. In an isolated preview environment, Platform must:
+
+1. block Elasticsearch writes and confirm the Logstash output-failure alert;
+2. create a controlled non-retryable indexing failure and confirm the
+   dead-letter-index alert; and
+3. record the alert URL, recipient, firing time, and receipt in CCD-4262.
+
+The Jenkins smoke below verifies manual requeue and successful index recovery;
+it does not prove alert delivery.
 
 Run this smoke test in an isolated preview deployment after the alert is active.
 The Jenkins hook is enabled for preview and runs after a successful preview smoke
@@ -82,7 +98,8 @@ SELECT id FROM case_data cd
 WHERE cd.reference = :case_reference
   AND NOT EXISTS (
     SELECT 1 FROM case_data_logstash_queue q WHERE q.case_data_id = cd.id
-  );
+  )
+ON CONFLICT (case_data_id) DO NOTHING;
 ```
 
 This is a manually initiated, Jenkins-automated preview smoke: Option 2
