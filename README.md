@@ -135,6 +135,18 @@ Will run only S-1023.5:
 ./gradlew functional -P tags="@S-1023.5"
 ```
 
+### Pact provider verification
+
+To verify the Cases provider against a local Pact Broker, run:
+
+```bash
+./gradlew -Ppact.verifier.publishResults=true runProviderPactVerification \
+-Dpactbroker.enablePending=false
+```
+
+Disabling pending pacts locally ensures that a failed pending interaction fails the
+verification command instead of being reported as a passed JUnit test.
+
 ## LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

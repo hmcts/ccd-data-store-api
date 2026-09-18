@@ -262,6 +262,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     public void adoptionWebToGetCaseUsersRoles(Map<String, Object> dataMap) {
     }
 
+    @State("a case exists")
+    public void aCaseExists(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = mockCaseDetailsResponse(
+            "mock_responses/wa_get_case_by_id.json", dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+    }
+
     @State("adoption-web makes request to get citizen-update-application event token")
     public void adoptionWebToGetCitizenUpdateEventToken(Map<String, Object> dataMap) {
     }
