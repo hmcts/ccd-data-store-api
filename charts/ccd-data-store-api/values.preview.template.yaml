@@ -313,6 +313,7 @@ logstash:
 
 ccd-definition-store-api:
   java:
+    releaseNameOverride: "{{ .Release.Name }}-ccd-definition-store"
     ingressHost: ccd-definition-store-${SERVICE_FQDN}
     image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
     imagePullPolicy: Always
