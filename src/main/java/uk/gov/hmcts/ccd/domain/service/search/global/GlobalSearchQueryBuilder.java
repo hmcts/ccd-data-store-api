@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
+import jakarta.inject.Named;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
-import jakarta.inject.Named;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.C
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_NAME;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_LOCATION;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_NAME_HMCTS_INTERNAL;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE_VALUE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.REGION;
@@ -111,6 +112,7 @@ public class GlobalSearchQueryBuilder {
             .add(CASE_MANAGEMENT_CATEGORY_NAME)
             .add(CASE_MANAGEMENT_LOCATION)
             .add(CASE_NAME_HMCTS_INTERNAL)
+            .add(NEXT_HEARING_DETAILS)
             // remaining case data fields
             .add(OTHER_REFERENCE);
     }
@@ -209,9 +211,15 @@ public class GlobalSearchQueryBuilder {
                     GlobalSearchSortDirection.DESCENDING.name().equalsIgnoreCase(sortCriteria.getSortDirection())
                         ? SortOrder.DESC : SortOrder.ASC;
 
-                return Optional.of(SortBuilders
+                FieldSortBuilder sortBuilder = SortBuilders
                     .fieldSort(sortByCategory.getField())
-                    .order(sortOrder));
+                    .order(sortOrder);
+
+                if (StringUtils.isNotBlank(sortByCategory.getMissingValue())) {
+                    sortBuilder.missing(sortByCategory.getMissingValue());
+                }
+
+                return Optional.of(sortBuilder);
             }
         }
 

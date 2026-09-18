@@ -36,23 +36,18 @@ import static org.mockito.Mockito.doReturn;
 class GlobalSearchResponseTransformerTest extends TestFixtures {
 
     protected static final String JURISDICTION_ID_DIFFERENT = "DIFFERENT";
-
-    @Mock
-    private CachedCaseDefinitionRepository caseDefinitionRepository;
-
-    @Mock
-    private CaseDataAccessControl caseDataAccessControl;
-
-    @InjectMocks
-    private GlobalSearchResponseTransformer underTest;
-
     private static Map<String, JsonNode> CASE_DATA;
     private static Map<String, JsonNode> SUPPLEMENTARY_DATA;
     private static ServiceLookup SERVICE_LOOKUP;
     private static LocationLookup LOCATION_LOOKUP;
-
     private final String categoryId = "CATEGORY-A";
     private final String categoryName = "This is the description for category A.";
+    @Mock
+    private CachedCaseDefinitionRepository caseDefinitionRepository;
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+    @InjectMocks
+    private GlobalSearchResponseTransformer underTest;
 
     @BeforeAll
     static void prepare() throws Exception {
@@ -62,6 +57,41 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
         LOCATION_LOOKUP = new LocationLookup(
             Map.of("321", "Location 1", "L-2", "Location 2"),
             Map.of("R-1", "Region 1", "123", "Region 2")
+        );
+    }
+
+    private static Stream<Arguments> providePaginationParameters() {
+        return Stream.of(
+            Arguments.of(10, 1, 11L, 10, true),
+            Arguments.of(5, 5, 10L, 5, true),
+            Arguments.of(10, 1, 10L, 10, false),
+            Arguments.of(5, 6, 10L, 5, false),
+            Arguments.of(5, 1, 2L, 2, false)
+        );
+    }
+
+    private static Stream<Arguments> provideCaseDataWithNoNextHearingDate() {
+        return Stream.of(
+            Arguments.of(emptyMap()),
+            Arguments.of(Map.of("nextHearingDetails", mapper.nullNode())),
+            Arguments.of(Map.of("nextHearingDetails", mapper.createObjectNode()))
+        );
+    }
+
+    private static Stream<String> provideValidNextHearingDates() {
+        return Stream.of(
+            "2026-10-12T09:30:00.000",
+            "2026-10-12T09:30:00",
+            "2026-10-12T09:30"
+        );
+    }
+
+    private static Stream<String> provideInvalidNextHearingDates() {
+        return Stream.of(
+            "2026-10-12T09:30:00Z",
+            "2026-10-12T09:30:00+01:00",
+            "2026-10-12T09:30:00-05:00",
+            "not-a-date"
         );
     }
 
@@ -273,6 +303,74 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
             .satisfies(result -> assertThat(result.getCaseNameHmctsInternal()).isEqualTo("Internal case name"));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidNextHearingDates")
+    void testShouldMapValidNextHearingDate(final String nextHearingDate) {
+        // GIVEN
+        stubAccessMetadata();
+        final Map<String, JsonNode> caseData = Map.of(
+            "nextHearingDetails",
+            mapper.createObjectNode().put("hearingDateTime", nextHearingDate)
+        );
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(caseData)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getNextHearingDate()).isEqualTo(nextHearingDate));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidNextHearingDates")
+    void testShouldMapInvalidNextHearingDateAsNull(final String nextHearingDate) {
+        // GIVEN
+        stubAccessMetadata();
+        final Map<String, JsonNode> caseData = Map.of(
+            "nextHearingDetails",
+            mapper.createObjectNode().put("hearingDateTime", nextHearingDate)
+        );
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(caseData)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getNextHearingDate()).isNull());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCaseDataWithNoNextHearingDate")
+    void testShouldMapNullNextHearingDate(final Map<String, JsonNode> caseData) {
+        // GIVEN
+        stubAccessMetadata();
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(caseData)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getNextHearingDate()).isNull());
+    }
+
     private void stubAccessMetadata() {
         val caseAccessMetadata = new CaseAccessMetadata();
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
@@ -359,16 +457,6 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
                 assertThat(resultInfo.getCaseStartRecord()).isEqualTo(startRecordNumber);
                 assertThat(resultInfo.isMoreResultsToGo()).isEqualTo(moreToGo);
             });
-    }
-
-    private static Stream<Arguments> providePaginationParameters() {
-        return Stream.of(
-            Arguments.of(10, 1, 11L, 10, true),
-            Arguments.of(5, 5, 10L, 5, true),
-            Arguments.of(10, 1, 10L, 10, false),
-            Arguments.of(5, 6, 10L, 5, false),
-            Arguments.of(5, 1, 2L, 2, false)
-        );
     }
 
 }
