@@ -80,6 +80,16 @@
     "TextField": "PUBLIC",
     "YesOrNoField": "PUBLIC"
   },
+  "supplementary_data": {
+    "new_case": {
+      "OrgY": true,
+      "OrgZ": false
+    },
+    "orgs_assigned_users": {
+      "OrgY": 1,
+      "OrgZ": 2500
+    }
+  },
   "jurisdiction": "AUTOTEST1",
   "last_modified": "2020-05-14T12:40:56.242Z",
   "last_state_modified_date": "2020-05-14T12:40:56.240Z",
