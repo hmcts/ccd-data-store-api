@@ -23,6 +23,6 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd-core.enabled
   - name: ccd-definition-store-api
-    version: 1.6.30
+    version: 1.6.29
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd-core.enabled
