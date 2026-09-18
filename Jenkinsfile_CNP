@@ -1,6 +1,7 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import groovy.transform.Field
 properties(
     [
         [
@@ -84,10 +85,11 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-def vaultOverrides = [
+@Field Map<String, String> vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
+
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -100,6 +102,9 @@ env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
 env.PACT_BROKER_PORT = "443"
 env.PACT_BROKER_SCHEME = "https"
+env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED = "true"
+env.APP_INSIGHTS_TELEMETRY_REQUIRED = "true"
+env.APP_INSIGHTS_TRACE_MARKER = "CLA-CCD"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
@@ -224,6 +229,10 @@ withPipeline(type, product, component) {
       ]
     }
 
+    afterSuccess('functionalTest:preview') {
+        runTelemetrySmokeCheckAfterFunctional('preview')
+    }
+
     afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
         publishHTML target: [
@@ -234,6 +243,10 @@ withPipeline(type, product, component) {
             reportFiles          : "overview-features.html",
             reportName           : "Functional Test Report"
       ]
+    }
+
+    afterSuccess('functionalTest:aat') {
+        runTelemetrySmokeCheckAfterFunctional('aat')
     }
 
     afterAlways('pact-provider-verification') {
@@ -254,4 +267,54 @@ withPipeline(type, product, component) {
  */
 def copyIgnore(filePath, destinationDir) {
   steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
+}
+
+def runTelemetrySmokeCheckAfterFunctional(environment) {
+  steps.stage("Application Insights telemetry - ${environment}") {
+    steps.catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+      runTelemetrySmokeCheck(environment)
+    }
+  }
+}
+
+def runTelemetrySmokeCheck(environment) {
+  if (!env.APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED?.toBoolean()) {
+    echo "Skipping App Insights telemetry smoke check for ${environment}; set APP_INSIGHTS_TELEMETRY_SMOKE_ENABLED=true to enable."
+    return
+  }
+
+  def azureConfigDir = env.AZURE_CONFIG_DIR?.trim() ?: '/opt/jenkins/.azure-nonprod'
+  def appInsightsEnvironment = vaultOverrides[environment] ?: environment
+
+  steps.echo("Running Application Insights telemetry smoke check for ${environment}")
+  steps.echo("Using Azure CLI config ${azureConfigDir} for Application Insights telemetry check")
+  steps.echo("Using ${appInsightsEnvironment} Application Insights for ${environment} telemetry check")
+  steps.echo("Functional TEST_URL for ${environment}: ${env.TEST_URL ?: '<not set>'}")
+  def requestUrlContains = environment == 'preview' ? (env.TEST_URL?.trim() ?: '') : ''
+  if (!requestUrlContains && environment == 'aat') {
+    requestUrlContains = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+  }
+  requestUrlContains = requestUrlContains.replaceFirst('^https?://', '').replaceFirst('/.*$', '').toLowerCase()
+  def status = steps.sh(
+      script: """
+        AZURE_CONFIG_DIR='${azureConfigDir}' \\
+        APP_INSIGHTS_SOURCE_ENV='${environment}' \\
+        APP_INSIGHTS_ENV='${appInsightsEnvironment}' \\
+        APP_INSIGHTS_REQUEST_URL_CONTAINS='${requestUrlContains}' \\
+        APP_INSIGHTS_TRACE_MARKER='${env.APP_INSIGHTS_TRACE_MARKER}' \\
+        ./scripts/check-app-insights-telemetry.sh
+      """,
+      returnStatus: true
+  )
+
+  if (status == 0) {
+    return
+  }
+
+  def message = "Application Insights telemetry check did not pass for ${environment} (exit code ${status})."
+  def telemetryRequired = env.APP_INSIGHTS_TELEMETRY_REQUIRED?.toBoolean() && environment != 'preview'
+  if (telemetryRequired) {
+    steps.error(message)
+  }
+  steps.echo("${message} Continuing because telemetry smoke check is non-blocking for ${environment}.")
 }

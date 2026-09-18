@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.collect.Sets;
-import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +20,9 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import jakarta.inject.Inject;
+
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -49,7 +50,7 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         String uidNoEventAccess = "1234";
         UserInfo userInfo = UserInfo.builder()
             .uid(uidNoEventAccess)
-            .roles(com.google.common.collect.Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .roles(List.of(MockUtils.ROLE_CASEWORKER_PUBLIC))
             .build();
         stubFor(WireMock.post(urlMatching("/o/token"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
@@ -70,7 +71,7 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         String caseId = "1504259907353529";
         String requestUrl =  "/cases/" + caseId + "/users/" + userId;
         CaseUser caseUser = new CaseUser();
-        caseUser.setCaseRoles(Sets.newHashSet(role1, role2));
+        caseUser.setCaseRoles(new LinkedHashSet<>(List.of(role1, role2)));
 
         stubIdamRolesForUser(userId);
 
@@ -88,6 +89,6 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE_ACCESS.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(caseId));
         assertThat(captor.getValue().getTargetIdamId(), is(userId));
-        assertThat(captor.getValue().getTargetCaseRoles(), is(Lists.newArrayList(role1, role2)));
+        assertThat(captor.getValue().getTargetCaseRoles(), is(List.of(role1, role2)));
     }
 }
