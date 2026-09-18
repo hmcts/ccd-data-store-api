@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,18 +45,20 @@ public class ExcludedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
     @SuppressWarnings("java:S2789")
     private String getCaseReferences(Supplier<Stream<RoleAssignment>> streamSupplier,
                                      Map<String, Object> params) {
-        Set<String> caseReferences = streamSupplier.get()
+        Long[] caseReferences = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .filter(Objects::nonNull)
             .map(Optional::get)
             .filter(StringUtils::isNotBlank)
-            .collect(Collectors.toSet());
+            .filter(ref -> ref.matches("\\d+"))
+            .map(Long::parseLong)
+            .toArray(Long[]::new);
 
-        if (!caseReferences.isEmpty()) {
+        if (caseReferences.length > 0) {
             String paramName = "case_ids_excluded";
             params.put(paramName, caseReferences);
-            return String.format(QUERY, REFERENCE, paramName);
+            return String.format(QUERY_ANY, REFERENCE, paramName);
         }
         return EMPTY;
     }
