@@ -1,3 +1,8 @@
+global:
+  postgresql:
+    auth:
+      username: javapostgres
+
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
@@ -25,8 +30,7 @@ java:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
     DATA_STORE_DB_NAME: data-store
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+    DATA_STORE_DB_USERNAME: "{{ .Values.global.postgresql.auth.username}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
@@ -46,16 +50,20 @@ java:
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
     SPRING_APPLICATION_JSON: |
       {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
+  secrets:
+    DATA_STORE_DB_PASSWORD:
+      secretRef: "{{ .Release.Name }}-postgresql"
+      key: password
   postgresql:
     enabled: true
     primary:
       initdb:
         scripts:
           init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = {{ .Values.global.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = {{ .Values.global.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = {{ .Values.global.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role-assignment" WITH OWNER = {{ .Values.global.postgresql.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
 ccd:
   enabled: true
@@ -102,8 +110,7 @@ ccd:
       devcpuLimits: 4000m
       environment:
         DEFINITION_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-        DEFINITION_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-        DEFINITION_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        DEFINITION_STORE_DB_USERNAME: "{{ .Values.global.postgresql.auth.username}}"
         DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
@@ -112,9 +119,9 @@ ccd:
         ELASTIC_SEARCH_SCHEME: http
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
+          secretRef: "{{ .Release.Name }}-postgresql"
+          key: password
+          disabled: false
 
   ccd-user-profile-api:
     java:
@@ -123,28 +130,26 @@ ccd:
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
-        USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-        USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        USER_PROFILE_DB_USERNAME: "{{ .Values.global.postgresql.auth.username}}"
         USER_PROFILE_DB_OPTIONS: ""
       secrets:
         USER_PROFILE_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
+          secretRef: "{{ .Release.Name }}-postgresql"
+          key: password
+          disabled: false
 
   am-role-assignment-service:
     java:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       environment:
         ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
-        ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-        ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.global.postgresql.auth.username}}"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
+          secretRef: "{{ .Release.Name }}-postgresql"
+          key: password
+          disabled: false
       devmemoryRequests: 1024Mi
       devcpuRequests: 250m
       devmemoryLimits: 2048Mi
@@ -196,9 +201,15 @@ logstash:
   extraVolumes: |
     - name: logstash-lib
       emptyDir: {}
+    - name: postgresql-credentials
+      secret:
+        secretName: "{{ .Release.Name }}-postgresql"
   extraVolumeMounts: |
     - name: logstash-lib
       mountPath: /usr/share/logstash/ccd
+    - name: postgresql-credentials
+      mountPath: /etc/logstash/postgresql
+      readOnly: true
   logstashConfig:
     logstash.yml: |
       api.http.host: 0.0.0.0
@@ -216,8 +227,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_user => '{{ tpl .Values.global.postgresql.auth.username $ }}'
+          jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
