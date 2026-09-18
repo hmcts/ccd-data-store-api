@@ -18,6 +18,8 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,14 +34,21 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final String JURISDICTION = "TEST_JURISDICTION";
     private static final String CASE_TYPE_DECENTRALIZED = "DecentralizedCaseType";
     private static final String CASE_STATE = "CaseCreated";
-    private static final String LOGSTASH_POLL_STATEMENT =
-        "DELETE FROM case_data_logstash_queue USING case_data "
-            + "WHERE case_data_logstash_queue.case_data_id = case_data.id "
-            + "RETURNING case_data_logstash_queue.id AS version, case_data.id, created_date, last_modified, "
+    private static final Path COALESCING_MIGRATION = Path.of(
+        "src/main/resources/db/migration/V20260918_0000__CCD-4262_coalesce_logstash_queue_rows.sql");
+
+    private static String logstashPollStatement(int batchSize) {
+        return "WITH candidates AS (SELECT q.id FROM case_data_logstash_queue q ORDER BY q.id "
+            + "FOR UPDATE SKIP LOCKED LIMIT " + batchSize + ") "
+            + "DELETE FROM case_data_logstash_queue q USING candidates c, case_data "
+            + "WHERE q.id = c.id AND q.case_data_id = case_data.id "
+            + "RETURNING q.id AS version, case_data.id, created_date, last_modified, "
             + "jurisdiction, case_type_id, state, "
             + "last_state_modified_date, data::TEXT as json_data, data_classification::TEXT "
             + "as json_data_classification, reference, security_classification, supplementary_data::TEXT "
             + "as json_supplementary_data";
+    }
+
     private static final AtomicLong CASE_REFERENCE_SEQUENCE = new AtomicLong(7777777777777777L);
 
     @Inject
@@ -171,32 +180,81 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    void logstashPollingShouldDeleteQueuedRowsAndReturnQueueIdsAsExternalVersions() {
-        // Proves the Logstash DB poll contract: queued rows are deleted while reading the live case row.
+    void logstashQueueShouldCoalesceWritesAndReturnTheLatestCaseState() {
+        // One pending queue row represents the latest state of a frequently updated case.
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
         CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
 
         persisted.setData(Map.of("foo", mapper.valueToTree("baz")));
         CaseDetails updated = caseDetailsRepository.set(persisted);
 
-        assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isEqualTo(2);
-        List<Long> queuedIds = jdbcTemplate.queryForList(
-            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ? ORDER BY id",
-            Long.class,
-            Long.valueOf(updated.getId())
-        );
+        assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isOne();
+        Long queuedId = jdbcTemplate.queryForObject(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Long.class, Long.valueOf(updated.getId()));
 
-        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(logstashPollStatement(1000));
 
         assertAll(
-            () -> assertThat(polledRows).hasSize(2),
+            () -> assertThat(polledRows).hasSize(1),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("id").toString().equals(updated.getId())))
                 .isTrue(),
             () -> assertThat(polledRows).extracting(row -> ((Number) row.get("version")).longValue())
-                .containsExactlyInAnyOrderElementsOf(queuedIds),
+                .containsExactly(queuedId),
             () -> assertThat(polledRows.stream().allMatch(row -> row.get("json_data").toString().contains("baz")))
                 .isTrue(),
             () -> assertThat(countQueuedRows(jdbcTemplate, updated.getId())).isZero()
+        );
+    }
+
+    @Test
+    void logstashPollingShouldLeaveRowsBeyondItsBatchForTheNextPoll() {
+        caseDetailsRepository.set(originalCaseDetails);
+        caseDetailsRepository.set(createOriginalCaseDetails());
+        caseDetailsRepository.set(createOriginalCaseDetails());
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+
+        List<Map<String, Object>> firstBatch = jdbcTemplate.queryForList(logstashPollStatement(2));
+
+        assertAll(
+            () -> assertThat(firstBatch).hasSize(2),
+            () -> assertThat(jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM case_data_logstash_queue", Integer.class)).isOne(),
+            () -> assertThat(jdbcTemplate.queryForList(logstashPollStatement(2))).hasSize(1),
+            () -> assertThat(jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM case_data_logstash_queue", Integer.class)).isZero()
+        );
+    }
+
+    @Test
+    void coalescingMigrationShouldKeepOneFreshRegularCaseRowAndDiscardLegacyPointerRows() throws Exception {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        final CaseDetails regularCase = caseDetailsRepository.set(originalCaseDetails);
+        final CaseDetails pointerSource = createOriginalCaseDetails();
+        casePointerRepository.persistCasePointerAndInitId(pointerSource);
+
+        jdbcTemplate.update("DELETE FROM case_data_logstash_queue");
+        jdbcTemplate.execute("ALTER TABLE case_data_logstash_queue "
+            + "DROP CONSTRAINT case_data_logstash_queue_case_data_id_unique");
+        jdbcTemplate.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", regularCase.getId());
+        jdbcTemplate.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", regularCase.getId());
+        jdbcTemplate.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", pointerSource.getId());
+        Long previousHighestQueueId = jdbcTemplate.queryForObject(
+            "SELECT max(id) FROM case_data_logstash_queue", Long.class);
+
+        jdbcTemplate.execute(Files.readString(COALESCING_MIGRATION));
+
+        Long freshQueueId = jdbcTemplate.queryForObject(
+            "SELECT id FROM case_data_logstash_queue WHERE case_data_id = ?",
+            Long.class, regularCase.getId());
+
+        assertAll(
+            () -> assertThat(countQueuedRows(jdbcTemplate, regularCase.getId())).isOne(),
+            () -> assertThat(countQueuedRows(jdbcTemplate, pointerSource.getId())).isZero(),
+            () -> assertThat(freshQueueId).isGreaterThan(previousHighestQueueId),
+            () -> assertThat(jdbcTemplate.update(
+                "INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?) "
+                    + "ON CONFLICT (case_data_id) DO NOTHING", regularCase.getId())).isZero()
         );
     }
 
@@ -222,7 +280,7 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             Long.class,
             Long.valueOf(persisted.getId())
         );
-        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(LOGSTASH_POLL_STATEMENT);
+        List<Map<String, Object>> polledRows = jdbcTemplate.queryForList(logstashPollStatement(1000));
 
         assertAll(
             () -> assertThat(countQueuedRows(jdbcTemplate, persisted.getId()))
