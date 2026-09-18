@@ -15,25 +15,16 @@ public interface OidcApi {
     @Body("grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}"
         + "&redirect_uri={redirect_uri}&scope={scope}&username={username}&password={password}")
     TokenResponse generateOpenIdToken(@Param("grant_type") String grantType,
-                                       @Param("client_id") String clientId,
-                                       @Param("client_secret") String clientSecret,
-                                       @Param("redirect_uri") String redirectUri,
-                                       @Param("scope") String scope,
-                                       @Param("username") String username,
-                                       @Param("password") String password);
+                                      @Param("client_id") String clientId,
+                                      @Param("client_secret") String clientSecret,
+                                      @Param("redirect_uri") String redirectUri,
+                                      @Param("scope") String scope,
+                                      @Param("username") String username,
+                                      @Param("password") String password);
 
     @RequestLine("GET /o/userinfo")
     @Headers("Authorization: Bearer {access_token}")
     IdamUser getUser(@Param("access_token") String accessToken);
-
-    class AuthenticateUserResponse {
-        @JsonProperty("code")
-        private String code;
-
-        public String getCode() {
-            return code;
-        }
-    }
 
     class TokenResponse {
         @JsonProperty("access_token")

@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -110,7 +110,7 @@ public class IdamRepositoryCachingIT extends WireMockBaseTest {
         verify(applicationParams, times(expectedNumInvocations)).getDataStoreSystemUserId();
         verify(applicationParams, times(expectedNumInvocations)).getDataStoreSystemUserPassword();
         verify(idamClient, times(expectedNumInvocations)).getAccessToken(TEST_SYS_USERNAME, TEST_SYS_PASSWORD);
-        assertEquals("Unexpected Access Token value", expectedAccessToken, actualAccessToken);
+        assertEquals(expectedAccessToken, actualAccessToken, "Unexpected Access Token value");
     }
 
     @AfterEach
