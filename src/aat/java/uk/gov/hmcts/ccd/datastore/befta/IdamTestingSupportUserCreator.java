@@ -101,6 +101,14 @@ public final class IdamTestingSupportUserCreator {
             ((ObjectNode) userNode).put("id", userId);
         }
 
+        String httpMethod = userAlreadyExists ? "PUT" : "POST";
+        String requestPath = userAlreadyExists
+            ? CREATE_OR_UPDATE_USER_PATH.replace("{userId}", userId)
+            : CREATE_USER_PATH;
+        BeftaUtils.defaultLog(
+            "IDAM Testing Support " + httpMethod + " " + requestPath + " request body:\n" + requestJson.toPrettyString()
+        );
+
         Response response = userAlreadyExists
             ? putCreateOrUpdateUser(idamTsUrl, accessToken, userId, requestJson)
             : postCreateUser(idamTsUrl, accessToken, requestJson);
