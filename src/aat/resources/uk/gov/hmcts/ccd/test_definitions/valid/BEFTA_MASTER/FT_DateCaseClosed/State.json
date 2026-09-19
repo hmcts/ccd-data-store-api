@@ -1,0 +1,24 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "ID": "CaseClosedForPayment",
+    "Name": "Closed for payment purpose",
+    "Description": "",
+    "DisplayOrder": 1,
+    "TitleDisplay": "",
+    "StateCategory": "CLOSED FOR PAYMENT,End"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "ID": "CaseNotClosedForPayment",
+    "Name": "Not closed for payment purpose",
+    "Description": "",
+    "DisplayOrder": 2,
+    "TitleDisplay": "",
+    "StateCategory": "End"
+  }
+]
