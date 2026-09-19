@@ -68,7 +68,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.13'
+        force 'net.bytebuddy:byte-buddy:1.18.14'
     }
 }
 
