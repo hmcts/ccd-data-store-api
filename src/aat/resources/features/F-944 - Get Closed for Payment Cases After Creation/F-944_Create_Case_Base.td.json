@@ -1,0 +1,67 @@
+{
+  "_guid_": "F-944_Create_Case_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit case creation as Case worker",
+
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_DateCaseClosed"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "summary": "",
+        "description": ""
+      },
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "version": 0,
+      "case_type_id": "FT_DateCaseClosed",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {},
+      "data_classification": {},
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "callback_error_message": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

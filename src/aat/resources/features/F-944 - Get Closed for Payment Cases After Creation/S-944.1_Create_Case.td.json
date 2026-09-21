@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-944.1_Create_Case",
+  "_extends_": "F-944_Create_Case_Base",
+  "title": "Create a case in state category closed for payment",
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-944.1_GetToken_CaseCreate][testData][actualResponse][body][token]}",
+      "event": {
+        "id": "createClosedForPaymentCase"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "state": "CaseClosedForPayment"
+    }
+  }
+}
