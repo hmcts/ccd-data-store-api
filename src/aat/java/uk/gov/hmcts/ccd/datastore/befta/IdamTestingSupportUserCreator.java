@@ -182,6 +182,12 @@ public final class IdamTestingSupportUserCreator {
         if (root.has("password")) {
             root.put("password", resolveRequiredValue(root.get("password").asText(), "password"));
         }
+        if (root.has("activationSecretPhrase")) {
+            root.put(
+                "activationSecretPhrase",
+                resolveRequiredValue(root.get("activationSecretPhrase").asText(), "activationSecretPhrase")
+            );
+        }
         JsonNode userNode = root.get("user");
         if (userNode != null && userNode.isObject() && userNode.has("email")) {
             ((ObjectNode) userNode).put(
@@ -196,7 +202,8 @@ public final class IdamTestingSupportUserCreator {
         if (StringUtils.isBlank(value) || value.contains(UNRESOLVED_PLACEHOLDER_PREFIX)) {
             throw new RuntimeException(
                 "Unresolved environment variable for IDAM user field '" + fieldDescription + "'. "
-                    + "Ensure Jenkins Key Vault secrets are mapped (e.g. CCD_DISPOSER_PAYMENT_USER_EMAIL). "
+                    + "Ensure Jenkins Key Vault secrets are mapped (e.g. CCD_DISPOSER_PAYMENT_USER_EMAIL / "
+                    + "CCD_DISPOSER_PAYMENT_USER_PASSWORD for activationSecretPhrase). "
                     + "Raw value: " + rawValue
             );
         }
