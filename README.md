@@ -153,14 +153,14 @@ Pact provider verification tests are located under `src/contractTest/java/`.
 
 Set up a local Pact Broker using the [Pact Broker Docker documentation](https://github.com/pact-foundation/pact-broker-docker).
 
-The commands below expect the broker to be available at `http://localhost:80`.
+The commands below expect the broker to be available directly at `http://localhost:9292`.
 
 #### Run All Pact Provider Verification Tests
 
 Will run all Pact provider verification tests against all of the latest consumer pacts on  `Dev` branch and publish the verification result and provider version to the local Pact Broker:
 
 ```bash
-PACT_BROKER_FULL_URL=http://localhost:80 \
+PACT_BROKER_FULL_URL=http://localhost:9292 \
 PACT_BRANCH_NAME=Dev \
 ./gradlew -Ppactbroker.enablePending=false \
   -Ppact.verifier.publishResults=true \
@@ -175,7 +175,7 @@ Will run the `ccdDataStoreAPI_Cases` Pact provider verification tests defined in
 local Pact Broker:
 
 ```bash
-PACT_BROKER_FULL_URL=http://localhost:80 \
+PACT_BROKER_FULL_URL=http://localhost:9292 \
 PACT_BRANCH_NAME=Dev \
 ./gradlew -Ppactbroker.consumers=wa_task_monitor \
   -Ppactbroker.enablePending=false \
@@ -196,7 +196,7 @@ build/reports/tests/runProviderPactVerification/index.html
 ```
 
 When publishing is enabled, the official Pact verification results can also be viewed in the local Pact Broker at
-[`http://localhost:80`](http://localhost:80).
+[`http://localhost:9292`](http://localhost:9292).
 
 ## LICENSE
 
