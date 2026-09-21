@@ -4,17 +4,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_NOT_FOUND;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -30,7 +29,6 @@ public class RoleAssignmentCategoryService {
         Pattern.compile("^citizen(-.*)?$|^letter-holder$", Pattern.CASE_INSENSITIVE);
     private static final Pattern JUDICIAL_ROLE = Pattern.compile(".+-panelmember$",
         Pattern.CASE_INSENSITIVE);
-    private static final List<String> ENFORCEMENT_ROLES = List.of("bailiff-manager", "bailiff");
 
     private final IdamRepository idamRepository;
     private final RoleAssignmentRepository roleAssignmentRepository;
@@ -47,7 +45,6 @@ public class RoleAssignmentCategoryService {
 
     public RoleCategory getRoleCategory(String userId) {
         List<String> idamUserRoles = idamRepository.getUserRoles(userId);
-
 
         if (hasProfessionalRole(idamUserRoles)) {
             return PROFESSIONAL;
@@ -75,20 +72,17 @@ public class RoleAssignmentCategoryService {
     }
 
     private boolean hasEnforcementRole(String userId) {
-        RoleAssignments roleAssignments;
-        try {
-            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository
-                .getRoleAssignments(userId));
-        } catch (ResourceNotFoundException ex) {
-            return false;
-        }
-        List<RoleAssignment> assignments = roleAssignments == null || roleAssignments.getRoleAssignments() == null
-            ? Collections.emptyList()
-            : roleAssignments.getRoleAssignments();
 
-        return assignments.stream()
+        RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository
+                .getRoleAssignments(userId));
+        if (roleAssignments.getRoleAssignments().isEmpty()) {
+            throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND, userId));
+        }
+
+        // Filter for Bailiff Manager and Bailiff roles, which have GrantType.STANDARD
+        return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> roleAssignment.isGrantType(GrantType.STANDARD))
-            .map(RoleAssignment::getRoleName)
-            .anyMatch(ENFORCEMENT_ROLES::contains);
+            .anyMatch(roleAssignment ->
+                ENFORCEMENT.name().equalsIgnoreCase(roleAssignment.getRoleCategory()));
     }
 }

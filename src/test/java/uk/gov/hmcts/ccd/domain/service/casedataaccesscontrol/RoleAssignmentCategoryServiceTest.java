@@ -15,13 +15,17 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_NOT_FOUND;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -45,7 +49,6 @@ class RoleAssignmentCategoryServiceTest {
 
     @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
-
 
     @Nested
     @DisplayName("getRoleCategory()")
@@ -140,6 +143,58 @@ class RoleAssignmentCategoryServiceTest {
             assertThat(roleCategory, is(ENFORCEMENT));
         }
 
-    }
+        @Test
+        void shouldFallbackToLegalOperationsWhenRoleAssignmentsAreUnavailable() {
 
+            given(idamRepository.getUserRoles(USER_ID))
+                .willReturn(singletonList("invalidUser"));
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willThrow(new ResourceNotFoundException("not found"));
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenRoleAssignmentsListIsNull() {
+
+            given(idamRepository.getUserRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder().roleAssignmentsList(null).build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+                roleAssignmentCategoryService.getRoleCategory(USER_ID));
+            assertEquals(String.format(ROLE_ASSIGNMENTS_NOT_FOUND, USER_ID), exception.getMessage());
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenOnlySpecificGrantTypeEnforcementRoleExists() {
+
+            given(idamRepository.getUserRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+
+            RoleAssignment enforcementRoleWithSpecificGrant = RoleAssignment.builder()
+                .roleName("bailiff-manager")
+                .grantType(SPECIFIC.name())
+                .build();
+
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                    .roleAssignmentsList(singletonList(enforcementRoleWithSpecificGrant))
+                    .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+
+        }
+    }
 }
