@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +19,24 @@ class LogstashPipelineConfigurationTest {
         Path.of("charts/ccd-data-store-api/values.preview.template.yaml");
     private static final Path COALESCING_MIGRATION =
         Path.of("src/main/resources/db/migration/V20260918_0000__CCD-4262_coalesce_logstash_queue_rows.sql");
+    private static final Pattern JDBC_STATEMENT = Pattern.compile(
+        "statement => \\\"(.*?)\\\"\\s+clean_run", Pattern.DOTALL);
+    private static final String EXPECTED_POLL_STATEMENT = """
+        WITH candidates AS (
+        SELECT q.id
+        FROM case_data_logstash_queue q
+        ORDER BY q.id
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1000
+        )
+        DELETE FROM case_data_logstash_queue q
+        USING candidates c, case_data cd
+        WHERE q.id = c.id
+        AND q.case_data_id = cd.id
+        RETURNING q.id AS version, cd.id, created_date, last_modified, jurisdiction, case_type_id, state,
+        last_state_modified_date, data::TEXT AS json_data, data_classification::TEXT AS json_data_classification,
+        reference, security_classification, supplementary_data::TEXT AS json_supplementary_data
+        """;
 
     @Test
     void previewLogstashPipelineShouldDeleteBoundedQueueBatchesUsingQueueIdsAsExternalVersions() throws IOException {
@@ -36,20 +57,9 @@ class LogstashPipelineConfigurationTest {
                 output.contains("version_type => \"external\""),
                 "Preview Logstash output must use Elasticsearch external versioning"
             ),
-            () -> assertTrue(
-                input.contains("RETURNING q.id AS version"),
-                "Preview Logstash input must expose the monotonic queue row id as version"
-            ),
-            () -> assertTrue(
-                input.contains("ORDER BY q.id")
-                    && input.contains("FOR UPDATE SKIP LOCKED")
-                    && input.contains("LIMIT 1000"),
-                "Preview Logstash input must delete a bounded, lock-safe queue batch"
-            ),
-            () -> assertTrue(
-                input.contains("DELETE FROM case_data_logstash_queue q"),
-                "Queue rows must have a terminal state after they are read"
-            ),
+            () -> assertThat(normaliseWhitespace(jdbcStatement(input)))
+                .as("Preview Logstash must use the complete bounded plain-delete queue poll contract")
+                .isEqualTo(normaliseWhitespace(EXPECTED_POLL_STATEMENT)),
             () -> assertFalse(input.contains("claim_token") || input.contains("claimed_at"),
                 "Preview Logstash input must not retain the removed lease/claim path"),
             () -> assertTrue(
@@ -86,5 +96,15 @@ class LogstashPipelineConfigurationTest {
         int startIndex = values.indexOf(start);
         int endIndex = values.indexOf(end, startIndex);
         return values.substring(startIndex, endIndex);
+    }
+
+    private String jdbcStatement(String input) {
+        Matcher matcher = JDBC_STATEMENT.matcher(input);
+        assertThat(matcher.find()).as("JDBC input statement").isTrue();
+        return matcher.group(1);
+    }
+
+    private String normaliseWhitespace(String value) {
+        return value.replaceAll("\\s+", " ").trim();
     }
 }

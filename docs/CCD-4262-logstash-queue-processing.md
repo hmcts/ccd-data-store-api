@@ -25,6 +25,32 @@ rows are inserted. The recovery query never updates `case_data`.
 Operational monitoring must alert on Elasticsearch output failures, including
 non-retryable failures and DLQ routing, so the affected window is known promptly.
 
+## Batch-write contract and required validation
+
+The JDBC poll is a database batch, not an Elasticsearch bulk-size setting. It
+must select, lock, delete, and return at most 1000 queue rows, using `q.id` as
+the external Elasticsearch version. The 1000-row limit bounds the work and the
+potentially affected rows per at-most-once poll failure; a prolonged outage can
+require recovery of multiple batches. Logstash's pipeline batch setting controls
+Elasticsearch request size independently and is a throughput tuning decision,
+not a data-correctness requirement.
+
+The Option 2 query contract is the source of truth; every deployment's embedded
+statement must conform to it. The repository's preview configuration test
+compares its complete query and projection with that contract; repository tests
+exercise the same poll semantics against PostgreSQL, and Elasticsearch tests
+prove stale external versions are rejected. Any poll-query change must update
+and validate all three configuration sources:
+
+- `ccd-data-store-api` preview Helm values and its configuration test;
+- `cnp-flux-config` Data Store Logstash pipelines and queue-contract test; and
+- `ccd-docker` Logstash pipeline and queue-contract test.
+
+Required evidence for a release is a passing configuration contract, the focused
+PostgreSQL and Elasticsearch tests, F-106/S-609 in preview, and the operational
+outage/DLQ/manual-requeue evidence below. A bulk-size or worker-count change
+additionally requires a representative backlog-drain measurement before rollout.
+
 ## Release gate: operational alert and manual-requeue smoke test
 
 The Logstash pipeline enables its dead-letter queue and indexes non-retryable
