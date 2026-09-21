@@ -21,11 +21,13 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_NOT_FOUND;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -164,7 +166,7 @@ class RoleAssignmentCategoryServiceTest {
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(new RoleAssignmentResponse());
             given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
-                .willReturn(RoleAssignments.builder().roleAssignmentsList(null).build());
+                 .willReturn(RoleAssignments.builder().roleAssignments(null).build());
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
             Exception exception = assertThrows(ResourceNotFoundException.class, () ->
@@ -187,9 +189,9 @@ class RoleAssignmentCategoryServiceTest {
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(new RoleAssignmentResponse());
             given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
-                .willReturn(RoleAssignments.builder()
-                    .roleAssignmentsList(singletonList(enforcementRoleWithSpecificGrant))
-                    .build());
+                 .willReturn(RoleAssignments.builder()
+                     .roleAssignments(singletonList(enforcementRoleWithSpecificGrant))
+                     .build());
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
