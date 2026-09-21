@@ -14,7 +14,7 @@ plugins {
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'info.solidsoft.pitest' version '1.19.0'
-    id 'uk.gov.hmcts.java' version '0.12.68'
+    id 'uk.gov.hmcts.java' version '0.12.70'
     id 'au.com.dius.pact' version '4.7.5'
     id 'org.jsonschema2pojo' version '1.2.2'
     id 'org.owasp.dependencycheck' version '12.2.1'
@@ -30,6 +30,7 @@ ext {
     set('spring-security.version', '6.5.7')
     set('log4j2.version', '2.24.3')
     set('jacksonVersion', '2.19.2')
+    set('netty.version', '4.1.136.Final')
     set('snakeyaml.version', '2.2')
     junit = '5.14.4'
     junitPlatform = '1.14.4'
@@ -263,7 +264,7 @@ dependencies {
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json     // spring-boot-starter-data-jpa
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.56.Final'      // spring-boot-starter-data-jpa
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.57.Final'      // spring-boot-starter-data-jpa
     implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20260313.1' // java-html-sanitizer
 
 
@@ -306,7 +307,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.9.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.9.1'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
