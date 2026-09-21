@@ -43,7 +43,7 @@ ext {
     elasticVersion = '9.5.1'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.8'
-    beftaFwVersion = '9.2.10'
+    beftaFwVersion = '9.2.11'
     ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
@@ -307,7 +307,7 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-config'
     implementation group: 'org.springframework.security', name: 'spring-security-web'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.9.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.9.1'
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
