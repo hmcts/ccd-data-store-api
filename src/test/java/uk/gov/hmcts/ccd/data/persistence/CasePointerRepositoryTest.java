@@ -301,6 +301,38 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
         );
     }
 
+    @Test
+    void laterSupplementaryDataUpdateShouldHaveHigherQueueVersionThanAnAlreadyPolledUpdate() throws Exception {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+        jdbcTemplate.update("DELETE FROM case_data_logstash_queue");
+
+        supplementaryDataRepository.setSupplementaryData(
+            persisted.getReferenceAsString(), "orgs_assigned_users.OrgA", 1);
+        em.flush();
+        Map<String, Object> firstPolledRow = onlyPolledRow(jdbcTemplate);
+
+        supplementaryDataRepository.setSupplementaryData(
+            persisted.getReferenceAsString(), "orgs_assigned_users.OrgA", 2);
+        em.flush();
+        Map<String, Object> secondPolledRow = onlyPolledRow(jdbcTemplate);
+
+        assertAll(
+            () -> assertThat(((Number) secondPolledRow.get("version")).longValue())
+                .isGreaterThan(((Number) firstPolledRow.get("version")).longValue()),
+            () -> assertThat(mapper.readTree(firstPolledRow.get("json_supplementary_data").toString())
+                .at("/orgs_assigned_users/OrgA").asInt()).isEqualTo(1),
+            () -> assertThat(mapper.readTree(secondPolledRow.get("json_supplementary_data").toString())
+                .at("/orgs_assigned_users/OrgA").asInt()).isEqualTo(2)
+        );
+    }
+
+    private Map<String, Object> onlyPolledRow(JdbcTemplate jdbcTemplate) {
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(logstashPollStatement(1000));
+        assertThat(rows).as("one queued case should be returned by the Logstash poll").hasSize(1);
+        return rows.get(0);
+    }
+
     private Integer countQueuedRows(JdbcTemplate jdbcTemplate, String caseDataId) {
         return jdbcTemplate.queryForObject(
             "SELECT count(*) FROM case_data_logstash_queue WHERE case_data_id = ?",

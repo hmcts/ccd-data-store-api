@@ -27,7 +27,7 @@
                     "range": {
                       "supplementary_data.orgs_assigned_users.OrgZ": {
                         "lte": 2499,
-                        "gte": 2498
+                        "gte": 2499
                       }
                     }
                   }

@@ -68,18 +68,39 @@ row to be consumed, and verifies its Elasticsearch document contains the
 expected supplementary data. Do not supply a case reference in normal PR builds;
 this is a targeted release-gate smoke.
 
-The required preparation is:
+The required preview procedure is:
 
-1. Create an `AAT_PRIVATE` case in the isolated preview deployment and add
-   supplementary data; record the case ID and the UTC start/end time.
-2. Block writes to that preview Elasticsearch index, wait for Logstash to poll
-   the queue, then restore writes. Confirm the failure is visible in Logstash and
-   the DLQ/dead-letter index where the failure is non-retryable.
-3. Enable the Jenkins hook with the recorded values above. It re-queues only that
-   case, waits for the queue row to be consumed, and verifies its Elasticsearch
-   document contains the expected supplementary data.
-4. Confirm the alert fired and was received by its owner, then attach the Jenkins
-   result and alert evidence to the ticket.
+1. Confirm Platform monitoring has alerts for Logstash Elasticsearch-output
+   failures and for new `ccd-logstash-dead-letter` documents. Use an isolated PR
+   preview only.
+2. Create an `AAT_PRIVATE` case and add known supplementary data. Record the
+   numeric reference, exact expected JSON, and UTC start time.
+3. Block writes to that preview index only:
+
+   ```bash
+   curl -X PUT "http://<preview-es>:9200/aat_private_cases*/_settings" \
+     -H 'Content-Type: application/json' \
+     -d '{"index.blocks.write": true}'
+   ```
+
+4. Submit another supplementary-data update and wait for Logstash to poll.
+   Capture the output failure and confirm its alert fires and is received.
+5. Using a Platform-approved controlled non-retryable failure, confirm a
+   document reaches `ccd-logstash-dead-letter` and its alert fires and is
+   received.
+6. Restore writes immediately after collecting the failure evidence:
+
+   ```bash
+   curl -X PUT "http://<preview-es>:9200/aat_private_cases*/_settings" \
+     -H 'Content-Type: application/json' \
+     -d '{"index.blocks.write": false}'
+   ```
+
+7. Enable the Jenkins hook with the recorded variables above. It re-queues only
+   that case, waits for the queue row to be consumed, and verifies its
+   Elasticsearch document contains the expected supplementary data.
+8. Confirm both alerts fired and were received, then attach the Jenkins result
+   and alert evidence to CCD-4262.
 
 Jenkins archives `Logstash Manual Requeue Smoke/evidence.md`, which records the
 case, queue ID, Elasticsearch verification, and UTC completion time. Add the
