@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_NOT_FOUND;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -72,13 +71,12 @@ public class RoleAssignmentCategoryService {
     }
 
     private boolean hasEnforcementRole(String userId) {
+        RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(
+            roleAssignmentRepository.getRoleAssignments(userId));
 
-        RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentRepository
-                .getRoleAssignments(userId));
-        if (roleAssignments.getRoleAssignments().isEmpty()) {
-            throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND, userId));
+        if (roleAssignments == null || roleAssignments.getRoleAssignments() == null) {
+            return false;
         }
-
         // Filter for Bailiff Manager and Bailiff roles, which have GrantType.STANDARD
         return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> roleAssignment.isGrantType(GrantType.STANDARD))
