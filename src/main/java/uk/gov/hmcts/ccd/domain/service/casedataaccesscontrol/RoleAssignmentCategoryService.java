@@ -76,7 +76,11 @@ public class RoleAssignmentCategoryService {
         if (roleAssignments == null || roleAssignments.getRoleAssignments() == null) {
             return false;
         }
-        // Filter for Bailiff Manager and Bailiff roles, which have GrantType.STANDARD
+
+        /*
+         * Filter for ENFORCEMENT roles with GrantType.STANDARD.
+         * The global hmcts-enforcement role has GrantType.BASIC and is therefore not included.
+         */
         return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> roleAssignment.isGrantType(GrantType.STANDARD))
             .anyMatch(roleAssignment ->

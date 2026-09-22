@@ -155,12 +155,12 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        void shouldFallbackToLegalOperationsWhenOnlySpecificGrantTypeEnforcementRoleExists() {
+        void shouldFallbackToLegalOperationsWhenOnlyBasicGrantTypeEnforcementRoleExists() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("some-user"));
 
-            RoleAssignment enforcementRoleWithSpecificGrant = RoleAssignment.builder()
+            RoleAssignment enforcementRoleWithBasicGrant = RoleAssignment.builder()
                 .roleName("hmcts-enforcement")
                 .grantType(BASIC.name())
                 .roleCategory(ENFORCEMENT.name())
@@ -170,7 +170,7 @@ class RoleAssignmentCategoryServiceTest {
                 .willReturn(new RoleAssignmentResponse());
             given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
                  .willReturn(RoleAssignments.builder()
-                     .roleAssignments(singletonList(enforcementRoleWithSpecificGrant))
+                     .roleAssignments(singletonList(enforcementRoleWithBasicGrant))
                      .build());
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
