@@ -50,6 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
 class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
@@ -166,6 +167,8 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
         stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/.*"))
+            .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
     }
 
     protected HttpHeaders createHttpHeaders() {
