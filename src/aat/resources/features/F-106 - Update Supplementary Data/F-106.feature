@@ -61,3 +61,16 @@ Feature: F-106: Update Supplementary Data
     When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
     Then the response [contains the previously created case],
     And the response has all other details as expected.
+
+  @S-610 @F-7841 @elasticsearch @Retryable(maxAttempts=6,delay=1000,statusCodes={500,502,503,504},match={total[^0-9]*0})
+  Scenario: indexes a supplementary-data update after the previous value is searchable
+    Given a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
+    And a successful call [by Dil to update supplementary_data] as in [F-106_Set_Supplementary_Data_C1],
+    And a successful call [the first supplementary value is searchable] as in [F-106_Search_First_Supplementary_Value],
+    And a successful call [by Dil to decrement supplementary_data] as in [F-106_Decrement_Supplementary_Data_C1],
+    And a user with [a valid profile],
+    And the request [is configured to search for the previously created case by the updated supplementary data value],
+    And a request is prepared with appropriate values,
+    When it is submitted to call the [external search query] operation of [CCD Data Store Elastic Search API],
+    Then the response [contains the previously created case],
+    And the response has all other details as expected.

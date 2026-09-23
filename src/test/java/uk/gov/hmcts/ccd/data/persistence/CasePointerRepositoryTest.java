@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.persistence;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,6 +38,9 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     private static final Path COALESCING_MIGRATION = Path.of(
         "src/main/resources/db/migration/V20260918_0000__CCD-4262_coalesce_logstash_queue_rows.sql");
 
+    private static final Path VERSION_MIGRATION = Path.of(
+        "src/main/resources/db/migration/V20260923_0000__CCD-4262_raise_logstash_queue_version.sql");
+
     private static String logstashPollStatement(int batchSize) {
         return "WITH candidates AS (SELECT q.id FROM case_data_logstash_queue q ORDER BY q.id "
             + "FOR UPDATE SKIP LOCKED LIMIT " + batchSize + ") "
@@ -60,6 +64,12 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
 
     @Inject
     private SupplementaryDataRepository supplementaryDataRepository;
+
+    @Inject
+    private Flyway flyway;
+
+    @Inject
+    private LogstashQueueMigrationCallback logstashQueueMigrationCallback;
 
     @PersistenceContext
     private EntityManager em;
@@ -89,6 +99,11 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
         caseDetails.setDataClassification(Map.of());
 
         return caseDetails;
+    }
+
+    @Test
+    void applicationFlywayShouldRegisterLogstashQueueMigrationCallback() {
+        assertThat(flyway.getConfiguration().getCallbacks()).contains(logstashQueueMigrationCallback);
     }
 
     @Test
@@ -259,6 +274,69 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
+    void migrationSequenceShouldPreserveBacklogNearIntegerLimit() throws Exception {
+        JdbcTemplate jdbc = new JdbcTemplate(db);
+        CaseDetails first = caseDetailsRepository.set(originalCaseDetails);
+        CaseDetails second = caseDetailsRepository.set(createOriginalCaseDetails());
+        jdbc.update("DELETE FROM case_data_logstash_queue");
+        jdbc.execute("ALTER TABLE case_data_logstash_queue "
+            + "DROP CONSTRAINT case_data_logstash_queue_case_data_id_unique");
+        jdbc.execute("ALTER TABLE case_data_logstash_queue ALTER COLUMN id TYPE integer");
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq RESTART WITH 2147483646");
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq AS integer");
+        jdbc.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?), (?)",
+            first.getId(), second.getId());
+
+        Path wideningMigration = Path.of(
+            "src/main/resources/db/migration/V20260917_0001__CCD-4262_widen_logstash_queue_id.sql");
+        jdbc.execute(Files.readString(wideningMigration));
+        jdbc.execute(Files.readString(COALESCING_MIGRATION));
+        jdbc.execute(Files.readString(VERSION_MIGRATION));
+        // Already-upgraded environments can apply the earlier migration out of order.
+        jdbc.execute(Files.readString(wideningMigration));
+
+        assertThat(jdbc.queryForList("SELECT case_data_id FROM case_data_logstash_queue", Long.class))
+            .containsExactlyInAnyOrder(Long.valueOf(first.getId()), Long.valueOf(second.getId()));
+        assertThat(jdbc.queryForList("SELECT id FROM case_data_logstash_queue", Long.class))
+            .allSatisfy(id -> assertThat(id).isGreaterThan(10000000000L));
+    }
+
+    @Test
+    void versionMigrationShouldUpgradeLegacySequenceAndReversionBacklog() throws Exception {
+        JdbcTemplate jdbc = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+        jdbc.update("DELETE FROM case_data_logstash_queue");
+        jdbc.execute("ALTER TABLE case_data_logstash_queue ALTER COLUMN id TYPE integer");
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq RESTART WITH 1");
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq AS integer");
+        jdbc.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", persisted.getId());
+
+        jdbc.execute(Files.readString(VERSION_MIGRATION));
+
+        assertThat(((Number) onlyPolledRow(jdbc).get("version")).longValue()).isEqualTo(10000000001L);
+        jdbc.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", persisted.getId());
+        assertThat(((Number) onlyPolledRow(jdbc).get("version")).longValue()).isEqualTo(10000000002L);
+    }
+
+    @Test
+    void versionMigrationShouldPreserveHigherSequenceAndExplicitQueueIds() throws Exception {
+        JdbcTemplate jdbc = new JdbcTemplate(db);
+        CaseDetails persisted = caseDetailsRepository.set(originalCaseDetails);
+        jdbc.update("DELETE FROM case_data_logstash_queue");
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq RESTART WITH 20000000000");
+        jdbc.update("INSERT INTO case_data_logstash_queue (id, case_data_id) VALUES (30000000000, ?)",
+            persisted.getId());
+
+        jdbc.execute(Files.readString(VERSION_MIGRATION));
+        assertThat(((Number) onlyPolledRow(jdbc).get("version")).longValue()).isEqualTo(30000000001L);
+
+        jdbc.execute("ALTER SEQUENCE case_data_logstash_queue_id_seq RESTART WITH 40000000000");
+        jdbc.execute(Files.readString(VERSION_MIGRATION));
+        jdbc.update("INSERT INTO case_data_logstash_queue (case_data_id) VALUES (?)", persisted.getId());
+        assertThat(((Number) onlyPolledRow(jdbc).get("version")).longValue()).isEqualTo(40000000001L);
+    }
+
+    @Test
     void supplementaryDataOnlyUpdateShouldUseItsQueueIdAsExternalVersion() {
         // Supplementary-data-only writes intentionally do not change case_data.version. The queue id is monotonic,
         // so it must be used as the external Elasticsearch version.
@@ -295,9 +373,9 @@ class CasePointerRepositoryTest extends WireMockBaseTest {
             () -> assertThat(versionAfterSupplementaryDataWrite)
                 .as("case_data.version is NOT advanced by a supplementary-data-only write")
                 .isEqualTo(versionBeforeSupplementaryDataWrite),
-            () -> assertThat(((Number) polledRows.get(0).get("version")).intValue())
+            () -> assertThat(((Number) polledRows.get(0).get("version")).longValue())
                 .as("the external version is the monotonic queue row id")
-                .isEqualTo(queuedExternalVersion.intValue())
+                .isEqualTo(queuedExternalVersion.longValue())
         );
     }
 

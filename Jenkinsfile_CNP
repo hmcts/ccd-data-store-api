@@ -143,7 +143,7 @@ withPipeline(type, product, component) {
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
-        env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED = "true"
+        // Recovery/cutover smoke is opt-in and requires a prepared fixture and evidence.
     }
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
@@ -157,6 +157,16 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
 
     afterAlways('test') {
+      steps.junit allowEmptyResults: true, testResults: 'build/test-results/logstashSmokeTest/TEST-*.xml'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/logstashSmokeTest/**'
+      publishHTML target: [
+          allowMissing: true,
+          alwaysLinkToLastBuild: true,
+          keepAll: true,
+          reportDir: 'build/reports/tests/logstashSmokeTest',
+          reportFiles: 'index.html',
+          reportName: 'Logstash Smoke Script Tests'
+      ]
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
 
     builder.gradle('integration')
@@ -202,12 +212,9 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        if (env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED == 'true'
-            && env.LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE) {
+        if (env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED == 'true') {
             steps.sh './scripts/logstash-manual-requeue-smoke.sh'
             steps.archiveArtifacts artifacts: 'Logstash Manual Requeue Smoke/evidence.md', onlyIfSuccessful: true
-        } else if (env.LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED == 'true') {
-            echo 'Logstash manual-requeue smoke skipped: no case reference was supplied.'
         }
     }
 

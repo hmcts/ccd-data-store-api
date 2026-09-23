@@ -77,21 +77,28 @@ it does not prove alert delivery.
 
 Run this smoke test in an isolated preview deployment after the alert is active.
 The Jenkins hook is enabled for preview and runs after a successful preview smoke
-test when a case reference is supplied. It refuses any non-PR namespace. Set
+test when `LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED=true`. It requires a PR branch
+and a `pr-*` namespace, or namespace `ccd` on a `cft-preview-*-aks` Kubernetes
+context. Resource selection remains scoped to that PR's release. Set
 these build variables from the outage scenario's recorded case:
 
 ```
+LOGSTASH_MANUAL_REQUEUE_SMOKE_ENABLED=true
 LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE=<numeric case reference>
 LOGSTASH_MANUAL_REQUEUE_CASE_TYPE=AAT_PRIVATE
 LOGSTASH_MANUAL_REQUEUE_EXPECTED_SUPPLEMENTARY_DATA={"orgs_assigned_users":{"OrgA":22,"OrgB":1}}
+LOGSTASH_MANUAL_REQUEUE_OUTAGE_EVIDENCE=<link to recorded outage and Logstash failure evidence>
 ```
 
-Without `LOGSTASH_MANUAL_REQUEUE_CASE_REFERENCE`, normal preview builds log a
-skip. Supply the values only for the targeted release-gate run.
+Normal preview builds leave the hook disabled. When enabled, missing case
+reference, exact expected data or outage evidence fails the build. Supply these
+values only for the targeted release-gate run.
 
 It re-queues just that case in the preview PostgreSQL pod, waits for the queue
-row to be consumed, and verifies its Elasticsearch document contains the
-expected supplementary data. Do not supply a case reference in normal PR builds;
+row to be consumed, then polls Elasticsearch until the document version equals
+the inserted queue ID and its supplementary data exactly matches the expected JSON.
+For cases with `SearchCriteria`, it also verifies `global_search`; supply a known
+`HMCTSServiceId` in the expected data for that destination. Do not supply a case reference in normal PR builds;
 this is a targeted release-gate smoke.
 
 The required preview procedure is:
@@ -152,6 +159,54 @@ ON CONFLICT (case_data_id) DO NOTHING;
 This is a manually initiated, Jenkins-automated preview smoke: Option 2
 deliberately has no automatic retry after the queue row has been deleted.
 
+## Cutover end-to-end release gate
+
+### Local smoke-script regression tests
+
+`./gradlew test` also runs the mocked smoke-script tests via
+`logstashSmokeTest`. Run only these tests with `./gradlew logstashSmokeTest`.
+Python 3, Bash and jq are required; missing jq fails rather than skipping coverage.
+JUnit XML is written to `build/test-results/logstashSmokeTest/TEST-logstash-smoke.xml`
+and the HTML report to `build/reports/tests/logstashSmokeTest/index.html`.
+Jenkins publishes the XML results and the **Logstash Smoke Script Tests** HTML
+report, including failures. These tests do not replace the live preview gate below.
+
+### Live preview procedure
+
+Run separately from recovery in an isolated preview using the actual deployed
+Logstash configuration. Keep case writes paused throughout this check.
+
+1. Before upgrading, create a case with `SearchCriteria`, a known
+   `HMCTSServiceId` and known supplementary data. Index its old state using the
+   legacy consumer. Record its ID and internal ES versions in both its case
+   index and `global_search`.
+2. Stop/drain consumers, change the fixture case's supplementary data, and
+   record that the changed case is in the queue while both ES documents remain
+   at their old values. Pause case writes and run Data Store migrations.
+3. Before restarting consumers, record this case's migrated queue ID (above
+   `10^10`). Restart the real Logstash consumers without further fixture updates.
+4. Enable the Jenkins hook with the case reference/type and exact expected
+   supplementary JSON above, plus:
+
+   ```text
+   LOGSTASH_SMOKE_MODE=cutover
+   LOGSTASH_CUTOVER_QUEUE_ID=<recorded migrated backlog ID>
+   LOGSTASH_CUTOVER_EVIDENCE=<link to recorded legacy versions and backlog evidence>
+   ```
+
+   Cutover mode does not requeue the case. It checks successful Flyway history,
+   queue drainage, and the exact migrated version and expected data in both
+   destinations. It then submits an older external version to each destination,
+   requires HTTP 409 and verifies the stored version and source are unchanged.
+   It fails if the case lacks `SearchCriteria` or expected `HMCTSServiceId`.
+5. Archive the Jenkins evidence with the legacy/backlog evidence before
+   resuming normal writes. Run recovery mode separately with outage evidence.
+
+`S-609` retains rapid-update coverage. `S-610` first waits for the initial
+supplementary value to be searchable, then changes it and waits for the final
+value, preventing both writes from being hidden by a single coalesced event.
+Both searches are restricted to the newly created case reference.
+
 ## Deferred design
 
 Lease/claim processing is deferred. It must include a post-Elasticsearch ACK and
@@ -164,3 +219,43 @@ when joining the queue to `case_data`.
 The earlier CCD-7841 claim-column migration is retained so environments that
 already applied it continue to validate. CCD-4262 removes those unused columns
 and index with a later, forward-only migration.
+
+## Production cutover and coalescing tradeoff
+
+Follow the ordered deployment and rollback procedure in
+[CCD-7841 release notes](CCD-7841-release.md#deployment-prerequisites).
+The bigint migration raises the sequence above 10^10 (or any higher existing
+sequence/queue ID) and gives the existing backlog fresh IDs. Verify the legacy
+ES version bound for every destination, including `global_search`, before
+switching consumers. Do not run old and new writers concurrently.
+
+Pause case-writing traffic and background jobs for the migration window and
+allow in-flight writes to finish. Queue locks block case writes through the
+trigger. The 15-second lock timeout limits lock acquisition, not lock holding
+time; measure the full migration against a representative backlog before rollout.
+The earlier `V20260917_0001` migration widens IDs before coalescing can exhaust
+the integer sequence. For previously migrated environments, verify the effective
+Flyway out-of-order setting and successful migration history as described in
+the release notes. Resume writes after migration and indexing checks pass.
+
+The retained unique constraint means a case write can wait for a poll holding
+its queue row. This is indirect contention despite the absence of case-row
+locks in the poll. Measure write latency under load; the observed 10 ms is not
+a guaranteed bound. Removing uniqueness and deduplicating batches is deferred.
+
+Monitor Elasticsearch output warnings separately from the dead-letter index:
+409s are normally dropped, not sent to the DLQ. An older event rejected after a
+newer successful event is harmless; a legacy-version conflict requires baseline
+correction and manual requeue. The at-most-once delivery limitation remains.
+
+### Marker trigger removal timing
+
+`V20240617_4775__CCD-4775_modify_db_trigger_for_IU.sql` drops the old
+`trg_case_data_updated` marker trigger and installs the queue trigger during
+Data Store migration. This happens before the bigint migration, not as a manual
+cleanup after flux deployment. Stop old consumers before running migrations;
+start the new consumers only after all migrations succeed. The replacement queue
+trigger captures subsequent case changes during the search-staleness window.
+Removing the `marked_by_logstash` column is a separate CCD-4790 change after
+all consumers have migrated. Deferring the trigger removal itself would require
+a different, staged compatibility rollout; it is not the current migration order.

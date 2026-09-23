@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -291,7 +292,30 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         Assertions.assertThat(stored.path("_source").path("case_version").asInt()).isEqualTo(2);
     }
 
+    @Test
+    void shouldMigrateInternalVersionsToBigintExternalVersions() throws IOException {
+        createExternalVersioningIndex();
+        for (int i = 0; i < 50; i++) {
+            HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX + "/_doc/"
+                + EXTERNAL_VERSIONING_DOCUMENT_ID));
+            request.setEntity(new StringEntity("{\"value\":\"internal\"}",
+                org.apache.http.entity.ContentType.APPLICATION_JSON));
+            Assertions.assertThat(executeElasticRequest(request).status()).isIn(200, 201);
+        }
+        Assertions.assertThat(putExternalVersionedDocument(7, "{\"value\":\"unsafe\"}").status())
+            .isEqualTo(409);
+        Assertions.assertThat(putExternalVersionedDocument(10000000001L, "{\"value\":\"latest\"}").status())
+            .isEqualTo(200);
+        Assertions.assertThat(putExternalVersionedDocument(10000000000L, "{\"value\":\"stale\"}").status())
+            .isEqualTo(409);
+        JsonNode stored = mapper.readTree(getExternalVersionedDocument().body());
+        Assertions.assertThat(stored.path("_version").asLong()).isEqualTo(10000000001L);
+        Assertions.assertThat(stored.path("_source").path("value").asText()).isEqualTo("latest");
+    }
+
     private static void createExternalVersioningIndex() {
+        executeElasticRequest(new HttpDelete(elasticUrl("/"
+            + EXTERNAL_VERSIONING_INDEX)));
         HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX));
 
         ElasticResponse response = executeElasticRequest(request);
@@ -299,7 +323,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         Assertions.assertThat(response.status()).isIn(200, 201);
     }
 
-    private static ElasticResponse putExternalVersionedDocument(int version, String json) {
+    private static ElasticResponse putExternalVersionedDocument(long version, String json) {
         HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX + "/_doc/"
             + EXTERNAL_VERSIONING_DOCUMENT_ID + "?version=" + version + "&version_type=external&refresh=true"));
         request.setHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
