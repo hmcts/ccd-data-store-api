@@ -26,16 +26,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>The {@code jwtDecoder} now receives a {@link JWSKeySelector} from {@link JwkSourceConfiguration}
  * instead of building one from the issuer. This test ensures that wiring is correct.
  *
- * <p>The JWK endpoint points to an unused port, verifying that the application can start without IDAM.
- * Previously, {@code JwtDecoders.fromOidcIssuerLocation} fetched the OpenID configuration during startup
- * and failed the application if IDAM was unavailable.
+ * <p>The JWK endpoint points to an unused port, verifying that the decoder no longer needs IDAM at start-up.
+ * Previously, {@code JwtDecoders.fromOidcIssuerLocation} fetched the OpenID configuration while the decoder
+ * was created and failed the application if IDAM was unavailable.
+ *
+ * <p>This does not show that the application starts without IDAM. Spring Boot's OAuth2 client
+ * auto-configuration still performs OIDC discovery at start-up for the {@code oidc} client registration, and
+ * {@code TestIdamConfiguration} replaces that {@code ClientRegistrationRepository} in every Spring test, so no
+ * test exercises that call. See CCD-8077.
  */
 @TestPropertySource(properties = {
     "oidc.jwks.uri=http://localhost:1/o/jwks",
     "oidc.jwks.connect-timeout-ms=250",
     "oidc.jwks.read-timeout-ms=250",
     "oidc.jwks.cache-ttl-ms=60000",
-    "oidc.jwks.cache-refresh-timeout-ms=1000",
+    "oidc.jwks.cache-refresh-timeout-ms=1100",
     "oidc.jwks.refresh-ahead-time-ms=5000",
     "oidc.jwks.rate-limit-min-interval-ms=1000",
     "oidc.jwks.outage-tolerance-ms=300000"

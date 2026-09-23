@@ -29,6 +29,7 @@ import java.net.URL;
  * @param refreshAheadTimeMs     how far before expiry the background refresh is scheduled
  * @param rateLimitMinIntervalMs minimum interval between retrievals reaching IDAM
  * @param outageToleranceMs      how long the last retrieved key set can be used while IDAM is unavailable
+ * @param retrying               whether a failed retrieval is retried before the outage cache is used
  */
 @ConfigurationProperties("oidc.jwks")
 public record JwksProperties(
@@ -37,15 +38,33 @@ public record JwksProperties(
     @DefaultValue("5000") int readTimeoutMs,
     @DefaultValue("51200") int sizeLimitBytes,
     @DefaultValue("300000") long cacheTtlMs,
-    @DefaultValue("10000") long cacheRefreshTimeoutMs,
+    @DefaultValue("16000") long cacheRefreshTimeoutMs,
     @DefaultValue("60000") long refreshAheadTimeMs,
     @DefaultValue("30000") long rateLimitMinIntervalMs,
-    @DefaultValue("21600000") long outageToleranceMs
+    @DefaultValue("21600000") long outageToleranceMs,
+    @DefaultValue("true") boolean retrying
 ) {
+
+    /**
+     * {@code RetryingJWKSetSource} retries exactly once. The count is fixed in Nimbus and cannot be configured;
+     * {@code JwkSourceConfigurationTest} checks it against the library so an upgrade that changes it fails the build.
+     */
+    static final int NIMBUS_RETRIES = 1;
 
     public JwksProperties {
         validate(uri, connectTimeoutMs, readTimeoutMs, sizeLimitBytes, cacheTtlMs, cacheRefreshTimeoutMs,
-            refreshAheadTimeMs, rateLimitMinIntervalMs, outageToleranceMs);
+            refreshAheadTimeMs, rateLimitMinIntervalMs, outageToleranceMs, retrying);
+    }
+
+    /**
+     * The number of HTTP requests a single retrieval can make before it fails.
+     */
+    public int retrievalAttempts() {
+        return retrievalAttempts(retrying);
+    }
+
+    private static int retrievalAttempts(boolean retrying) {
+        return retrying ? 1 + NIMBUS_RETRIES : 1;
     }
 
     public URL url() {
@@ -65,7 +84,8 @@ public record JwksProperties(
                                  long cacheRefreshTimeoutMs,
                                  long refreshAheadTimeMs,
                                  long rateLimitMinIntervalMs,
-                                 long outageToleranceMs) {
+                                 long outageToleranceMs,
+                                 boolean retrying) {
 
         require(uri != null && !uri.isBlank(), "oidc.jwks.uri must be set");
         require(connectTimeoutMs > 0, "oidc.jwks.connect-timeout-ms must be greater than 0, but was %d; "
@@ -91,14 +111,16 @@ public record JwksProperties(
         // loses the cache-lock race can time out with "Timeout while waiting for cache refresh" while the
         // retrieval is still progressing normally. Nimbus does not enforce this relationship, so we validate
         // it here instead of relying on a property-file comment.
-        // Worst case: connect timeout + read timeout.
-        long worstCaseRetrievalMs = (long) connectTimeoutMs + readTimeoutMs;
+        // Worst case: every attempt the retrieval can make runs to both its connect and read timeouts. The retry
+        // happens inside the lock the waiter is queued on, so the waiter has to outlast all attempts, not one.
+        int attempts = retrievalAttempts(retrying);
+        long worstCaseRetrievalMs = attempts * ((long) connectTimeoutMs + readTimeoutMs);
         require(cacheRefreshTimeoutMs > worstCaseRetrievalMs,
-            "oidc.jwks.cache-refresh-timeout-ms (%d) must be greater than oidc.jwks.connect-timeout-ms plus "
-                + "oidc.jwks.read-timeout-ms (%d + %d = %d); otherwise a thread waiting on an in-flight retrieval "
-                + "gives up before that retrieval can complete, which is the failure this configuration exists to "
-                + "prevent",
-            cacheRefreshTimeoutMs, connectTimeoutMs, readTimeoutMs, worstCaseRetrievalMs);
+            "oidc.jwks.cache-refresh-timeout-ms (%d) must be greater than the retrieval attempts times "
+                + "oidc.jwks.connect-timeout-ms plus oidc.jwks.read-timeout-ms (%d x (%d + %d) = %d); otherwise a "
+                + "thread waiting on an in-flight retrieval gives up before that retrieval can complete, which is "
+                + "the failure this configuration exists to prevent",
+            cacheRefreshTimeoutMs, attempts, connectTimeoutMs, readTimeoutMs, worstCaseRetrievalMs);
 
         // Reproduces JWKSourceBuilder's own constraints, so the message names the property rather than surfacing as
         // an IllegalStateException from deep inside the builder.

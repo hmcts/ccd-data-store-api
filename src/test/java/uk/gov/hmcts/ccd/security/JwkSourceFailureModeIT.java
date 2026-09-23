@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -94,7 +95,7 @@ class JwkSourceFailureModeIT {
     @Test
     @DisplayName("returns 500 once the outage tolerance window has expired")
     void returnsServerErrorWhenToleranceWindowExpires() throws Exception {
-        NimbusJwtDecoder decoder = decoder(propertiesWith(400L, 2_500L, 10L));
+        NimbusJwtDecoder decoder = decoder(propertiesWith(500L, 2_500L, 10L));
 
         stubHealthy(wireMock, originalJwkSet());
         assertThat(statusFor(decoder, originalToken)).isEqualTo(HttpStatus.OK.value());
@@ -125,7 +126,8 @@ class JwkSourceFailureModeIT {
     @Test
     @DisplayName("returns 401 for a key rotated in while IDAM is unreachable")
     void returnsUnauthorisedForAKeyRotatedInDuringAnOutage() throws Exception {
-        NimbusJwtDecoder decoder = decoder(propertiesWith(400L, 60_000L, 10L));
+        long rateLimitMinIntervalMs = 10L;
+        NimbusJwtDecoder decoder = decoder(propertiesWith(500L, 60_000L, rateLimitMinIntervalMs));
 
         stubHealthy(wireMock, originalJwkSet());
         assertThat(statusFor(decoder, originalToken)).isEqualTo(HttpStatus.OK.value());
@@ -139,6 +141,11 @@ class JwkSourceFailureModeIT {
         assertThat(statusFor(decoder, rotatedToken))
             .as("an unknown kid is an invalid token, not a server fault")
             .isEqualTo(HttpStatus.UNAUTHORIZED.value());
+
+        // Each unknown-kid decode takes a rate-limit permit, and so does the background refresh. Two decodes and a
+        // background refresh in one interval exhaust the two permits and turn the 401 into the 500 that
+        // returnsServerErrorWhenTheRateLimiterIsExhausted covers, so the second decode waits for a fresh interval.
+        TimeUnit.MILLISECONDS.sleep(rateLimitMinIntervalMs * 2);
 
         assertThatThrownBy(() -> decoder.decode(rotatedToken))
             .isInstanceOf(BadJwtException.class)
@@ -228,10 +235,11 @@ class JwkSourceFailureModeIT {
             100,                      // read timeout, ms
             51200,                    // size limit, bytes
             cacheTtlMs,
-            200L, // cache refresh timeout: above connect + read
+            320L,                     // cache refresh timeout: above 2 attempts x (connect + read) = 300
             100L,                     // refresh ahead time
             rateLimitMinIntervalMs,
-            outageToleranceMs
+            outageToleranceMs,
+            true                      // retrying, as in production
         );
     }
 }

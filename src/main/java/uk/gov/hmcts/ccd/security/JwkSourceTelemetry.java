@@ -85,7 +85,7 @@ public class JwkSourceTelemetry {
     }
 
     /**
-     * Called by {@link ObservedResourceRetriever} when IDAM successfully responds.
+     * Called by {@link ObservedJWKSetSource} when IDAM returns a key set that parses.
      * This confirms that the keys were freshly retrieved from IDAM rather than served from the outage cache.
      * Nimbus listeners cannot make this distinction because they sit above the outage-tolerant layer and see
      * both cases as a successful result.

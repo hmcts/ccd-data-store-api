@@ -9,9 +9,11 @@ import com.nimbusds.jose.jwk.KeyType;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.JWKSourceBuilder;
+import com.nimbusds.jose.jwk.source.URLBasedJWKSetSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +37,9 @@ import java.util.Set;
  * <ul>
  *     <li>using explicit connect and read timeouts, so network failures are detected within seconds;</li>
  *     <li>refreshing keys in the background before they expire, so user requests do not wait for a refresh;</li>
- *     <li>retrying once after a network failure, and only then falling back to the last known keys for
- *         {@link JwksProperties#outageToleranceMs()}, with the remaining outage window reported through
+ *     <li>retrying once after a failed retrieval ({@link JwksProperties#retrying()}), and only then falling back
+ *         to the last known keys for {@link JwksProperties#outageToleranceMs()}, with the remaining outage window
+ *         reported through
  *         {@link JwkSourceTelemetry}.</li>
  * </ul>
  *
@@ -75,22 +78,31 @@ public class JwkSourceConfiguration {
      * executors when the application context closes.
      *
      * <p>The layer order is fixed by {@code JWKSourceBuilder#build()}. From the network outwards,
-     * the layers are retry, outage tolerance, health reporting, rate limiting, and refresh-ahead caching.
+     * the layers are {@link ObservedJWKSetSource}, retry, outage tolerance, health reporting, rate limiting, and
+     * refresh-ahead caching.
      *
      * <p>Rate limiting is outside the outage-tolerant layer, so a {@code RateLimitReachedException}
      * is not handled by the outage cache and will be propagated to the caller.
      */
     @Bean
     public JWKSource<SecurityContext> idamJwkSource(JwkSourceTelemetry telemetry) {
-        log.info("Configuring IDAM JWK source for {} (connect {}ms, read {}ms, cache TTL {}ms, "
-                + "refresh ahead {}ms, rate limit {}ms, outage tolerance {}ms)",
-            properties.uri(), properties.connectTimeoutMs(), properties.readTimeoutMs(), properties.cacheTtlMs(),
+        log.info("Configuring IDAM JWK source for {} (connect {}ms, read {}ms, attempts {}, cache TTL {}ms, "
+                + "cache refresh timeout {}ms, refresh ahead {}ms, rate limit {}ms, outage tolerance {}ms)",
+            properties.uri(), properties.connectTimeoutMs(), properties.readTimeoutMs(),
+            properties.retrievalAttempts(), properties.cacheTtlMs(), properties.cacheRefreshTimeoutMs(),
             properties.refreshAheadTimeMs(), properties.rateLimitMinIntervalMs(), properties.outageToleranceMs());
 
-        return JWKSourceBuilder.create(properties.url(),
-                new ObservedResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
-                    properties.sizeLimitBytes(), telemetry))
-            .retrying(telemetry.retryingEventListener())
+        URLBasedJWKSetSource<SecurityContext> urlSource = new URLBasedJWKSetSource<>(properties.url(),
+            new DefaultResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
+                properties.sizeLimitBytes()));
+
+        JWKSourceBuilder<SecurityContext> builder =
+            JWKSourceBuilder.create(new ObservedJWKSetSource<>(urlSource, telemetry));
+        if (properties.retrying()) {
+            builder.retrying(telemetry.retryingEventListener());
+        }
+
+        return builder
             .outageTolerant(properties.outageToleranceMs(), telemetry.outageEventListener())
             .healthReporting(telemetry.healthReportListener())
             .rateLimited(properties.rateLimitMinIntervalMs(), telemetry.rateLimitedEventListener())

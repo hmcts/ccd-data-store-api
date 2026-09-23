@@ -276,13 +276,14 @@ class JwkSourceRecoveryIT {
             50,             // connect timeout, ms
             100,            // read timeout, ms
             51200,          // size limit, bytes
-            400L,           // cache time to live
-            200L,           // cache refresh timeout: above connect + read
+            500L,           // cache time to live
+            320L,           // cache refresh timeout: above 2 attempts x (connect + read) = 300
             150L,           // refresh ahead time
             // Rate limit interval below the poll interval, so polling cannot exhaust the two retrievals it
             // allows per window.
             10L,
-            30_000L         // outage tolerance
+            30_000L,        // outage tolerance
+            true            // retrying, as in production
         );
     }
 
@@ -292,11 +293,12 @@ class JwkSourceRecoveryIT {
             50,
             100,
             51200,
-            400L,
-            200L,
+            500L,
+            320L,
             150L,
             10L,
-            outageToleranceMs);
+            outageToleranceMs,
+            true);
     }
 
     private JwksProperties slowEndpointProperties() {
@@ -305,11 +307,12 @@ class JwkSourceRecoveryIT {
             200,            // connect timeout, ms
             2_500,          // read timeout, ms: must outlast the 2s endpoint delay
             51200,          // size limit, bytes
-            4_000L,         // cache time to live
-            2_800L,         // cache refresh timeout: above connect + read (2700)
+            7_000L,         // cache time to live
+            5_500L,         // cache refresh timeout: above 2 attempts x (connect + read) = 5400
             900L,           // refresh ahead time
             100L,           // rate limit minimum interval
-            60_000L         // outage tolerance
+            60_000L,        // outage tolerance
+            true            // retrying, as in production
         );
     }
 }

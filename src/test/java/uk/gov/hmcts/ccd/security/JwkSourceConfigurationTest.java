@@ -21,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,7 +30,12 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.ccd.security.JwkTestSupport.JWKS_PATH;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.ORIGINAL_KEY_ID;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.RecordingAppInsights;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.jwksUri;
@@ -39,7 +46,7 @@ import static uk.gov.hmcts.ccd.security.JwkTestSupport.stubHealthy;
 
 class JwkSourceConfigurationTest {
 
-    private static final long CACHE_TTL_MS = 300L;
+    private static final long CACHE_TTL_MS = 500L;
 
     private WireMockServer wireMock;
     private JWKSource<SecurityContext> jwkSource;
@@ -252,6 +259,82 @@ class JwkSourceConfigurationTest {
             .isNotEmpty();
     }
 
+    @ParameterizedTest(name = "body: {0}")
+    @ValueSource(strings = {"{\"error\":\"maintenance\"}", "<html><body>Service Unavailable</body></html>"})
+    @DisplayName("does not report recovery when IDAM answers HTTP 200 with a body that is not a JWK set")
+    void doesNotReportRecoveryForAnInvalidJwkSetBody(String body) throws Exception {
+        stubHealthy(wireMock, originalJwkSet());
+        JwkSourceTelemetry telemetry = new JwkSourceTelemetry(appInsights);
+        jwkSource = configuration().idamJwkSource(telemetry);
+
+        assertThat(signingKeys(jwkSource)).hasSize(1);
+
+        stubDown(wireMock);
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(25))
+            .untilAsserted(() -> {
+                signingKeys(jwkSource);
+                assertThat(telemetry.remainingToleranceMs()).isPositive();
+            });
+
+        appInsights.clear();
+        wireMock.resetAll();
+        wireMock.stubFor(get(urlEqualTo(JWKS_PATH)).willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(body)));
+
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(25))
+            .untilAsserted(() -> {
+                signingKeys(jwkSource);
+                assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED))
+                    .hasSizeGreaterThanOrEqualTo(3)
+                    .allSatisfy(event -> assertThat(event.properties())
+                        .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "JWKSetParseException"));
+            });
+
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_ENDED))
+            .as("an unparseable 200 is a failed retrieval, not IDAM recovering")
+            .isEmpty();
+        assertThat(telemetry.remainingToleranceMs())
+            .as("stale keys are still being served, so the outage state must not be cleared")
+            .isPositive();
+        assertThat(signingKeys(jwkSource)).extracting(JWK::getKeyID).containsExactly(ORIGINAL_KEY_ID);
+    }
+
+    @Test
+    @DisplayName("makes exactly the number of attempts per retrieval that the refresh timeout is validated against")
+    void makesTheAttemptsTheValidationBudgetsFor() {
+        stubDown(wireMock);
+
+        for (boolean retrying : new boolean[] {true, false}) {
+            wireMock.resetRequests();
+            JwksProperties properties = properties(retrying);
+            JWKSource<SecurityContext> source = new JwkSourceConfiguration(properties)
+                .idamJwkSource(new JwkSourceTelemetry(appInsights));
+            try {
+                assertThatThrownBy(() -> signingKeys(source)).isInstanceOf(Exception.class);
+
+                assertThat(JwkTestSupport.retrievalAttempts(wireMock))
+                    .as("retrying=%s: JwksProperties.NIMBUS_RETRIES must match RetryingJWKSetSource", retrying)
+                    .isEqualTo(properties.retrievalAttempts());
+            } finally {
+                closeQuietly(source);
+            }
+        }
+    }
+
+    private static void closeQuietly(JWKSource<SecurityContext> source) {
+        if (source instanceof Closeable closeable) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                // nothing further to release
+            }
+        }
+    }
+
     private static final long OUTAGE_TOLERANCE_MS = 60_000L;
 
     private JWKSource<SecurityContext> buildSource() {
@@ -259,17 +342,22 @@ class JwkSourceConfigurationTest {
     }
 
     private JwkSourceConfiguration configuration() {
-        return new JwkSourceConfiguration(new JwksProperties(
+        return new JwkSourceConfiguration(properties(true));
+    }
+
+    private JwksProperties properties(boolean retrying) {
+        return new JwksProperties(
             jwksUri(wireMock),
             50,                     // connect timeout, ms
             100,                    // read timeout, ms
             51200,                  // size limit, bytes
             CACHE_TTL_MS,           // cache time to live
-            180L,                   // cache refresh timeout: above connect + read, below the TTL
+            320L,                   // cache refresh timeout: above 2 attempts x (connect + read) = 300
             100L,                   // refresh ahead time
             50L,                    // rate limit minimum interval
-            OUTAGE_TOLERANCE_MS     // outage tolerance
-        ));
+            OUTAGE_TOLERANCE_MS,    // outage tolerance
+            retrying
+        );
     }
 
     @SuppressWarnings("unchecked")

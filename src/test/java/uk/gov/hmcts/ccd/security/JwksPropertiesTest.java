@@ -41,19 +41,20 @@ class JwksPropertiesTest {
     class Relationships {
 
         @Test
-        @DisplayName("rejects a cache refresh timeout that a retrieval could outlive")
-        void rejectsCacheRefreshTimeoutBelowRetrievalWorstCase() {
-            // 2000 + 5000 = 7000ms worst case for retrieval; a waiter given 6000ms always gives up first. This is
-            // the production failure mode, and the check exists, so it cannot be reintroduced by configuration.
+        @DisplayName("rejects a cache refresh timeout sized for one attempt when the retrieval is retried")
+        void rejectsCacheRefreshTimeoutSizedForOneAttempt() {
+            // 10000ms was the previous default. It outlasts one attempt (2000 + 5000 = 7000ms) but not the retry,
+            // which runs inside the same lock: 2 x 7000 = 14000ms. JwkSourceRefreshWaitIT shows a waiter sized
+            // like this timing out on a retrieval that then succeeds.
             Builder builder = productionDefaults()
                 .connectTimeoutMs(2000)
                 .readTimeoutMs(5000)
-                .cacheRefreshTimeoutMs(6000);
+                .cacheRefreshTimeoutMs(10_000);
 
             assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("cache-refresh-timeout-ms (6000)")
-                .hasMessageContaining("2000 + 5000 = 7000");
+                .hasMessageContaining("cache-refresh-timeout-ms (10000)")
+                .hasMessageContaining("2 x (2000 + 5000) = 14000");
         }
 
         @Test
@@ -62,11 +63,29 @@ class JwksPropertiesTest {
             Builder builder = productionDefaults()
                 .connectTimeoutMs(2000)
                 .readTimeoutMs(5000)
-                .cacheRefreshTimeoutMs(7000);
+                .cacheRefreshTimeoutMs(14_000);
 
             assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-refresh-timeout-ms");
+        }
+
+        @Test
+        @DisplayName("sizes the worst case for a single attempt when retrying is disabled")
+        void sizesWorstCaseForOneAttemptWithoutRetry() {
+            assertThatCode(() -> productionDefaults().retrying(false).cacheRefreshTimeoutMs(10_000).build())
+                .doesNotThrowAnyException();
+
+            assertThatThrownBy(productionDefaults().retrying(false).cacheRefreshTimeoutMs(7000)::build)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("1 x (2000 + 5000) = 7000");
+        }
+
+        @Test
+        @DisplayName("counts the retry as a second attempt")
+        void countsRetrievalAttempts() {
+            assertThat(productionDefaults().build().retrievalAttempts()).isEqualTo(2);
+            assertThat(productionDefaults().retrying(false).build().retrievalAttempts()).isEqualTo(1);
         }
 
         @Test
@@ -87,7 +106,7 @@ class JwksPropertiesTest {
             Builder builder = productionDefaults()
                 .cacheTtlMs(60_000)
                 .refreshAheadTimeMs(55_000)
-                .cacheRefreshTimeoutMs(10_000);
+                .cacheRefreshTimeoutMs(16_000);
 
             assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -221,14 +240,30 @@ class JwksPropertiesTest {
                     "oidc.jwks.read-timeout-ms=4000",
                     "oidc.jwks.size-limit-bytes=12345",
                     "oidc.jwks.cache-ttl-ms=200000",
-                    "oidc.jwks.cache-refresh-timeout-ms=9000",
+                    "oidc.jwks.cache-refresh-timeout-ms=12000",
                     "oidc.jwks.refresh-ahead-time-ms=45000",
                     "oidc.jwks.rate-limit-min-interval-ms=20000",
                     "oidc.jwks.outage-tolerance-ms=3600000")
                 .run(context -> assertThat(context).hasNotFailed()
                     .getBean(JwksProperties.class)
-                    .isEqualTo(new JwksProperties(URI, 1500, 4000, 12345, 200_000L, 9_000L, 45_000L, 20_000L,
-                        3_600_000L)));
+                    .isEqualTo(new JwksProperties(URI, 1500, 4000, 12345, 200_000L, 12_000L, 45_000L, 20_000L,
+                        3_600_000L, true)));
+        }
+
+        @Test
+        @DisplayName("binds the retrying flag, which changes the worst case the refresh timeout must exceed")
+        void bindsRetrying() {
+            contextRunner
+                .withPropertyValues(
+                    "oidc.jwks.uri=" + URI,
+                    "oidc.jwks.retrying=false",
+                    "oidc.jwks.cache-refresh-timeout-ms=10000")
+                .run(context -> assertThat(context).hasNotFailed()
+                    .getBean(JwksProperties.class)
+                    .satisfies(properties -> {
+                        assertThat(properties.retrying()).isFalse();
+                        assertThat(properties.retrievalAttempts()).isEqualTo(1);
+                    }));
         }
 
         @Test
@@ -267,10 +302,11 @@ class JwksPropertiesTest {
         private int readTimeoutMs = 5000;
         private int sizeLimitBytes = 51200;
         private long cacheTtlMs = 300_000L;
-        private long cacheRefreshTimeoutMs = 10_000L;
+        private long cacheRefreshTimeoutMs = 16_000L;
         private long refreshAheadTimeMs = 60_000L;
         private long rateLimitMinIntervalMs = 30_000L;
         private long outageToleranceMs = 21_600_000L;
+        private boolean retrying = true;
 
         Builder uri(String value) {
             this.uri = value;
@@ -317,9 +353,14 @@ class JwksPropertiesTest {
             return this;
         }
 
+        Builder retrying(boolean value) {
+            this.retrying = value;
+            return this;
+        }
+
         JwksProperties build() {
             return new JwksProperties(uri, connectTimeoutMs, readTimeoutMs, sizeLimitBytes, cacheTtlMs,
-                cacheRefreshTimeoutMs, refreshAheadTimeMs, rateLimitMinIntervalMs, outageToleranceMs);
+                cacheRefreshTimeoutMs, refreshAheadTimeMs, rateLimitMinIntervalMs, outageToleranceMs, retrying);
         }
     }
 }
