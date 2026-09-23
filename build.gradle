@@ -802,6 +802,7 @@ test {
     ]
 }
 
+check.dependsOn integration
 check.dependsOn jacocoTestReport
 
 task fortifyScan(type: JavaExec)  {
