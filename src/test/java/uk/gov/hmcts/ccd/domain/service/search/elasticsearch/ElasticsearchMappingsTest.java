@@ -18,8 +18,8 @@ class ElasticsearchMappingsTest {
     @BeforeEach
     void setUp() {
         ElasticsearchMappings.TypeMappings typeMappings = new ElasticsearchMappings.TypeMappings(
-            Arrays.asList("Text", "TextArea", "FixedList", "FixedListEdit", "MultiSelectList", "FixedRadioList",
-                    "DynamicList", "DynamicRadioList", "DynamicMultiSelectList")
+            Arrays.asList("Text", "TextArea", "RichTextArea", "FixedList", "FixedListEdit", "MultiSelectList",
+                "FixedRadioList", "DynamicList", "DynamicRadioList", "DynamicMultiSelectList")
         );
 
         ElasticsearchMappings.CasePredefinedMappings casePredefinedMappings =
