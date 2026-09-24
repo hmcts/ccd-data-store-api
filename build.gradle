@@ -68,7 +68,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.13'
+        force 'net.bytebuddy:byte-buddy:1.18.14'
     }
 }
 
@@ -250,7 +250,7 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9.1'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.19'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.20'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.6.3'                 // applicationinsights-logging-logback
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.6.3'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
@@ -901,6 +901,12 @@ task runProviderPactVerification(type:Test) {
     classpath = sourceSets.contractTest.runtimeClasspath
     if (project.hasProperty('pact.verifier.publishResults')) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+    }
+    if (project.hasProperty('pactbroker.consumers')) {
+        systemProperty 'pactbroker.consumers', project.property('pactbroker.consumers')
+    }
+    if (project.hasProperty('pactbroker.enablePending')) {
+        systemProperty 'pactbroker.enablePending', project.property('pactbroker.enablePending')
     }
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
