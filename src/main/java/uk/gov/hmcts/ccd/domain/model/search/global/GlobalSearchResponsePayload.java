@@ -46,6 +46,7 @@ public class GlobalSearchResponsePayload {
         @JsonProperty("CCDCaseTypeName")
         String ccdCaseTypeName;
         String caseNameHmctsInternal;
+        String nextHearingDate;
         String baseLocationId;
         String baseLocationName;
         String caseManagementCategoryId;
