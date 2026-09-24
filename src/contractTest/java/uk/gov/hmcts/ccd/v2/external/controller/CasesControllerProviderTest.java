@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -27,6 +26,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.WireMockBaseContractTest;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -84,6 +87,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -96,6 +100,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -120,7 +125,6 @@ import static org.mockito.Mockito.when;
 })
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-@IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
@@ -136,6 +140,8 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     UserAuthorisationSecurity userAuthorisationSecurity;
     @Autowired
     ContractTestCreateCaseOperation contractTestCreateCaseOperation;
+    @Autowired
+    ContractTestIdempotencyKeyHolder contractTestIdempotencyKeyHolder;
     @Autowired
     ContractTestGetCaseOperation getCaseOperation;
     @Autowired
@@ -203,6 +209,11 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     @MockitoBean
     @Qualifier("authorised")
     CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+    @MockitoBean
+    @Qualifier(CachedCaseUserRepository.QUALIFIER)
+    CaseUserRepository caseUserRepository;
+    @MockitoBean
+    CaseAuditEventRepository caseAuditEventRepository;
 
     private final ObjectMapper mapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -221,10 +232,23 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
+        contractTestIdempotencyKeyHolder.resetKey();
+        createEventOperation.setTestCaseReference(null);
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
+        when(userRepository.getUserId()).thenReturn("userId");
+        when(userRepository.getUserRoles()).thenReturn(Set.of("caseworker-ia"));
+        when(userRepository.getUserClassifications(anyString())).thenReturn(Set.of(SecurityClassification.PUBLIC));
+        when(userRepository.anyRoleEqualsTo(anyString())).thenReturn(true);
+        when(caseUserRepository.findCaseRoles(anyLong(), anyString())).thenReturn(List.of());
+        when(caseUserRepository.getCaseUserRolesByUserId(anyString())).thenReturn(Set.of());
+        when(caseUserRepository.findCasesUserIdHasAccessTo(anyString())).thenReturn(List.of());
+        when(caseUserRepository.findCaseUserRoles(anyList(), anyList())).thenReturn(List.of());
+        when(caseAuditEventRepository.set(isA(AuditEvent.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(eventTokenService).validateToken(anyString(), anyString(), isA(CaseDetails.class),
+            isA(CaseEventDefinition.class), isA(JurisdictionDefinition.class), isA(CaseTypeDefinition.class));
 
         AuthenticateUserResponse authenticateUserResponse = new AuthenticateUserResponse("200");
 
@@ -406,7 +430,11 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         String caseType = (String) dataMap.get(CASE_TYPE);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        CaseDetails caseDetails = contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        if (caseDetails.getReference() == null && caseDetails.getId() != null) {
+            caseDetails.setReference(Long.valueOf(caseDetails.getId()));
+        }
+        return caseDetails;
 
     }
 
@@ -455,6 +483,12 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     private CaseDetails mockCaseDetailsResponse(String fileName,
                                          Map<String, Object> dataMap) {
         CaseDetails caseDetails = convertToCaseDetails(fileName);
+        if (caseDetails != null && caseDetails.getReference() == null && caseDetails.getId() != null) {
+            caseDetails.setReference(Long.valueOf(caseDetails.getId()));
+        }
+        if (caseDetails != null && caseDetails.getId() == null && caseDetails.getReference() != null) {
+            caseDetails.setId(caseDetails.getReference().toString());
+        }
         when(submitCaseTransaction.submitCase(any(),
             any(),
             any(),
@@ -471,6 +505,10 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(caseDetailsRepository.findUniqueCase(any(), any(), any())).thenReturn(caseDetails);
         when(caseDetailsRepository.findByReference(anyLong())).thenReturn(caseDetails);
         when(caseDetailsRepository.findByReference(anyString())).thenReturn(Optional.of(caseDetails));
+        when(caseDetailsRepository.findByReference(anyString(), anyLong())).thenReturn(Optional.of(caseDetails));
+        when(caseDetailsRepository.findByReference(isNull(), anyLong())).thenReturn(Optional.of(caseDetails));
+        when(caseDetailsRepository.findByReferenceWithNoAccessControl(anyString()))
+            .thenReturn(Optional.of(caseDetails));
         when(caseDetailsRepository.set(any())).thenReturn(caseDetails);
         when(eventTriggerService.isPreStateValid(any(), any())).thenReturn(true);
         CaseEventDefinition caseEventDefinition = mock(CaseEventDefinition.class);
@@ -524,13 +562,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(eventTokenService.generateToken(anyString(),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn(null);
 
         when(eventTokenService.generateToken(anyString(),
             isA(CaseDetails.class),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn(null);
         return caseDetails;
     }
 }
