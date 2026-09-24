@@ -289,7 +289,7 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     }
 
     @State("a case exists")
-    public void aCaseExists(Map<String, Object> dataMap) {
+    public void acaseExists(Map<String, Object> dataMap) {
         CaseDetails caseDetails = mockCaseDetailsResponse(
             "mock_responses/wa_get_case_by_id.json", dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
