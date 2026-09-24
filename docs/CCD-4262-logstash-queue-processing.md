@@ -19,8 +19,13 @@ This is at-most-once delivery: an Elasticsearch or pod failure after polling may
 require manual recovery. Re-queue the affected cases using
 `src/main/resources/db/useful-queries/logstash_re_indexing_query.sql`, narrowed
 to the known jurisdiction, case type, references, or failure time window where
-appropriate. Each execution inserts at most 1000 queue rows; repeat it until no
-rows are inserted. The recovery query never updates `case_data`.
+appropriate. Run the entire DO block with autocommit enabled, outside an explicit
+transaction. It traverses jurisdictions in batches of at most 1000 cases, committing
+each batch and advancing by case ID independently of queue consumption. The pass
+is bounded by the maximum case ID at its start; normal triggers queue new writes.
+An interrupted run retains committed batches and can be rerun as a fresh pass.
+The recovery query never updates `case_data`. Completion confirms queueing only:
+check output failures/DLQ and verify Elasticsearch delivery before closing recovery.
 
 Operational monitoring must alert on Elasticsearch output failures, including
 non-retryable failures and DLQ routing, so the affected window is known promptly.

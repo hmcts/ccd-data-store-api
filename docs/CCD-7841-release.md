@@ -97,6 +97,13 @@ same callback.
 | Rollback required | Stop new consumers and preserve the queue. Reverting flux alone does not restore the marker trigger. Restoring marker processing requires restoring database behaviour, reconciling cutover changes and planning a fresh version baseline before retrying. Never reset the queue sequence backwards. |
 | Conflict with a legacy ES version | Resolve the version baseline, then requeue affected cases. |
 
+Run the recovery query's entire DO block with **autocommit enabled**, outside an
+explicit transaction. It automatically traverses jurisdictions in batches of up
+to 1,000 cases, committing each batch and tracking progress independently of queue
+consumption. Interrupted runs retain committed batches and can be restarted as a
+fresh pass. Completion confirms queueing only: verify Elasticsearch delivery and
+check Logstash output failures/DLQ; resolve failures and requeue affected cases.
+
 See [CCD-4262 Logstash queue processing](CCD-4262-logstash-queue-processing.md)
 for detailed operational procedures and preview evidence requirements.
 

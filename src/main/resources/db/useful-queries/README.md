@@ -59,4 +59,5 @@ Use **Script 2** for production or regular maintenance, as it is idempotent, bat
 1. Execute `CALL cleanup_case_data(2000, 3);` (batches of 2000, data older than 3 months)
 2. Delete all ES indexes
 3. Login into cwd-admin-web and trigger ES re-indexing (this will create the static indexes)
-4. Copy and run `logstash_re_indexing_query.sql`. It inserts batches into `case_data_logstash_queue` without updating `case_data`, which triggers indexing.
+4. Run the entire `logstash_re_indexing_query.sql` DO block with **autocommit enabled**, outside an explicit transaction. It traverses all jurisdictions and commits batches of up to 1000 cases into `case_data_logstash_queue` without updating `case_data`. Logstash can drain the queue while it runs. An interrupted run can be restarted; already committed batches remain queued or may have been consumed.
+5. Verify Elasticsearch delivery and check Logstash output failures/DLQ. Script completion confirms queueing only; resolve failures and re-queue the affected cases if needed.
