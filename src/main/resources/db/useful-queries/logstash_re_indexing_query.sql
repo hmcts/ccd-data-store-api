@@ -1,5 +1,15 @@
 -- Re-queue case data without updating case_data. Requires the unique queue
--- constraint and queue-ID version migrations. Recreate target indexes first.
+-- constraint and queue-ID version migrations.
+-- Prerequisites:
+-- Full rebuild after index removal: use "Create Elasticsearch Indices" in
+-- ccd-admin-web to create missing case-type indexes and configure mappings.
+-- Use "Create Global Search Indices" separately if rebuilding Global Search.
+-- These actions do not queue case data or delete existing indexes.
+-- Targeted recovery: keep existing indexes and filter this query to affected cases.
+-- Old case-data cleanup is optional, not a prerequisite for re-indexing.
+-- This script queues cases; Logstash consumes the queue and sends case documents
+-- to its configured Elasticsearch destinations.
+--
 -- Set recovery_name below. Reuse it with the SAME filters to resume after interruption.
 -- Use a NEW name for a fresh recovery or whenever target indexes are recreated.
 -- Execute the entire DO block with autocommit enabled, outside BEGIN/COMMIT.
