@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -29,28 +28,19 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
 
     private static final String CASE_TYPE_ID = "caseType";
 
-    private CaseSearchFilter caseSearchFilter;
-    private ObjectMapperService objectMapperService;
-    private ObjectNode searchRequestJsonNode;
-    private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
-
-    private ElasticsearchCaseSearchRequestSecurity querySecurity;
-
-    @BeforeEach
-    void setUp() {
-        caseSearchFilter = mock(CaseSearchFilter.class);
-        objectMapperService = mock(ObjectMapperService.class);
-        searchRequestJsonNode = mock(ObjectNode.class);
-        grantTypeESQueryBuilder = mock(AccessControlGrantTypeESQueryBuilder.class);
-        querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
-            objectMapperService, grantTypeESQueryBuilder);
-        when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
-        when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
-    }
-
     @Test
     @DisplayName("should parse and secure request with filters")
     void shouldSecureRequest() {
+        CaseSearchFilter caseSearchFilter = mock(CaseSearchFilter.class);
+        ObjectMapperService objectMapperService = mock(ObjectMapperService.class);
+        ObjectNode searchRequestJsonNode = mock(ObjectNode.class);
+        AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder =
+            mock(AccessControlGrantTypeESQueryBuilder.class);
+        ElasticsearchCaseSearchRequestSecurity querySecurity =
+            new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
+                objectMapperService, grantTypeESQueryBuilder);
+        when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
+        when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
         CaseSearchRequest caseSearchRequest = mock(CaseSearchRequest.class);
         doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
         doReturn("{}").when(caseSearchRequest).getQueryValue();
