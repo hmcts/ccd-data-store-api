@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
@@ -48,7 +47,6 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
             objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
@@ -78,4 +76,3 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
         );
     }
 }
-
