@@ -2,9 +2,15 @@ package uk.gov.hmcts.ccd.appinsights;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
+import com.microsoft.applicationinsights.telemetry.EventTelemetry;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceState;
+import io.opentelemetry.context.Scope;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,16 +24,21 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_DURATION;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.CALLBACK_EVENT_NAME;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.METHOD;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.STATUS;
+import static uk.gov.hmcts.ccd.appinsights.AppInsights.TRIGGERING_OPERATION_ID;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.TYPE;
 import static uk.gov.hmcts.ccd.appinsights.AppInsights.URI;
 
@@ -252,6 +263,76 @@ public class AppInsightsTest {
         assertThat(captor.getValue().get(STATUS), is(equalTo(status)));
         assertThat(captor.getValue().get(METHOD), is(equalTo("POST")));
         assertThat(captor.getValue().get(CALLBACK_DURATION), is(equalTo("1200 ms")));
+    }
+
+    @Test
+    public void trackStandaloneEvent_outsideATrace_shouldSetItsOwnOperationIdAndNoTrigger() {
+
+        // ACT
+        classUnderTest.trackStandaloneEvent("STATE", Map.of("key", "value"), Map.of("count", 2.0));
+
+        // ASSERT
+        EventTelemetry event = captureEventTelemetry();
+        assertThat(event.getName(), is(equalTo("STATE")));
+        assertThat(event.getProperties().get("key"), is(equalTo("value")));
+        assertThat(event.getMetrics().get("count"), is(equalTo(2.0)));
+        assertTrue(event.getContext().getOperation().getId().matches("[0-9a-f]{32}"));
+        assertThat(event.getContext().getOperation().getParentId(), is(nullValue()));
+        assertFalse(event.getProperties().containsKey(TRIGGERING_OPERATION_ID));
+    }
+
+    @Test
+    public void trackStandaloneEvent_insideATrace_shouldLeaveTheTraceAndRecordItAsTheTrigger() {
+
+        // ARRANGE
+        String traceId = "4bdc605441b9ee4642172e523ffebfb2";
+        SpanContext request = SpanContext.create(traceId, "7854387e9dff28e2", TraceFlags.getDefault(),
+            TraceState.getDefault());
+
+        // ACT
+        try (Scope ignored = Span.wrap(request).makeCurrent()) {
+            classUnderTest.trackStandaloneEvent("STATE", Map.of(), Map.of());
+        }
+
+        // ASSERT
+        EventTelemetry event = captureEventTelemetry();
+        String operationId = event.getContext().getOperation().getId();
+        assertTrue(operationId.matches("[0-9a-f]{32}"));
+        assertThat("the agent keeps an event in the current trace only when the ids match",
+            operationId, is(not(equalTo(traceId))));
+        assertThat(event.getContext().getOperation().getParentId(), is(nullValue()));
+        assertThat(event.getProperties().get(TRIGGERING_OPERATION_ID), is(equalTo(traceId)));
+    }
+
+    @Test
+    public void trackStandaloneEvent_shouldUseANewOperationIdForEachEvent() {
+
+        // ACT
+        classUnderTest.trackStandaloneEvent("STATE", Map.of(), Map.of());
+        classUnderTest.trackStandaloneEvent("STATE", Map.of(), Map.of());
+
+        // ASSERT
+        ArgumentCaptor<EventTelemetry> captor = ArgumentCaptor.forClass(EventTelemetry.class);
+        verify(telemetryClient, times(2)).trackEvent(captor.capture());
+        assertThat(captor.getAllValues().get(0).getContext().getOperation().getId(),
+            is(not(equalTo(captor.getAllValues().get(1).getContext().getOperation().getId()))));
+    }
+
+    @Test
+    public void trackEvent_shouldNotSetAnOperationId() {
+
+        // ACT
+        classUnderTest.trackEvent("PER_REQUEST", Map.of(), Map.of());
+
+        // ASSERT: the agent fills in the current trace's ids, and samples the event with it
+        verify(telemetryClient).trackEvent(eq("PER_REQUEST"), eq(Map.of()), eq(Map.of()));
+        verify(telemetryClient, never()).trackEvent(any(EventTelemetry.class));
+    }
+
+    private EventTelemetry captureEventTelemetry() {
+        ArgumentCaptor<EventTelemetry> captor = ArgumentCaptor.forClass(EventTelemetry.class);
+        verify(telemetryClient).trackEvent(captor.capture());
+        return captor.getValue();
     }
 
 }

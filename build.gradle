@@ -320,6 +320,8 @@ dependencies {
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+    // Version from the Spring Boot BOM. The App Insights agent bridges it, so Span.current() is the agent's span
+    implementation group: 'io.opentelemetry', name: 'opentelemetry-api'
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
     implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'

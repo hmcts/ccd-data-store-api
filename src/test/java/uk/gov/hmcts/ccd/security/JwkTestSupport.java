@@ -158,12 +158,17 @@ final class JwkTestSupport {
 
         @Override
         public void trackEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
-            events.add(new TrackedEvent(name, Map.copyOf(properties), Map.copyOf(metrics)));
+            events.add(new TrackedEvent(name, Map.copyOf(properties), Map.copyOf(metrics), false));
         }
 
         @Override
         public void trackEvent(String name, Map<String, String> properties) {
-            events.add(new TrackedEvent(name, Map.copyOf(properties), Map.of()));
+            events.add(new TrackedEvent(name, Map.copyOf(properties), Map.of(), false));
+        }
+
+        @Override
+        public void trackStandaloneEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
+            events.add(new TrackedEvent(name, Map.copyOf(properties), Map.copyOf(metrics), true));
         }
 
         @Override
@@ -219,6 +224,13 @@ final class JwkTestSupport {
         }
     }
 
-    record TrackedEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
+    /**
+     * An event as the application handed it to {@link AppInsights}.
+     *
+     * @param standalone whether it was sent through {@link AppInsights#trackStandaloneEvent}, i.e. outside the
+     *                   current request's trace and its sampling
+     */
+    record TrackedEvent(String name, Map<String, String> properties, Map<String, Double> metrics,
+                        boolean standalone) {
     }
 }

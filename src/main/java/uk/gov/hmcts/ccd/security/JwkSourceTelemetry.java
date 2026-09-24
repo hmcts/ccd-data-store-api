@@ -46,6 +46,24 @@ import java.util.stream.Collectors;
  * chosen at start-up (see {@link AlgorithmSource}). The choice is fixed for the lifetime of the JVM, so carrying
  * it on every event, including the routine scheduled refreshes, keeps an instance running on the fallback set
  * visible for as long as it runs, not just in the minutes after it started.
+ *
+ * <p><b>Sampling.</b> The App Insights agent drops an event raised inside a request's trace when that request is
+ * sampled out, and Nimbus's refresh executors inherit the trace of whichever thread last scheduled a refresh, which
+ * can be a request. The events are therefore sent in two ways:
+ * <ul>
+ *     <li><b>State events</b> ({@code OUTAGE_TOLERATED}, {@code OUTAGE_ENDED}, {@code HEALTH}, {@code RETRIAL},
+ *         {@code REFRESH_COMPLETED}, {@code SCHEDULED_REFRESH_COMPLETED}, {@code SCHEDULED_REFRESH_FAILED},
+ *         {@code REFRESH_NOT_SCHEDULED}, {@code ALGORITHMS_FALLBACK}) are sent standalone through
+ *         {@link AppInsights#trackStandaloneEvent}, so the monitoring queries see every one of them. Each is raised
+ *         at or below the rate limiter, only when a retrieval passes it, or once per scheduled refresh, so their rate
+ *         is bounded (about two retrievals per rate limit interval) whatever the request rate. The trace they were
+ *         raised in, if any, is kept as {@code triggeringOperationId}. They are kept at 100% only while the agent
+ *         has no fixed {@code sampling.percentage}; if one is set, they are sampled at it.</li>
+ *     <li><b>Per-request events</b> ({@code RATE_LIMIT_REACHED}, {@code WAITING_FOR_REFRESH},
+ *         {@code REFRESH_TIMED_OUT}, {@code UNABLE_TO_REFRESH}, {@code UNABLE_TO_REFRESH_AHEAD}) are raised above
+ *         the rate limiter and can fire once per request during an incident. They stay in the request's trace and
+ *         are sampled with it. Sending them standalone would send one unsampled event per request.</li>
+ * </ul>
  */
 @Slf4j
 public class JwkSourceTelemetry {
@@ -163,7 +181,7 @@ public class JwkSourceTelemetry {
             ? Map.of(EXCEPTION_TYPE, NONE, DETAIL, "IDAM JWK set advertised no usable signature algorithms")
             : causeOf(cause));
 
-        track(ALGORITHMS_FALLBACK, dimensions, Map.of());
+        trackState(ALGORITHMS_FALLBACK, dimensions, Map.of());
     }
 
     /**
@@ -176,7 +194,7 @@ public class JwkSourceTelemetry {
         long previous = toleranceExpiresAtMs.getAndSet(NOT_IN_OUTAGE);
         if (previous != NOT_IN_OUTAGE) {
             log.info("IDAM JWK set retrieved successfully; no longer serving stale signing keys");
-            track(OUTAGE_ENDED);
+            trackState(OUTAGE_ENDED, Map.of(), Map.of());
         }
     }
 
@@ -193,7 +211,7 @@ public class JwkSourceTelemetry {
                 log.warn("IDAM JWK set unavailable; serving cached signing keys for a further {}ms. Cause: {}",
                     remaining, outage.getException().toString());
 
-                track(OUTAGE_TOLERATED, causeOf(outage.getException()),
+                trackState(OUTAGE_TOLERATED, causeOf(outage.getException()),
                     Map.of(REMAINING_TOLERANCE_MS, (double) remaining));
             } else {
                 trackUnknown(event);
@@ -211,7 +229,7 @@ public class JwkSourceTelemetry {
             if (event instanceof RateLimitedJWKSetSource.RateLimitedEvent) {
                 log.warn("IDAM JWK set retrieval refused by the rate limiter; the caller will see a failure "
                     + "rather than the cached keys");
-                track(RATE_LIMIT_REACHED);
+                trackPerRequest(RATE_LIMIT_REACHED, Map.of(), Map.of());
             } else {
                 trackUnknown(event);
             }
@@ -234,39 +252,39 @@ public class JwkSourceTelemetry {
                 case CachingJWKSetSource.RefreshTimedOutEvent<SecurityContext> timedOut -> {
                     log.error("Timed out waiting for an in-flight IDAM JWK set retrieval; {} thread(s) queued",
                         timedOut.getThreadQueueLength());
-                    track(REFRESH_TIMED_OUT, Map.of(), threadQueue(timedOut.getThreadQueueLength()));
+                    trackPerRequest(REFRESH_TIMED_OUT, Map.of(), threadQueue(timedOut.getThreadQueueLength()));
                 }
                 case CachingJWKSetSource.WaitingForRefreshEvent<SecurityContext> waiting -> {
                     log.info("Waiting on an in-flight IDAM JWK set retrieval; {} thread(s) queued",
                         waiting.getThreadQueueLength());
-                    track(WAITING_FOR_REFRESH, Map.of(), threadQueue(waiting.getThreadQueueLength()));
+                    trackPerRequest(WAITING_FOR_REFRESH, Map.of(), threadQueue(waiting.getThreadQueueLength()));
                 }
                 case CachingJWKSetSource.UnableToRefreshEvent<SecurityContext> ignored -> {
                     log.error("Unable to refresh the IDAM JWK set cache");
-                    track(UNABLE_TO_REFRESH);
+                    trackPerRequest(UNABLE_TO_REFRESH, Map.of(), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.UnableToRefreshAheadOfExpirationEvent<SecurityContext>
                     ignored -> {
                     log.warn("Unable to refresh the IDAM JWK set ahead of expiry; the cache will be refreshed on "
                         + "the request path instead");
-                    track(UNABLE_TO_REFRESH_AHEAD);
+                    trackPerRequest(UNABLE_TO_REFRESH_AHEAD, Map.of(), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.ScheduledRefreshFailed<SecurityContext> failed -> {
                     log.warn("Scheduled IDAM JWK set refresh failed", failed.getException());
-                    track(SCHEDULED_REFRESH_FAILED, causeOf(failed.getException()), Map.of());
+                    trackState(SCHEDULED_REFRESH_FAILED, causeOf(failed.getException()), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent<SecurityContext> ignored -> {
                     log.info("Scheduled IDAM JWK set refresh completed");
-                    track(SCHEDULED_REFRESH_COMPLETED);
+                    trackState(SCHEDULED_REFRESH_COMPLETED, Map.of(), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.RefreshNotScheduledEvent<SecurityContext> ignored -> {
                     log.warn("No IDAM JWK set refresh scheduled ahead of expiry");
-                    track(REFRESH_NOT_SCHEDULED);
+                    trackState(REFRESH_NOT_SCHEDULED, Map.of(), Map.of());
                 }
                 case CachingJWKSetSource.RefreshCompletedEvent<SecurityContext> completed -> {
                     log.debug("IDAM JWK set cache refreshed; {} thread(s) queued",
                         completed.getThreadQueueLength());
-                    track(REFRESH_COMPLETED, Map.of(), threadQueue(completed.getThreadQueueLength()));
+                    trackState(REFRESH_COMPLETED, Map.of(), threadQueue(completed.getThreadQueueLength()));
                 }
                 case CachingJWKSetSource.RefreshInitiatedEvent<SecurityContext> ignored ->
                     log.trace("IDAM JWK set cache refresh initiated");
@@ -303,7 +321,7 @@ public class JwkSourceTelemetry {
             dimensions.put(HEALTH_STATUS, String.valueOf(report.getHealthStatus()));
             dimensions.putAll(causeOf(exception));
 
-            track(HEALTH, dimensions, Map.of());
+            trackState(HEALTH, dimensions, Map.of());
         };
     }
 
@@ -311,7 +329,7 @@ public class JwkSourceTelemetry {
         return event -> {
             if (event instanceof RetryingJWKSetSource.RetrialEvent<SecurityContext> retrial) {
                 log.warn("Retrying IDAM JWK set retrieval after {}", retrial.getException().toString());
-                track(RETRIAL, causeOf(retrial.getException()), Map.of());
+                trackState(RETRIAL, causeOf(retrial.getException()), Map.of());
             } else {
                 trackUnknown(event);
             }
@@ -322,17 +340,34 @@ public class JwkSourceTelemetry {
         log.debug("Unhandled IDAM JWK set event {}", event == null ? NONE : event.getClass().getSimpleName());
     }
 
-    private void track(String type) {
-        track(type, Map.of(), Map.of());
+    /**
+     * Tracks an event that describes the state of the key source. Its rate is bounded without sampling, so it is
+     * sent standalone and is not dropped with the request that happened to raise it. See the class comment.
+     */
+    private void trackState(String type, Map<String, String> dimensions, Map<String, Double> measurements) {
+        track(type, dimensions, measurements, true);
     }
 
-    private void track(String type, Map<String, String> dimensions, Map<String, Double> measurements) {
+    /**
+     * Tracks an event that can be raised once per request during an incident. It stays in the raising request's
+     * trace and is sampled with it, which is what keeps its volume affordable. See the class comment.
+     */
+    private void trackPerRequest(String type, Map<String, String> dimensions, Map<String, Double> measurements) {
+        track(type, dimensions, measurements, false);
+    }
+
+    private void track(String type, Map<String, String> dimensions, Map<String, Double> measurements,
+                       boolean standalone) {
         try {
             Map<String, String> properties = new LinkedHashMap<>();
             properties.put(EVENT_TYPE, type);
             properties.put(ALGORITHM_SOURCE, algorithmSource.name());
             properties.putAll(dimensions);
-            appInsights.trackEvent(EVENT_NAME, properties, measurements);
+            if (standalone) {
+                appInsights.trackStandaloneEvent(EVENT_NAME, properties, measurements);
+            } else {
+                appInsights.trackEvent(EVENT_NAME, properties, measurements);
+            }
         } catch (Exception e) {
             log.warn("Unable to publish IDAM JWK set telemetry for {}", type, e);
         }

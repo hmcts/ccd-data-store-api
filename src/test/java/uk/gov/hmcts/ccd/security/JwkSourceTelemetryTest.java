@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.source.RefreshAheadCachingJWKSetSource;
 import com.nimbusds.jose.jwk.source.RetryingJWKSetSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.util.events.Event;
+import com.nimbusds.jose.util.events.EventListener;
 import com.nimbusds.jose.util.health.HealthReport;
 import com.nimbusds.jose.util.health.HealthStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -483,6 +487,116 @@ class JwkSourceTelemetryTest {
         }
     }
 
+    @Nested
+    @DisplayName("sampling treatment")
+    class SamplingTreatment {
+
+        /**
+         * Bounded by the rate limiter or the refresh schedule, and needed by the monitoring queries.
+         */
+        private static final Set<String> STATE_EVENTS = Set.of(
+            JwkSourceTelemetry.OUTAGE_TOLERATED, JwkSourceTelemetry.OUTAGE_ENDED, JwkSourceTelemetry.HEALTH,
+            JwkSourceTelemetry.RETRIAL, JwkSourceTelemetry.REFRESH_COMPLETED,
+            JwkSourceTelemetry.SCHEDULED_REFRESH_COMPLETED, JwkSourceTelemetry.SCHEDULED_REFRESH_FAILED,
+            JwkSourceTelemetry.REFRESH_NOT_SCHEDULED, JwkSourceTelemetry.ALGORITHMS_FALLBACK);
+
+        /**
+         * Raised above the rate limiter, so they can fire once per request during an incident.
+         */
+        private static final Set<String> PER_REQUEST_EVENTS = Set.of(
+            JwkSourceTelemetry.RATE_LIMIT_REACHED, JwkSourceTelemetry.WAITING_FOR_REFRESH,
+            JwkSourceTelemetry.REFRESH_TIMED_OUT, JwkSourceTelemetry.UNABLE_TO_REFRESH,
+            JwkSourceTelemetry.UNABLE_TO_REFRESH_AHEAD);
+
+        @Test
+        @DisplayName("sends state events standalone, so they are not sampled out with a request")
+        void sendsStateEventsStandalone() {
+            raiseEveryEvent();
+
+            assertThat(appInsights.events())
+                .filteredOn(event -> STATE_EVENTS.contains(event.properties().get(JwkSourceTelemetry.EVENT_TYPE)))
+                .extracting(event -> event.properties().get(JwkSourceTelemetry.EVENT_TYPE))
+                .as("every state event is raised once")
+                .containsExactlyInAnyOrderElementsOf(STATE_EVENTS);
+            assertThat(appInsights.events())
+                .filteredOn(event -> STATE_EVENTS.contains(event.properties().get(JwkSourceTelemetry.EVENT_TYPE)))
+                .allSatisfy(event -> assertThat(event.standalone())
+                    .as("%s is standalone", event.properties().get(JwkSourceTelemetry.EVENT_TYPE))
+                    .isTrue());
+        }
+
+        @Test
+        @DisplayName("keeps per-request events in the request's trace, so they are sampled with it")
+        void keepsPerRequestEventsInTheRequestTrace() {
+            raiseEveryEvent();
+
+            assertThat(appInsights.events())
+                .filteredOn(event -> PER_REQUEST_EVENTS.contains(
+                    event.properties().get(JwkSourceTelemetry.EVENT_TYPE)))
+                .extracting(event -> event.properties().get(JwkSourceTelemetry.EVENT_TYPE))
+                .as("every per-request event is raised once")
+                .containsExactlyInAnyOrderElementsOf(PER_REQUEST_EVENTS);
+            assertThat(appInsights.events())
+                .filteredOn(event -> PER_REQUEST_EVENTS.contains(
+                    event.properties().get(JwkSourceTelemetry.EVENT_TYPE)))
+                .allSatisfy(event -> assertThat(event.standalone())
+                    .as("%s stays in the request's trace", event.properties().get(JwkSourceTelemetry.EVENT_TYPE))
+                    .isFalse());
+        }
+
+        @Test
+        @DisplayName("classifies every event type, so a new one cannot be added without choosing its sampling")
+        void classifiesEveryEventType() throws IllegalAccessException {
+            Set<String> eventTypes = new HashSet<>();
+            for (Field field : JwkSourceTelemetry.class.getDeclaredFields()) {
+                // The event type constants are the String constants named after their own value
+                if (Modifier.isStatic(field.getModifiers()) && field.getType() == String.class
+                    && !Modifier.isPrivate(field.getModifiers())) {
+                    field.setAccessible(true);
+                    if (field.getName().equals(field.get(null))) {
+                        eventTypes.add(field.getName());
+                    }
+                }
+            }
+
+            assertThat(eventTypes).hasSize(STATE_EVENTS.size() + PER_REQUEST_EVENTS.size());
+            Set<String> classified = new HashSet<>(STATE_EVENTS);
+            classified.addAll(PER_REQUEST_EVENTS);
+            assertThat(classified).isEqualTo(eventTypes);
+
+            raiseEveryEvent();
+            assertThat(appInsights.events())
+                .extracting(event -> event.properties().get(JwkSourceTelemetry.EVENT_TYPE))
+                .as("every event type can be raised")
+                .containsExactlyInAnyOrderElementsOf(eventTypes);
+        }
+
+        @SuppressWarnings("unchecked")
+        private void raiseEveryEvent() {
+            telemetry.outageEventListener().notify(outageEvent(5_000L, new RuntimeException("down")));
+            telemetry.retrievalSucceeded();
+            telemetry.healthReportListener().notify(
+                new HealthReport<>(healthSource(), HealthStatus.HEALTHY, System.currentTimeMillis(), null));
+            telemetry.retryingEventListener().notify(retrialEvent(new RuntimeException("down")));
+            telemetry.algorithmsFellBack(Set.of(JWSAlgorithm.RS256), null);
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            RefreshAheadCachingJWKSetSource.ScheduledRefreshFailed<SecurityContext> failed =
+                mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshFailed.class);
+            when(failed.getException()).thenReturn(new RuntimeException("rejected"));
+            EventListener<CachingJWKSetSource<SecurityContext>, SecurityContext> caching =
+                telemetry.cachingEventListener();
+            caching.notify(mock(CachingJWKSetSource.RefreshCompletedEvent.class));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent.class));
+            caching.notify(failed);
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.RefreshNotScheduledEvent.class));
+            caching.notify(mock(CachingJWKSetSource.WaitingForRefreshEvent.class));
+            caching.notify(mock(CachingJWKSetSource.RefreshTimedOutEvent.class));
+            caching.notify(mock(CachingJWKSetSource.UnableToRefreshEvent.class));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.UnableToRefreshAheadOfExpirationEvent.class));
+        }
+    }
+
     @Test
     @DisplayName("does not propagate a failure to publish telemetry")
     void telemetryFailureDoesNotPropagate() {
@@ -490,6 +604,10 @@ class JwkSourceTelemetryTest {
 
         assertThatCode(() -> faultyTelemetry.rateLimitedEventListener()
             .notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class)))
+            .doesNotThrowAnyException();
+        assertThatCode(() -> faultyTelemetry.outageEventListener()
+            .notify(outageEvent(5_000L, new RuntimeException("down"))))
+            .as("a standalone state event")
             .doesNotThrowAnyException();
     }
 
@@ -529,6 +647,11 @@ class JwkSourceTelemetryTest {
 
         @Override
         public void trackEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
+            throw new RuntimeException("telemetry backend unavailable");
+        }
+
+        @Override
+        public void trackStandaloneEvent(String name, Map<String, String> properties, Map<String, Double> metrics) {
             throw new RuntimeException("telemetry backend unavailable");
         }
     }

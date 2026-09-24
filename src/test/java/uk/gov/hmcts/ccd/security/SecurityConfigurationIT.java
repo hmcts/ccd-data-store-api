@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.security;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.telemetry.EventTelemetry;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
@@ -25,11 +26,8 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -112,23 +110,28 @@ class SecurityConfigurationIT extends WireMockBaseTest {
             .isFalse();
 
         assertThat(jwkSourceTelemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.FALLBACK);
-        assertThat(jwkSourceEvents())
-            .as("the fallback is reported once, at start-up, through the live telemetry client")
-            .filteredOn(properties -> JwkSourceTelemetry.ALGORITHMS_FALLBACK.equals(
-                properties.get(JwkSourceTelemetry.EVENT_TYPE)))
+        assertThat(standaloneJwkSourceEvents())
+            .as("the fallback is reported once, at start-up, through the live telemetry client, outside any trace")
+            .filteredOn(event -> JwkSourceTelemetry.ALGORITHMS_FALLBACK.equals(
+                event.getProperties().get(JwkSourceTelemetry.EVENT_TYPE)))
             .singleElement()
-            .satisfies(properties -> assertThat(properties)
-                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK")
-                .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256")
-                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "JWKSetRetrievalException"));
+            .satisfies(event -> {
+                assertThat(event.getProperties())
+                    .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK")
+                    .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256")
+                    .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "JWKSetRetrievalException");
+                assertThat(event.getContext().getOperation().getId())
+                    .as("its own operation id, so the agent does not sample it with a request")
+                    .matches("[0-9a-f]{32}");
+            });
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Map<String, String>> jwkSourceEvents() {
-        ArgumentCaptor<Map<String, String>> properties = ArgumentCaptor.forClass(Map.class);
-        verify(telemetryClient, atLeastOnce()).trackEvent(eq(JwkSourceTelemetry.EVENT_NAME), properties.capture(),
-            any());
-        return properties.getAllValues();
+    private List<EventTelemetry> standaloneJwkSourceEvents() {
+        ArgumentCaptor<EventTelemetry> events = ArgumentCaptor.forClass(EventTelemetry.class);
+        verify(telemetryClient, atLeastOnce()).trackEvent(events.capture());
+        return events.getAllValues().stream()
+            .filter(event -> JwkSourceTelemetry.EVENT_NAME.equals(event.getName()))
+            .toList();
     }
 
     @Test
