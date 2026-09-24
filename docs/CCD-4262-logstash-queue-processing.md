@@ -20,10 +20,23 @@ require manual recovery. Re-queue the affected cases using
 `src/main/resources/db/useful-queries/logstash_re_indexing_query.sql`, narrowed
 to the known jurisdiction, case type, references, or failure time window where
 appropriate. Run the entire DO block with autocommit enabled, outside an explicit
-transaction. It traverses jurisdictions in batches of at most 1000 cases, committing
+transaction. It traverses cases in primary-key order in batches of at most 1000, committing
 each batch and advancing by case ID independently of queue consumption. The pass
 is bounded by the maximum case ID at its start; normal triggers queue new writes.
-An interrupted run retains committed batches and can be rerun as a fresh pass.
+This avoids a full jurisdiction count/sort and repeated scans per jurisdiction;
+only one small checkpoint row is stored per recovery, not a copy of all case IDs.
+Set `recovery_name` in the script before running. Progress is stored in the persistent
+`public.logstash_reindex_progress` table and committed atomically with each batch.
+After interruption, rerun with the same name and unchanged filters to resume after
+the last committed batch, even from a new connection. Use a new name for a fresh
+recovery, changed filters, or recreated target indexes. Completed names do no work.
+The first execution requires permission to create the checkpoint table; subsequent
+runs require SELECT, INSERT and UPDATE on it. Retain checkpoints while recovery
+may need resuming; deleting one makes that name start from the beginning. Never
+delete checkpoints while their recovery is running. To remove a verified completed
+run, use `DELETE FROM public.logstash_reindex_progress WHERE run_name = '<name>' AND completed;`.
+Checkpoints record queueing progress, not Elasticsearch acknowledgements: to retry
+failed delivery from earlier batches, use a new recovery name with appropriate filters.
 The recovery query never updates `case_data`. Completion confirms queueing only:
 check output failures/DLQ and verify Elasticsearch delivery before closing recovery.
 

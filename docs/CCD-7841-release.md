@@ -98,10 +98,13 @@ same callback.
 | Conflict with a legacy ES version | Resolve the version baseline, then requeue affected cases. |
 
 Run the recovery query's entire DO block with **autocommit enabled**, outside an
-explicit transaction. It automatically traverses jurisdictions in batches of up
+explicit transaction. It automatically traverses cases in primary-key order in batches of up
 to 1,000 cases, committing each batch and tracking progress independently of queue
-consumption. Interrupted runs retain committed batches and can be restarted as a
-fresh pass. Completion confirms queueing only: verify Elasticsearch delivery and
+consumption. Set `recovery_name` in the script; interrupted runs resume from the
+last committed batch when rerun with the same name and unchanged filters. Progress
+is saved in `public.logstash_reindex_progress` (created on first use). Use a new
+name for fresh recovery, changed filters or recreated indexes; completed names do
+no work. Keep checkpoints until recovery is verified. Completion confirms queueing only: verify Elasticsearch delivery and
 check Logstash output failures/DLQ; resolve failures and requeue affected cases.
 
 See [CCD-4262 Logstash queue processing](CCD-4262-logstash-queue-processing.md)

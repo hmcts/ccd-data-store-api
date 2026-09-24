@@ -1,69 +1,96 @@
--- Re-queue case data for Elasticsearch re-indexing without updating case_data.
--- Run after recreating the target Elasticsearch indexes via ccd-admin-web.
--- Requires the unique queue constraint and queue-ID version migrations.
--- Execute this entire DO block with autocommit enabled, outside BEGIN/COMMIT:
--- each batch commits separately so Logstash can drain the queue during the run.
--- Completed batches survive an interruption; rerunning starts a fresh pass.
--- Queueing completion does not confirm ES delivery: check output failures/DLQ
--- and verify the target indexes; re-queue affected cases after resolving failures.
+-- Re-queue case data without updating case_data. Requires the unique queue
+-- constraint and queue-ID version migrations. Recreate target indexes first.
+-- Set recovery_name below. Reuse it with the SAME filters to resume after interruption.
+-- Use a NEW name for a fresh recovery or whenever target indexes are recreated.
+-- Execute the entire DO block with autocommit enabled, outside BEGIN/COMMIT.
+-- The persistent checkpoint and queue inserts commit together every 1000 cases.
+-- Both roll back if a batch fails; resuming skips only previously committed batches.
+-- New cases and updates may continue: normal database triggers queue them
+-- independently, including updates to cases already passed by this checkpoint.
+-- Those triggers must remain enabled; this pass stops at its saved maximum case ID.
+-- Completed runs are retained and rerunning their name does nothing.
+-- Queueing is not ES delivery: verify indexes and check output failures/DLQ.
+-- Logstash deletes queue rows before ES confirms delivery. Resuming does not retry
+-- failed delivery from committed batches: resolve the failure, then use a NEW
+-- recovery name with filters covering the affected cases and verify ES delivery.
 DO $$
 DECLARE
+    recovery_name TEXT := 'SET-RUN-NAME';
     batch_size INT := 1000;
     rows_queued INT;
-    total_queued BIGINT;
-    current_jurisdiction TEXT;
-    last_case_id BIGINT;
     next_case_id BIGINT;
-    upper_case_id BIGINT;
-    start_time TIMESTAMP;
+    progress RECORD;
 BEGIN
-    -- Bound this pass. New cases and concurrent updates use the normal trigger.
-    SELECT max(id) INTO upper_case_id FROM case_data;
+    IF recovery_name = 'SET-RUN-NAME' THEN
+        RAISE EXCEPTION 'Set recovery_name: reuse it to resume, or choose a new name for a fresh recovery';
+    END IF;
 
-    RAISE NOTICE 'Starting re-queue through case ID %...', upper_case_id;
-    FOR current_jurisdiction IN
-        SELECT jurisdiction
-        FROM case_data
-        WHERE id <= upper_case_id
-        GROUP BY jurisdiction
-        ORDER BY count(*) DESC, jurisdiction
+    -- Serialize first-time table creation, including concurrent recovery sessions.
+    PERFORM pg_advisory_xact_lock(hashtextextended('ccd_logstash_reindex_progress', 0));
+    CREATE TABLE IF NOT EXISTS public.logstash_reindex_progress (
+        run_name TEXT PRIMARY KEY,
+        upper_case_id BIGINT,
+        last_case_id BIGINT,
+        total_queued BIGINT NOT NULL DEFAULT 0,
+        completed BOOLEAN NOT NULL DEFAULT false
+    );
+    -- Bound this pass using the primary-key index; avoid counting/sorting all cases.
+    INSERT INTO public.logstash_reindex_progress (run_name, upper_case_id)
+    SELECT recovery_name, (SELECT max(id) FROM case_data)
+    ON CONFLICT ON CONSTRAINT logstash_reindex_progress_pkey DO NOTHING;
+    COMMIT;
+
     LOOP
-        last_case_id := NULL;
-        total_queued := 0;
-        start_time := clock_timestamp();
-        RAISE NOTICE 'Processing jurisdiction: %', current_jurisdiction;
+        -- Same-name sessions serialize each batch and always reload saved progress.
+        SELECT p.* INTO progress
+        FROM public.logstash_reindex_progress p
+        WHERE p.run_name = recovery_name
+        FOR UPDATE;
 
-        LOOP
-            WITH batch AS (
-                SELECT cd.id
-                FROM case_data cd
-                WHERE cd.jurisdiction IS NOT DISTINCT FROM current_jurisdiction
-                  AND cd.id <= upper_case_id
-                  AND (last_case_id IS NULL OR cd.id > last_case_id)
-                  AND NOT (cd.data = '{}'::jsonb AND cd.state = '')
-                  -- Add case type, reference or time-window filters here for targeted recovery.
-                ORDER BY cd.id
-                LIMIT batch_size
-                -- Prevent deletion before the queue insert commits. Do not skip locked cases.
-                FOR KEY SHARE OF cd
-            ), queued AS (
-                INSERT INTO case_data_logstash_queue (case_data_id)
-                SELECT id FROM batch ORDER BY id
-                ON CONFLICT (case_data_id) DO NOTHING
-                RETURNING case_data_id
-            )
-            SELECT (SELECT max(id) FROM batch), (SELECT count(*) FROM queued)
-            INTO next_case_id, rows_queued;
-
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Checkpoint for run % was removed; stop and verify recovery state.', recovery_name;
+        END IF;
+        IF progress.completed THEN
+            RAISE NOTICE 'Run % already complete; use a new name for a fresh recovery.', recovery_name;
             COMMIT;
-            EXIT WHEN next_case_id IS NULL;
-            -- Advance even if every candidate was already queued, or Logstash drained them.
-            last_case_id := next_case_id;
-            total_queued := total_queued + rows_queued;
-        END LOOP;
+            EXIT;
+        END IF;
+        WITH batch AS (
+            SELECT cd.id
+            FROM case_data cd
+            WHERE cd.id >= COALESCE(progress.last_case_id, '-9223372036854775808'::bigint)
+              AND cd.id <= progress.upper_case_id
+              AND (progress.last_case_id IS NULL OR cd.id > progress.last_case_id)
+              AND NOT (cd.data = '{}'::jsonb AND cd.state = '')
+              -- Add jurisdiction, case type, reference or time-window filters here.
+              -- Keep filters unchanged when resuming this recovery name.
+            ORDER BY cd.id
+            LIMIT batch_size
+            -- Prevent deletion before commit; do not skip locked cases.
+            FOR KEY SHARE OF cd
+        ), queued AS (
+            INSERT INTO case_data_logstash_queue (case_data_id)
+            SELECT id FROM batch ORDER BY id
+            ON CONFLICT (case_data_id) DO NOTHING
+            RETURNING case_data_id
+        )
+        SELECT (SELECT max(id) FROM batch), (SELECT count(*) FROM queued)
+        INTO next_case_id, rows_queued;
 
-        RAISE NOTICE 'Jurisdiction %: queued %, Time taken: %',
-            current_jurisdiction, total_queued, clock_timestamp() - start_time;
+        -- Advance over already-queued cases too. A failed batch rolls back both
+        -- its queue inserts and checkpoint; previously committed batches survive.
+        UPDATE public.logstash_reindex_progress p
+        SET last_case_id = COALESCE(next_case_id, p.last_case_id),
+            completed = next_case_id IS NULL,
+            total_queued = p.total_queued + rows_queued
+        WHERE p.run_name = recovery_name;
+        COMMIT;
+        IF next_case_id IS NULL THEN
+            RAISE NOTICE 'Run % complete: queued %. Verify Elasticsearch delivery.',
+                recovery_name, progress.total_queued;
+            EXIT;
+        END IF;
+        RAISE NOTICE 'Run %: queued %, last committed case ID %',
+            recovery_name, rows_queued, next_case_id;
     END LOOP;
-    RAISE NOTICE 'Re-queue pass complete; verify Elasticsearch delivery.';
 END $$;
