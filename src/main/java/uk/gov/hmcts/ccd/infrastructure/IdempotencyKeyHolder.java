@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -15,10 +16,11 @@ import org.springframework.web.context.annotation.RequestScope;
  */
 @Component
 @RequestScope
+@Profile("!SECURITY_MOCK")
 @Getter
 public class IdempotencyKeyHolder {
 
-    private UUID key;
+    protected UUID key;
 
     public void computeAndSetKeyToRequestContext(final String digest) {
         if (this.key != null) {
