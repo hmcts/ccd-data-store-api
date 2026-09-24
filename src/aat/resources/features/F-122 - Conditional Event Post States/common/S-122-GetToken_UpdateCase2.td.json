@@ -1,0 +1,16 @@
+{
+	"_guid_": "S-122-GetToken_UpdateCase2",
+	"_extends_": "S-122-GetToken_UpdateCase",
+
+	"request": {
+		"pathVariables": {
+			"etid": "updateCase2"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"event_id": "updateCase2"
+		}
+	}
+}
