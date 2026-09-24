@@ -57,8 +57,7 @@ import static org.mockito.Mockito.mock;
     "spring.datasource.hikari.maximum-pool-size=5",
     "spring.datasource.hikari.minimum-idle=2",
     "spring.jpa.hibernate.ddl-auto=none",
-    "spring.flyway.enabled=false",
-    "spring.security.oauth2.client.provider.oidc.issuer-uri=${IDAM_OIDC_URL:http://localhost:5000/o}"
+    "spring.flyway.enabled=false"
 })
 class CaseLinkServiceExternalDbDeadlockIT {
 

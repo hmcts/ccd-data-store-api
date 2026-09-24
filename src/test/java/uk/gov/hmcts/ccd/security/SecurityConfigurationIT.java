@@ -10,6 +10,10 @@ import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockFilterChain;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.mockito.ArgumentCaptor;
@@ -39,10 +43,9 @@ import static org.mockito.Mockito.verify;
  * Previously, {@code JwtDecoders.fromOidcIssuerLocation} fetched the OpenID configuration while the decoder
  * was created and failed the application if IDAM was unavailable.
  *
- * <p>This does not show that the application starts without IDAM. Spring Boot's OAuth2 client
- * auto-configuration still performs OIDC discovery at start-up for the {@code oidc} client registration, and
- * {@code TestIdamConfiguration} replaces that {@code ClientRegistrationRepository} in every Spring test, so no
- * test exercises that call. See CCD-8077.
+ * <p>This does not show that the application starts without IDAM: {@code TestIdamConfiguration} replaces the
+ * {@code ClientRegistrationRepository} in every Spring test. {@link ClientRegistrationStartupTest} covers that, by
+ * building Boot's own repository from the production properties. See CCD-8077.
  */
 @TestPropertySource(properties = {
     "oidc.jwks.uri=http://localhost:1/o/jwks",
@@ -151,6 +154,33 @@ class SecurityConfigurationIT extends WireMockBaseTest {
             .as("ExceptionHandlingFilter must run before BearerTokenAuthenticationFilter, so that an "
                 + "AuthenticationServiceException rethrown by the failure handler is caught and turned into a 500")
             .isLessThan(bearerTokenIndex);
+    }
+
+    @Test
+    @DisplayName("passes /oauth2/authorization/** on to authentication instead of redirecting to IDAM")
+    void doesNotStartAnAuthorizationCodeFlow() throws Exception {
+        Filter redirectFilter = securityFilterChains.stream()
+            .flatMap(chain -> chain.getFilters().stream())
+            .filter(OAuth2AuthorizationRequestRedirectFilter.class::isInstance)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError(".oauth2Client() should install the redirect filter"));
+
+        // TestIdamConfiguration registers "oidc" as an authorization_code client, so the default resolver would
+        // redirect this request; production's client_credentials registration would fail it with a 500.
+        for (String registrationId : List.of("oidc", "unknown")) {
+            MockHttpServletRequest request =
+                new MockHttpServletRequest("GET", "/oauth2/authorization/" + registrationId);
+            request.setServletPath("/oauth2/authorization/" + registrationId);
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            MockFilterChain chain = new MockFilterChain();
+
+            redirectFilter.doFilter(request, response, chain);
+
+            assertThat(chain.getRequest()).as("%s: passed on down the chain", registrationId).isSameAs(request);
+            assertThat(response.getStatus()).as("%s: no response written", registrationId).isEqualTo(200);
+            assertThat(response.getRedirectedUrl()).as("%s: no redirect", registrationId).isNull();
+            assertThat(request.getSession(false)).as("%s: no session created", registrationId).isNull();
+        }
     }
 
     private static int indexOf(List<Filter> filters, Class<? extends Filter> type) {
