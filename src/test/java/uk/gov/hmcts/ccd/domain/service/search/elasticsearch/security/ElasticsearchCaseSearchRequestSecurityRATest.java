@@ -6,9 +6,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
@@ -28,25 +25,23 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
-@ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityRATest {
 
     private static final String CASE_TYPE_ID = "caseType";
 
-    @Mock
     private CaseSearchFilter caseSearchFilter;
-    @Mock
     private ObjectMapperService objectMapperService;
-    @Mock
     private ObjectNode searchRequestJsonNode;
-
-    @Mock
     private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
     private ElasticsearchCaseSearchRequestSecurity querySecurity;
 
     @BeforeEach
     void setUp() {
+        caseSearchFilter = mock(CaseSearchFilter.class);
+        objectMapperService = mock(ObjectMapperService.class);
+        searchRequestJsonNode = mock(ObjectNode.class);
+        grantTypeESQueryBuilder = mock(AccessControlGrantTypeESQueryBuilder.class);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
             objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
