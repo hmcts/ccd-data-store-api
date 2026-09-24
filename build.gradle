@@ -17,7 +17,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.70'
     id 'au.com.dius.pact' version '4.7.5'
     id 'org.jsonschema2pojo' version '1.2.2'
-    id 'org.owasp.dependencycheck' version '12.2.1'
+    id 'org.owasp.dependencycheck' version '12.2.2'
 }
 
 def versions = [
@@ -68,7 +68,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.13'
+        force 'net.bytebuddy:byte-buddy:1.18.14'
     }
 }
 
@@ -250,7 +250,7 @@ dependencies {
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9.1'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.19'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.20'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.6.3'                 // applicationinsights-logging-logback
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.6.3'              // applicationinsights-logging-logback
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
@@ -264,7 +264,7 @@ dependencies {
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'          // service-auth-provider-java-client
     implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'                       // spring-security-oauth2-client
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'            // java-property-to-json     // spring-boot-starter-data-jpa
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.57.Final'      // spring-boot-starter-data-jpa
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.58.Final'      // spring-boot-starter-data-jpa
     implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20260313.1' // java-html-sanitizer
 
 
