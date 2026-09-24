@@ -20,6 +20,12 @@
 -- Those triggers must remain enabled; this pass stops at its saved maximum case ID.
 -- Completed runs are retained and rerunning their name does nothing.
 -- Queueing is not ES delivery: verify indexes and check output failures/DLQ.
+-- End-to-end: this script queues cases -> Logstash reads and sends case documents
+-- -> Elasticsearch accepts the writes -> an index refresh makes them searchable.
+-- Before declaring recovery complete, reconcile the affected cases against each
+-- intended search destination and verify expected case content through CCD search.
+-- Allow for refresh visibility and investigate output failures/DLQ entries.
+-- An empty queue or a successful sample search alone does not prove full recovery.
 -- Logstash deletes queue rows before ES confirms delivery. Resuming does not retry
 -- failed delivery from committed batches: resolve the failure, then use a NEW
 -- recovery name with filters covering the affected cases and verify ES delivery.
