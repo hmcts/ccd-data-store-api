@@ -17,7 +17,11 @@ import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -181,6 +185,37 @@ final class JwkTestSupport {
 
         void clear() {
             events.clear();
+        }
+    }
+
+    /**
+     * A clock that only moves when told to, so a test can step past a tolerance window without sleeping.
+     */
+    static final class MutableClock extends Clock {
+
+        private volatile Instant now;
+
+        MutableClock(Instant start) {
+            this.now = start;
+        }
+
+        void advance(Duration duration) {
+            now = now.plus(duration);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            throw new UnsupportedOperationException("not needed by these tests");
+        }
+
+        @Override
+        public Instant instant() {
+            return now;
         }
     }
 

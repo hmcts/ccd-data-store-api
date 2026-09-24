@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.security;
 
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.CachingJWKSetSource;
 import com.nimbusds.jose.jwk.source.JWKSetSourceWithHealthStatusReporting;
 import com.nimbusds.jose.jwk.source.OutageTolerantJWKSetSource;
@@ -15,25 +16,31 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.security.JwkTestSupport.MutableClock;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.RecordingAppInsights;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.TrackedEvent;
 
 class JwkSourceTelemetryTest {
 
     private RecordingAppInsights appInsights;
+    private MutableClock clock;
     private JwkSourceTelemetry telemetry;
 
     @BeforeEach
     void setUp() {
         appInsights = new RecordingAppInsights();
-        telemetry = new JwkSourceTelemetry(appInsights);
+        clock = new MutableClock(Instant.parse("2026-09-23T12:00:00Z"));
+        telemetry = new JwkSourceTelemetry(appInsights, clock);
     }
 
     @Test
@@ -67,6 +74,135 @@ class JwkSourceTelemetryTest {
             telemetry.outageEventListener().notify(null);
 
             assertThat(appInsights.events()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("remaining outage tolerance")
+    class RemainingTolerance {
+
+        @Test
+        @DisplayName("counts down between events and reports zero once the window closes with no further event")
+        void reportsZeroOnceTheWindowHasClosed() {
+            telemetry.outageEventListener().notify(outageEvent(5_000L, new RuntimeException("down")));
+
+            clock.advance(Duration.ofMillis(3_000));
+            assertThat(telemetry.remainingToleranceMs())
+                .as("calculated when read, not repeated from the event")
+                .isEqualTo(2_000L);
+
+            clock.advance(Duration.ofMillis(2_000));
+            assertThat(telemetry.remainingToleranceMs()).isZero();
+
+            clock.advance(Duration.ofHours(6));
+            assertThat(telemetry.remainingToleranceMs())
+                .as("hours after the window closed, it must not report the last event's value")
+                .isZero();
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED))
+                .as("exactly one outage event fired, so nothing but the clock moved the value")
+                .hasSize(1);
+        }
+
+        @Test
+        @DisplayName("reports no outage after IDAM recovers, including after the old window would have closed")
+        void reportsNoOutageAfterRecovery() {
+            telemetry.outageEventListener().notify(outageEvent(5_000L, new RuntimeException("down")));
+            clock.advance(Duration.ofMillis(1_000));
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(4_000L);
+
+            telemetry.retrievalSucceeded();
+
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(-1L);
+            clock.advance(Duration.ofMillis(10_000));
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(-1L);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED)).hasSize(1);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_ENDED)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("reports the new window for a second outage after a recovery")
+        void reportsTheNewWindowForASecondOutage() {
+            telemetry.outageEventListener().notify(outageEvent(5_000L, new RuntimeException("first")));
+            telemetry.retrievalSucceeded();
+            clock.advance(Duration.ofMillis(10_000));
+
+            telemetry.outageEventListener().notify(outageEvent(8_000L, new RuntimeException("second")));
+
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(8_000L);
+            clock.advance(Duration.ofMillis(3_000));
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(5_000L);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED)).hasSize(2);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_ENDED)).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("still reports recovery when IDAM answers after the window has closed")
+        void reportsRecoveryAfterTheWindowHasClosed() {
+            telemetry.outageEventListener().notify(outageEvent(1_000L, new RuntimeException("down")));
+            clock.advance(Duration.ofMillis(5_000));
+            assertThat(telemetry.remainingToleranceMs()).isZero();
+
+            telemetry.retrievalSucceeded();
+
+            assertThat(telemetry.remainingToleranceMs()).isEqualTo(-1L);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_ENDED))
+                .as("a closed window is still an outage, and its end must be reported")
+                .hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("algorithm source")
+    class AlgorithmSourceDimension {
+
+        @Test
+        @DisplayName("marks events raised before start-up has chosen the algorithms as PENDING")
+        void marksEventsBeforeTheChoiceAsPending() {
+            telemetry.retryingEventListener().notify(retrialEvent(new RuntimeException("down")));
+
+            assertThat(telemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.PENDING);
+            assertThat(onlyEventOfType(JwkSourceTelemetry.RETRIAL).getFirst().properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "PENDING");
+        }
+
+        @Test
+        @DisplayName("emits a fallback marker with its cause, and marks every later event FALLBACK")
+        void emitsAMarkerAndMarksLaterEventsOnFallback() {
+            telemetry.algorithmsFellBack(Set.of(JWSAlgorithm.RS256),
+                new IllegalStateException("Connection refused"));
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            assertThat(telemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.FALLBACK);
+            assertThat(onlyEventOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK).getFirst().properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK")
+                .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256")
+                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "IllegalStateException")
+                .containsEntry(JwkSourceTelemetry.DETAIL, "Connection refused");
+            assertThat(onlyEventOfType(JwkSourceTelemetry.RATE_LIMIT_REACHED).getFirst().properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK");
+        }
+
+        @Test
+        @DisplayName("says why when the key set was retrieved but had no usable keys")
+        void explainsAFallbackWithoutAnException() {
+            telemetry.algorithmsFellBack(Set.of(JWSAlgorithm.RS256), null);
+
+            assertThat(onlyEventOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK).getFirst().properties())
+                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "NONE")
+                .containsEntry(JwkSourceTelemetry.DETAIL, "IDAM JWK set advertised no usable signature algorithms");
+        }
+
+        @Test
+        @DisplayName("emits no marker when the algorithms were derived, and marks every later event DERIVED")
+        void emitsNoMarkerAndMarksLaterEventsWhenDerived() {
+            telemetry.algorithmsDerived(Set.of(JWSAlgorithm.RS256, JWSAlgorithm.ES256));
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            assertThat(telemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.DERIVED);
+            assertThat(appInsights.eventsOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK)).isEmpty();
+            assertThat(onlyEventOfType(JwkSourceTelemetry.RATE_LIMIT_REACHED).getFirst().properties())
+                .as("the event this assertion depends on fired, and carries the dimension")
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "DERIVED");
         }
     }
 

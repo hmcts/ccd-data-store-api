@@ -59,6 +59,8 @@ public class JwkSourceConfiguration {
      *
      * <p>Note that this set is fixed for the lifetime of the JVM once start-up has taken this branch: the
      * {@link JWSVerificationKeySelector} is built once. See CCD-8077 for why that is accepted rather than fixed.
+     * {@link JwkSourceTelemetry} reports it: an {@code ALGORITHMS_FALLBACK} event at start-up, and
+     * {@code algorithmSource=FALLBACK} on every later event.
      */
     static final Set<JWSAlgorithm> FALLBACK_ALGORITHMS = Set.of(JWSAlgorithm.RS256);
 
@@ -112,8 +114,9 @@ public class JwkSourceConfiguration {
     }
 
     @Bean
-    public JWSKeySelector<SecurityContext> idamJwsKeySelector(JWKSource<SecurityContext> idamJwkSource) {
-        return new JWSVerificationKeySelector<>(signatureAlgorithms(idamJwkSource), idamJwkSource);
+    public JWSKeySelector<SecurityContext> idamJwsKeySelector(JWKSource<SecurityContext> idamJwkSource,
+                                                              JwkSourceTelemetry telemetry) {
+        return new JWSVerificationKeySelector<>(signatureAlgorithms(idamJwkSource, telemetry), idamJwkSource);
     }
 
     /**
@@ -121,7 +124,8 @@ public class JwkSourceConfiguration {
      * which was previously used by {@code JwtDecoders.fromOidcIssuerLocation}. This keeps the accepted
      * algorithms unchanged while allowing the application to start even when IDAM is unavailable.
      */
-    private Set<JWSAlgorithm> signatureAlgorithms(JWKSource<SecurityContext> jwkSource) {
+    private Set<JWSAlgorithm> signatureAlgorithms(JWKSource<SecurityContext> jwkSource,
+                                                  JwkSourceTelemetry telemetry) {
         JWKMatcher matcher = new JWKMatcher.Builder()
             .publicOnly(true)
             .keyUses(KeyUse.SIGNATURE, null)
@@ -143,15 +147,18 @@ public class JwkSourceConfiguration {
             }
 
             if (!algorithms.isEmpty()) {
+                telemetry.algorithmsDerived(algorithms);
                 return algorithms;
             }
 
             log.warn("IDAM JWK set at {} advertised no usable signature algorithms; falling back to {}",
                 properties.uri(), FALLBACK_ALGORITHMS);
+            telemetry.algorithmsFellBack(FALLBACK_ALGORITHMS, null);
         } catch (KeySourceException e) {
             log.warn("Unable to retrieve IDAM JWK set from {} at start-up; falling back to {}. "
                 + "Token verification will retry against IDAM on the first request.", properties.uri(),
                 FALLBACK_ALGORITHMS, e);
+            telemetry.algorithmsFellBack(FALLBACK_ALGORITHMS, e);
         }
 
         return FALLBACK_ALGORITHMS;

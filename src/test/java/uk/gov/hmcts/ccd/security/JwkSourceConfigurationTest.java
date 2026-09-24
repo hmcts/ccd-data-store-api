@@ -76,16 +76,44 @@ class JwkSourceConfigurationTest {
     }
 
     @Test
-    @DisplayName("derives the accepted signature algorithms from the JWK set")
+    @DisplayName("derives the accepted signature algorithms from the JWK set, and emits no fallback marker")
     void derivesSignatureAlgorithms() {
         stubHealthy(wireMock, originalJwkSet());
-        JwkSourceConfiguration configuration = configuration();
-        jwkSource = configuration.idamJwkSource(new JwkSourceTelemetry(appInsights));
+        // Generous timeouts: this test is about the outcome of a healthy start-up retrieval, and the 50/100 ms
+        // used elsewhere in this class can time out on a loaded build agent and take the fallback path instead.
+        JwkSourceConfiguration configuration = new JwkSourceConfiguration(new JwksProperties(
+            jwksUri(wireMock), 1_000, 2_000, 51200, 60_000L, 6_100L, 100L, 50L, 120_000L, true));
+        JwkSourceTelemetry telemetry = new JwkSourceTelemetry(appInsights);
+        jwkSource = configuration.idamJwkSource(telemetry);
 
-        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(jwkSource);
+        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(jwkSource, telemetry);
 
         assertThat(keySelector).isInstanceOf(JWSVerificationKeySelector.class);
         assertThat(allows(keySelector, JWSAlgorithm.RS256)).isTrue();
+        assertThat(telemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.DERIVED);
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.HEALTH))
+            .as("the start-up retrieval must have reported, or the absence of a marker proves nothing")
+            .isNotEmpty();
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK)).isEmpty();
+
+        // An unknown kid makes the source go back to IDAM (or be refused by the rate limiter), and either way
+        // it reports. Everything reported from here on was raised after the algorithms were chosen.
+        appInsights.clear();
+        JWKSelector unknownKid = new JWKSelector(new JWKMatcher.Builder().keyID("no-such-key").build());
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(25))
+            .untilAsserted(() -> {
+                try {
+                    jwkSource.get(unknownKid, null);
+                } catch (Exception e) {
+                    // a rate-limited lookup still reports, which is all this needs
+                }
+                assertThat(appInsights.events()).isNotEmpty();
+            });
+        assertThat(appInsights.events())
+            .as("events raised after start-up carry the algorithm source")
+            .allSatisfy(event -> assertThat(event.properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "DERIVED"));
     }
 
     @Test
@@ -98,7 +126,8 @@ class JwkSourceConfigurationTest {
         JWKSource<SecurityContext> source = new ImmutableJWKSet<>(new JWKSet(keyWithoutAlgorithm.toPublicJWK()));
         JwkSourceConfiguration configuration = configuration();
 
-        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(source);
+        JWSKeySelector<SecurityContext> keySelector =
+            configuration.idamJwsKeySelector(source, new JwkSourceTelemetry(appInsights));
 
         assertThat(allows(keySelector, JWSAlgorithm.RS256)).isTrue();
     }
@@ -113,7 +142,8 @@ class JwkSourceConfigurationTest {
         JWKSource<SecurityContext> source = new ImmutableJWKSet<>(new JWKSet(keyWithoutAlgorithm.toPublicJWK()));
         JwkSourceConfiguration configuration = configuration();
 
-        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(source);
+        JWSKeySelector<SecurityContext> keySelector =
+            configuration.idamJwsKeySelector(source, new JwkSourceTelemetry(appInsights));
 
         assertThat(allows(keySelector, JWSAlgorithm.ES256)).isTrue();
     }
@@ -124,24 +154,53 @@ class JwkSourceConfigurationTest {
         JWKSource<SecurityContext> source = new ImmutableJWKSet<>(new JWKSet());
         JwkSourceConfiguration configuration = configuration();
 
-        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(source);
+        JwkSourceTelemetry telemetry = new JwkSourceTelemetry(appInsights);
+
+        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(source, telemetry);
 
         assertThat(allows(keySelector, JWSAlgorithm.RS256)).isTrue();
+        assertThat(telemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.FALLBACK);
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK))
+            .singleElement()
+            .satisfies(event -> assertThat(event.properties())
+                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "NONE")
+                .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256"));
     }
 
     @Test
-    @DisplayName("falls back to RS256 rather than failing start-up when the JWK set cannot be retrieved")
-    void fallsBackToRs256WhenJwkSetUnavailable() {
+    @DisplayName("falls back to RS256 rather than failing start-up when the JWK set cannot be retrieved, and "
+        + "keeps marking events FALLBACK after IDAM recovers")
+    void fallsBackToRs256WhenJwkSetUnavailable() throws Exception {
         stubDown(wireMock);
         JwkSourceConfiguration configuration = configuration();
-        jwkSource = configuration.idamJwkSource(new JwkSourceTelemetry(appInsights));
+        JwkSourceTelemetry telemetry = new JwkSourceTelemetry(appInsights);
+        jwkSource = configuration.idamJwkSource(telemetry);
 
-        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(jwkSource);
+        JWSKeySelector<SecurityContext> keySelector = configuration.idamJwsKeySelector(jwkSource, telemetry);
 
         assertThat(allows(keySelector, JWSAlgorithm.RS256)).isTrue();
         assertThat(JwkTestSupport.retrievalAttempts(wireMock))
             .as("expected the start-up retrieval to have actually been attempted")
             .isPositive();
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.ALGORITHMS_FALLBACK))
+            .singleElement()
+            .satisfies(event -> assertThat(event.properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK")
+                .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256")
+                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "JWKSetRetrievalException"));
+
+        // The key source recovers; the algorithm set does not, so the events must go on saying so.
+        appInsights.clear();
+        stubHealthy(wireMock, originalJwkSet());
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(25))
+            .ignoreExceptions()
+            .untilAsserted(() -> assertThat(signingKeys(jwkSource)).hasSize(1));
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.HEALTH))
+            .as("the recovery retrieval must have reported")
+            .isNotEmpty()
+            .allSatisfy(event -> assertThat(event.properties())
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK"));
     }
 
     @Test

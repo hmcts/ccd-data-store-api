@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.security;
 
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.CachingJWKSetSource;
 import com.nimbusds.jose.jwk.source.JWKSetSourceWithHealthStatusReporting;
 import com.nimbusds.jose.jwk.source.OutageTolerantJWKSetSource;
@@ -14,9 +15,12 @@ import com.nimbusds.jose.util.health.HealthStatus;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 
+import java.time.Clock;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Publishes Nimbus JWK set source lifecycle events to Application Insights.
@@ -37,6 +41,11 @@ import java.util.concurrent.atomic.AtomicLong;
  * and {@code REFRESH_TIMED_OUT}. These events represent the lifecycle of retrieval that can cause
  * request threads to wait. The value shows how much request traffic is being held up by a slow IDAM
  * retrieval, which is the failure mode addressed by CCD-8077.
+ *
+ * <p>Every event also carries {@code algorithmSource}, which records how the accepted signature algorithms were
+ * chosen at start-up (see {@link AlgorithmSource}). The choice is fixed for the lifetime of the JVM, so carrying
+ * it on every event, including the routine scheduled refreshes, keeps an instance running on the fallback set
+ * visible for as long as it runs, not just in the minutes after it started.
  */
 @Slf4j
 public class JwkSourceTelemetry {
@@ -49,6 +58,8 @@ public class JwkSourceTelemetry {
     static final String HEALTH_STATUS = "healthStatus";
     static final String REMAINING_TOLERANCE_MS = "remainingToleranceMs";
     static final String THREAD_QUEUE_LENGTH = "threadQueueLength";
+    static final String ALGORITHM_SOURCE = "algorithmSource";
+    static final String ALGORITHMS = "algorithms";
 
     static final String OUTAGE_TOLERATED = "OUTAGE_TOLERATED";
     static final String OUTAGE_ENDED = "OUTAGE_ENDED";
@@ -63,25 +74,96 @@ public class JwkSourceTelemetry {
     static final String REFRESH_COMPLETED = "REFRESH_COMPLETED";
     static final String WAITING_FOR_REFRESH = "WAITING_FOR_REFRESH";
     static final String REFRESH_NOT_SCHEDULED = "REFRESH_NOT_SCHEDULED";
+    static final String ALGORITHMS_FALLBACK = "ALGORITHMS_FALLBACK";
 
     private static final String NONE = "NONE";
 
+    private static final long NOT_IN_OUTAGE = -1L;
+
     private static final int MAX_DETAIL_LENGTH = 256;
+
+    /**
+     * How the signature algorithms accepted by the key selector were chosen at start-up.
+     */
+    public enum AlgorithmSource {
+        /** Start-up has not yet chosen the algorithms; only seen on events raised by the start-up retrieval. */
+        PENDING,
+        /** Derived from the key set IDAM returned at start-up. */
+        DERIVED,
+        /** The key set could not be used at start-up, so a fixed set is in force until the JVM restarts. */
+        FALLBACK
+    }
 
     private final AppInsights appInsights;
 
-    private final AtomicLong remainingToleranceMs = new AtomicLong(-1L);
+    private final Clock clock;
+
+    /**
+     * When the outage-tolerant layer stops serving the cached keys, in epoch milliseconds, or
+     * {@link #NOT_IN_OUTAGE} once IDAM has supplied a key set. Stored as an instant rather than as the
+     * remaining time because no further outage event arrives once the window has closed, so a remaining time
+     * would never be corrected.
+     */
+    private final AtomicLong toleranceExpiresAtMs = new AtomicLong(NOT_IN_OUTAGE);
+
+    private volatile AlgorithmSource algorithmSource = AlgorithmSource.PENDING;
 
     public JwkSourceTelemetry(AppInsights appInsights) {
+        // Nimbus measures the outage window with System.currentTimeMillis(), so the system clock is used here
+        // rather than an application Clock bean that a test could replace.
+        this(appInsights, Clock.systemUTC());
+    }
+
+    JwkSourceTelemetry(AppInsights appInsights, Clock clock) {
         this.appInsights = appInsights;
+        this.clock = clock;
     }
 
     /**
-     * Returns the remaining outage tolerance, or {@code -1} when stale keys are not currently being served.
-     * This allows a health indicator or test to check the current state without waiting for another event.
+     * Returns how long the outage-tolerant layer will continue to serve the cached keys, calculated when called:
+     * <ul>
+     *     <li>{@code -1} when IDAM has supplied a key set since the last outage, or no outage has occurred;</li>
+     *     <li>{@code 0} when the outage continues but the tolerance window has closed;</li>
+     *     <li>otherwise the time remaining, in milliseconds.</li>
+     * </ul>
+     *
+     * <p>The expiry is taken as the time the outage event arrived plus the remaining time it reported. Nimbus
+     * measures that remaining time from the start of the failed call, so the expiry can be late by up to the
+     * duration of one retrieval, including its retry.
      */
     public long remainingToleranceMs() {
-        return remainingToleranceMs.get();
+        long expiresAt = toleranceExpiresAtMs.get();
+        return expiresAt == NOT_IN_OUTAGE ? NOT_IN_OUTAGE : Math.max(0L, expiresAt - clock.millis());
+    }
+
+    public AlgorithmSource algorithmSource() {
+        return algorithmSource;
+    }
+
+    /**
+     * Called by {@link JwkSourceConfiguration} when the accepted algorithms were derived from IDAM's key set.
+     */
+    void algorithmsDerived(Set<JWSAlgorithm> algorithms) {
+        algorithmSource = AlgorithmSource.DERIVED;
+        log.info("Accepting IDAM token signature algorithms {} derived from the JWK set", names(algorithms));
+    }
+
+    /**
+     * Called by {@link JwkSourceConfiguration} when start-up could not derive the accepted algorithms and the
+     * fixed fallback set is in force for the lifetime of the JVM.
+     *
+     * @param cause the retrieval failure, or {@code null} when IDAM returned a key set without usable keys
+     */
+    void algorithmsFellBack(Set<JWSAlgorithm> algorithms, Exception cause) {
+        algorithmSource = AlgorithmSource.FALLBACK;
+
+        Map<String, String> dimensions = new LinkedHashMap<>();
+        dimensions.put(ALGORITHMS, names(algorithms));
+        dimensions.putAll(cause == null
+            ? Map.of(EXCEPTION_TYPE, NONE, DETAIL, "IDAM JWK set advertised no usable signature algorithms")
+            : causeOf(cause));
+
+        track(ALGORITHMS_FALLBACK, dimensions, Map.of());
     }
 
     /**
@@ -91,8 +173,8 @@ public class JwkSourceTelemetry {
      * both cases as a successful result.
      */
     void retrievalSucceeded() {
-        long previous = remainingToleranceMs.getAndSet(-1L);
-        if (previous >= 0L) {
+        long previous = toleranceExpiresAtMs.getAndSet(NOT_IN_OUTAGE);
+        if (previous != NOT_IN_OUTAGE) {
             log.info("IDAM JWK set retrieved successfully; no longer serving stale signing keys");
             track(OUTAGE_ENDED);
         }
@@ -106,7 +188,7 @@ public class JwkSourceTelemetry {
         return event -> {
             if (event instanceof OutageTolerantJWKSetSource.OutageEvent<SecurityContext> outage) {
                 long remaining = outage.getRemainingTime();
-                remainingToleranceMs.set(remaining);
+                toleranceExpiresAtMs.set(clock.millis() + remaining);
 
                 log.warn("IDAM JWK set unavailable; serving cached signing keys for a further {}ms. Cause: {}",
                     remaining, outage.getException().toString());
@@ -248,6 +330,7 @@ public class JwkSourceTelemetry {
         try {
             Map<String, String> properties = new LinkedHashMap<>();
             properties.put(EVENT_TYPE, type);
+            properties.put(ALGORITHM_SOURCE, algorithmSource.name());
             properties.putAll(dimensions);
             appInsights.trackEvent(EVENT_NAME, properties, measurements);
         } catch (Exception e) {
@@ -259,6 +342,10 @@ public class JwkSourceTelemetry {
         return exception == null
             ? Map.of(EXCEPTION_TYPE, NONE, DETAIL, NONE)
             : Map.of(EXCEPTION_TYPE, exception.getClass().getSimpleName(), DETAIL, message(exception));
+    }
+
+    private static String names(Set<JWSAlgorithm> algorithms) {
+        return algorithms.stream().map(JWSAlgorithm::getName).sorted().collect(Collectors.joining(","));
     }
 
     private static Map<String, Double> threadQueue(int threadQueueLength) {

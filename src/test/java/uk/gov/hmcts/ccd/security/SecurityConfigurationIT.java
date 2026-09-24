@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.security;
 
+import com.microsoft.applicationinsights.TelemetryClient;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
@@ -11,14 +12,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.mockito.ArgumentCaptor;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockReset;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 /**
  * Covers the wiring shared by {@code SecurityConfiguration} and {@link JwkSourceConfiguration}.
@@ -62,6 +71,14 @@ class SecurityConfigurationIT extends WireMockBaseTest {
     @Inject
     private List<SecurityFilterChain> securityFilterChains;
 
+    /**
+     * Spied rather than replaced, so the start-up marker is shown to reach the real client that the
+     * {@code AppInsights} bean publishes through. The fallback happens while the context starts, before any test
+     * runs, so the recorded calls must not be reset between tests.
+     */
+    @MockitoSpyBean(reset = MockReset.NONE)
+    private TelemetryClient telemetryClient;
+
     @Test
     @DisplayName("starts with the JWK set endpoint unreachable")
     void contextStartsWithTheJwkSetEndpointDead() {
@@ -90,6 +107,25 @@ class SecurityConfigurationIT extends WireMockBaseTest {
         assertThat(keySelector.isAllowed(JWSAlgorithm.ES256))
             .as("only the fallback algorithms are accepted when the key set could not be read")
             .isFalse();
+
+        assertThat(jwkSourceTelemetry.algorithmSource()).isEqualTo(JwkSourceTelemetry.AlgorithmSource.FALLBACK);
+        assertThat(jwkSourceEvents())
+            .as("the fallback is reported once, at start-up, through the live telemetry client")
+            .filteredOn(properties -> JwkSourceTelemetry.ALGORITHMS_FALLBACK.equals(
+                properties.get(JwkSourceTelemetry.EVENT_TYPE)))
+            .singleElement()
+            .satisfies(properties -> assertThat(properties)
+                .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK")
+                .containsEntry(JwkSourceTelemetry.ALGORITHMS, "RS256")
+                .containsEntry(JwkSourceTelemetry.EXCEPTION_TYPE, "JWKSetRetrievalException"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, String>> jwkSourceEvents() {
+        ArgumentCaptor<Map<String, String>> properties = ArgumentCaptor.forClass(Map.class);
+        verify(telemetryClient, atLeastOnce()).trackEvent(eq(JwkSourceTelemetry.EVENT_NAME), properties.capture(),
+            any());
+        return properties.getAllValues();
     }
 
     @Test

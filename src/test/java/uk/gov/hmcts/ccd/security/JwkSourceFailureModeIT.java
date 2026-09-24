@@ -32,12 +32,14 @@ import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.RecordingAppInsights;
+import static uk.gov.hmcts.ccd.security.JwkTestSupport.TrackedEvent;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.jwksUri;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.originalJwkSet;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.originalKey;
@@ -121,6 +123,20 @@ class JwkSourceFailureModeIT {
         assertThat(retrievalAttempts(wireMock))
             .as("expected the source to have kept trying the failing endpoint")
             .isPositive();
+
+        // Once the window has closed no further OUTAGE_TOLERATED event arrives, so the telemetry must work out
+        // the remaining tolerance itself rather than repeat the value carried by the last event.
+        List<TrackedEvent> outages = appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED);
+        assertThat(outages.getLast().metrics().get(JwkSourceTelemetry.REMAINING_TOLERANCE_MS))
+            .as("the last event reported time remaining, so a snapshot of it would still read as positive")
+            .isPositive();
+        assertThat(statusFor(decoder, originalToken)).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(appInsights.eventsOfType(JwkSourceTelemetry.OUTAGE_TOLERATED))
+            .as("no outage event fires once the window has closed")
+            .hasSameSizeAs(outages);
+        assertThat(telemetry.remainingToleranceMs())
+            .as("the window has closed, so no tolerance remains")
+            .isZero();
     }
 
     @Test
