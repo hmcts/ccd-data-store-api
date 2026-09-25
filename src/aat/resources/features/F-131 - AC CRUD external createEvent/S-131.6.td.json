@@ -1,18 +1,25 @@
 {
-  "_guid_": "S-135.3",
-  "_extends_": "F-135_Test_Data_Base",
-  "title": "User getting event trigger for Case with no CaseType U access gets error",
+  "_guid_" : "S-131.6",
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "title": "User cannot start event creation with missing CaseEvent C Access",
 
-  "specs": [
-    "with no case type U access to update a case",
-    "contains HTTP 404 status code",
-    "attempts to get event trigger for the previously created case"
+  "specs" : [
+    "with no C access to create an event",
+    "contains HTTP 404 status code"
   ],
+
+  "method": "GET",
+  "uri": "/cases/{caseId}/event-triggers/{etid}",
+
   "request": {
     "_extends_": "Common_Request",
+    "headers": {
+      "Experimental": "true"
+    },
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-135.3_CreateCase][testData][actualResponse][body][id]}",
-      "etid": "event1"
+      "etid": "event1",
+      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     },
     "event_id" : "event1"
   },
@@ -32,7 +39,4 @@
       "callbackWarnings" : null
     }
   }
-
 }
-
-

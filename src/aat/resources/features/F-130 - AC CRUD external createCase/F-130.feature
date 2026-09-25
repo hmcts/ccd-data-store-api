@@ -45,6 +45,15 @@ Feature: F-130: Create Case External API CRUD Tests
     And the response has all other details as expected
     And the response [contains an error stating that the case event cannot be found]
 
+  @S-130.8
+  Scenario: User cannot start case creation without CaseEvent C Access
+    Given a user [with no C access to create an event]
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
+    Then a negative response is received
+    And the response has all other details as expected
+    And the response [contains an error stating that the case event cannot be found]
+
 
   @S-130.7
   Scenario: User submits case creation with no CaseType R Access does not return the case after successful case creation
