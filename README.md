@@ -184,8 +184,8 @@ PACT_BRANCH_NAME=Dev \
   --tests 'uk.gov.hmcts.ccd.v2.external.controller.CasesControllerProviderTest'
 ```
 
-`-Ppactbroker.enablePending=false` disables pending Pacts for this local run, so only the selected non-pending Pacts are
-verified.
+`-Ppactbroker.enablePending=false` disables pending Pacts for this local run, so that a failed pending interaction 
+fails the verification.
 
 `-Ppact.verifier.publishResults=true` publishes the verification result to the configured broker.
 
