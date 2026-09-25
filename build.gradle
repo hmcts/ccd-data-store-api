@@ -742,7 +742,16 @@ jacocoTestReport {
     }
 }
 
+tasks.register('logstashSmokeTest', Exec) {
+    group = 'verification'
+    description = 'Tests the Logstash smoke script and writes JUnit XML and HTML reports.'
+    workingDir projectDir
+    commandLine 'python3', '-B', 'scripts/tests/run_logstash_smoke_tests.py',
+        "${buildDir}/test-results/logstashSmokeTest", "${buildDir}/reports/tests/logstashSmokeTest"
+}
+
 test {
+    dependsOn tasks.named('logstashSmokeTest')
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = true

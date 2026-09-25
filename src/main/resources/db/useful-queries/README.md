@@ -56,7 +56,8 @@ This file defines a **stored procedure** (`cleanup_case_data(batch_size int DEFA
 Use **Script 2** for production or regular maintenance, as it is idempotent, batched, and safe for repeat execution.
 
 # 🧹 CCD Data Store Database Cleanup Process
-1. Execute `CALL cleanup_case_data(2000, 3);` (batches of 2000, data older than 3 months)
-2. Delete all ES indexes
-3. Login into cwd-admin-web and trigger ES re-indexing (this will create the static indexes)
-4. Copy and run the script `logstash_re_indexing_query.sql` (this will mark all cases as logstash_enabled=false, which in turn will trigger the indexing process)
+1. Case-data cleanup is optional and is not required for re-indexing. If cleanup is intended, `CALL cleanup_case_data(2000, 3);` deletes data older than 3 months in batches of 2000.
+2. Choose the recovery scope: for targeted recovery, retain existing indexes and filter the query to affected cases. Index deletion is not required to requeue cases; do not use a blanket deletion of all Elasticsearch indexes.
+3. For a full rebuild after index removal, use **Create Elasticsearch Indices** in `ccd-admin-web` to create missing case-type indexes and configure mappings. Use **Create Global Search Indices** separately if rebuilding Global Search. These actions do not queue case data or delete existing indexes; the SQL script queues cases and Logstash sends their documents to its configured Elasticsearch destinations.
+4. Run the entire `logstash_re_indexing_query.sql` DO block with **autocommit enabled**, outside an explicit transaction. It traverses cases across all jurisdictions in primary-key order and commits batches of up to 1000 cases into `case_data_logstash_queue` without updating `case_data`. Logstash can drain the queue while it runs. Set `recovery_name` in the script. Rerun with the same name and unchanged filters to resume from the last committed batch; progress persists in `public.logstash_reindex_progress`. Use a new name for fresh recovery, changed filters or recreated indexes. Completed names do no work. Retain checkpoints until recovery is verified; see the [recovery guidance](../../../../../docs/CCD-4262-logstash-queue-processing.md#failure-recovery) for permissions and cleanup.
+5. Verify Elasticsearch delivery and check Logstash output failures/DLQ. Script completion confirms queueing only; resolve failures and re-queue the affected cases if needed.
