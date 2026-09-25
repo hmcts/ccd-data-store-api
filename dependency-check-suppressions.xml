@@ -64,6 +64,16 @@
 
    <suppress>
       <notes><![CDATA[
+      Spring Security 6.5.12 is available only under enterprise support. CVE-2026-41707 affects
+      DPoPProofJwtDecoderFactory's replay cache. This service uses NimbusJwtDecoder for bearer JWT
+      validation and does not use DPoPProofJwtDecoderFactory or DPoP proof-of-possession tokens.
+      ]]></notes>
+      <packageUrl>pkg:maven/org.springframework.security/spring-security-oauth2-jose@6.5.11</packageUrl>
+      <cve>CVE-2026-41707</cve>
+   </suppress>
+
+   <suppress>
+      <notes><![CDATA[
       Spring Cloud Commons 4.3.4 is available only under enterprise support. CVE-2026-59284
       requires the writable actuator env endpoint. This service exposes only health and info
       actuator endpoints, so the vulnerable endpoint is neither exposed nor writable.
