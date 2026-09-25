@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -51,6 +50,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
@@ -126,7 +126,6 @@ import static org.mockito.Mockito.when;
 })
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
-@IgnoreNoPactsToVerify
 public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
@@ -443,7 +442,11 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         String caseType = (String) dataMap.get(CASE_TYPE);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        CaseDetails caseDetails = contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        if (caseDetails.getReference() == null && caseDetails.getId() != null) {
+            caseDetails.setReference(Long.valueOf(caseDetails.getId()));
+        }
+        return caseDetails;
 
     }
 
@@ -571,13 +574,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(eventTokenService.generateToken(anyString(),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn(null);
 
         when(eventTokenService.generateToken(anyString(),
             isA(CaseDetails.class),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn("someToken");
+            isA(CaseTypeDefinition.class))).thenReturn(null);
         return caseDetails;
     }
 }

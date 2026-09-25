@@ -92,11 +92,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Profile("!SECURITY_MOCK")
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers(AUTH_WHITELIST);
     }
 
     @Bean
+    @Profile("!SECURITY_MOCK")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
@@ -108,7 +110,7 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF is disabled purposely
             .formLogin(fl -> fl.disable())
             .logout(logout -> logout.disable())
-            .authorizeHttpRequests(auth -> 
+            .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/error")
                 .permitAll()
                 .anyRequest()

@@ -12,6 +12,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets.
+
+## Contents
+
+- [Prerequisites](#prerequisites)
+- [Environment variables](#environment-variables)
+- [Building](#building)
+- [Running](#running)
+- [Functional Tests](#functional-tests)
+- [Pact Provider Verification](#pact-provider-verification)
+- [License](#license)
   
 ### Prerequisites
 
@@ -135,17 +145,58 @@ Will run only S-1023.5:
 ./gradlew functional -P tags="@S-1023.5"
 ```
 
-### Pact provider verification
+### Pact Provider Verification
 
-To verify the Cases provider against a local Pact Broker, run:
+Pact provider verification tests are located under `src/contractTest/java/`.
+
+#### Prerequisites
+
+Set up a local Pact Broker using the [Pact Broker Docker documentation](https://github.com/pact-foundation/pact-broker-docker).
+
+The commands below expect the broker to be available directly at `http://localhost:9292`.
+
+#### Run All Pact Provider Verification Tests
+
+Will run all Pact provider verification tests against all of the latest consumer pacts on  `Dev` branch and publish the verification result and provider version to the local Pact Broker:
 
 ```bash
-./gradlew -Ppact.verifier.publishResults=true runProviderPactVerification \
--Dpactbroker.enablePending=false
+PACT_BROKER_FULL_URL=http://localhost:9292 \
+PACT_BRANCH_NAME=Dev \
+./gradlew -Ppactbroker.enablePending=false \
+  -Ppact.verifier.publishResults=true \
+  runProviderPactVerification
 ```
 
-Disabling pending pacts locally ensures that a failed pending interaction fails the
-verification command instead of being reported as a passed JUnit test.
+#### Run Specific Pact Provider Verification Test
+
+Will run the `ccdDataStoreAPI_Cases` Pact provider verification tests defined in
+`src/contractTest/java/uk/gov/hmcts/ccd/v2/external/controller/CasesControllerProviderTest.java` against the latest
+`wa_task_monitor` consumer Pact on the `Dev` branch and publish the verification result and provider version to the
+local Pact Broker:
+
+```bash
+PACT_BROKER_FULL_URL=http://localhost:9292 \
+PACT_BRANCH_NAME=Dev \
+./gradlew -Ppactbroker.consumers=wa_task_monitor \
+  -Ppactbroker.enablePending=false \
+  -Ppact.verifier.publishResults=true \
+  runProviderPactVerification \
+  --tests 'uk.gov.hmcts.ccd.v2.external.controller.CasesControllerProviderTest'
+```
+
+`-Ppactbroker.enablePending=false` disables pending Pacts for this local run, so that a failed pending interaction 
+fails the verification.
+
+`-Ppact.verifier.publishResults=true` publishes the verification result to the configured broker.
+
+The local HTML test report is generated at:
+
+```text
+build/reports/tests/runProviderPactVerification/index.html
+```
+
+When publishing is enabled, the official Pact verification results can also be viewed in the local Pact Broker at
+[`http://localhost:9292`](http://localhost:9292).
 
 ## LICENSE
 
