@@ -1,6 +1,6 @@
 elastic:
   enabled: false
-ccd:
+ccd-core:
   enabled: false
 
 java:
