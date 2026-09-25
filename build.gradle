@@ -68,7 +68,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.13'
+        force 'net.bytebuddy:byte-buddy:1.18.14'
     }
 }
 
@@ -901,6 +901,12 @@ task runProviderPactVerification(type:Test) {
     classpath = sourceSets.contractTest.runtimeClasspath
     if (project.hasProperty('pact.verifier.publishResults')) {
         systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+    }
+    if (project.hasProperty('pactbroker.consumers')) {
+        systemProperty 'pactbroker.consumers', project.property('pactbroker.consumers')
+    }
+    if (project.hasProperty('pactbroker.enablePending')) {
+        systemProperty 'pactbroker.enablePending', project.property('pactbroker.enablePending')
     }
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
