@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
+    consumerVersionSelectors = {@VersionSelector(
+            tag = "${PACT_BRANCH_NAME:Dev}", fallbackTag = "${PACT_FALLBACK_TAG:master}")})
 @IgnoreNoPactsToVerify
 @ExtendWith(SpringExtension.class)
 public class CasesProviderTest {

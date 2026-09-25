@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,8 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
         doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
         doReturn("{}").when(caseSearchRequest).getQueryValue();
         doReturn("").when(caseSearchRequest).toJsonString();
-        doReturn(Optional.of(mock(QueryBuilder.class))).when(caseSearchFilter).getFilter(CASE_TYPE_ID);
+        doReturn(Optional.of(QueryBuilders.termQuery("filterTermValue", "filterValue")))
+            .when(caseSearchFilter).getFilter(CASE_TYPE_ID);
         doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(),
             eq(ObjectNode.class));
         doReturn(searchRequestJsonNode).when(searchRequestJsonNode).get(anyString());
@@ -78,4 +79,3 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
         );
     }
 }
-
