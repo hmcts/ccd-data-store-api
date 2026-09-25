@@ -87,8 +87,10 @@ dependencyCheck {
         .orElse(providers.systemProperty('nvd.api.key'))
         .orElse(providers.environmentVariable('NVD_API_KEY'))
         .orNull
-    nvd {
-        apiKey = nvdApiKeyValue?.trim() ? nvdApiKeyValue : null
+    if (nvdApiKeyValue?.trim()) {
+        nvd {
+            apiKey = nvdApiKeyValue.trim()
+        }
     }
 }
 
