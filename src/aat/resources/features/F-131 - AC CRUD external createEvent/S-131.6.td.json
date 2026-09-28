@@ -9,6 +9,12 @@
     "contains HTTP 404 status code"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
   "method": "GET",
   "uri": "/cases/{caseId}/event-triggers/{etid}",
 
