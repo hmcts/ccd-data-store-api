@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
@@ -8,6 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
@@ -23,19 +29,29 @@ public class RoleAssignmentCategoryService {
         Pattern.CASE_INSENSITIVE);
 
     private final IdamRepository idamRepository;
+    private final RoleAssignmentRepository roleAssignmentRepository;
+    private final RoleAssignmentsMapper roleAssignmentsMapper;
 
-    public RoleAssignmentCategoryService(IdamRepository idamRepository) {
+    public RoleAssignmentCategoryService(IdamRepository idamRepository,
+                                           @Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
+                                           RoleAssignmentRepository roleAssignmentRepository,
+                                           RoleAssignmentsMapper roleAssignmentsMapper) {
         this.idamRepository = idamRepository;
+        this.roleAssignmentRepository = roleAssignmentRepository;
+        this.roleAssignmentsMapper = roleAssignmentsMapper;
     }
 
     public RoleCategory getRoleCategory(String userId) {
         List<String> idamUserRoles = idamRepository.getUserRoles(userId);
+
         if (hasProfessionalRole(idamUserRoles)) {
             return PROFESSIONAL;
         } else if (hasCitizenRole(idamUserRoles)) {
             return CITIZEN;
         } else if (hasJudicialRole(idamUserRoles)) {
             return JUDICIAL;
+        } else if (hasEnforcementRole(userId)) {
+            return ENFORCEMENT;
         } else {
             return LEGAL_OPERATIONS;
         }
@@ -51,5 +67,23 @@ public class RoleAssignmentCategoryService {
 
     private boolean hasJudicialRole(List<String> roles) {
         return roles.stream().anyMatch(role -> JUDICIAL_ROLE.matcher(role).matches());
+    }
+
+    private boolean hasEnforcementRole(String userId) {
+        RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(
+            roleAssignmentRepository.getRoleAssignments(userId));
+
+        if (roleAssignments == null || roleAssignments.getRoleAssignments() == null) {
+            return false;
+        }
+
+        /*
+         * Filter for ENFORCEMENT roles with GrantType.STANDARD.
+         * The global hmcts-enforcement role has GrantType.BASIC and is therefore not included.
+         */
+        return roleAssignments.getRoleAssignments().stream()
+            .filter(roleAssignment -> roleAssignment.isGrantType(GrantType.STANDARD))
+            .anyMatch(roleAssignment ->
+                ENFORCEMENT.name().equalsIgnoreCase(roleAssignment.getRoleCategory()));
     }
 }

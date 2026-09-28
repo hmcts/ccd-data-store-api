@@ -30,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
 public class CaseUserControllerIT extends WireMockBaseTest {
 
@@ -55,6 +56,8 @@ public class CaseUserControllerIT extends WireMockBaseTest {
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
         stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/.*"))
+            .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
 
     }
 
