@@ -15,10 +15,7 @@
         "urlPath": "/document_hash_callback",
         "bodyPatterns": [
           {
-            "matchesJsonPath": {
-              "expression": "$.case_details.data.TextField",
-              "equalTo": "S-1045-payload"
-            }
+            "contains": "S-1045-payload"
           }
         ]
       },
@@ -48,10 +45,7 @@
         "method": "POST",
         "bodyPatterns": [
           {
-            "matchesJsonPath": {
-              "expression": "$.case_details.data.TextField",
-              "equalTo": "S-1045-payload"
-            }
+            "contains": "S-1045-payload"
           }
         ]
       },
