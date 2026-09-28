@@ -78,7 +78,7 @@ dependencyCheck {
     //suppressionFiles = ['dependency-check-suppressions.xml']
 
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-    suppressionFile = 'config/owasp/suppressions.xml'
+    suppressionFiles = ['config/owasp/suppressions.xml']
 }
 
 apply from: "$rootDir/gradle/suppress.gradle"
