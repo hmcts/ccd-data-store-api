@@ -213,6 +213,10 @@ logstash:
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
         queue.type: persisted
+      - pipeline.id: index-dead-letter-to-es
+        path.config: "/usr/share/logstash/pipeline/dead_letter_indexing_pipeline.conf"
+        pipeline.workers: 1
+        dead_letter_queue.enable: false
   logstashPipeline:
     01_input.conf: |
       input  {
@@ -224,7 +228,18 @@ logstash:
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
           jdbc_default_timezone => "UTC"
-          statement => "DELETE FROM case_data_logstash_queue USING case_data WHERE case_data_logstash_queue.case_data_id = case_data.id RETURNING case_data_logstash_queue.id AS version, case_data.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+          statement => "WITH candidates AS (
+            SELECT q.id
+            FROM case_data_logstash_queue q
+            ORDER BY q.id
+            FOR UPDATE SKIP LOCKED
+            LIMIT 1000
+          )
+          DELETE FROM case_data_logstash_queue q
+          USING candidates c, case_data cd
+          WHERE q.id = c.id
+            AND q.case_data_id = cd.id
+          RETURNING q.id AS version, cd.id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT AS json_data, data_classification::TEXT AS json_data_classification, reference, security_classification, supplementary_data::TEXT AS json_supplementary_data"
           clean_run => false
           schedule => "* * * * * *"
         }
@@ -340,9 +355,30 @@ logstash:
               # External versioning configuration
               version => "%{version}"
               version_type => "external"
-              # Handle version conflicts gracefully
-              retry_on_conflict => 0
           }
+      }
+    dead_letter_indexing_pipeline.conf: |
+      input {
+        dead_letter_queue {
+          path => "${LOGSTASH_HOME}/data/dead_letter_queue"
+          commit_offsets => true
+          pipeline_id => "main"
+        }
+      }
+      filter {
+        ruby { code => "event.set('failed_case', event.to_json())" }
+        prune { whitelist_names => [ "^failed_case$" ] }
+        ruby { code => "event.set('timestamp', event.get('[@metadata][dead_letter_queue][entry_time]'))" }
+        mutate {
+          add_field => { "reason" => "%{[@metadata][dead_letter_queue][reason]}" }
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["http://{{ .Release.Name }}-es-master:9200"]
+          sniffing => false
+          index => "ccd-logstash-dead-letter"
+        }
       }
 
 ccd-definition-store-api:
