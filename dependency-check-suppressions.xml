@@ -297,4 +297,14 @@
     <suppress>
         <cve>CVE-2025-7962</cve>
     </suppress>
+    <suppress until="2026-10-28Z">
+        <notes><![CDATA[
+            CVE-2026-41707 affects DPoPProofJwtDecoderFactory replay protection.
+            This application uses bearer JWT authentication with NimbusJwtDecoder;
+            no DPoP authentication is configured. Review before expiry or enabling DPoP.
+            https://spring.io/security/cve-2026-41707/
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/.*$</packageUrl>
+        <cve>CVE-2026-41707</cve>
+    </suppress>
 </suppressions>
