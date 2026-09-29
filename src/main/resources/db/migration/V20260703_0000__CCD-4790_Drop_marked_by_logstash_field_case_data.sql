@@ -3,6 +3,8 @@
 -- database cannot independently prove Logstash has drained the queue or that Elasticsearch has
 -- fully caught up.
 
+SET LOCAL lock_timeout = '15s';
+
 CREATE TABLE IF NOT EXISTS public.ccd_data_migration_status (
     migration_name text PRIMARY KEY,
     completed_at timestamp with time zone NOT NULL DEFAULT now()

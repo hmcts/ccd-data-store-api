@@ -38,7 +38,8 @@ WITH expected_documents AS (
         cd.id AS document_id
     FROM public.case_data cd
     WHERE NOT (cd.data = '{}'::jsonb AND cd.state = '')
-      AND cd.data ? 'SearchCriteria'
+      AND cd.data -> 'SearchCriteria' IS NOT NULL
+      AND cd.data -> 'SearchCriteria' NOT IN ('null'::jsonb, 'false'::jsonb)
 )
 SELECT
     index_name,
@@ -66,7 +67,8 @@ WITH expected_documents AS (
         cd.version
     FROM public.case_data cd
     WHERE NOT (cd.data = '{}'::jsonb AND cd.state = '')
-      AND cd.data ? 'SearchCriteria'
+      AND cd.data -> 'SearchCriteria' IS NOT NULL
+      AND cd.data -> 'SearchCriteria' NOT IN ('null'::jsonb, 'false'::jsonb)
 ),
 ranked_documents AS (
     SELECT
