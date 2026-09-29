@@ -42,6 +42,7 @@ class LogstashPipelineConfigurationTest {
     void previewLogstashPipelineShouldDeleteBoundedQueueBatchesUsingQueueIdsAsExternalVersions() throws IOException {
         String previewValues = Files.readString(PREVIEW_VALUES);
         String input = pipelineBlock(previewValues, "01_input.conf", "02_filter.conf");
+        String filter = pipelineBlock(previewValues, "02_filter.conf", "03_output.conf");
         String output = pipelineBlock(previewValues, "03_output.conf", "dead_letter_indexing_pipeline.conf");
 
         assertAll(
@@ -50,7 +51,7 @@ class LogstashPipelineConfigurationTest {
                 "Logstash output must keep stable document ids"
             ),
             () -> assertTrue(
-                output.contains("version => \"%{version}\""),
+                output.contains("version => \"%{[@metadata][queue_version]}\""),
                 "Preview Logstash output must use the queue row version as the external version"
             ),
             () -> assertTrue(
@@ -69,6 +70,8 @@ class LogstashPipelineConfigurationTest {
                 "Preview Logstash must route non-retryable Elasticsearch failures to the dead-letter index"
             )
         );
+        assertThat(filter).contains("rename => { \"version\" => \"[@metadata][queue_version]\" }");
+        assertThat(filter.indexOf("[@metadata][queue_version]")).isLessThan(filter.indexOf("clone {"));
     }
 
     @Test

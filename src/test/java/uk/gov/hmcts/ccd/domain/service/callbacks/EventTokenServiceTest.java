@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -114,7 +115,23 @@ class EventTokenServiceTest {
     }
 
     @Test
-    void testValidateToken_ValidTokenAllConditionsMetWithNullValues() {
+    void testValidateToken_CreateTokenWithoutCaseIdMatchesOnlyNewCase() {
+        when(event.getId()).thenReturn("eventId");
+        when(jurisdictionDefinition.getId()).thenReturn("jurisdictionId");
+        when(caseTypeDefinition.getId()).thenReturn("caseTypeId");
+
+        String createToken = eventTokenService.generateToken(uid, event, jurisdictionDefinition, caseTypeDefinition);
+
+        eventTokenService.validateToken(createToken, uid, event, jurisdictionDefinition, caseTypeDefinition);
+
+        when(caseDetails.getId()).thenReturn("caseId");
+        assertThrows(EventTokenException.class, () -> eventTokenService.validateToken(
+            createToken, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
+    }
+
+    @Test
+    void testValidateToken_RejectsMissingBindingClaims() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -136,13 +153,13 @@ class EventTokenServiceTest {
 
         doReturn(propertiesWithNull).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
-    void testValidateToken_ValidTokenConditionMetWithNullEventId() {
+    void testValidateToken_RejectsMissingEventId() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -164,13 +181,13 @@ class EventTokenServiceTest {
 
         doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
-    void testValidateToken_ValidTokenConditionMetWithNullCaseId() {
+    void testValidateToken_RejectsMissingCaseId() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -192,13 +209,13 @@ class EventTokenServiceTest {
 
         doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
-    void testValidateToken_ValidTokenConditionMetWithNullJurisdictionId() {
+    void testValidateToken_RejectsMissingJurisdictionId() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -220,13 +237,13 @@ class EventTokenServiceTest {
 
         doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
-    void testValidateToken_ValidTokenConditionMetWithNullCaseTypeId() {
+    void testValidateToken_RejectsMissingCaseTypeId() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -248,13 +265,13 @@ class EventTokenServiceTest {
 
         doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
-    void testValidateToken_ValidTokenConditionMetWithNullUid() {
+    void testValidateToken_RejectsMissingUid() {
         EventTokenService spyEventTokenService = spy(eventTokenService);
 
         when(event.getId()).thenReturn("eventId");
@@ -276,9 +293,9 @@ class EventTokenServiceTest {
 
         doReturn(tokenProperties).when(spyEventTokenService).parseToken(token);
 
-        spyEventTokenService.validateToken(token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition);
-
-        verify(caseDetails).setVersion(Integer.parseInt(tokenProperties.getEntityVersion()));
+        assertThrows(EventTokenException.class, () -> spyEventTokenService.validateToken(
+            token, uid, caseDetails, event, jurisdictionDefinition, caseTypeDefinition));
+        verify(caseDetails, never()).setVersion(anyInt());
     }
 
     @Test
