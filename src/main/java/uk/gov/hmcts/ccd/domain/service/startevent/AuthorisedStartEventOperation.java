@@ -183,7 +183,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                          Set<AccessProfile> accessProfiles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_UPDATE)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            // Do not disclose that the case exists when the user has no access to it.
+            throw new CaseNotFoundException(caseDetails.getReferenceAsString());
         }
 
         if (!accessControlService.canAccessCaseEventWithCriteria(eventId,

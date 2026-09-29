@@ -475,6 +475,22 @@ class AuthorisedStartEventOperationTest {
         }
 
         @Test
+        @DisplayName("should hide case when user has no case access")
+        void shouldHideCaseWhenUserHasNoCaseAccess() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
+                .thenReturn(false);
+
+            CaseNotFoundException exception = assertThrows(CaseNotFoundException.class,
+                () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is("No case found for reference: " + CASE_REFERENCE));
+            verify(classifiedStartEventOperation, never()).triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+        }
+
+        @Test
         @DisplayName("should fail if case type not found")
         void shouldFailIfNoCaseTypeFound() {
 
