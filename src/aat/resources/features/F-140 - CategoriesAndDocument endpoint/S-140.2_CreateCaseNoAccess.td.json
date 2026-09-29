@@ -18,7 +18,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor2"
+      "_extends_": "BeftaCaseworkerCaa"
     }
   },
 
@@ -86,3 +86,4 @@
     }
   }
 }
+
