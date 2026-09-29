@@ -34,7 +34,8 @@ public class ContractTestCreateEventOperation extends DefaultCreateEventOperatio
     public CaseDetails createCaseEvent(String caseReference,
                                        CaseDataContent content) {
         contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(content.getEventId());
-        return super.createCaseEvent(testCaseReference, content);
+        String effectiveCaseReference = testCaseReference != null ? testCaseReference : caseReference;
+        return super.createCaseEvent(effectiveCaseReference, content);
     }
 
     public void setTestCaseReference(String testCaseReference) {
