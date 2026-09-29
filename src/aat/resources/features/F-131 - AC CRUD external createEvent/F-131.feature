@@ -7,19 +7,10 @@ Feature: F-131: Create Event External API CRUD Tests
   @S-131.1
   Scenario: User cannot create event with missing CaseEvent C Access
     Given a case that has just been created as in [F-131_CreateCase],
+    And a successful call [to create a token for event creation] as in [S-131.1_Token_Creation]
     And a user [with no C access to create an event]
     When a request is prepared with appropriate values,
-    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
-    Then a negative response is received
-    And the response has all other details as expected.
-
-
-  @S-131.6
-  Scenario: User cannot start event creation with missing CaseEvent C Access
-    Given a case that has just been created as in [F-131_CreateCase],
-    And a user [with no C access to create an event]
-    When a request is prepared with appropriate values,
-    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
+    And it is submitted to call the [create event] operation of [CCD Data Store],
     Then a negative response is received
     And the response has all other details as expected.
 
@@ -58,5 +49,14 @@ Feature: F-131: Create Event External API CRUD Tests
     When a request is prepared with appropriate values,
     And the request [attempts to create an event for the previously created case]
     And it is submitted to call the [create event] operation of [CCD Data Store],
+    Then a negative response is received
+    And the response has all other details as expected.
+
+  @S-131.6
+  Scenario: User cannot start event creation without case access
+    Given a case that has just been created as in [F-131_CreateCase],
+    And a user [with no access to the case]
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
     Then a negative response is received
     And the response has all other details as expected.
