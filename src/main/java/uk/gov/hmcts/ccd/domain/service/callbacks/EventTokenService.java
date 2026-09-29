@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Optional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -164,9 +163,7 @@ public class EventTokenService {
     }
 
     private boolean isMatching(String tokenValue, String actualValue) {
-        return Optional.ofNullable(tokenValue)
-            .map(value -> value.equalsIgnoreCase(actualValue))
-            .orElse(true);
+        return tokenValue == null ? actualValue == null : tokenValue.equalsIgnoreCase(actualValue);
     }
 
     /**
