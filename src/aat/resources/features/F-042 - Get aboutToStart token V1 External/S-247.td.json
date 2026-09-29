@@ -20,7 +20,7 @@
       "jid": "BEFTA_MASTER",
       "ctid": "FT_CRUD",
       "etid": "event1",
-      "cid": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-042.7_CreateCase][testData][actualResponse][body][id]}"
     }
   },
 
