@@ -85,6 +85,36 @@ same callback.
 | Jenkins outage/manual-requeue smoke | Elasticsearch recovery through targeted manual requeue. This does not prove alert delivery. |
 | Platform alert verification | Before production rollout, test Elasticsearch output-failure and dead-letter-index alerts in preview. Platform owns rules and routing; record alert URL, recipient, firing time and receipt in CCD-4262. |
 
+### CCD-6024 acceptance clarification
+
+The validation above also supports CCD-6024's stale-write protection (AC1, AC4,
+AC8 and AC10) and eventual indexed-data checks. It does not establish all API
+criteria or replace live preview evidence:
+
+- AC5: ingestion is asynchronous; a later Logstash failure cannot change an
+  already returned API response. Use the existing failure/alert/recovery gates;
+  clarify the required error recipient in the ticket.
+- AC6 and AC9: API concurrency checks use PostgreSQL case versions, whereas
+  Elasticsearch uses bigint queue IDs. An API comparison against Elasticsearch
+  is outside the current contract.
+- AC13: search does not expose Elasticsearch's version. Queue IDs are distinct
+  from, and can exceed the integer range of, the API case-version field.
+- AC14 and AC15: an absent case in search produces an empty result, not a
+  structured 404. These criteria need ticket clarification or separate work.
+
+For AC2, AC3, AC7, AC11 and AC12, the preview test must show that case creation
+and update requests succeed, and that a subsequent search returns the updated
+data after indexing completes. Record these API responses as evidence.
+
+To test out-of-order ingestion, Logstash must collect the earlier case state
+before the next update, then collect the updated state in a separate poll.
+If both writes occur before polling, they may be combined into one queue entry,
+leaving no older event to reject. Arrange for Logstash to send the newer event
+to Elasticsearch first, then the older event, and verify that the older event
+is rejected and the updated data remains unchanged. Sending stale writes
+directly to Elasticsearch tests its version checks, but does not verify this
+sequence through Logstash.
+
 ## Recovery and rollback
 
 > [!WARNING]
