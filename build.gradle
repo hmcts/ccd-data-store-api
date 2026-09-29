@@ -73,8 +73,8 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 dependencyCheck {
-    // suppress.gradle parses dependency-check-report.xml
-    formats = ['HTML', 'XML']
+    // suppress.gradle parses XML; CVE dashboard ingestion consumes JSON.
+    formats = ['HTML', 'XML', 'JSON']
     //suppressionFiles = ['dependency-check-suppressions.xml']
 
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
