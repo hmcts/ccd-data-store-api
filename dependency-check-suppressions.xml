@@ -79,6 +79,9 @@
         <cve>CVE-2026-41706</cve>
     </suppress>
     <suppress>
+        <cve>CVE-2026-41707</cve>
+    </suppress>
+    <suppress>
         <cve>CVE-2026-41838</cve>
     </suppress>
     <suppress>
