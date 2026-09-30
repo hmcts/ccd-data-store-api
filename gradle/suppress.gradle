@@ -46,9 +46,9 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
     }
 }
 
-void validateGeneratedCveSuppressions(String baselineSuppressionPath,
-                                      String generatedSuppressionPath = null,
-                                      String vulnerabilityReportPath = null) {
+Set<String> validateGeneratedCveSuppressions(String baselineSuppressionPath,
+                                             String generatedSuppressionPath = null,
+                                             String vulnerabilityReportPath = null) {
     File baselineSuppressionFile = project.file(baselineSuppressionPath)
     File generatedSuppressionFile = generatedSuppressionPath
             ? project.file(generatedSuppressionPath)
@@ -139,6 +139,8 @@ void validateGeneratedCveSuppressions(String baselineSuppressionPath,
     if (!newCves.every { notes.contains("${it} refer [Ticket]") }) {
         throw new GradleException('A generated CVE is missing its temporary-suppression note')
     }
+
+    return newCves
 }
 
 File resolveSuppressionFile() {
@@ -245,9 +247,16 @@ tasks.register('validateGeneratedCveSuppressions') {
         if (!baselineSuppressionFile) {
             throw new GradleException('Use -PbaselineSuppressionFile=<path> to specify the original suppression file')
         }
-        validateGeneratedCveSuppressions(
+        Set<String> newCves = validateGeneratedCveSuppressions(
                 baselineSuppressionFile,
                 providers.gradleProperty('generatedSuppressionFile').getOrNull(),
                 providers.gradleProperty('vulnerabilityReportFile').getOrNull())
+
+        String outputPath = providers.gradleProperty('validatedCvesOutput').getOrNull()
+        if (outputPath) {
+            File outputFile = project.file(outputPath)
+            outputFile.parentFile.mkdirs()
+            outputFile.setText(newCves.toList().sort().join('\n') + '\n', 'UTF-8')
+        }
     }
 }

@@ -143,6 +143,7 @@ withNightlyPipeline(type, product, component) {
 
             def suppressionFile = ''
             def baselineSuppressionFile = 'build/cve-suppression-baseline.xml'
+            def validatedCvesFile = 'build/validated-cve-suppressions.txt'
             def slackNotificationChannel = '#nightly_cve_suppressions'
             def credentialsId = env.GIT_CREDENTIALS_ID
             def targetBranch = 'master'
@@ -178,8 +179,7 @@ withNightlyPipeline(type, product, component) {
             // Store the list of changed files relative to the master baseline
             def changedFiles = []
 
-            // Store the changes in the suppression file
-            def changes = ''
+            def suppressionChanged = false
 
             script {
                 def workspaceChangedFiles = sh(
@@ -193,42 +193,30 @@ withNightlyPipeline(type, product, component) {
 
                 if (readFile(file: baselineSuppressionFile) != readFile(file: suppressionFile)) {
                     changedFiles = [suppressionFile]
+                    suppressionChanged = true
                     echo "✅ Only suppression file changed. Proceeding..."
-
-                    // Verify it includes CVE-related changes
-                    changes = sh(
-                        script: """
-                          diff -u '${baselineSuppressionFile}' '${suppressionFile}' | grep '^+' | grep '<cve>' || true
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    if (changes) {
-                        echo "✅ CVE-related changes found in suppression file."
-                    } else {
-                        echo "⚠️ No CVE-related changes detected."
-                    }
-
                 } else {
-                    echo "✅ Suppression file not changed — marking step as successfull"
+                    echo "✅ Suppression file not changed — marking step as successful"
                 }
             }
 
-            if (changes && env.CHANGE_ID) {
+            if (suppressionChanged && env.CHANGE_ID) {
                 echo "CVE suppression changes detected during PR validation; skipping automated PR creation."
-            } else if (changes) {
-                sh "./gradlew validateGeneratedCveSuppressions -PbaselineSuppressionFile=${baselineSuppressionFile}"
+            } else if (suppressionChanged) {
+                sh(
+                    script: "./gradlew validateGeneratedCveSuppressions "
+                        + "-PbaselineSuppressionFile=${baselineSuppressionFile} "
+                        + "-PvalidatedCvesOutput=${validatedCvesFile}"
+                )
 
-                // Clean and format CVE lines
-                def simplifiedChanges = changes
+                def newCves = readFile(file: validatedCvesFile)
                     .readLines()
-                    .collect { it.replaceFirst(/\+/, '').trim() }                // Remove leading '+'
-                    .collect { it.replaceAll(/<\/?[^>]+>/, '') }                 // Strip XML/HTML tags
-                //.collect { it.replace('[Ticket]', '<https://yourtracker.example/TICKET-ID|Ticket>') } // Optional link
-                    .join('\n')
+                    .collect { it.trim() }
+                    .findAll { it }
+                def formattedCves = newCves.collect { "- `${it}`" }.join('\n')
 
                 echo "Staged files: ${changedFiles}"
-                echo "Changes: ${changes}"
+                echo "New CVEs: ${newCves}"
 
                 def automationBranch = "automated/cve-suppressions-${env.BUILD_NUMBER}"
                 def automationWorkspace = "${pwd(tmp: true)}/cve-suppressions-${env.BUILD_NUMBER}"
@@ -280,21 +268,22 @@ withNightlyPipeline(type, product, component) {
                 def pullRequest = readJSON returnPojo: true, text: pullRequestResponse.content
                 def pullRequestNumber = pullRequest.number
                 def pullRequestUrl = pullRequest.html_url
+                def slackMessage = [
+                    '*ACTION REQUIRED: MANUAL MERGE NEEDED*',
+                    "*Merge PR #${pullRequestNumber} manually to fix the CVE suppression failure.*",
+                    '',
+                    "*New CVEs to suppress (${newCves.size()}):*",
+                    formattedCves,
+                    '',
+                    "*Pull request:* <${pullRequestUrl}|Open PR #${pullRequestNumber}>",
+                    "*Build:* <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
+                ].join('\n')
 
                 slackSend(
                     channel: slackNotificationChannel,
                     color: 'danger',
                     failOnError: true,
-                    message: """
-                                *ACTION REQUIRED: THIS PR MUST BE MERGED MANUALLY TO FIX THE CVE SUPPRESSION FAILURE*
-
-                                *This PR suppresses the following CVEs:*
-
-                                ${simplifiedChanges}
-
-                                *Pull request:* <${pullRequestUrl}|#${pullRequestNumber}>
-                                *Build:* <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>
-                               """.stripIndent().trim()
+                    message: slackMessage
                 )
             } else {
                 echo "✅ Suppression file not changed — skipping Slack notification"
