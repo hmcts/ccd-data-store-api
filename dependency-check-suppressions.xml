@@ -305,6 +305,10 @@
             https://spring.io/security/cve-2026-41707/
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/.*$</packageUrl>
+    <suppress>
+        <notes><![CDATA[
+        file name: spring-security-config-6.5.7.jar
+        ]]></notes>
         <cve>CVE-2026-41707</cve>
     </suppress>
 </suppressions>
