@@ -143,26 +143,35 @@ withNightlyPipeline(type, product, component) {
 
             def suppressionFile = ''
             def baselineSuppressionFile = 'build/cve-suppression-baseline.xml'
+            def slackNotificationChannel = '#nightly_cve_suppressions'
+            def credentialsId = env.GIT_CREDENTIALS_ID
+            def targetBranch = 'master'
+
+            withCredentials([
+                gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+            ]) {
+                sh "git fetch origin ${targetBranch}"
+            }
+
             script {
                 suppressionFile = sh(
                     script: './gradlew printSuppressionFile -q',
                     returnStdout: true
                 ).trim().split("=")[1]
 
-                echo "Suppression file and path: ${suppressionFile}"
+                def masterSuppression = sh(
+                    script: "git show origin/${targetBranch}:${suppressionFile}",
+                    returnStdout: true
+                )
+                writeFile(file: suppressionFile, text: masterSuppression)
+                writeFile(file: baselineSuppressionFile, text: masterSuppression)
 
+                echo "Suppression file and path: ${suppressionFile}"
                 sh """
                   echo 'Current contents of ${suppressionFile}:'
                   cat '${suppressionFile}'
                 """
-
-                writeFile(
-                    file: baselineSuppressionFile,
-                    text: sh(script: "git show HEAD:${suppressionFile}", returnStdout: true)
-                )
             }
-
-            def slackNotificationChannel = '#nightly_cve_suppressions'
 
             sh './gradlew suppressCves'
 
@@ -202,7 +211,7 @@ withNightlyPipeline(type, product, component) {
                     // Verify it includes CVE-related changes
                     changes = sh(
                         script: """
-                          git diff --cached ${suppressionFile} | grep '^+' | grep '<cve>' || true
+                          diff -u '${baselineSuppressionFile}' '${suppressionFile}' | grep '^+' | grep '<cve>' || true
                         """,
                         returnStdout: true
                     ).trim()
@@ -234,22 +243,38 @@ withNightlyPipeline(type, product, component) {
                 echo "Staged files: ${changedFiles}"
                 echo "Changes: ${changes}"
 
-                def targetBranch = env.BRANCH_NAME
                 def automationBranch = "automated/cve-suppressions-${env.BUILD_NUMBER}"
-                def credentialsId = env.GIT_CREDENTIALS_ID
+                def automationWorkspace = "${pwd(tmp: true)}/cve-suppressions-${env.BUILD_NUMBER}"
                 def githubProject = new GithubAPI(this).currentProject()
                 def headCommit = ''
+                def generatedSuppression = readFile(file: suppressionFile)
 
-                echo "Committing changes for branch ${automationBranch}"
-                sh 'git commit -m "Suppressing CVE - Actions"'
-                headCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                echo "Creating ${automationBranch} from origin/${targetBranch}"
+                sh "git worktree add --no-track -b '${automationBranch}' '${automationWorkspace}' origin/${targetBranch}"
+                try {
+                    writeFile(file: "${automationWorkspace}/${suppressionFile}", text: generatedSuppression)
 
-                withCredentials([
-                    gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
-                ]) {
-                    sh """
-                        git push origin HEAD:refs/heads/${automationBranch}
-                    """
+                    dir(automationWorkspace) {
+                        sh "git add -- '${suppressionFile}'"
+                        def automationChangedFiles = sh(
+                            script: 'git diff --cached --name-only',
+                            returnStdout: true
+                        ).trim().readLines()
+                        if (automationChangedFiles != [suppressionFile]) {
+                            error("Expected only ${suppressionFile} to change, found: ${automationChangedFiles}")
+                        }
+
+                        sh 'git commit -m "Suppressing CVE - Actions"'
+                        headCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+
+                        withCredentials([
+                            gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+                        ]) {
+                            sh "git push origin HEAD:refs/heads/${automationBranch}"
+                        }
+                    }
+                } finally {
+                    sh(returnStatus: true, script: "git worktree remove --force '${automationWorkspace}'")
                 }
 
                 def pullRequestResponse = httpRequest(
