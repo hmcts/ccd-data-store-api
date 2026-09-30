@@ -175,37 +175,24 @@ withNightlyPipeline(type, product, component) {
 
             sh './gradlew suppressCves'
 
-            // Store the list of changed files
-            def changedFiles = ''
+            // Store the list of changed files relative to the master baseline
+            def changedFiles = []
 
             // Store the changes in the suppression file
             def changes = ''
 
             script {
-                // Stage all modified tracked files
-                sh 'git add -u'
-
-                changedFiles = sh(
-                    script: 'git diff --cached --name-only',
+                def workspaceChangedFiles = sh(
+                    script: 'git diff HEAD --name-only',
                     returnStdout: true
-                ).trim().split("\n").findAll { it?.trim() } as List
-
-                echo "List of changed files: ${changedFiles}"
-
-                if (changedFiles.isEmpty()) {
-                    echo "No changed files to extract."
-                } else {
-                    def fileName = sh(
-                        script: """
-                            echo '${changedFiles}' | tr -d '[]' | xargs basename
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    echo "Extracted file name: ${fileName}"
+                ).trim().readLines().findAll { it?.trim() }
+                def unexpectedChangedFiles = workspaceChangedFiles.findAll { it != suppressionFile }
+                if (unexpectedChangedFiles) {
+                    error("CVE suppression generation changed unexpected files: ${unexpectedChangedFiles}")
                 }
 
-                if (changedFiles.size() == 1 && changedFiles[0] == suppressionFile) {
+                if (readFile(file: baselineSuppressionFile) != readFile(file: suppressionFile)) {
+                    changedFiles = [suppressionFile]
                     echo "✅ Only suppression file changed. Proceeding..."
 
                     // Verify it includes CVE-related changes
