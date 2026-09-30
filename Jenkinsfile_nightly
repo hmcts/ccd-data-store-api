@@ -284,6 +284,7 @@ withNightlyPipeline(type, product, component) {
                 slackSend(
                     channel: slackNotificationChannel,
                     color: 'danger',
+                    failOnError: true,
                     message: """
                                 *ACTION REQUIRED: THIS PR MUST BE MERGED MANUALLY TO FIX THE CVE SUPPRESSION FAILURE*
 
