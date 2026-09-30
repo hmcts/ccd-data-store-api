@@ -3831,7 +3831,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(404))
             .andReturn();
-        assertEquals("No case type found",
+        assertEquals("No case found for reference: " + reference,
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
     }
 
