@@ -150,7 +150,7 @@ withNightlyPipeline(type, product, component) {
             withCredentials([
                 gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
             ]) {
-                sh "git fetch origin ${targetBranch}"
+                sh "git fetch origin +refs/heads/${targetBranch}:refs/remotes/origin/${targetBranch}"
             }
 
             script {
