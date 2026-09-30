@@ -46,6 +46,127 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
     }
 }
 
+void validateGeneratedCveSuppressions(String baselineSuppressionPath,
+                                      String generatedSuppressionPath = null,
+                                      String vulnerabilityReportPath = null) {
+    File baselineSuppressionFile = project.file(baselineSuppressionPath)
+    File generatedSuppressionFile = generatedSuppressionPath
+            ? project.file(generatedSuppressionPath)
+            : resolveSuppressionFile()
+    File reportFile = vulnerabilityReportPath
+            ? project.file(vulnerabilityReportPath)
+            : new File(project.file(dependencyCheck.getOutputDirectory()), Globals.REPORT_NAME)
+
+    [baselineSuppressionFile, generatedSuppressionFile].each { file ->
+        if (!file.isFile() || file.length() == 0) {
+            throw new GradleException("Required CVE validation file is missing or empty: ${file}")
+        }
+    }
+
+    // Dependency-Check's parser validates the complete document against its bundled suppression schema.
+    def suppressionParserClass = dependencyCheck.class.classLoader.loadClass(
+            'org.owasp.dependencycheck.xml.suppression.SuppressionParser')
+    def suppressionParser = suppressionParserClass.getDeclaredConstructor().newInstance()
+    suppressionParser.parseSuppressionRules(baselineSuppressionFile)
+    suppressionParser.parseSuppressionRules(generatedSuppressionFile)
+    if (!reportFile.isFile() || reportFile.length() == 0) {
+        throw new GradleException("Required CVE validation file is missing or empty: ${reportFile}")
+    }
+
+    def baselineRoot = new XmlSlurper(false, true).parse(baselineSuppressionFile)
+    def generatedRoot = new XmlSlurper(false, true).parse(generatedSuppressionFile)
+    if (baselineRoot.name() != generatedRoot.name()
+            || baselineRoot.namespaceURI() != generatedRoot.namespaceURI()
+            || baselineRoot.attributes() != generatedRoot.attributes()) {
+        throw new GradleException('The suppression document root or namespace was modified')
+    }
+
+    def baselineDocument = new XmlSlurper(false, false).parse(baselineSuppressionFile)
+    def generatedDocument = new XmlSlurper(false, false).parse(generatedSuppressionFile)
+    def baselineRules = baselineDocument.children().findAll { it.name() == 'suppress' }
+    def generatedRules = generatedDocument.children().findAll { it.name() == 'suppress' }
+    def baselineTemporaryRules = baselineRules.findAll { it.notes.text().contains(Globals.TEXT_TO_FIND) }
+    def generatedTemporaryRules = generatedRules.findAll { it.notes.text().contains(Globals.TEXT_TO_FIND) }
+
+    if (baselineTemporaryRules.size() > 1 || generatedTemporaryRules.size() != 1) {
+        throw new GradleException('Expected exactly one generated temporary suppression section')
+    }
+
+    def baselinePermanentRules = baselineRules.findAll { !it.notes.text().contains(Globals.TEXT_TO_FIND) }
+            .collect { normaliseRule(it) }
+    def generatedPermanentRules = generatedRules.findAll { !it.notes.text().contains(Globals.TEXT_TO_FIND) }
+            .collect { normaliseRule(it) }
+    if (baselinePermanentRules != generatedPermanentRules) {
+        throw new GradleException('An existing non-temporary suppression rule was added, removed, or modified')
+    }
+
+    def generatedTemporaryRule = generatedTemporaryRules.first()
+    def generatedChildNames = generatedTemporaryRule.children().collect { it.name() }
+    if (generatedChildNames.any { !(it in ['notes', 'cve']) }
+            || generatedChildNames.count { it == 'notes' } != 1) {
+        throw new GradleException('The temporary section may contain only one notes element and CVE entries')
+    }
+
+    List<String> baselineCves = baselineTemporaryRules.size() == 1
+            ? cvesFromRule(baselineTemporaryRules.first())
+            : []
+    List<String> generatedCves = cvesFromRule(generatedTemporaryRule)
+    if (generatedCves.size() != generatedCves.toSet().size()) {
+        throw new GradleException('The generated temporary section contains duplicate CVE entries')
+    }
+    if (!generatedCves.every { it ==~ Globals.CVE_PATTERN }) {
+        throw new GradleException('The generated temporary section contains an invalid CVE identifier')
+    }
+
+    Set<String> newCves = generatedCves.toSet() - baselineCves.toSet()
+    if (newCves.isEmpty() || !generatedCves.toSet().containsAll(baselineCves)) {
+        throw new GradleException('No new CVEs were added, or an existing temporary CVE was removed')
+    }
+
+    def vulnerabilityReport = new XmlSlurper().parse(reportFile)
+    List<String> reportedVulnerabilities = vulnerabilityReport.'**'
+            .findAll { node -> node.name() == 'vulnerability' }
+            .collect { it.name.text().trim() }
+    if (!reportedVulnerabilities.every { it ==~ Globals.CVE_PATTERN }) {
+        throw new GradleException('The dependency report contains a vulnerability that is not a valid CVE identifier')
+    }
+    if (newCves != reportedVulnerabilities.toSet()) {
+        throw new GradleException("Generated CVEs do not match the dependency report. "
+                + "Generated: ${newCves.sort()}, report: ${reportedVulnerabilities.toSet().sort()}")
+    }
+
+    String notes = generatedTemporaryRule.notes.text()
+    if (!newCves.every { notes.contains("${it} refer [Ticket]") }) {
+        throw new GradleException('A generated CVE is missing its temporary-suppression note')
+    }
+}
+
+File resolveSuppressionFile() {
+    def suppressionFileValue = dependencyCheck.getSuppressionFiles()
+    if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, 'getOrNull')) {
+        suppressionFileValue = suppressionFileValue.getOrNull()
+    } else if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, 'get')) {
+        suppressionFileValue = suppressionFileValue.get()
+    }
+    if (suppressionFileValue instanceof Collection) {
+        suppressionFileValue = suppressionFileValue.find { it }?.toString()
+    }
+    if (!suppressionFileValue) {
+        throw new GradleException('No dependency-check suppression file is configured')
+    }
+    return project.file(suppressionFileValue)
+}
+
+static String normaliseRule(rule) {
+    XmlUtil.serialize(rule).replaceFirst(/(?s)^<\?xml[^>]*>\s*/, '').trim()
+}
+
+static List<String> cvesFromRule(rule) {
+    rule.children()
+            .findAll { it.name() == 'cve' }
+            .collect { it.text().trim() }
+}
+
 static void addNewSuppression(unSuppressedCves, suppressionDoc) {
     /*
     * Find a specified phrase in a <notes> element
@@ -107,6 +228,7 @@ class Globals {
     static String TEXT_TO_FIND = "Temporary Suppression"
     static String REPORT_NAME = "dependency-check-report.xml"
     static String WHITE_SPACE_FOR_INDENT = "\n" + "\u0020".repeat(8) // white space for indentation
+    static String CVE_PATTERN = /CVE-\d{4}-\d{4,}/
 }
 
 task suppressCves() {
@@ -114,5 +236,18 @@ task suppressCves() {
         // Optional argument can be added to specify the name of the report file.
         // If no argument is specified, the default report file is 'dependency-check-report.xml'
         suppressCves()
+    }
+}
+
+tasks.register('validateGeneratedCveSuppressions') {
+    doLast {
+        String baselineSuppressionFile = providers.gradleProperty('baselineSuppressionFile').getOrNull()
+        if (!baselineSuppressionFile) {
+            throw new GradleException('Use -PbaselineSuppressionFile=<path> to specify the original suppression file')
+        }
+        validateGeneratedCveSuppressions(
+                baselineSuppressionFile,
+                providers.gradleProperty('generatedSuppressionFile').getOrNull(),
+                providers.gradleProperty('vulnerabilityReportFile').getOrNull())
     }
 }

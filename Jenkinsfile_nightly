@@ -1,5 +1,8 @@
 #!groovy
 
+import groovy.json.JsonOutput
+import uk.gov.hmcts.contino.GithubAPI
+
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
     //CCD-3539 (Stop running Nightly builds on weekends) - At 07:00 on every day-of-week from Monday through Friday.  Original schedule was 'H 07 * * *'
@@ -139,6 +142,7 @@ withNightlyPipeline(type, product, component) {
             }
 
             def suppressionFile = ''
+            def baselineSuppressionFile = 'build/cve-suppression-baseline.xml'
             script {
                 suppressionFile = sh(
                     script: './gradlew printSuppressionFile -q',
@@ -151,15 +155,14 @@ withNightlyPipeline(type, product, component) {
                   echo 'Current contents of ${suppressionFile}:'
                   cat '${suppressionFile}'
                 """
+
+                writeFile(
+                    file: baselineSuppressionFile,
+                    text: sh(script: "git show HEAD:${suppressionFile}", returnStdout: true)
+                )
             }
 
             def slackNotificationChannel = '#nightly_cve_suppressions'
-            def branch = env.BRANCH_NAME
-
-            if (env.CHANGE_ID) {
-                // If this is a PR, push changes to the PR branch
-                branch = env.CHANGE_BRANCH
-            }
 
             sh './gradlew suppressCves'
 
@@ -215,7 +218,10 @@ withNightlyPipeline(type, product, component) {
                 }
             }
 
-            if (changes) {
+            if (changes && env.CHANGE_ID) {
+                echo "CVE suppression changes detected during PR validation; skipping automated PR creation."
+            } else if (changes) {
+                sh "./gradlew validateGeneratedCveSuppressions -PbaselineSuppressionFile=${baselineSuppressionFile}"
 
                 // Clean and format CVE lines
                 def simplifiedChanges = changes
@@ -225,40 +231,111 @@ withNightlyPipeline(type, product, component) {
                 //.collect { it.replace('[Ticket]', '<https://yourtracker.example/TICKET-ID|Ticket>') } // Optional link
                     .join('\n')
 
-                def message = """
-                                📦 *CVE Suppression File Updated*
-
-                                *Detected CVE changes (Please create Jira backlog ticket):*
-
-                                ${simplifiedChanges}
-
-                                *Build Info:*
-                                • *Job*: ${env.JOB_NAME}
-                                • *Build*: #${env.BUILD_NUMBER}
-                                • *URL*: ${env.BUILD_URL}
-                               """.stripIndent().trim()
-
-                slackSend(
-                    channel: slackNotificationChannel,
-                    color: '#439FE0',
-                    message: message
-                )
-
                 echo "Staged files: ${changedFiles}"
                 echo "Changes: ${changes}"
 
-                echo "Commiting changes into branch ${branch}"
-                sh 'git commit -m "Suppressing CVE - Actions"'
-                echo "Pushing changes"
-
+                def targetBranch = env.BRANCH_NAME
+                def automationBranch = "automated/cve-suppressions-${env.BUILD_NUMBER}"
                 def credentialsId = env.GIT_CREDENTIALS_ID
+                def githubProject = new GithubAPI(this).currentProject()
+                def headCommit = ''
+
+                echo "Committing changes for branch ${automationBranch}"
+                sh 'git commit -m "Suppressing CVE - Actions"'
+                headCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
                 withCredentials([
                     gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
                 ]) {
                     sh """
-                        git push origin HEAD:${branch}
+                        git push origin HEAD:refs/heads/${automationBranch}
                     """
+                }
+
+                def pullRequestResponse = httpRequest(
+                    acceptType: 'APPLICATION_JSON',
+                    authentication: credentialsId,
+                    consoleLogResponseBody: false,
+                    contentType: 'APPLICATION_JSON',
+                    httpMode: 'POST',
+                    requestBody: JsonOutput.toJson([
+                        title: 'Suppress newly detected CVEs',
+                        head: automationBranch,
+                        base: targetBranch,
+                        body: "Automated CVE suppression update generated and validated by ${env.JOB_NAME} #${env.BUILD_NUMBER}."
+                    ]),
+                    url: "https://api.github.com/repos/${githubProject}/pulls",
+                    validResponseCodes: '201'
+                )
+                def pullRequest = readJSON returnPojo: true, text: pullRequestResponse.content
+                def pullRequestNumber = pullRequest.number
+                def pullRequestUrl = pullRequest.html_url
+                def requiredCheck = 'continuous-integration/jenkins/pr-head'
+                pullRequestResponse = null
+                pullRequest = null
+
+                try {
+                    httpRequest(
+                        acceptType: 'APPLICATION_JSON',
+                        authentication: credentialsId,
+                        consoleLogResponseBody: false,
+                        contentType: 'APPLICATION_JSON',
+                        httpMode: 'POST',
+                        requestBody: JsonOutput.toJson([
+                            state: 'success',
+                            context: requiredCheck,
+                            description: 'CVE suppressions validated by the Jenkins nightly pipeline',
+                            target_url: env.BUILD_URL
+                        ]),
+                        url: "https://api.github.com/repos/${githubProject}/statuses/${headCommit}",
+                        validResponseCodes: '201'
+                    )
+
+                    def mergeResponse = httpRequest(
+                        acceptType: 'APPLICATION_JSON',
+                        authentication: credentialsId,
+                        consoleLogResponseBody: false,
+                        contentType: 'APPLICATION_JSON',
+                        httpMode: 'PUT',
+                        requestBody: JsonOutput.toJson([
+                            sha: headCommit,
+                            merge_method: 'squash'
+                        ]),
+                        url: "https://api.github.com/repos/${githubProject}/pulls/${pullRequestNumber}/merge",
+                        validResponseCodes: '200,405,409'
+                    )
+                    def mergeResult = readJSON returnPojo: true, text: mergeResponse.content
+                    if (mergeResponse.status != 200 || !mergeResult.merged) {
+                        error("GitHub could not merge ${pullRequestUrl}: ${mergeResult.message}")
+                    }
+                } catch (err) {
+                    slackSend(
+                        channel: slackNotificationChannel,
+                        color: 'danger',
+                        message: "CVE suppression PR <${pullRequestUrl}|#${pullRequestNumber}> was created but could not be merged automatically. ${env.BUILD_URL}"
+                    )
+                    throw err
+                }
+
+                slackSend(
+                    channel: slackNotificationChannel,
+                    color: '#439FE0',
+                    message: """
+                                *CVE Suppression PR Merged*
+
+                                *Detected CVE changes (Please create Jira backlog ticket):*
+
+                                ${simplifiedChanges}
+
+                                *Pull request:* <${pullRequestUrl}|#${pullRequestNumber}>
+                                *Build:* <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>
+                               """.stripIndent().trim()
+                )
+
+                withCredentials([
+                    gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+                ]) {
+                    sh(returnStatus: true, script: "git push origin --delete ${automationBranch}")
                 }
             } else {
                 echo "✅ Suppression file not changed — skipping Slack notification"
