@@ -259,9 +259,6 @@
         <cve>CVE-2026-59314</cve>
     </suppress>
     <suppress>
-        <cve>CVE-2026-65182</cve>
-    </suppress>
-    <suppress>
         <cve>CVE-2026-65183</cve>
     </suppress>
     <suppress>
