@@ -130,9 +130,10 @@ Set<String> validateGeneratedCveSuppressions(String baselineSuppressionPath,
     if (!reportedVulnerabilities.every { it ==~ Globals.CVE_PATTERN }) {
         throw new GradleException('The dependency report contains a vulnerability that is not a valid CVE identifier')
     }
-    if (newCves != reportedVulnerabilities.toSet()) {
+    Set<String> expectedNewCves = reportedVulnerabilities.toSet() - baselineCves.toSet()
+    if (newCves != expectedNewCves) {
         throw new GradleException("Generated CVEs do not match the dependency report. "
-                + "Generated: ${newCves.sort()}, report: ${reportedVulnerabilities.toSet().sort()}")
+                + "Generated: ${newCves.sort()}, report: ${expectedNewCves.sort()}")
     }
 
     String notes = generatedTemporaryRule.notes.text()
@@ -183,13 +184,15 @@ static void addNewSuppression(unSuppressedCves, suppressionDoc) {
             def noteNode = it
             Document document = suppressionDoc.getOwnerDocument()
             Node parentNode = noteNode.getParentNode()
+            Set<String> existingCves = cvesFromSuppressNode(parentNode)
             unSuppressedCves.each {
                 String cveValue = it
-                if (cveValue.contains("CVE")) {
+                if (cveValue.contains("CVE") && !existingCves.contains(cveValue)) {
                     noteNode.appendChild(
                             document.createTextNode(Globals.WHITE_SPACE_FOR_INDENT + cveValue + " refer [Ticket]"))
                     parentNode.appendChild(
                             document.createElement("cve")).appendChild(document.createTextNode(cveValue))
+                    existingCves.add(cveValue)
                 }
             }
             return true
@@ -209,6 +212,18 @@ static boolean validateSection(suppressionFile, suppressions) {
         return true
     }
     return false
+}
+
+static Set<String> cvesFromSuppressNode(Node suppressNode) {
+    Set<String> cves = []
+    NodeList children = suppressNode.getChildNodes()
+    for (int i = 0; i < children.getLength(); i++) {
+        Node child = children.item(i)
+        if (child.getLocalName() == 'cve' || child.getNodeName() == 'cve') {
+            cves.add(child.getTextContent().trim())
+        }
+    }
+    return cves
 }
 
 static def cleanXml(Element suppressionDoc) {
