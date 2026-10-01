@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-151.1",
+  "_extends_": "F-151_Test_Data_Base",
+  "title": "must retrieve banner information for the jurisdictions successfully",
+
+  "specs": [
+    "an active profile in CCD",
+    "code is HTTP-200 OK"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-banners.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "banners": [
+        {
+          "id": "[[ANY_STRING_NOT_NULLABLE]]",
+          "bannerEnabled": true,
+          "bannerDescription": "Test Jurisdiction Description",
+          "bannerUrlText": "Click here to see it.>>>",
+          "bannerUrl": "http://localhost:3451/testjurisdiction",
+          "jurisdictionDefinition": null
+        }
+      ]
+    }
+  }
+}
