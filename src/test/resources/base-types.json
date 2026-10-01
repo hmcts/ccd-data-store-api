@@ -100,6 +100,16 @@
     "collection_field_type": null
   },
   {
+    "id": "RichTextArea",
+    "type": "RichTextArea",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  {
     "id": "Complex",
     "type": "Complex",
     "min": null,

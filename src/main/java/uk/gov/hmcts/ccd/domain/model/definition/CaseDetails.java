@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +110,9 @@ public class CaseDetails implements Cloneable {
      */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
+
+    @JsonProperty("callback_error_message")
+    private String callbackErrorMessage;
 
     /**
      * Attribute passed to UI layer, does not need persistence.
@@ -237,6 +238,10 @@ public class CaseDetails implements Cloneable {
         return callbackResponseStatus;
     }
 
+    public String getCallbackErrorMessage() {
+        return callbackErrorMessage;
+    }
+
     public LocalDateTime getLastStateModifiedDate() {
         return lastStateModifiedDate;
     }
@@ -268,6 +273,10 @@ public class CaseDetails implements Cloneable {
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
         this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
+    }
+
+    public void setCallbackErrorMessage(String errorMessage) {
+        this.callbackErrorMessage = errorMessage;
     }
 
     public void setIncompleteDeleteDraftResponse() {

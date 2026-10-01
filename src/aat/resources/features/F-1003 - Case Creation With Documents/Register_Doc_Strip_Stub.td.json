@@ -1,0 +1,69 @@
+{
+  "_guid_": "Register_Doc_Strip_Stub",
+  "_extends_": "Register_Dynamic_Stub",
+  "specs": [
+    "to register a document strip callback stub with the ccd-test-stubs service"
+  ],
+  "prerequisites": [
+    "UnRegister_All_Doc_Strip_Stubs_By_Metadata"
+  ],
+  "request": {
+    "body": {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "urlPath": "/document_hash_callback",
+        "bodyPatterns": [
+          {
+            "contains": "S-1045-payload"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "data": {
+            "TextField": "S-1045-stripped-by-callback"
+          }
+        }
+      },
+      "metadata": {
+        "testId": "S-1045"
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "priority": 1,
+      "request": {
+        "urlPath": "/document_hash_callback",
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "contains": "S-1045-payload"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "data": {
+            "TextField": "S-1045-stripped-by-callback"
+          }
+        }
+      },
+      "uuid": "[[ANY_STRING_NOT_NULLABLE]]",
+      "metadata": {
+        "testId": "S-1045"
+      }
+    }
+  }
+}

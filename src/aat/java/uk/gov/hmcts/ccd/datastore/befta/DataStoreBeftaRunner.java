@@ -12,7 +12,7 @@ import uk.gov.hmcts.befta.BeftaMain;
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = {"uk.gov.hmcts.befta.player"},
     features = { "classpath:features" },
-    tags = "(not @Ignore) or (not @elasticsearch)")
+    tags = "(not @Ignore) or (not @elasticsearch) or (not @groupaccess)")
 public class DataStoreBeftaRunner {
 
     private DataStoreBeftaRunner() {

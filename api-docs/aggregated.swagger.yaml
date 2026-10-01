@@ -517,6 +517,7 @@ definitions:
       - FixedList
       - MoneyGBP
       - TextArea
+      - RichTextArea
       - ComplexType
       - Collection
       - MultiSelectList

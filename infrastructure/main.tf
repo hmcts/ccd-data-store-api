@@ -71,18 +71,17 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
 
 
 module "postgresql_v15" {
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=DTSPO-30107-additional-postgres-admins"
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
 
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
-  common_tags          = var.common_tags
+  common_tags          = merge(var.common_tags, var.extra_tags)
   component            = var.component
   env                  = var.env
   subnet_suffix        = var.subnet_suffix
-
   # Setup Access for reporting and JiT perms.
   force_user_permissions_trigger     = "2"
   enable_db_report_privileges        = true

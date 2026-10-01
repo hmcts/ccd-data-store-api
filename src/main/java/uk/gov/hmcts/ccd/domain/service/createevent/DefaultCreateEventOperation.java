@@ -100,6 +100,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             LOG.warn("Submitted callback failed", ex);
             // Exception occurred, e.g. call back service is unavailable,
             caseDetails.setIncompleteCallbackResponse();
+            caseDetails.setCallbackErrorMessage(ex.getMessage());
         }
         return caseDetails;
     }

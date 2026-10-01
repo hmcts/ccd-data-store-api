@@ -230,3 +230,42 @@ VALUES (1006, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
           }
         }'
 );
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data)
+VALUES (1007, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Peter",
+          "PersonLastName": "Pullen",
+          "PersonAddress": {
+            "AddressLine1": "Governer House",
+            "AddressLine2": "1 Puddle Lane",
+            "AddressLine3": "London",
+            "Country": "England",
+            "Postcode": "SE1 4EE"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          }
+        }',
+        '1504259907333333',
+        '2025-02-06 20:44:53.824',
+        '2025-02-06 20:44:53.824',
+        '2025-02-06 20:44:53.824',
+        '{
+            "new_case": {
+                "organisationA": true,
+                "organisationB": true
+          }
+        }'
+);

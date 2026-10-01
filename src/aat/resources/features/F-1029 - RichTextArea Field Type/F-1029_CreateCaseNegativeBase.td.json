@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-1029_CreateCaseNegativeBase",
+  "_extends_": "Case_Creation_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "body": {
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1029_GetCreateToken][testData][actualResponse][body][token]}"
+    }
+  }
+}

@@ -34,6 +34,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
     }
 
+    @Before("@groupaccess")
+    public void skipGroupAccessTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("GROUP_ACCESS_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Group Access not Enabled");
+        }
+    }
+
     @Before
     public void createUID(Scenario scenario) {
         String tag = getDataFileTag(scenario);
@@ -130,6 +137,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                     return actualSizeFromHeaderStr;
                 }
                 return expectedSize;
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
+        } else if (key.toString().startsWith("contains ") && key.toString().contains(" and does not contain ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String[] expectedValues = key.toString().split(" and does not contain ", 2);
+                String expectedPresentValueStr = expectedValues[0].replace("contains ", "");
+                String expectedAbsentValueStr = expectedValues[1];
+
+                if (actualValueStr.contains(expectedPresentValueStr)
+                    && !actualValueStr.contains(expectedAbsentValueStr)) {
+                    return actualValueStr;
+                }
+                return "response did not match plain text expectations";
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
