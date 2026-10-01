@@ -1,8 +1,5 @@
 #!groovy
 
-import groovy.json.JsonOutput
-import uk.gov.hmcts.contino.GithubAPI
-
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
     //CCD-3539 (Stop running Nightly builds on weekends) - At 07:00 on every day-of-week from Monday through Friday.  Original schedule was 'H 07 * * *'
@@ -201,7 +198,7 @@ withNightlyPipeline(type, product, component) {
             }
 
             if (suppressionChanged && env.CHANGE_ID) {
-                echo "CVE suppression changes detected during PR validation; skipping automated PR creation."
+                echo "CVE suppression changes detected during PR validation; skipping automated branch update."
             } else if (suppressionChanged) {
                 sh(
                     script: "./gradlew validateGeneratedCveSuppressions "
@@ -218,70 +215,58 @@ withNightlyPipeline(type, product, component) {
                 echo "Staged files: ${changedFiles}"
                 echo "New CVEs: ${newCves}"
 
-                def automationBranch = "automated/cve-suppressions-${env.BUILD_NUMBER}"
-                def automationWorkspace = "${pwd(tmp: true)}/cve-suppressions-${env.BUILD_NUMBER}"
-                def githubProject = new GithubAPI(this).currentProject()
+                def directUpdateWorkspace = "${pwd(tmp: true)}/cve-suppressions-${env.BUILD_NUMBER}"
                 def generatedSuppression = readFile(file: suppressionFile)
+                def directUpdateCommit = ''
 
-                echo "Creating ${automationBranch} from origin/${targetBranch}"
-                sh "git worktree add --no-track -b '${automationBranch}' '${automationWorkspace}' origin/${targetBranch}"
+                echo "Creating temporary worktree from origin/${targetBranch}"
+                sh "git worktree add --detach '${directUpdateWorkspace}' origin/${targetBranch}"
                 try {
-                    writeFile(file: "${automationWorkspace}/${suppressionFile}", text: generatedSuppression)
+                    writeFile(file: "${directUpdateWorkspace}/${suppressionFile}", text: generatedSuppression)
 
-                    dir(automationWorkspace) {
+                    dir(directUpdateWorkspace) {
                         sh "git add -- '${suppressionFile}'"
-                        def automationChangedFiles = sh(
+                        def directUpdateChangedFiles = sh(
                             script: 'git diff --cached --name-only',
                             returnStdout: true
                         ).trim().readLines()
-                        if (automationChangedFiles != [suppressionFile]) {
-                            error("Expected only ${suppressionFile} to change, found: ${automationChangedFiles}")
+                        if (directUpdateChangedFiles != [suppressionFile]) {
+                            error("Expected only ${suppressionFile} to change, found: ${directUpdateChangedFiles}")
                         }
 
                         sh 'git commit -m "Suppressing CVE - Actions"'
+                        directUpdateCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
                         withCredentials([
                             gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
                         ]) {
-                            sh "git push origin HEAD:refs/heads/${automationBranch}"
+                            sh "git push origin HEAD:refs/heads/${targetBranch}"
                         }
                     }
                 } finally {
-                    sh(returnStatus: true, script: "git worktree remove --force '${automationWorkspace}'")
+                    sh(returnStatus: true, script: "git worktree remove --force '${directUpdateWorkspace}'")
                 }
 
-                def pullRequestResponse = httpRequest(
-                    acceptType: 'APPLICATION_JSON',
-                    authentication: credentialsId,
-                    consoleLogResponseBody: false,
-                    contentType: 'APPLICATION_JSON',
-                    httpMode: 'POST',
-                    requestBody: JsonOutput.toJson([
-                        title: 'Suppress newly detected CVEs',
-                        head: automationBranch,
-                        base: targetBranch,
-                        body: "Automated CVE suppression update generated and validated by ${env.JOB_NAME} #${env.BUILD_NUMBER}."
-                    ]),
-                    url: "https://api.github.com/repos/${githubProject}/pulls",
-                    validResponseCodes: '201'
-                )
-                def pullRequest = readJSON returnPojo: true, text: pullRequestResponse.content
-                def pullRequestNumber = pullRequest.number
-                def pullRequestUrl = pullRequest.html_url
                 def slackMessage = [
-                    '*ACTION REQUIRED: MANUAL MERGE NEEDED*',
-                    "*Merge PR #${pullRequestNumber} manually to fix the CVE suppression failure.*",
+                    '*CVE suppression update*',
                     '',
-                    "*New CVEs to suppress (${newCves.size()}):*",
+                    '*ACTION REQUIRED: MANUAL JIRA BACKLOG TICKET FOR FUTURE FIX*',
+                    '',
+                    '*Summary*',
+                    "- Suppression update pushed directly to `${targetBranch}`.",
+                    "- New CVEs added: `${newCves.size()}`.",
+                    '',
+                    '*CVEs*',
                     formattedCves,
                     '',
-                    "*Pull request:* <${pullRequestUrl}|Open PR #${pullRequestNumber}>",
-                    "*Build:* <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
+                    '*References*',
+                    "- Commit: `${directUpdateCommit}`",
+                    "- Build: <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
                 ].join('\n')
 
                 slackSend(
                     channel: slackNotificationChannel,
-                    color: 'danger',
+                    color: '#439FE0',
                     failOnError: true,
                     message: slackMessage
                 )
