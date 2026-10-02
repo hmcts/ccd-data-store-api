@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-role?role=Y2FzZXdvcmtlci1hdXRvdGVzdDEtbmV4dC1oZWFyaW5nLWRhdGU%3D"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "role": "caseworker-autotest1-next-hearing-date",
+      "security_classification": "PUBLIC"
+    }
+  }
+}
