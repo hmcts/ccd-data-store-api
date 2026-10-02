@@ -263,6 +263,76 @@ class CaseServiceTest {
         }
 
         @Test
+        @DisplayName("should prefer event data over data when both are supplied")
+        void shouldPreferEventDataOverData() {
+            CaseDataContent content = newCaseDataContent()
+                .withData(Map.of("name", new TextNode("Submitted"), "dataOnly", new TextNode("Ignored")))
+                .withEventData(Map.of("name", new TextNode("Event")))
+                .build();
+            CaseDetails storedCase = buildCaseDetails();
+            storedCase.setData(new HashMap<>(Map.of("name", new TextNode("Stored"),
+                "storedOnly", new TextNode("Retained"))));
+
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(content, storedCase);
+
+            assertThat(result.getData(), is(Map.of("name", new TextNode("Event"),
+                "storedOnly", new TextNode("Retained"))));
+        }
+
+        @Test
+        @DisplayName("should not fall back to data when event data is explicitly empty")
+        void shouldNotFallBackWhenEventDataIsEmpty() {
+            Map<String, JsonNode> storedData = Map.of("name", new TextNode("Stored"));
+            CaseDataContent content = newCaseDataContent()
+                .withData(Map.of("name", new TextNode("Submitted")))
+                .withEventData(Map.of())
+                .build();
+            CaseDetails storedCase = buildCaseDetails();
+            storedCase.setData(new HashMap<>(storedData));
+
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(content, storedCase);
+
+            assertThat(result.getData(), is(storedData));
+        }
+
+        @Test
+        @DisplayName("should merge data when event data is absent")
+        void shouldMergeDataWhenEventDataIsAbsent() throws Exception {
+            Map<String, JsonNode> submittedData = JacksonUtils.convertValue(MAPPER.readTree(
+                """
+                    {
+                      "PersonFirstName": "Updated Name",
+                      "PersonLastName": "Last Name"
+                    }"""));
+
+            Map<String, JsonNode> storedData = JacksonUtils.convertValue(MAPPER.readTree(
+                """
+                    {
+                      "PersonFirstName": "Stored Name",
+                      "PersonMiddleName": "Middle Name"
+                    }"""));
+
+            Map<String, JsonNode> expectedData = JacksonUtils.convertValue(MAPPER.readTree(
+                """
+                    {
+                      "PersonFirstName": "Updated Name",
+                      "PersonLastName": "Last Name",
+                      "PersonMiddleName": "Middle Name"
+                    }"""));
+
+            CaseDataContent caseDataContent = newCaseDataContent()
+                .withCaseReference(CASE_REFERENCE)
+                .withData(submittedData)
+                .build();
+            CaseDetails caseDetails = buildCaseDetails();
+            caseDetails.setData(new HashMap<>(storedData));
+
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
+
+            assertThat(result.getData(), is(expectedData));
+        }
+
+        @Test
         @DisplayName("should fail for bad CASE_REFERENCE")
         void shouldThrowBadRequestException() {
             doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
