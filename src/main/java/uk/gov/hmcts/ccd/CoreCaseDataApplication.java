@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam",
     "uk.gov.hmcts.reform.ccd.document.am",
-    "uk.gov.hmcts.ccd.auditlog"
+    "uk.gov.hmcts.ccd.auditlog",
+    "uk.gov.hmcts.ccd.security.idam"
 })
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
