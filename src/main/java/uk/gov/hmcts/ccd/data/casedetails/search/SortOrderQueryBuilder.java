@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -15,7 +16,7 @@ public class SortOrderQueryBuilder {
     private static final String CREATED_DATE = "created_date";
     private static final String SPACE = " ";
     private static final String COMMA = ",";
-    private static final String CASE_FIELD_ID_PATTERN = "^['a-zA-Z0-9\\[\\]\\#%\\&()\\.?_\\£\\s\\xA0-]+$";
+    private static final String CASE_FIELD_ID_PATTERN = "^[a-zA-Z0-9_.\\[\\]]+$";
 
 
     public String buildSortOrderClause(MetaData metaData) {
@@ -37,7 +38,7 @@ public class SortOrderQueryBuilder {
         });
         // always sort with creation_date as a last order so that it supports cases where
         // no values at all for the configured fields and also default fallback.
-        return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
+        return sb.append(CREATED_DATE + SPACE).append(fromOptionalString(metaData.getSortDirection())).toString();
     }
 
     private String getMataFieldName(String fieldName) {
@@ -47,7 +48,7 @@ public class SortOrderQueryBuilder {
     }
 
     private static String convertFieldNameToJsonbSqlFormat(final String in) {
-        return DATA_FIELD + " #>> '{" + StringUtils.replace(in, ".", ",") + "}'";
+        return DATA_FIELD + " #>> '{" + Strings.CS.replace(in, ".", ",") + "}'";
     }
 
 }
