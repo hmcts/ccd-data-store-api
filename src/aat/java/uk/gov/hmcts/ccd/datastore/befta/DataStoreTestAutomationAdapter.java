@@ -73,6 +73,15 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
+        if ("globalSearchLocation".equals(key)) {
+            try {
+                List<?> locations = (List<?>) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext, "testData.actualResponse.body.arrayInMap");
+                return GlobalSearchTestLocation.select(locations);
+            } catch (Exception e) {
+                throw new FunctionalTestException("Unable to select global-search location with region data", e);
+            }
+        }
         String docAmUrl = EnvironmentVariableUtils.getRequiredVariable("CASE_DOCUMENT_AM_URL");
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
