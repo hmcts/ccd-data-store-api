@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -11,9 +10,6 @@ import org.springframework.web.context.ContextCleanupListener;
 
 @Configuration
 public class TestIdamConfiguration extends ContextCleanupListener {
-
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
 
     @Bean
     // Overriding as OAuth2ClientRegistrationRepositoryConfiguration loading before wire-mock mappings
