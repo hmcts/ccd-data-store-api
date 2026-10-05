@@ -129,8 +129,10 @@ public class GlobalSearchResponseTransformer {
 
         final Optional<JsonNode> optionalJsonNode = Optional.ofNullable(jsonNodeMap.get(parentKey));
         return optionalJsonNode.map(node -> {
-            final JsonNode value = node.isContainerNode() ? node.at(childPath) : node;
-            return value.isNull() || value.isMissingNode() ? null : value.asText();
+            if (node.isContainerNode()) {
+                return Optional.ofNullable(node.at(childPath)).map(JsonNode::asText).orElse(null);
+            }
+            return node.asText();
         }).orElse(null);
     }
 

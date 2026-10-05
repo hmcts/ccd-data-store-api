@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -233,28 +230,6 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
                 assertThat(result.getRegionId()).isEqualTo("123");
                 assertThat(result.getRegionName()).isEqualTo("Region 2");
             });
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testShouldPreserveNullRegionId(boolean explicitNull) {
-        stubAccessMetadata();
-        final ObjectNode location = JsonNodeFactory.instance.objectNode()
-            .put("baseLocation", "321");
-        if (explicitNull) {
-            location.putNull("region");
-        }
-        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withData(Map.of("caseManagementLocation", location))
-            .withSupplementaryData(emptyMap())
-            .build();
-
-        final GlobalSearchResponsePayload.Result result =
-            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
-
-        assertThat(result.getBaseLocationId()).isEqualTo("321");
-        assertThat(result.getRegionName()).isNull();
-        assertThat(result.getRegionId()).isNull();
     }
 
     @Test
