@@ -214,6 +214,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void submittedCallback(CaseEventDefinition caseEventDefinition, CaseDetails savedCaseDetails) {
+        // Preserve the post-commit callback outcome returned by a decentralised service.
+        if (savedCaseDetails.getCallbackResponseStatus() != null) {
+            return;
+        }
         if (!isBlank(caseEventDefinition.getCallBackURLSubmittedEvent())) {
             try { // make a call back
                 final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse =

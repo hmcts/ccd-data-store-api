@@ -91,6 +91,10 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
 
     private CaseDetails invokeSubmitedToCallback(CreateCaseEventResult caseEventResult) {
         CaseDetails caseDetails = caseEventResult.getSavedCaseDetails();
+        // A decentralised service has already run the callback and supplied its outcome.
+        if (caseDetails.getCallbackResponseStatus() != null) {
+            return caseDetails;
+        }
         try { // make a call back
             final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse = callbackInvoker
                 .invokeSubmittedCallback(caseEventResult.getEventTrigger(), caseEventResult.getCaseDetailsBefore(),

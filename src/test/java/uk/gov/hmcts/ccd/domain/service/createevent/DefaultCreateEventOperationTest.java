@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -144,6 +147,39 @@ class DefaultCreateEventOperationTest {
             postStates.add(definition);
         }
         return postStates;
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void preservesIncompleteCallbackFromDecentralisedService(boolean systemEvent) {
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseDetails.setIncompleteCallbackResponse();
+        caseDetails.setCallbackErrorMessage("Submitted callback failed after 3 attempt(s)");
+
+        CaseDetails result = systemEvent
+            ? createEventOperation.createCaseSystemEvent(CASE_REFERENCE, CASE_VERSION, ATTRIBUTE_PATH, CATEGORY_ID)
+            : createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(result, is(caseDetails));
+        assertThat(result.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"));
+        assertThat(result.getCallbackResponseStatusCode(), is(SC_OK));
+        assertThat(result.getCallbackErrorMessage(), is("Submitted callback failed after 3 attempt(s)"));
+        assertNull(result.getAfterSubmitCallbackResponse());
+        verifyNoInteractions(callbackInvoker);
+    }
+
+    @Test
+    void preservesCompletedCallbackFromDecentralisedService() {
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        AfterSubmitCallbackResponse confirmation = new AfterSubmitCallbackResponse();
+        confirmation.setConfirmationHeader("Already completed");
+        caseDetails.setAfterSubmitCallbackResponseEntity(ResponseEntity.ok(confirmation));
+
+        CaseDetails result = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(result.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"));
+        assertThat(result.getAfterSubmitCallbackResponse(), is(confirmation));
+        verifyNoInteractions(callbackInvoker);
     }
 
     @Test

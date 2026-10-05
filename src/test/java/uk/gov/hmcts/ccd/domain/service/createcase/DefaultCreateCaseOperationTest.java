@@ -50,6 +50,8 @@ import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -520,9 +522,11 @@ class DefaultCreateCaseOperationTest {
         verify(savedCaseType, times(1)).setIncompleteDeleteDraftResponse();
     }
 
-    @Test
-    @DisplayName("Should return saved case details when Submitted Callback url is blank")
-    void shouldReturnSavedCaseDetails_whenSubmittedCallBackUrlIsBlank() {
+    @ParameterizedTest
+    @CsvSource({"'',", "http://localhost/submittedcallback,INCOMPLETE_CALLBACK",
+        "http://localhost/submittedcallback,CALLBACK_COMPLETED"})
+    @DisplayName("Should preserve saved case when callback is absent or already handled")
+    void shouldReturnSavedCaseDetails_whenCallbackIsAbsentOrHandled(String callbackUrl, String callbackStatus) {
         final String caseEventStateId = "Some state";
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
@@ -541,7 +545,8 @@ class DefaultCreateCaseOperationTest {
             any()))
             .willReturn(savedCaseType);
         willDoNothing().given(draftGateway).delete(DRAFT_ID);
-        eventTrigger.setCallBackURLSubmittedEvent("   ");
+        eventTrigger.setCallBackURLSubmittedEvent(callbackUrl);
+        given(savedCaseType.getCallbackResponseStatus()).willReturn(callbackStatus);
 
         final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                      eventData,
