@@ -131,7 +131,9 @@ public class GlobalSearchQueryBuilder {
                 .map(String::toLowerCase)
                 .distinct()
                 .collect(Collectors.toList());
-            boolQueryBuilder.must(QueryBuilders.termsQuery(term, normalisedValues));
+            if (!normalisedValues.isEmpty()) {
+                boolQueryBuilder.must(QueryBuilders.termsQuery(term, normalisedValues));
+            }
         }
     }
 

@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,23 @@ class GlobalSearchQueryBuilderTest {
             // ASSERT
             assertFalse(toBoolQueryBuilder(output).hasClauses());
 
+        }
+
+        @Test
+        void shouldSkipRegionFilterWhenRegionListContainsOnlyNull() {
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of("1791194717993077"));
+            searchCriteria.setCaseManagementBaseLocationIds(List.of("815833"));
+            searchCriteria.setCaseManagementRegionIds(Collections.singletonList(null));
+            GlobalSearchRequestPayload request = new GlobalSearchRequestPayload();
+            request.setSearchCriteria(searchCriteria);
+
+            QueryBuilder output = classUnderTest.globalSearchQuery(request);
+            TermsQueryBuilder regionFilter = getTermsQueryBuilder(output, CaseDataPaths.REGION);
+
+            assertNull(regionFilter);
+            assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, List.of("815833"));
+            assertWildcardQuery(output, GlobalSearchFields.REFERENCE + ".keyword", List.of("1791194717993077"));
         }
 
         @DisplayName("Term Filters: should add terms filter when corresponding SearchCriteria supplied")
