@@ -9,7 +9,7 @@ properties([
     pipelineTriggers([cron('H 17 * * 1-5')])
 ])
 
-@Library("Infrastructure@2.9.1")
+@Library("Infrastructure@cve-dashboard")
 
 def type = "java"
 def product = "ccd"
@@ -107,13 +107,14 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
+    enableCveDashboardIngestion()
 
-    //stage('Wait for ccd-definition-store-api job') {
-    //    script {
-    //        echo "Waiting for upstream ccd-definition-store-api job to complete..."
-    //        build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
-    //    }
-    //}
+    stage('Wait for ccd-definition-store-api job') {
+        script {
+            echo "Waiting for upstream ccd-definition-store-api job to complete..."
+            build job: 'HMCTS_a_to_c_Nightly/ccd-definition-store-api/master', wait: true, propagate: false
+        }
+    }
 
     overrideVaultEnvironments(vaultOverrides)
     disableLegacyDeploymentOnAAT()
