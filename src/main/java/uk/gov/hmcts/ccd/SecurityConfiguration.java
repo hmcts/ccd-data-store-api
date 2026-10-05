@@ -72,7 +72,7 @@ public class SecurityConfiguration {
     };
 
     // Data store never starts an authorisation code flow, and its only client registration is client_credentials.
-    // Resolving no authorisation requests lets /oauth2/authorisation/** fall through to the normal authentication
+    // Resolving no authorisation requests lets /oauth2/authorization/** fall through to the normal authentication
     // checks (401) instead of redirecting to IDAM or failing with a 500.
     private static final OAuth2AuthorizationRequestResolver NO_AUTHORIZATION_REQUESTS =
         new OAuth2AuthorizationRequestResolver() {
@@ -131,7 +131,9 @@ public class SecurityConfiguration {
                 .anyRequest()
                 .authenticated())
             .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
-            .oauth2Client(client -> client.authorizationCodeGrant(grant -> grant.authorizationRequestResolver(NO_AUTHORIZATION_REQUESTS)));
+            .oauth2Client(client ->
+                client.authorizationCodeGrant(grant ->
+                    grant.authorizationRequestResolver(NO_AUTHORIZATION_REQUESTS)));
         return http.build();
     }
 

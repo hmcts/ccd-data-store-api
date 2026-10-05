@@ -16,7 +16,7 @@ import java.net.URL;
  * while another combination can lead to the production failure this configuration is intended
  * to prevent.
  *
- * <p>They are therefore checked in {@link #validate(String, int, int, int, long, long, long, long, long, boolean)}
+ * <p>They are therefore checked in validate()
  * when the bean is created. This ensures configuration errors are caught at start-up rather than when the first token
  * needs to be verified during an IDAM outage.
  *
