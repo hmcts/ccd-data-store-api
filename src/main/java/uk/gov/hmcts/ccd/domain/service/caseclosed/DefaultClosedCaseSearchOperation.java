@@ -24,7 +24,7 @@ public class DefaultClosedCaseSearchOperation implements ClosedCaseSearchOperati
     @Override
     public DateCaseClosedResponse execute(LocalDate closedCaseDate) {
         LocalDateTime nextDayStart = closedCaseDate.plusDays(1).atStartOfDay();
-        List<String> caseReferences = dateCaseClosedRepository.findByStateChangedDateBefore(nextDayStart)
+        List<String> caseReferences = dateCaseClosedRepository.findByStateChangeDateBefore(nextDayStart)
             .stream()
             .map(DateCaseClosedEntity::getCcdCaseNumber)
             .map(String::valueOf)

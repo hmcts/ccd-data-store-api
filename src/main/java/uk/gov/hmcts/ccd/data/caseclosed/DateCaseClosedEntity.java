@@ -34,6 +34,6 @@ public class DateCaseClosedEntity {
     @Column(name = "state_category")
     private String stateCategory;
 
-    @Column(name = "state_changed_date")
-    private LocalDateTime stateChangedDate;
+    @Column(name = "state_change_date")
+    private LocalDateTime stateChangeDate;
 }

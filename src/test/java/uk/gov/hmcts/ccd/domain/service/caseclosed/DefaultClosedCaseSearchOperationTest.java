@@ -42,43 +42,43 @@ class DefaultClosedCaseSearchOperationTest {
     void shouldReturnClosedCaseReferences() {
         DateCaseClosedEntity firstClosedCase = createDateCaseClosedEntity(1234567890123456L);
         DateCaseClosedEntity secondClosedCase = createDateCaseClosedEntity(2345678901234567L);
-        when(dateCaseClosedRepository.findByStateChangedDateBefore(NEXT_DAY_START))
+        when(dateCaseClosedRepository.findByStateChangeDateBefore(NEXT_DAY_START))
             .thenReturn(List.of(firstClosedCase, secondClosedCase));
 
         DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(CLOSED_CASES_DATE);
 
         assertAll(
-            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(NEXT_DAY_START),
+            () -> verify(dateCaseClosedRepository).findByStateChangeDateBefore(NEXT_DAY_START),
             () -> assertThat(response.getCaseReferences(), is(List.of("1234567890123456", "2345678901234567")))
         );
     }
 
     @Test
     void shouldReturnNullCaseReferencesWhenNoClosedCasesFound() {
-        when(dateCaseClosedRepository.findByStateChangedDateBefore(NEXT_DAY_START))
+        when(dateCaseClosedRepository.findByStateChangeDateBefore(NEXT_DAY_START))
             .thenReturn(Collections.emptyList());
 
         DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(CLOSED_CASES_DATE);
 
         assertAll(
-            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(NEXT_DAY_START),
+            () -> verify(dateCaseClosedRepository).findByStateChangeDateBefore(NEXT_DAY_START),
             () -> assertThat(response.getCaseReferences(), is(nullValue()))
         );
     }
 
     @Test
     void shouldUseNextDayStartAsCutoffForCurrentDate() {
-        ArgumentCaptor<LocalDateTime> stateChangedDateCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+        ArgumentCaptor<LocalDateTime> stateChangeDateCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
         DateCaseClosedEntity closedCase = createDateCaseClosedEntity(1234567890123456L);
         LocalDate currentDate = LocalDate.now();
-        when(dateCaseClosedRepository.findByStateChangedDateBefore(currentDate.plusDays(1).atStartOfDay()))
+        when(dateCaseClosedRepository.findByStateChangeDateBefore(currentDate.plusDays(1).atStartOfDay()))
             .thenReturn(List.of(closedCase));
 
         DateCaseClosedResponse response = defaultClosedCaseSearchOperation.execute(currentDate);
 
         assertAll(
-            () -> verify(dateCaseClosedRepository).findByStateChangedDateBefore(stateChangedDateCaptor.capture()),
-            () -> assertThat(stateChangedDateCaptor.getValue(), is(currentDate.plusDays(1).atStartOfDay())),
+            () -> verify(dateCaseClosedRepository).findByStateChangeDateBefore(stateChangeDateCaptor.capture()),
+            () -> assertThat(stateChangeDateCaptor.getValue(), is(currentDate.plusDays(1).atStartOfDay())),
             () -> assertThat(response.getCaseReferences(), is(List.of("1234567890123456")))
         );
     }

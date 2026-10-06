@@ -29,7 +29,7 @@ class DateCaseClosedServiceTest {
     private static final Long CASE_REFERENCE = 1234567890123456L;
     private static final String CLOSED_STATE = "ClosedForPayment";
     private static final String OPEN_STATE = "Open";
-    private static final LocalDateTime STATE_CHANGED_DATE = LocalDateTime.of(2026, 6, 16, 10, 30);
+    private static final LocalDateTime STATE_CHANGE_DATE = LocalDateTime.of(2026, 6, 16, 10, 30);
 
     @Mock
     private DateCaseClosedRepository dateCaseClosedRepository;
@@ -63,7 +63,7 @@ class DateCaseClosedServiceTest {
             () -> assertThat(dateCaseClosedEntity.getCcdCaseNumber()).isEqualTo(CASE_REFERENCE),
             () -> assertThat(dateCaseClosedEntity.getState()).isEqualTo(CLOSED_STATE),
             () -> assertThat(dateCaseClosedEntity.getStateCategory()).isEqualTo("CLOSED FOR PAYMENT, End"),
-            () -> assertThat(dateCaseClosedEntity.getStateChangedDate()).isEqualTo(STATE_CHANGED_DATE)
+            () -> assertThat(dateCaseClosedEntity.getStateChangeDate()).isEqualTo(STATE_CHANGE_DATE)
         );
     }
 
@@ -129,7 +129,7 @@ class DateCaseClosedServiceTest {
             () -> assertThat(captor.getValue().getCcdCaseNumber()).isEqualTo(CASE_REFERENCE),
             () -> assertThat(captor.getValue().getState()).isEqualTo(CLOSED_STATE),
             () -> assertThat(captor.getValue().getStateCategory()).isEqualTo("CLOSED FOR PAYMENT, End"),
-            () -> assertThat(captor.getValue().getStateChangedDate()).isEqualTo(STATE_CHANGED_DATE)
+            () -> assertThat(captor.getValue().getStateChangeDate()).isEqualTo(STATE_CHANGE_DATE)
         );
     }
 
@@ -167,7 +167,7 @@ class DateCaseClosedServiceTest {
             () -> assertThat(captor.getValue().getCcdCaseNumber()).isEqualTo(CASE_REFERENCE),
             () -> assertThat(captor.getValue().getState()).isEqualTo(CLOSED_STATE),
             () -> assertThat(captor.getValue().getStateCategory()).isEqualTo("CLOSED FOR PAYMENT, End"),
-            () -> assertThat(captor.getValue().getStateChangedDate()).isEqualTo(STATE_CHANGED_DATE)
+            () -> assertThat(captor.getValue().getStateChangeDate()).isEqualTo(STATE_CHANGE_DATE)
         );
     }
 
@@ -175,7 +175,7 @@ class DateCaseClosedServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setState(state);
-        caseDetails.setLastStateModifiedDate(STATE_CHANGED_DATE);
+        caseDetails.setLastStateModifiedDate(STATE_CHANGE_DATE);
         return caseDetails;
     }
 

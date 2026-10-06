@@ -22,7 +22,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "queryParams": {
-      "stateChangedDate": "${[scenarioContext][customValues][today]}"
+      "stateChangeDate": "${[scenarioContext][customValues][today]}"
     }
   },
 

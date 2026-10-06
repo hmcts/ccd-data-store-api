@@ -56,7 +56,7 @@ public class DateCaseClosedService {
         dateCaseClosedEntity.setCcdCaseNumber(caseDetails.getReference());
         dateCaseClosedEntity.setState(caseDetails.getState());
         dateCaseClosedEntity.setStateCategory(stateCategory);
-        dateCaseClosedEntity.setStateChangedDate(caseDetails.getLastStateModifiedDate());
+        dateCaseClosedEntity.setStateChangeDate(caseDetails.getLastStateModifiedDate());
         dateCaseClosedRepository.save(dateCaseClosedEntity);
     }
 

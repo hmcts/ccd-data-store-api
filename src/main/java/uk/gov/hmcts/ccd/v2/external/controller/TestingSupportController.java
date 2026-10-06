@@ -123,7 +123,7 @@ public class TestingSupportController {
         entity.setCcdCaseNumber(request.getCcdCaseNumber());
         entity.setState(request.getState());
         entity.setStateCategory(request.getStateCategory());
-        entity.setStateChangedDate(request.getStateChangedDate());
+        entity.setStateChangeDate(request.getStateChangeDate());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(dateCaseClosedRepository.save(entity));
     }
@@ -133,14 +133,14 @@ public class TestingSupportController {
     @ApiResponse(responseCode = "204", description = "Success")
     public ResponseEntity<Void> dateCaseClosedDelete(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        @Parameter(name = "State Changed Date", required = true) LocalDate stateChangedDate) {
+        @Parameter(name = "State Change Date", required = true) LocalDate stateChangeDate) {
         Session session = sessionFactory.openSession();
 
         session.beginTransaction();
         session.createNativeQuery(
                 "DELETE FROM date_case_closed "
-                    + "WHERE state_changed_date < :stateChangedDateEnd")
-            .setParameter("stateChangedDateEnd", Timestamp.valueOf(stateChangedDate.plusDays(1).atStartOfDay()))
+                    + "WHERE state_change_date < :stateChangeDateEnd")
+            .setParameter("stateChangeDateEnd", Timestamp.valueOf(stateChangeDate.plusDays(1).atStartOfDay()))
             .executeUpdate();
         session.getTransaction().commit();
 
@@ -163,7 +163,7 @@ public class TestingSupportController {
         private Long ccdCaseNumber;
         private String state;
         private String stateCategory;
-        private LocalDateTime stateChangedDate;
+        private LocalDateTime stateChangeDate;
     }
 
 }

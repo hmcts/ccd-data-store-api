@@ -86,13 +86,13 @@ class TestingSupportControllerTest {
 
     @Test
     void shouldCreateDateCaseClosedRecord() {
-        final LocalDateTime stateChangedDate = LocalDateTime.of(2025, 5, 8, 12, 30);
+        final LocalDateTime stateChangeDate = LocalDateTime.of(2025, 5, 8, 12, 30);
         TestingSupportController.DateCaseClosedRequest request =
             new TestingSupportController.DateCaseClosedRequest();
         request.setCcdCaseNumber(1234567890123456L);
         request.setState("Closed");
         request.setStateCategory("Closed");
-        request.setStateChangedDate(stateChangedDate);
+        request.setStateChangeDate(stateChangeDate);
         when(dateCaseClosedRepository.save(any(DateCaseClosedEntity.class))).thenAnswer(invocation -> {
             DateCaseClosedEntity entity = invocation.getArgument(0);
             entity.setId(1L);
@@ -106,7 +106,7 @@ class TestingSupportControllerTest {
         assertEquals(1234567890123456L, responseBody.getCcdCaseNumber());
         assertEquals("Closed", responseBody.getState());
         assertEquals("Closed", responseBody.getStateCategory());
-        assertEquals(stateChangedDate, responseBody.getStateChangedDate());
+        assertEquals(stateChangeDate, responseBody.getStateChangeDate());
     }
 
     @Test
@@ -125,8 +125,8 @@ class TestingSupportControllerTest {
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(session).createNativeQuery(
             "DELETE FROM date_case_closed "
-                + "WHERE state_changed_date < :stateChangedDateEnd"
+                + "WHERE state_change_date < :stateChangeDateEnd"
         );
-        verify(nativeQuery).setParameter("stateChangedDateEnd", Timestamp.valueOf("2025-01-02 00:00:00"));
+        verify(nativeQuery).setParameter("stateChangeDateEnd", Timestamp.valueOf("2025-01-02 00:00:00"));
     }
 }

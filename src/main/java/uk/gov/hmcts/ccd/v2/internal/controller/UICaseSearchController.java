@@ -190,7 +190,7 @@ public class UICaseSearchController {
 
     @LogAudit(operationType = AuditOperationType.GET_CLOSED_CASES)
     @GetMapping(path = "/getClosedCases/{date}")
-    @Operation(description = "Retrieve closed cases from date_case_closed by state changed date.")
+    @Operation(description = "Retrieve closed cases from date_case_closed by state change date.")
     @ApiResponse(
         responseCode = "200",
         description = "Success"

@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface DateCaseClosedRepository extends CrudRepository<DateCaseClosedEntity, Long> {
 
-    List<DateCaseClosedEntity> findByStateChangedDateBefore(LocalDateTime stateChangedDate);
+    List<DateCaseClosedEntity> findByStateChangeDateBefore(LocalDateTime stateChangeDate);
 
     Optional<DateCaseClosedEntity> findByCcdCaseNumber(Long ccdCaseNumber);
 
