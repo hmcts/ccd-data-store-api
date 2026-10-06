@@ -1696,7 +1696,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+        final CaseDetails caseDetails = mapper.readValue(
+            result.getResponse().getContentAsString(), CaseDetails.class);
 
         assertEquals(1504259907353529L, caseDetails.getReference().longValue());
 
@@ -1812,6 +1813,45 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value")
                 .get("Postcode").asText());
         }
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WhenGetCaseWithDataWithoutDocumentForCaseworker() throws Exception {
+        shouldReturn200WhenGetCaseWithDataWithoutDocument("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WhenGetCaseWithDataWithoutDocumentForCitizen() throws Exception {
+        shouldReturn200WhenGetCaseWithDataWithoutDocument("citizens");
+    }
+
+    private void shouldReturn200WhenGetCaseWithDataWithoutDocument(String userRole) throws Exception {
+        final MvcResult result = mockMvc
+            .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+                + "/cases/1504259907353545")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseDetails caseDetails = mapper.readValue(result.getResponse().getContentAsString(), CaseDetails.class);
+
+        assertAll(
+            () -> assertEquals(1504259907353545L, caseDetails.getReference().longValue()),
+            () -> assertEquals(CASE_TYPE, caseDetails.getCaseTypeId()),
+            () -> assertEquals(JURISDICTION, caseDetails.getJurisdiction()),
+            () -> assertEquals(TEST_STATE, caseDetails.getState()),
+            () -> assertEquals("George", caseDetails.getData().get("PersonFirstName").asText()),
+            () -> assertEquals("Roof", caseDetails.getData().get("PersonLastName").asText()),
+            () -> assertEquals("Wales", caseDetails.getData().get("PersonAddress").get("Country").asText()),
+            () -> assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonFirstName").asText()),
+            () -> assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonLastName").asText()),
+            () -> assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress")
+                .get("classification").asText())
+        );
+
+        assertThat(caseDetails.getData().containsKey("D8Document"), is(false));
     }
 
     @Test
@@ -3478,6 +3518,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WithCaseTypeReadAccessForCaseworker()
+        throws Exception {
+        shouldReturn200WithCaseTypeReadAccess("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WithCaseTypeReadAccessForCitizen()
+        throws Exception {
+        shouldReturn200WithCaseTypeReadAccess("citizens");
+    }
+
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccessForCaseworker()
@@ -3833,6 +3888,45 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
         assertEquals("No case found for reference: " + reference,
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
+    }
+
+    private void shouldReturn200WithCaseTypeReadAccess(String userRole)
+        throws Exception {
+        final String reference = "1504259907353628";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String expected = "{  \n" +
+            "   \"case_details\":{  \n" +
+            "      \"id\":1504259907353628,\n" +
+            "      \"jurisdiction\":\"PROBATE\",\n" +
+            "      \"state\":\"CaseCreated\",\n" +
+            "      \"case_type_id\":\"TestAddressBookCaseNoReadFieldAccess\",\n" +
+            "      \"last_modified\":null,\n" +
+            "      \"security_classification\":\"PUBLIC\",\n" +
+            "      \"case_data\":{  \n" +
+            "\n" +
+            "      },\n" +
+            "      \"data_classification\":{  \n" +
+            "\n" +
+            "      },\n" +
+            "      \"after_submit_callback_response\":null,\n" +
+            "      \"callback_response_status_code\":null,\n" +
+            "      \"callback_response_status\":null\n" +
+            "   },\n" +
+            "   \"event_id\":\"TEST_EVENT\"\n" +
+            "}";
+        String actual = mvcResult.getResponse().getContentAsString();
+        assertAll(
+            () -> JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT),
+            () -> assertThat("Token is not present", MAPPER.readTree(actual).has("token"), is(true)),
+            () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details")
+                .has("created_date"), is(true))
+        );
     }
 
     private void shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent(String userRole)
