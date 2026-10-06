@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -45,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -64,6 +60,9 @@ import static org.mockito.Mockito.mock;
 class CaseLinkServiceExternalDbDeadlockIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseLinkServiceExternalDbDeadlockIT.class);
+
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
 
     @Autowired
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -241,12 +240,4 @@ class CaseLinkServiceExternalDbDeadlockIT {
         }
     }
 
-    @TestConfiguration
-    static class ExternalDbDeadlockConfig {
-        @Bean
-        @Primary
-        JwtDecoder jwtDecoder() {
-            return mock(JwtDecoder.class);
-        }
-    }
 }

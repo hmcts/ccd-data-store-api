@@ -18,10 +18,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
 
 import java.security.Principal;
 import java.time.Instant;
@@ -45,6 +47,9 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     @Value("${oidc.issuer}")
     private String expectedIssuer;
@@ -73,6 +78,7 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
     }
 
     private ResponseEntity<String> authenticate(String issuer) {
+        assertThat(jwtDecoder).isInstanceOf(AppInsightsJwtDecoder.class);
         stubUserInfo("123");
         wireMockServer.resetRequests();
         HttpHeaders headers = new HttpHeaders();
