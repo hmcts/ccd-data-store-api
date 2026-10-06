@@ -53,7 +53,10 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
     void shouldAcceptJwtWithExpectedIssuerThroughConfiguredDecoder() {
         ResponseEntity<String> response = authenticate(expectedIssuer);
 
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getStatusCode().value())
+            .withFailMessage("Expected authenticated response, got %s: %s",
+                response.getStatusCode(), response.getBody())
+            .isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("123");
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
     }
@@ -70,6 +73,7 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
     }
 
     private ResponseEntity<String> authenticate(String issuer) {
+        stubUserInfo("123");
         wireMockServer.resetRequests();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + signedJwt(issuer));
