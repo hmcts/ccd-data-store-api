@@ -274,7 +274,7 @@ public class JwkSourceTelemetry {
                     trackState(SCHEDULED_REFRESH_FAILED, causeOf(failed.getException()), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent<SecurityContext> ignored -> {
-                    log.info("Scheduled IDAM JWK set refresh completed");
+                    log.debug("Scheduled IDAM JWK set refresh completed");
                     trackState(SCHEDULED_REFRESH_COMPLETED, Map.of(), Map.of());
                 }
                 case RefreshAheadCachingJWKSetSource.RefreshNotScheduledEvent<SecurityContext> ignored -> {
