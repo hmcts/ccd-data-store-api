@@ -2,13 +2,13 @@ package uk.gov.hmcts.ccd.security.idam;
 
 import feign.FeignException;
 import feign.Request;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
+@ExtendWith(MockitoExtension.class)
 class IdamRepositoryTest {
 
     private static final String TEST_USER_TOKEN = "TestUserToken";
@@ -43,7 +45,6 @@ class IdamRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(idamRepository, "selfInstance", idamRepository);
     }
 
@@ -65,7 +66,7 @@ class IdamRepositoryTest {
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
 
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -76,7 +77,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -87,7 +88,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -98,7 +99,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
             () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
