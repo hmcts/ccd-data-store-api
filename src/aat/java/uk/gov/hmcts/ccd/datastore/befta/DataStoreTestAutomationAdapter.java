@@ -73,14 +73,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
-        if ("globalSearchLocation".equals(key)) {
-            try {
-                List<?> locations = (List<?>) ReflectionUtils.deepGetFieldInObject(
-                    scenarioContext, "testData.actualResponse.body.arrayInMap");
-                return GlobalSearchTestLocation.select(locations);
-            } catch (Exception e) {
-                throw new FunctionalTestException("Unable to select global-search location with region data", e);
-            }
+        if ("validBuildingLocation".equals(key)) {
+            return selectValidBuildingLocation(scenarioContext.getTestData().getActualResponse()
+                                                   .getBody().get("arrayInMap"));
         }
         String docAmUrl = EnvironmentVariableUtils.getRequiredVariable("CASE_DOCUMENT_AM_URL");
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
@@ -224,6 +219,29 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             return UUID.randomUUID();
         }
         return super.calculateCustomValue(scenarioContext, key);
+    }
+
+    private Map<?, ?> selectValidBuildingLocation(Object locations) {
+        if (locations instanceof List<?>) {
+            // Reference data is unordered and can contain buildings without a region.
+            // Always select the same complete record for case creation, criteria and assertions.
+            for (Object location : (List<?>) locations) {
+                if (location instanceof Map<?, ?>) {
+                    Map<?, ?> building = (Map<?, ?>) location;
+                    boolean complete = Arrays.asList("epimms_id", "building_location_name", "region_id", "region")
+                        .stream().allMatch(field -> {
+                            Object value = building.get(field);
+                            return value != null && !value.toString().isBlank()
+                                && !"null".equalsIgnoreCase(value.toString().trim());
+                        });
+                    if (complete) {
+                        return building;
+                    }
+                }
+            }
+        }
+        throw new FunctionalTestException("No building location with non-blank epimms_id, building_location_name, "
+                                              + "region_id and region found in location reference data");
     }
 
     private boolean elasticSearchFunctionalTestsEnabled() {
