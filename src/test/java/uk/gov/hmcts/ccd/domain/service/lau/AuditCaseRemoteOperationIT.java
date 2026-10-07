@@ -14,9 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -58,7 +56,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.doReturn;
 
-@Import(AuditCaseRemoteOperationIT.MockConfig.class)
 public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
 
     private static int ASYNC_DELAY_TIMEOUT_MILLISECONDS = 2000;
@@ -81,7 +78,7 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     @Autowired
     SecurityUtils securityUtils;
 
-    @Autowired
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     @Autowired
@@ -130,18 +127,10 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static final ZonedDateTime LOG_TIMESTAMP =
         ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
-    @TestConfiguration
-    static class MockConfig {
-
-        @Bean
-        public AuthTokenGenerator authTokenGenerator() {
-            return Mockito.mock(AuthTokenGenerator.class);
-        }
-    }
-
     @BeforeEach
     public void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
+        Mockito.when(authTokenGenerator.generate()).thenReturn("Bearer audit-test-token");
 
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);

@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.ccd.util.KeyGenerator.getRsaJWK;
 
 // Proves SecurityConfiguration wires the real OIDC-discovered JwtDecoder with issuer validation.
 @TestPropertySource(properties = "idam.s2s-authorised.services=ccd_gw")
+@ActiveProfiles("jwt-issuer-probe")
 @Import(SecurityConfigurationJwtDecoderIssuerValidationIT.AuthenticationProbe.class)
 class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest {
 
@@ -96,6 +99,7 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
 
     @RestController
     @TestComponent
+    @Profile("jwt-issuer-probe")
     static class AuthenticationProbe {
 
         @GetMapping(PROBE_URL)
