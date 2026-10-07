@@ -31,10 +31,10 @@ public class JexlEnablingConditionConverter implements EnablingConditionConverte
     private static final String OR_OPERATOR = " or ";
 
     private static final Pattern EQUALITY_CONDITION_PATTERN =
-        Pattern.compile("\\s*([^!=]+?)\\s*(=|CONTAINS)\\s*(\"[^\"]*\")\\s*");
+        Pattern.compile("\\s*([^!=]+?)\\s*(=|CONTAINS)\\s*(\"[^\"]*\")\\s*\\)*\\s*");
 
     private static final Pattern NOT_EQUAL_CONDITION_PATTERN =
-        Pattern.compile("\\s*([^!=]+?)\\s*(!=|CONTAINS)\\s*(\"[^\"]*\")\\s*");
+        Pattern.compile("\\s*([^!=]+?)\\s*(!=|CONTAINS)\\s*(\"[^\"]*\")\\s*\\)*\\s*");
 
     private static final String WILD_CARD = "\"*\"";
 
