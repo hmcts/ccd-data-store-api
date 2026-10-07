@@ -3518,19 +3518,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
-
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldReturn200WithCaseTypeReadAccessForCaseworker()
         throws Exception {
-        shouldReturn200WithCaseTypeReadAccess("caseworkers");
+        shouldReturn200WhenCaseTypeIsReadableButFieldIsNot("caseworkers");
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldReturn200WithCaseTypeReadAccessForCitizen()
         throws Exception {
-        shouldReturn200WithCaseTypeReadAccess("citizens");
+        shouldReturn200WhenCaseTypeIsReadableButFieldIsNot("citizens");
     }
 
     @Test
@@ -3877,20 +3876,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-    private void shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
-        throws Exception {
-        final String reference = "1504259907353610";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
-            .andExpect(status().is(404))
-            .andReturn();
-        assertEquals("No case found for reference: " + reference,
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
-    }
-
-    private void shouldReturn200WithCaseTypeReadAccess(String userRole)
+    private void shouldReturn200WhenCaseTypeIsReadableButFieldIsNot(String userRole)
         throws Exception {
         final String reference = "1504259907353628";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
@@ -3927,6 +3913,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details")
                 .has("created_date"), is(true))
         );
+    }
+
+    private void shouldReturn404WhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
+        throws Exception {
+        final String reference = "1504259907353610";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(404))
+            .andReturn();
+        assertEquals("No case found for reference: " + reference,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
     }
 
     private void shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent(String userRole)
