@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.security;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
@@ -12,6 +16,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 
 import java.io.IOException;
@@ -190,6 +195,41 @@ final class JwkTestSupport {
 
         void clear() {
             events.clear();
+        }
+    }
+
+    /**
+     * Captures everything a class logs, at every level, with Logback's {@link ListAppender}. Closing it detaches the
+     * appender and restores the logger's level.
+     */
+    static final class CapturedLogs implements AutoCloseable {
+
+        private final Logger logger;
+        private final Level previousLevel;
+        private final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+
+        CapturedLogs(Class<?> source) {
+            logger = (Logger) LoggerFactory.getLogger(source);
+            previousLevel = logger.getLevel();
+            logger.setLevel(Level.TRACE);
+            appender.start();
+            logger.addAppender(appender);
+        }
+
+        List<ILoggingEvent> startingWith(String prefix) {
+            // AppenderBase#doAppend synchronises on the appender, and Nimbus logs from its own executor threads.
+            synchronized (appender) {
+                return appender.list.stream()
+                    .filter(event -> event.getFormattedMessage().startsWith(prefix))
+                    .toList();
+            }
+        }
+
+        @Override
+        public void close() {
+            logger.detachAppender(appender);
+            appender.stop();
+            logger.setLevel(previousLevel);
         }
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.security;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -52,7 +53,13 @@ public class AppInsightsJwtDecoder implements JwtDecoder {
         String failureType = classifyJwtFailure(exception);
         String failureMessage = sanitise(exception.getMessage());
 
-        log.warn("{}: {}", JWT_VALIDATION_FAILURE_MESSAGE, failureType);
+        // A plain JwtException means the token could not be checked, for example because no signing keys were
+        // available, not that it was invalid. Each such request fails with a 500 that ExceptionHandlingFilter logs.
+        if (exception instanceof BadJwtException) {
+            log.warn("{}: {}", JWT_VALIDATION_FAILURE_MESSAGE, failureType);
+        } else {
+            log.debug("{}: {}", JWT_VALIDATION_FAILURE_MESSAGE, failureType);
+        }
         appInsights.trackTrace(
             JWT_VALIDATION_FAILURE_MESSAGE,
             buildTelemetryProperties(exception, failureType, failureMessage),

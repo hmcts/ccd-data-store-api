@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.security;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.CachingJWKSetSource;
 import com.nimbusds.jose.jwk.source.JWKSetSourceWithHealthStatusReporting;
@@ -12,6 +14,7 @@ import com.nimbusds.jose.util.events.Event;
 import com.nimbusds.jose.util.events.EventListener;
 import com.nimbusds.jose.util.health.HealthReport;
 import com.nimbusds.jose.util.health.HealthStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,8 +31,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.security.JwkTestSupport.CapturedLogs;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.MutableClock;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.RecordingAppInsights;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.TrackedEvent;
@@ -485,6 +490,284 @@ class JwkSourceTelemetryTest {
 
             assertThat(telemetry.remainingToleranceMs()).isEqualTo(-1L);
             assertThat(onlyEventOfType(JwkSourceTelemetry.OUTAGE_ENDED)).hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("log output")
+    class LogOutput {
+
+        private static final String RECOVERED_AFTER_FALLBACK =
+            "IDAM JWK set retrieved; key source recovered after start-up fallback";
+
+        private CapturedLogs logs;
+
+        @BeforeEach
+        void captureLogs() {
+            logs = new CapturedLogs(JwkSourceTelemetry.class);
+        }
+
+        @AfterEach
+        void releaseLogs() {
+            logs.close();
+        }
+
+        @Test
+        @DisplayName("logs a completed scheduled refresh at DEBUG, because it fires every few minutes per pod")
+        void logsScheduledRefreshCompletedAtDebug() {
+            telemetry.cachingEventListener().notify(
+                mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent.class));
+
+            assertThat(logs.startingWith("Scheduled IDAM JWK set refresh completed"))
+                .singleElement()
+                .satisfies(event -> assertThat(event.getLevel()).isEqualTo(Level.DEBUG));
+        }
+
+        @Test
+        @DisplayName("logs an unhealthy endpoint at WARN with the cause on one line and no stack trace")
+        void logsUnhealthyAtDebug() {
+            telemetry.healthReportListener().notify(new HealthReport<>(healthSource(), HealthStatus.NOT_HEALTHY,
+                new IllegalStateException("no keys available"), System.currentTimeMillis(), null));
+
+            assertThat(logs.startingWith("IDAM JWK set endpoint unhealthy"))
+                .singleElement()
+                .satisfies(event -> assertLoggedWithoutStackTrace(event, Level.WARN,
+                    "IDAM JWK set endpoint unhealthy: java.lang.IllegalStateException: no keys available"));
+        }
+
+        @Test
+        @DisplayName("logs a retry at DEBUG, because the outage WARN already reports the failed retrieval")
+        void logsRetrialAtDebug() {
+            telemetry.retryingEventListener().notify(retrialEvent(new IllegalStateException("Connection refused")));
+
+            assertThat(logs.startingWith("Retrying IDAM JWK set retrieval"))
+                .singleElement()
+                .satisfies(event -> assertLoggedWithoutStackTrace(event, Level.DEBUG,
+                    "Retrying IDAM JWK set retrieval after java.lang.IllegalStateException: Connection refused"));
+        }
+
+        @Test
+        @DisplayName("logs every per-request line at DEBUG, as each of those requests fails with a logged 500")
+        void logsPerRequestLinesAtDebug() {
+            EventListener<CachingJWKSetSource<SecurityContext>, SecurityContext> caching =
+                telemetry.cachingEventListener();
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+            caching.notify(mock(CachingJWKSetSource.WaitingForRefreshEvent.class));
+            caching.notify(mock(CachingJWKSetSource.RefreshTimedOutEvent.class));
+            caching.notify(mock(CachingJWKSetSource.UnableToRefreshEvent.class));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.UnableToRefreshAheadOfExpirationEvent.class));
+
+            assertThat(logs.startingWith(""))
+                .extracting(ILoggingEvent::getLevel, event -> event.getFormattedMessage().split(";")[0])
+                .containsExactly(
+                    tuple(Level.DEBUG, "IDAM JWK set retrieval refused by the rate limiter"),
+                    tuple(Level.DEBUG, "Waiting on an in-flight IDAM JWK set retrieval"),
+                    tuple(Level.DEBUG, "Timed out waiting for an in-flight IDAM JWK set retrieval"),
+                    tuple(Level.DEBUG, "Unable to refresh the IDAM JWK set cache"),
+                    tuple(Level.DEBUG, "Unable to refresh the IDAM JWK set ahead of expiry"));
+        }
+
+        @Test
+        @DisplayName("logs a refresh that could not be scheduled ahead of expiry at DEBUG, as it repeats per "
+            + "retrieval")
+        void logsRefreshNotScheduledAtDebug() {
+            telemetry.cachingEventListener().notify(
+                mock(RefreshAheadCachingJWKSetSource.RefreshNotScheduledEvent.class));
+
+            assertThat(logs.startingWith("No IDAM JWK set refresh scheduled ahead of expiry"))
+                .singleElement()
+                .satisfies(event -> assertThat(event.getLevel()).isEqualTo(Level.DEBUG));
+        }
+
+        @Test
+        @DisplayName("logs serving cached keys at WARN with the cause on one line and no stack trace")
+        void logsOutageToleratedAtWarn() {
+            telemetry.outageEventListener().notify(outageEvent(1_000L, new IllegalStateException("down")));
+
+            assertThat(logs.startingWith("IDAM JWK set unavailable"))
+                .singleElement()
+                .satisfies(event -> assertLoggedWithoutStackTrace(event, Level.WARN,
+                    "IDAM JWK set unavailable; serving cached signing keys for a further 1000ms. "
+                        + "Cause: java.lang.IllegalStateException: down"));
+        }
+
+        @Test
+        @DisplayName("logs a failed scheduled refresh at WARN with the cause on one line and no stack trace")
+        void logsScheduledRefreshFailedWithoutAStackTrace() {
+            RefreshAheadCachingJWKSetSource.ScheduledRefreshFailed<SecurityContext> event =
+                mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshFailed.class);
+            when(event.getException()).thenReturn(new RuntimeException("scheduled boom"));
+
+            telemetry.cachingEventListener().notify(event);
+
+            assertThat(logs.startingWith("Scheduled IDAM JWK set refresh failed"))
+                .singleElement()
+                .satisfies(logged -> assertLoggedWithoutStackTrace(logged, Level.WARN,
+                    "Scheduled IDAM JWK set refresh failed: java.lang.RuntimeException: scheduled boom"));
+        }
+
+        @Test
+        @DisplayName("logs a failure to publish a per-request event at DEBUG, as it can repeat per request")
+        void logsPerRequestTelemetryFailureAtDebug() {
+            new JwkSourceTelemetry(new ThrowingAppInsights()).rateLimitedEventListener()
+                .notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            assertThat(logs.startingWith("Unable to publish IDAM JWK set telemetry"))
+                .singleElement()
+                .satisfies(logged -> assertLoggedWithoutStackTrace(logged, Level.DEBUG,
+                    "Unable to publish IDAM JWK set telemetry for RATE_LIMIT_REACHED: "
+                        + "java.lang.RuntimeException: telemetry backend unavailable"));
+        }
+
+        @Test
+        @DisplayName("logs a failure to publish a state event at WARN with the cause on one line and no stack trace")
+        void logsStateTelemetryFailureAtWarn() {
+            new JwkSourceTelemetry(new ThrowingAppInsights()).cachingEventListener()
+                .notify(mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent.class));
+
+            assertThat(logs.startingWith("Unable to publish IDAM JWK set telemetry"))
+                .singleElement()
+                .satisfies(logged -> assertLoggedWithoutStackTrace(logged, Level.WARN,
+                    "Unable to publish IDAM JWK set telemetry for SCHEDULED_REFRESH_COMPLETED: "
+                        + "java.lang.RuntimeException: telemetry backend unavailable"));
+        }
+
+        @Test
+        @DisplayName("logs nothing above DEBUG for a healthy refresh cycle")
+        void logsNothingAboveDebugWhenHealthy() {
+            EventListener<CachingJWKSetSource<SecurityContext>, SecurityContext> caching =
+                telemetry.cachingEventListener();
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshInitiatedEvent.class));
+            caching.notify(mock(CachingJWKSetSource.RefreshInitiatedEvent.class));
+            telemetry.retrievalSucceeded();
+            telemetry.healthReportListener().notify(
+                new HealthReport<>(healthSource(), HealthStatus.HEALTHY, System.currentTimeMillis(), null));
+            caching.notify(mock(CachingJWKSetSource.RefreshCompletedEvent.class));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.RefreshScheduledEvent.class));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.ScheduledRefreshCompletedEvent.class));
+
+            assertThat(logs.startingWith("")).isNotEmpty();
+            assertThat(aboveDebug()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("logs one WARN for a failed retrieval while cached keys are served, and nothing per request")
+        void logsOneWarnPerFailedRetrievalDuringATolerableOutage() {
+            EventListener<CachingJWKSetSource<SecurityContext>, SecurityContext> caching =
+                telemetry.cachingEventListener();
+            // One failed retrieval: the retry fails too, the outage layer serves the cached keys, so the layers
+            // above it see a success.
+            caching.notify(mock(CachingJWKSetSource.RefreshInitiatedEvent.class));
+            telemetry.retryingEventListener().notify(retrialEvent(new IllegalStateException("Connection refused")));
+            telemetry.outageEventListener().notify(outageEvent(1_000L, new IllegalStateException("Read timed out")));
+            telemetry.healthReportListener().notify(
+                new HealthReport<>(healthSource(), HealthStatus.HEALTHY, System.currentTimeMillis(), null));
+            caching.notify(mock(CachingJWKSetSource.RefreshCompletedEvent.class));
+            // Requests that arrived while it was in flight, or found the rate limit used up.
+            caching.notify(mock(CachingJWKSetSource.WaitingForRefreshEvent.class));
+            caching.notify(mock(CachingJWKSetSource.WaitingForRefreshEvent.class));
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            assertThat(aboveDebug())
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getLevel()).isEqualTo(Level.WARN);
+                    assertThat(event.getFormattedMessage())
+                        .startsWith("IDAM JWK set unavailable; serving cached signing keys for a further 1000ms");
+                });
+        }
+
+        @Test
+        @DisplayName("logs nothing above WARN once no usable keys are left, as each failed request is logged "
+            + "elsewhere")
+        void logsNothingAboveWarnOnceNoUsableKeysAreLeft() {
+            EventListener<CachingJWKSetSource<SecurityContext>, SecurityContext> caching =
+                telemetry.cachingEventListener();
+            telemetry.retryingEventListener().notify(retrialEvent(new IllegalStateException("Connection refused")));
+            telemetry.healthReportListener().notify(new HealthReport<>(healthSource(), HealthStatus.NOT_HEALTHY,
+                new IllegalStateException("Connection refused"), System.currentTimeMillis(), null));
+            caching.notify(mock(RefreshAheadCachingJWKSetSource.UnableToRefreshAheadOfExpirationEvent.class));
+            caching.notify(mock(CachingJWKSetSource.UnableToRefreshEvent.class));
+            caching.notify(mock(CachingJWKSetSource.UnableToRefreshEvent.class));
+            caching.notify(mock(CachingJWKSetSource.RefreshTimedOutEvent.class));
+            telemetry.rateLimitedEventListener().notify(mock(RateLimitedJWKSetSource.RateLimitedEvent.class));
+
+            assertThat(logs.startingWith("")).hasSize(7);
+            assertThat(aboveWarn()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("logs recovery once at INFO when retrieval succeeds after a start-up fallback")
+        void logsRecoveryAfterAFallbackOnce() {
+            telemetry.algorithmsFellBack(JwkSourceConfiguration.FALLBACK_ALGORITHMS,
+                new IllegalStateException("Connection refused"));
+
+            telemetry.retrievalSucceeded();
+            telemetry.retrievalSucceeded();
+
+            assertThat(logs.startingWith(RECOVERED_AFTER_FALLBACK))
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getLevel()).isEqualTo(Level.INFO);
+                    assertThat(event.getFormattedMessage())
+                        .contains("remain the RSA family PS256,PS384,PS512,RS256,RS384,RS512 for this instance");
+                });
+        }
+
+        @Test
+        @DisplayName("never logs recovery after start-up derived the algorithms")
+        void doesNotLogRecoveryWhenDerived() {
+            // The start-up retrieval itself succeeds before the algorithms are chosen.
+            telemetry.retrievalSucceeded();
+            telemetry.algorithmsDerived(Set.of(JWSAlgorithm.RS256));
+            telemetry.retrievalSucceeded();
+            telemetry.retrievalSucceeded();
+
+            assertThat(logs.startingWith(RECOVERED_AFTER_FALLBACK)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("does not log recovery after a fallback for a key set with no usable keys, as nothing failed")
+        void doesNotLogRecoveryWhenTheKeySetHadNoUsableKeys() {
+            telemetry.retrievalSucceeded();
+            telemetry.algorithmsFellBack(JwkSourceConfiguration.FALLBACK_ALGORITHMS, null);
+            telemetry.retrievalSucceeded();
+
+            assertThat(logs.startingWith(RECOVERED_AFTER_FALLBACK)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("logs the end of a tolerated outage at INFO, separately from start-up recovery")
+        void logsOutageEndedAtInfo() {
+            telemetry.outageEventListener().notify(outageEvent(1_000L, new RuntimeException("down")));
+
+            telemetry.retrievalSucceeded();
+
+            assertThat(logs.startingWith("IDAM JWK set retrieved successfully; no longer serving stale signing keys"))
+                .singleElement()
+                .satisfies(event -> assertThat(event.getLevel()).isEqualTo(Level.INFO));
+            assertThat(logs.startingWith(RECOVERED_AFTER_FALLBACK)).isEmpty();
+        }
+
+        private List<ILoggingEvent> aboveDebug() {
+            return logs.startingWith("").stream()
+                .filter(event -> event.getLevel().isGreaterOrEqual(Level.INFO))
+                .toList();
+        }
+
+        private List<ILoggingEvent> aboveWarn() {
+            return logs.startingWith("").stream()
+                .filter(event -> event.getLevel().isGreaterOrEqual(Level.ERROR))
+                .toList();
+        }
+
+        private static void assertLoggedWithoutStackTrace(ILoggingEvent event, Level level, String message) {
+            assertThat(event.getLevel()).isEqualTo(level);
+            assertThat(event.getFormattedMessage()).isEqualTo(message);
+            assertThat(event.getThrowableProxy())
+                .as("an attached exception logs a stack trace and adds an App Insights exceptions entry")
+                .isNull();
         }
     }
 

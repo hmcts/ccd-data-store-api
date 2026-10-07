@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.security;
 
+import ch.qos.logback.classic.Level;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.Curve;
@@ -35,6 +36,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.ccd.security.JwkTestSupport.CapturedLogs;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.JWKS_PATH;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.ORIGINAL_KEY_ID;
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.RecordingAppInsights;
@@ -50,18 +52,27 @@ class JwkSourceConfigurationTest {
 
     private static final String RSA_FAMILY = "PS256,PS384,PS512,RS256,RS384,RS512";
 
+    private static final String RECOVERED_AFTER_FALLBACK =
+        "IDAM JWK set retrieved; key source recovered after start-up fallback";
+
     private WireMockServer wireMock;
     private JWKSource<SecurityContext> jwkSource;
     private RecordingAppInsights appInsights;
+    private CapturedLogs telemetryLogs;
+    private CapturedLogs configurationLogs;
 
     @BeforeEach
     void setUp() {
         wireMock = startWireMock();
         appInsights = new RecordingAppInsights();
+        telemetryLogs = new CapturedLogs(JwkSourceTelemetry.class);
+        configurationLogs = new CapturedLogs(JwkSourceConfiguration.class);
     }
 
     @AfterEach
     void tearDown() throws IOException {
+        telemetryLogs.close();
+        configurationLogs.close();
         if (jwkSource instanceof Closeable closeable) {
             closeable.close();
         }
@@ -119,6 +130,9 @@ class JwkSourceConfigurationTest {
             .as("events raised after start-up carry the algorithm source")
             .allSatisfy(event -> assertThat(event.properties())
                 .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "DERIVED"));
+        assertThat(telemetryLogs.startingWith(RECOVERED_AFTER_FALLBACK))
+            .as("a pod that derived its algorithms never fell back, so has nothing to recover from")
+            .isEmpty();
     }
 
     @Test
@@ -216,6 +230,43 @@ class JwkSourceConfigurationTest {
             .isNotEmpty()
             .allSatisfy(event -> assertThat(event.properties())
                 .containsEntry(JwkSourceTelemetry.ALGORITHM_SOURCE, "FALLBACK"));
+    }
+
+    @Test
+    @DisplayName("logs the start-up fallback with its stack trace, then logs recovery once, on the first real "
+        + "retrieval and not on later ones")
+    void logsRecoveryOnceAfterAStartUpFallback() throws Exception {
+        stubDown(wireMock);
+        JwkSourceConfiguration configuration = configuration();
+        JwkSourceTelemetry telemetry = new JwkSourceTelemetry(appInsights);
+        jwkSource = configuration.idamJwkSource(telemetry);
+
+        configuration.idamJwsKeySelector(jwkSource, telemetry);
+
+        assertThat(configurationLogs.startingWith("Unable to retrieve IDAM JWK set from"))
+            .singleElement()
+            .satisfies(event -> {
+                assertThat(event.getLevel()).isEqualTo(Level.WARN);
+                assertThat(event.getThrowableProxy())
+                    .as("fires once per pod, so keeps the full detail")
+                    .isNotNull();
+            });
+        assertThat(telemetryLogs.startingWith(RECOVERED_AFTER_FALLBACK)).isEmpty();
+
+        stubHealthy(wireMock, originalJwkSet());
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(25))
+            .ignoreExceptions()
+            .untilAsserted(() -> {
+                assertThat(signingKeys(jwkSource)).hasSize(1);
+                assertThat(JwkTestSupport.retrievalAttempts(wireMock))
+                    .as("a further successful retrieval after the one that recovered")
+                    .isGreaterThanOrEqualTo(2);
+            });
+
+        assertThat(telemetryLogs.startingWith(RECOVERED_AFTER_FALLBACK))
+            .singleElement()
+            .satisfies(event -> assertThat(event.getLevel()).isEqualTo(Level.INFO));
     }
 
     @Test
