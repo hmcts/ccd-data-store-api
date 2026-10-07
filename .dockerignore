@@ -1,0 +1,11 @@
+# The runtime image uses a pre-built JAR; do not upload source, test reports,
+# Gradle caches or other workspace files to Azure Container Registry.
+**
+!Dockerfile
+!acb.tpl.yaml
+!acb.yaml
+!build/
+!build/libs/
+!build/libs/core-case-data.jar
+!lib/
+!lib/applicationinsights.json

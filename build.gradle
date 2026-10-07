@@ -673,6 +673,7 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    dependsOn test, integration
     executionData(test, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
@@ -743,6 +744,8 @@ jacocoTestReport {
 }
 
 test {
+    // These classes have their own integration task; execute them only once.
+    exclude 'uk/gov/hmcts/ccd/integrations/**'
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = true
@@ -884,6 +887,12 @@ task functional(type: JavaExec) {
     }
 
     outputs.upToDateWhen { false }
+}
+
+// The adapter handles bounded JWT reuse. BEFTA's expire-after-access cache must
+// remain short so adapter refreshes obtain a new token, including on local runs.
+[highLevelDataSetup, smoke, functional].each {
+    it.environment 'BEFTA_USER_TOKEN_CACHE_TTL_SECONDS', '1'
 }
 
 project.ext {
