@@ -1,6 +1,5 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
-import uk.gov.hmcts.contino.GithubAPI
 properties(
     [
         [
@@ -14,6 +13,7 @@ properties(
 @Library("Infrastructure@cve-dashboard")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
@@ -157,6 +157,30 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
     enableHighLevelDataSetup()
+
+    // Temporary PR diagnostic: verify the schema before BEFTA tries to add roles.
+    before('highleveldatasetup') {
+        onPR {
+            timeout(time: 5, unit: 'MINUTES') {
+                def subscription = env.NONPROD_SUBSCRIPTION_NAME ?: 'nonprod'
+                def previewEnvironment = env.PREVIEW_ENVIRONMENT_NAME ?: 'preview'
+                def namespace = env.TEAM_NAMESPACE ?: product
+                withAksClient(subscription, previewEnvironment, product) {
+                    new Kubectl(this, subscription, namespace).login()
+                    withEnv(["SCHEMA_CHECK_NAMESPACE=${namespace}",
+                             "SCHEMA_CHECK_RELEASE=ccd-data-store-api-${env.BRANCH_NAME.toLowerCase()}"]) {
+                        try {
+                            sh(label: 'Check definition-store schema before setup',
+                               script: 'bash scripts/check-preview-definition-schema.sh')
+                        } finally {
+                            archiveArtifacts allowEmptyArchive: true,
+                                artifacts: 'definition-store-schema-diagnostics/**'
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     afterAlways('test') {
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
