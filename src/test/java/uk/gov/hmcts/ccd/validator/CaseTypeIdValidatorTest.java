@@ -19,6 +19,7 @@ public class CaseTypeIdValidatorTest {
     private static final String CASE_TYPE_ID_VALID_NUMBERS = "TEST_CASE_TYPE_ID_1234567890";
     private static final String CASE_TYPE_ID_VALID_HYPHENS = "TEST-CASE-TYPE-ID";
     private static final String CASE_TYPE_ID_VALID_ALL = "TEST_case-TYPE_1_ID";
+    private static final String CASE_TYPE_ID_INVALID_NON_ASCII = "é_CASE_TYPE_ID";
 
     private final CaseTypeIdValidator caseTypeIdValidator = new CaseTypeIdValidator();
 
@@ -53,6 +54,12 @@ public class CaseTypeIdValidatorTest {
     public void failForInvalidCharacter() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_INVALID_CHARACTER, constraintValidatorContext);
         assertFalse("Case Type Id " + CASE_TYPE_ID_INVALID_CHARACTER + " should not be valid", result);
+    }
+
+    @Test
+    public void failForNonAsciiLetter() {
+        final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_INVALID_NON_ASCII, constraintValidatorContext);
+        assertFalse("Case Type Id " + CASE_TYPE_ID_INVALID_NON_ASCII + " should not be valid", result);
     }
 
     @Test

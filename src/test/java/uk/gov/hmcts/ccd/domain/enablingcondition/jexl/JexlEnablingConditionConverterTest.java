@@ -3,9 +3,7 @@ package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JexlEnablingConditionConverterTest {
 
@@ -21,8 +19,7 @@ class JexlEnablingConditionConverterTest {
         String formatString = this.enablingConditionFormatter
             .convert("FieldA!=\"\" AND FieldB=\"I'm innocent\"");
 
-        assertNotNull(formatString);
-        assertEquals("FieldA!=\"\" and FieldB==\"I'm innocent\"", formatString);
+        assertThat(formatString).isEqualTo("FieldA!=\"\" and FieldB==\"I'm innocent\"");
     }
 
     @Test
@@ -30,22 +27,53 @@ class JexlEnablingConditionConverterTest {
         String formatString = this.enablingConditionFormatter
             .convert("FieldA!=\"\" OR FieldB!=\"I'm innocent\"");
 
-        assertNotNull(formatString);
-        assertEquals("FieldA!=\"\" or FieldB!=\"I'm innocent\"", formatString);
+        assertThat(formatString).isEqualTo("FieldA!=\"\" or FieldB!=\"I'm innocent\"");
+    }
+
+    @Test
+    void formatEnablingConditionWithAdditionalWhitespaceAroundAndOperator() {
+        String formatString = this.enablingConditionFormatter
+            .convert("FieldA!=\"\"  AND  FieldB=\"I'm innocent\"");
+
+        assertThat(formatString).isEqualTo("FieldA!=\"\" and FieldB==\"I'm innocent\"");
+    }
+
+    @Test
+    void formatEnablingConditionWithTabsAroundOrOperator() {
+        String formatString = this.enablingConditionFormatter
+            .convert("FieldA!=\"\"\tOR\tFieldB!=\"I'm innocent\"");
+
+        assertThat(formatString).isEqualTo("FieldA!=\"\" or FieldB!=\"I'm innocent\"");
+    }
+
+    @Test
+    void formatEnablingConditionDoesNotSplitOnOperatorInsideQuotedValue() {
+        String formatString = this.enablingConditionFormatter
+            .convert("FieldA=\"A OR B\" AND FieldB=\"C AND D\"");
+
+        assertThat(formatString).isEqualTo("FieldA==\"A OR B\" and FieldB==\"C AND D\"");
+    }
+
+    @Test
+    void formatEnablingConditionDoesNotPartiallyParseNonOperatorText() {
+        String enablingCondition = "FieldA=\"x\" BAND FieldB=\"y\"";
+
+        String formatString = this.enablingConditionFormatter.convert(enablingCondition);
+
+        assertThat(formatString).isEqualTo(enablingCondition);
     }
 
     @Test
     void formatEmptyEnablingCondition() {
         String formatString = this.enablingConditionFormatter.convert("");
 
-        assertNotNull(formatString);
-        assertEquals("", formatString);
+        assertThat(formatString).isEmpty();
     }
 
     @Test
     void formatNullEnablingCondition() {
         String formatString = this.enablingConditionFormatter.convert(null);
-        assertNull(formatString);
+        assertThat(formatString).isNull();
     }
 
     @Test
@@ -53,8 +81,7 @@ class JexlEnablingConditionConverterTest {
         String formatString = this.enablingConditionFormatter
             .convert("FieldA!=\"*\" AND FieldB=\"I'm innocent\"");
 
-        assertNotNull(formatString);
-        assertEquals("FieldA!~\".*\" and FieldB==\"I'm innocent\"", formatString);
+        assertThat(formatString).isEqualTo("FieldA!~\".*\" and FieldB==\"I'm innocent\"");
     }
 
     @Test
@@ -62,8 +89,7 @@ class JexlEnablingConditionConverterTest {
         String formatString = this.enablingConditionFormatter
             .convert("FieldA=\"*\" AND FieldB=\"I'm innocent\"");
 
-        assertNotNull(formatString);
-        assertEquals("FieldA=~\".*\" and FieldB==\"I'm innocent\"", formatString);
+        assertThat(formatString).isEqualTo("FieldA=~\".*\" and FieldB==\"I'm innocent\"");
     }
 
 }

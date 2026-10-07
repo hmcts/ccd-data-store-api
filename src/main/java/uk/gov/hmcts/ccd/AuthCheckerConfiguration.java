@@ -1,11 +1,10 @@
 package uk.gov.hmcts.ccd;
 
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
@@ -16,16 +15,14 @@ import java.util.regex.Pattern;
 @Configuration
 public class AuthCheckerConfiguration {
 
-    @Autowired
-    private ApplicationParams applicationParams;
+    private final ApplicationParams applicationParams;
 
-    public String[] getCitizenRoles() {
-        return applicationParams.getCcdAccessControlCitizenRoles().stream().toArray(String[]::new);
-    }
-
-    @Autowired
     public AuthCheckerConfiguration(ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
+    }
+
+    public String[] getCitizenRoles() {
+        return applicationParams.getCcdAccessControlCitizenRoles().toArray(String[]::new);
     }
 
     @Bean
@@ -60,7 +57,7 @@ public class AuthCheckerConfiguration {
                 final Matcher jurisdictionMatcher = jurisdictionPattern.matcher(request.getRequestURI());
                 if (jurisdictionMatcher.find()) {
                     role.append("-")
-                            .append(jurisdictionMatcher.group(1).toLowerCase());
+                        .append(jurisdictionMatcher.group(1).toLowerCase());
                 }
                 roles.add(role.toString());
             } else if (citizenMatcher.find()) {

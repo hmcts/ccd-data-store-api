@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypesOperation;
@@ -130,7 +131,8 @@ public class QueryEndpoint {
     @ApiResponse(responseCode = "200", description = "List of case types for the given access criteria")
     @ApiResponse(responseCode = "404", description = "No case types found for given access criteria")
     @SuppressWarnings("squid:CallToDeprecatedMethod")
-    public List<CaseTypeDefinition> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
+    public List<CaseTypeDefinition> getCaseTypes(@PathVariable("uid") final String uid,
+                                                 @PathVariable("jid") final String jurisdictionId,
                                                  @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
@@ -140,7 +142,8 @@ public class QueryEndpoint {
     @Operation(summary = "Get jurisdictions available to the user")
     @ApiResponse(responseCode = "200", description = "List of jurisdictions for the given access criteria")
     @ApiResponse(responseCode = "404", description = "No jurisdictions found for given access criteria")
-    public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
+    public List<JurisdictionDisplayProperties> getJurisdictions(@PathVariable("uid") final String uid,
+                                                                @RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
@@ -160,7 +163,8 @@ public class QueryEndpoint {
     @ApiResponse(responseCode = "412", description = "Mismatch between case type and workbasket definitions")
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint).buildCaseIds(#result)")
-    public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
+    public SearchResultView searchNew(@PathVariable("uid") final String uid,
+                                      @PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
         String validCaseTypeId = validateCaseTypeId(caseTypeId);
@@ -207,11 +211,11 @@ public class QueryEndpoint {
         method = RequestMethod.GET)
     @Operation(summary = "Get Workbasket Input details")
     @ApiResponse(
-        responseCode = "200", 
+        responseCode = "200",
         description = "Workbasket Input data found for the given case type and jurisdiction"
     )
     @ApiResponse(
-        responseCode = "404", 
+        responseCode = "404",
         description = "No Workbasket Input found for the given case type and jurisdiction"
     )
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
@@ -233,7 +237,8 @@ public class QueryEndpoint {
     @ApiResponse(responseCode = "200", description = "A displayable case")
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
         caseType = "#caseTypeId", caseId = "#cid")
-    public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
+    public CaseView findCase(@PathVariable("uid") final String uid,
+                             @PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
         Instant start = Instant.now();
@@ -299,7 +304,8 @@ public class QueryEndpoint {
     @Operation(summary = "Fetch case history for the event")
     @ApiResponse(responseCode = "200", description = "Displayable case data")
     @ApiResponse(responseCode = "404", description = "Invalid jurisdiction/case type/case reference or event id")
-    public CaseHistoryView getCaseHistoryForEvent(@PathVariable("jid") final String jurisdictionId,
+    public CaseHistoryView getCaseHistoryForEvent(@PathVariable("uid") final String uid,
+                                                  @PathVariable("jid") final String jurisdictionId,
                                                   @PathVariable("ctid") final String caseTypeId,
                                                   @PathVariable("cid") final String caseReference,
                                                   @PathVariable("eventId") final Long eventId) {
@@ -312,7 +318,7 @@ public class QueryEndpoint {
 
     public static String buildCaseIds(SearchResultView searchResultView) {
         return searchResultView.getSearchResultViewItems().stream().limit(MAX_CASE_IDS_LIST)
-            .map(c -> c.getCaseId())
+            .map(SearchResultViewItem::getCaseId)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 

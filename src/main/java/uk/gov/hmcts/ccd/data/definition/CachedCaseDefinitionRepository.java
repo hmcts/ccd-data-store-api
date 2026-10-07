@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,9 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
+        if (latestVersion == null) {
+            throw new ResourceNotFoundException("Cannot find latest case type version for " + caseTypeId);
+        }
         return this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
@@ -90,6 +94,9 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getScopedCachedCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
+        if (latestVersion == null) {
+            throw new ResourceNotFoundException("Cannot find latest case type version for " + caseTypeId);
+        }
         return getScopedCachedCaseType(caseTypeId, latestVersion);
     }
 
@@ -99,7 +106,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     private CaseTypeDefinition getClonedCaseType(int version, String caseTypeId) {
-        CaseTypeDefinition clonedCaseType = caseDefinitionRepository.getCaseType(version, caseTypeId).createCopy();
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(version, caseTypeId);
+        if (caseTypeDefinition == null) {
+            throw new ResourceNotFoundException("Cannot find case type definition for " + caseTypeId);
+        }
+        CaseTypeDefinition clonedCaseType = caseTypeDefinition.createCopy();
         log.debug("Cloned case type: {}", clonedCaseType);
         return clonedCaseType;
     }
@@ -114,13 +125,13 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         List<String> missingRoles = userRoles
             .stream()
             .filter(role -> !userRoleClassifications.containsKey(role))
-            .collect(Collectors.toList());
+            .toList();
 
         List<UserRole> missingClassifications = missingRoles
             .stream()
             .map(caseDefinitionRepository::getUserRoleClassifications)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
 
         missingClassifications
             .forEach(userClassification ->

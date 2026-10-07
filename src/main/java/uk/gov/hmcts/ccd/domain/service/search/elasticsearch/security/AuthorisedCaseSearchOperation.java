@@ -168,6 +168,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
                                                       CaseDetails caseDetails) {
         if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null
             // NB: bypass MultiCaseType CaseData filters if using a single search index (required for GlobalSearch)
+            && searchRequest.getSearchIndex().isPresent()
             && searchRequest.getSearchIndex().isEmpty()) {
 
             JsonNode caseData = caseDataToJsonNode(caseDetails);
@@ -209,7 +210,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private String sanitiseCollectionFieldInPath(CaseTypeDefinition caseType, String path) {
         String caseFieldId = getCaseFieldFromPath(path);
         if (path != null && caseType.isCaseFieldACollection(caseFieldId)) {
-            return path.replaceAll(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
+            return path.replace(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
         }
 
         return path;

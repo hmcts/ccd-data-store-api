@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,12 +23,10 @@ public class DocumentManagementRestClient {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentManagementRestClient.class);
 
     private final SecurityUtils securityUtils;
-    @Qualifier("documentRestTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
 
     public DocumentManagementRestClient(final SecurityUtils securityUtils,
-                                        final RestTemplate restTemplate) {
+                                        @Qualifier("documentRestTemplate") final RestTemplate restTemplate) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
     }
