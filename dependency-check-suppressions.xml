@@ -302,22 +302,4 @@
         </notes>
     <cve>CVE-2026-41707</cve>
   </suppress>
-  <suppress>
-    <notes>Temporary Suppression
-        CVE-2026-82294 refer [Ticket]
-        CVE-2026-82300 refer [Ticket]
-        CVE-2026-94396 refer [Ticket]
-        CVE-2026-94397 refer [Ticket]
-        CVE-2026-94398 refer [Ticket]
-        CVE-2026-94399 refer [Ticket]</notes>
-    <cve>CVE-2026-82294</cve>
-    <cve>CVE-2026-82300</cve>
-    <cve>CVE-2026-94396</cve>
-    <cve>CVE-2026-94397</cve>
-    <cve>CVE-2026-94398</cve>
-    <cve>CVE-2026-94399</cve>
-  </suppress>
-  <suppress>
-    <cve>CVE-2026-94408</cve>
-  </suppress>
 </suppressions>
