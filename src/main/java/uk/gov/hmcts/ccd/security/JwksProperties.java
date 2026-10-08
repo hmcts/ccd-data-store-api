@@ -67,6 +67,14 @@ public record JwksProperties(
         return retrying ? 1 + NIMBUS_RETRIES : 1;
     }
 
+    /**
+     * How often {@link JwkSetStartupRetry} retries while no key set has been retrieved since start-up: half the rate
+     * limit interval, 15 s at the defaults.
+     */
+    public long startupRetryIntervalMs() {
+        return Math.max(1L, rateLimitMinIntervalMs / 2);
+    }
+
     public URL url() {
         try {
             return new URI(uri).toURL();

@@ -47,10 +47,13 @@ final class JwkTestSupport {
     static final String JWKS_PATH = "/o/jwks";
     static final String ORIGINAL_KEY_ID = "original-signing-key";
     static final String ROTATED_KEY_ID = "rotated-signing-key";
+    static final String ENCRYPTION_KEY_ID = "encryption-key";
+    static final String EMPTY_JWK_SET = "{\"keys\":[]}";
     static final String SUBJECT = "user@example.com";
 
     private static final RSAKey ORIGINAL_KEY = generateKey(ORIGINAL_KEY_ID);
     private static final RSAKey ROTATED_KEY = generateKey(ROTATED_KEY_ID);
+    private static final RSAKey ENCRYPTION_KEY = generateKey(ENCRYPTION_KEY_ID, KeyUse.ENCRYPTION);
 
     private JwkTestSupport() {
     }
@@ -69,6 +72,20 @@ final class JwkTestSupport {
 
     static String rotatedJwkSet() {
         return new JWKSet(ROTATED_KEY.toPublicJWK()).toString();
+    }
+
+    /**
+     * A key set that parses but has no usable signing key: its only key is an RSA key for encryption.
+     */
+    static String encryptionOnlyJwkSet() {
+        return new JWKSet(ENCRYPTION_KEY.toPublicJWK()).toString();
+    }
+
+    /**
+     * The encryption key and the original signing key: one usable signing key is enough.
+     */
+    static String encryptionAndSigningJwkSet() {
+        return new JWKSet(List.of(ENCRYPTION_KEY.toPublicJWK(), ORIGINAL_KEY.toPublicJWK())).toString();
     }
 
     static String tokenSignedWith(RSAKey key) {
@@ -142,14 +159,19 @@ final class JwkTestSupport {
     }
 
     private static RSAKey generateKey(String keyId) {
+        return generateKey(keyId, KeyUse.SIGNATURE);
+    }
+
+    private static RSAKey generateKey(String keyId, KeyUse use) {
         try {
-            return new RSAKeyGenerator(2048)
-                .keyID(keyId)
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(JWSAlgorithm.RS256)
-                .generate();
+            RSAKeyGenerator generator = new RSAKeyGenerator(2048);
+            generator.keyID(keyId).keyUse(use);
+            if (KeyUse.SIGNATURE.equals(use)) {
+                generator.algorithm(JWSAlgorithm.RS256);
+            }
+            return generator.generate();
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to generate test signing key " + keyId, e);
+            throw new IllegalStateException("Unable to generate test key " + keyId, e);
         }
     }
 

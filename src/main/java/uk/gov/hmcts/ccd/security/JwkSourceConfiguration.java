@@ -69,7 +69,9 @@ public class JwkSourceConfiguration {
      * derive only if IDAM's key set changes:
      * <ul>
      *     <li>IDAM adds a signing key that is not RSA, for example, EC. Tokens signed with it get 401 on a pod that
-     *         fell back, until that pod restarts. This fails closed.</li>
+     *         fell back, until that pod restarts. This fails closed. If IDAM publishes only EC keys, the pod becomes
+     *         ready, since an EC key is a usable signing key, but rejects every token until it restarts, like any pod
+     *         that derived RSA at start-up.</li>
      *     <li>IDAM starts publishing an {@code alg} on its RSA key. A healthy start-up then derives only that
      *         algorithm, so a pod that fell back accepts more than a healthy one. It still accepts only RSA
      *         algorithms, and a token still needs a valid signature from one of IDAM's RSA keys.</li>
@@ -80,6 +82,22 @@ public class JwkSourceConfiguration {
      */
     static final Set<JWSAlgorithm> FALLBACK_ALGORITHMS =
         Collections.unmodifiableSet(new LinkedHashSet<>(JWSAlgorithm.Family.RSA));
+
+    /**
+     * The keys that can verify an IDAM token: public RSA or EC keys whose {@code use} is {@code sig} or absent. It is
+     * the matcher of {@code JwtDecoderProviderConfigurationUtils#getJWSAlgorithms}, which failed start-up on master
+     * when nothing matched.
+     *
+     * <p>{@link #signatureAlgorithms} derives the algorithms from these keys, and readiness waits for a key set that
+     * has at least one of them ({@link ObservedJWKSetSource}, {@link JwkSetStartupRetry}). A key set that parses but
+     * has none, for example, an empty one or one with only {@code enc} keys, verifies no token, so it must not make
+     * the instance ready.
+     */
+    static final JWKMatcher USABLE_SIGNING_KEYS = new JWKMatcher.Builder()
+        .publicOnly(true)
+        .keyUses(KeyUse.SIGNATURE, null)
+        .keyTypes(KeyType.RSA, KeyType.EC)
+        .build();
 
     private final JwksProperties properties;
 
@@ -137,21 +155,30 @@ public class JwkSourceConfiguration {
     }
 
     /**
+     * Not ready until a usable signing key has been retrieved once. See {@link IdamJwksHealthIndicator}; the bean
+     * name gives the health contributor its name, {@code idamJwks}, which the readiness group includes.
+     */
+    @Bean
+    public IdamJwksHealthIndicator idamJwksHealthIndicator(JwkSourceTelemetry telemetry) {
+        return new IdamJwksHealthIndicator(telemetry);
+    }
+
+    @Bean
+    public JwkSetStartupRetry jwkSetStartupRetry(JWKSource<SecurityContext> idamJwkSource,
+                                                 JwkSourceTelemetry telemetry) {
+        return new JwkSetStartupRetry(idamJwkSource, telemetry, properties.startupRetryIntervalMs());
+    }
+
+    /**
      * Uses the same signature algorithms as {@code JwtDecoderProviderConfigurationUtils#getJWSAlgorithms},
      * which was previously used by {@code JwtDecoders.fromOidcIssuerLocation}. This keeps the accepted
      * algorithms unchanged while allowing the application to start even when IDAM is unavailable.
      */
     private Set<JWSAlgorithm> signatureAlgorithms(JWKSource<SecurityContext> jwkSource,
                                                   JwkSourceTelemetry telemetry) {
-        JWKMatcher matcher = new JWKMatcher.Builder()
-            .publicOnly(true)
-            .keyUses(KeyUse.SIGNATURE, null)
-            .keyTypes(KeyType.RSA, KeyType.EC)
-            .build();
-
         try {
             Set<JWSAlgorithm> algorithms = new HashSet<>();
-            List<JWK> jwks = jwkSource.get(new JWKSelector(matcher), null);
+            List<JWK> jwks = jwkSource.get(new JWKSelector(USABLE_SIGNING_KEYS), null);
 
             for (JWK jwk : jwks) {
                 if (jwk.getAlgorithm() != null) {
@@ -169,12 +196,15 @@ public class JwkSourceConfiguration {
             }
 
             log.warn("IDAM JWK set at {} advertised no usable signature algorithms; falling back to the RSA family "
-                + "{} for the lifetime of this instance", properties.uri(), FALLBACK_ALGORITHMS);
+                + "{} for the lifetime of this instance. The instance is not ready (health check idamJwks) until a "
+                + "usable signing key is retrieved, retried in the background every {}ms.",
+                properties.uri(), FALLBACK_ALGORITHMS, properties.startupRetryIntervalMs());
             telemetry.algorithmsFellBack(FALLBACK_ALGORITHMS, null);
         } catch (KeySourceException e) {
             log.warn("Unable to retrieve IDAM JWK set from {} at start-up; falling back to the RSA family {} for "
-                + "the lifetime of this instance. Token verification will retry against IDAM on the first request.",
-                properties.uri(), FALLBACK_ALGORITHMS, e);
+                + "the lifetime of this instance. The instance is not ready (health check idamJwks) until a usable "
+                + "signing key is retrieved, retried in the background every {}ms.",
+                properties.uri(), FALLBACK_ALGORITHMS, properties.startupRetryIntervalMs(), e);
             telemetry.algorithmsFellBack(FALLBACK_ALGORITHMS, e);
         }
 

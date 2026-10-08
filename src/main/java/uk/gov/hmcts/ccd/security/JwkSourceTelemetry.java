@@ -139,6 +139,19 @@ public class JwkSourceTelemetry {
      */
     private final AtomicReference<String> recoveryPendingAlgorithms = new AtomicReference<>();
 
+    /**
+     * Set by the first retrieval whose key set has a usable signing key
+     * ({@link JwkSourceConfiguration#USABLE_SIGNING_KEYS}), and never cleared. Readiness latches on it: see
+     * {@link IdamJwksHealthIndicator}.
+     */
+    private volatile boolean usableSigningKeyRetrieved;
+
+    /**
+     * How many key sets IDAM has returned that parsed, usable or not. {@link JwkSetStartupRetry} compares it before
+     * and after an attempt to tell whether the attempt reached IDAM.
+     */
+    private final AtomicLong keySetsRetrieved = new AtomicLong();
+
     public JwkSourceTelemetry(AppInsights appInsights) {
         // Nimbus measures the outage window with System.currentTimeMillis(), so the system clock is used here
         // rather than an application Clock bean that a test could replace.
@@ -169,6 +182,18 @@ public class JwkSourceTelemetry {
 
     public AlgorithmSource algorithmSource() {
         return algorithmSource;
+    }
+
+    /**
+     * Whether IDAM has supplied a key set with a usable signing key at least once in this JVM. Once true, it stays
+     * true whatever happens to IDAM afterwards.
+     */
+    boolean hasRetrievedUsableSigningKey() {
+        return usableSigningKeyRetrieved;
+    }
+
+    long keySetsRetrieved() {
+        return keySetsRetrieved.get();
     }
 
     /**
@@ -210,6 +235,8 @@ public class JwkSourceTelemetry {
      * algorithms stay the fallback set, so the log says so.
      */
     void retrievalSucceeded() {
+        keySetsRetrieved.incrementAndGet();
+
         String fallbackAlgorithms = recoveryPendingAlgorithms.getAndSet(null);
         if (fallbackAlgorithms != null) {
             log.info("IDAM JWK set retrieved; key source recovered after start-up fallback. Accepted algorithms "
@@ -221,6 +248,14 @@ public class JwkSourceTelemetry {
             log.info("IDAM JWK set retrieved successfully; no longer serving stale signing keys");
             trackState(OUTAGE_ENDED, Map.of(), Map.of());
         }
+    }
+
+    /**
+     * Called by {@link ObservedJWKSetSource} after {@link #retrievalSucceeded()} when the key set has a usable signing
+     * key. It only sets the readiness latch: telemetry and the recovery log follow {@link #retrievalSucceeded()}.
+     */
+    void usableSigningKeyRetrieved() {
+        usableSigningKeyRetrieved = true;
     }
 
     /**

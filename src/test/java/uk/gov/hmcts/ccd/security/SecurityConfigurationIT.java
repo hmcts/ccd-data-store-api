@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.mockito.ArgumentCaptor;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockReset;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.verify;
  * {@code ClientRegistrationRepository} in every Spring test. {@link ClientRegistrationStartupTest} covers that, by
  * building Boot's own repository from the production properties. See CCD-8077.
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(properties = {
     "oidc.jwks.uri=http://localhost:1/o/jwks",
     "oidc.jwks.connect-timeout-ms=250",
@@ -52,7 +55,9 @@ import static org.mockito.Mockito.verify;
     "oidc.jwks.cache-ttl-ms=60000",
     "oidc.jwks.cache-refresh-timeout-ms=1100",
     "oidc.jwks.refresh-ahead-time-ms=5000",
-    "oidc.jwks.rate-limit-min-interval-ms=1000",
+    // As in production, so the background retry against the dead endpoint runs every 15s rather than flooding the
+    // log for as long as this class's context lives.
+    "oidc.jwks.rate-limit-min-interval-ms=30000",
     "oidc.jwks.outage-tolerance-ms=300000"
 })
 class SecurityConfigurationIT extends WireMockBaseTest {
@@ -72,6 +77,12 @@ class SecurityConfigurationIT extends WireMockBaseTest {
     @Inject
     private List<SecurityFilterChain> securityFilterChains;
 
+    @Inject
+    private IdamJwksHealthIndicator idamJwksHealthIndicator;
+
+    @Inject
+    private JwkSetStartupRetry jwkSetStartupRetry;
+
     /**
      * Spied rather than replaced, so the start-up marker is shown to reach the real client that the
      * {@code AppInsights} bean publishes through. The fallback happens while the context starts, before any test
@@ -85,6 +96,13 @@ class SecurityConfigurationIT extends WireMockBaseTest {
     void contextStartsWithTheJwkSetEndpointDead() {
         assertThat(idamJwkSource).isNotNull();
         assertThat(jwtDecoder).isNotNull();
+    }
+
+    @Test
+    @DisplayName("is not ready while it holds no keys, and retries in the background")
+    void notReadyWhileTheJwkSetEndpointIsDead() {
+        assertThat(idamJwksHealthIndicator.health().getStatus()).isEqualTo(Status.DOWN);
+        assertThat(jwkSetStartupRetry.isRunning()).isTrue();
     }
 
     @Test

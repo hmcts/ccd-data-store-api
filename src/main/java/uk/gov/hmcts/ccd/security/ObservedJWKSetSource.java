@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.security;
 
 import com.nimbusds.jose.KeySourceException;
+import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSetCacheRefreshEvaluator;
 import com.nimbusds.jose.jwk.source.JWKSetSource;
@@ -18,6 +19,9 @@ import com.nimbusds.jose.proc.SecurityContext;
  * <p>It wraps the source rather than the resource retriever because the source is where the response is parsed.
  * An HTTP 200 whose body is not a JWK set is a failed retrieval and must not be reported as IDAM having
  * recovered.
+ *
+ * <p>A key set that parses but has no usable signing key ({@link JwkSourceConfiguration#USABLE_SIGNING_KEYS}) still
+ * counts as IDAM answering, for telemetry and the recovery log, but does not make the instance ready.
  */
 class ObservedJWKSetSource<C extends SecurityContext> extends JWKSetSourceWrapper<C> {
 
@@ -34,6 +38,9 @@ class ObservedJWKSetSource<C extends SecurityContext> extends JWKSetSourceWrappe
 
         JWKSet jwkSet = getSource().getJWKSet(refreshEvaluator, currentTime, context);
         telemetry.retrievalSucceeded();
+        if (!new JWKSelector(JwkSourceConfiguration.USABLE_SIGNING_KEYS).select(jwkSet).isEmpty()) {
+            telemetry.usableSigningKeyRetrieved();
+        }
         return jwkSet;
     }
 }
