@@ -209,7 +209,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private String sanitiseCollectionFieldInPath(CaseTypeDefinition caseType, String path) {
         String caseFieldId = getCaseFieldFromPath(path);
         if (path != null && caseType.isCaseFieldACollection(caseFieldId)) {
-            return path.replaceAll(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
+            return path.replace(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
         }
 
         return path;

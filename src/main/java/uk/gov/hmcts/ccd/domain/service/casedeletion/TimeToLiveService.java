@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +97,7 @@ public class TimeToLiveService {
             }
 
             // set system TTL and write TTL field to cloned data
-            timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+            timeToLive.setSystemTTL(LocalDate.now(ZoneOffset.UTC).plusDays(ttlIncrement));
             outputData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
         }
 
@@ -156,7 +157,7 @@ public class TimeToLiveService {
         if (updatedTTL.isSuspended() != currentTTL.isSuspended()
             || overrideTTLIsChanged(currentTTL.getOverrideTTL(), updatedTTL.getOverrideTTL())) {
 
-            LocalDate ttlGuardDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
+            LocalDate ttlGuardDate = LocalDate.now(ZoneOffset.UTC).plusDays(applicationParams.getTtlGuard());
             LocalDate resolvedTTL = getResolvedTTL(updatedTTL);
 
             // validate: suspended/overrideTTL updates only allowed if the deletion will occur beyond the guard period

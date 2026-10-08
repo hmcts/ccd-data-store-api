@@ -40,7 +40,7 @@ public class CaseLinkExtractor {
                 .map(metadata -> JacksonUtils.getValueFromPath(metadata.getPath(), data))
                 .filter(StringUtils::isNotBlank)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         // look for Standard CaseLink field and find all caseReferences present
         List<String> standardCaseReferences = new ArrayList<>();
@@ -51,7 +51,9 @@ public class CaseLinkExtractor {
                 for (JsonNode caseLinkNode : jsonNode) {
                     JsonNode nestedCaseFieldByPath =
                         CaseFieldPathUtils.getNestedCaseFieldByPath(caseLinkNode, "value.CaseReference");
-                    standardCaseReferences.add(nestedCaseFieldByPath.textValue());
+                    if (nestedCaseFieldByPath != null && nestedCaseFieldByPath.isTextual()) {
+                        standardCaseReferences.add(nestedCaseFieldByPath.textValue());
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ public class UserProfileEndpoint {
     @RequestMapping(value = "/caseworkers/{uid}/profile", method = RequestMethod.GET)
     @Operation(summary = "Get default setting for user")
     @ApiResponse(responseCode = "200", description = "User default settings")
-    public UserProfile getUserProfile() {
+    public UserProfile getUserProfile(@PathVariable("uid") final String uid) {
         return getUserProfileOperation.execute(AccessControlService.CAN_READ);
     }
 }
