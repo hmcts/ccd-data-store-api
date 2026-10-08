@@ -132,6 +132,12 @@ Will run all the FT's:
 ./gradlew functional
 ```
 
+The data-store adapter reuses user authentication for up to five minutes, checking
+JWT expiry before each reuse and refreshing 30 seconds before expiry. Jenkins keeps
+`BEFTA_USER_TOKEN_CACHE_TTL_SECONDS=1` for the framework's underlying cache, whose
+expiry is extended on every access. The Gradle functional, smoke and data setup
+tasks also enforce this setting for local runs.
+
 #####  Some Functional Tests
 Will run both F-1023 and F-777:
 
