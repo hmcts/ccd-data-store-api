@@ -137,3 +137,19 @@ Scenario: must return the list of cases and status code 200 for correct inputs
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-026.03 # Access control parameters are namespaced (abac$...) so that no case field name can collide with,
+          # and therefore rebind, an access control predicate value. This covers the second entry point into
+          # the sanitiser (the aggregated/UI search) and pins that the namespace is unreachable from the API.
+Scenario: must return 400 when a case field name targets the reserved access control parameter namespace
+
+    Given a user with [an active profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [contains a case field name inside the reserved access control parameter namespace],
+      And it is submitted to call the [Get case data with UI layout] operation of [CCD Data Store],
+
+     Then a negative response is received,
+      And the response [contains an error message : Field Names Invalid],
+      And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

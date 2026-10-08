@@ -16,6 +16,22 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment
 
 public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
+    /**
+     * Reserved namespace for every named parameter that carries an access control predicate value.
+     *
+     * <p>Access control parameters are bound into the same {@code Query} as the user supplied search criteria
+     * (see {@code SearchQueryFactoryOperation#build}), and the criteria are bound last. Without a reserved
+     * namespace a search field such as {@code case.region_1_basic} would sanitise down to the parameter name
+     * {@code region_1_basic} and silently overwrite the region restriction of the first basic grant type group.
+     *
+     * <p>The {@code $} is the part that makes this collision-proof rather than merely unlikely: user supplied
+     * field names are validated against {@code ^[A-Za-z0-9_.-]+$} in {@code FieldMapSanitizeOperation}, and
+     * {@code Criterion#buildParameterId} only ever removes characters, so no user input can produce a name in
+     * this namespace. {@code $} is not a parameter separator for either Hibernate or Spring's named parameter
+     * parsers, so it binds normally.
+     */
+    public static final String ACCESS_CONTROL_PARAM_PREFIX = "abac$";
+
     public static final String OR = " OR ";
 
     public static final String AND_NOT = " AND NOT ";
@@ -40,13 +56,25 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String AND = " AND ";
 
-    public static final String CASE_STATES_PARAM = "states_%s_%s";
+    public static final String CASE_STATES_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "states_%s_%s";
 
-    public static final String CLASSIFICATIONS_PARAM = "classifications_%s_%s";
+    public static final String CLASSIFICATIONS_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "classifications_%s_%s";
 
-    public static final String REFERENCES_PARAM = "references_%s_%s";
+    public static final String REFERENCES_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "references_%s_%s";
 
     public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
+
+    public static final String JURISDICTION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "jurisdiction_%s_%s";
+
+    public static final String REGION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "region_%s_%s";
+
+    public static final String LOCATION_PARAM = ACCESS_CONTROL_PARAM_PREFIX + "location_%s_%s";
+
+    public static final String CASE_ACCESS_GROUP_ID_PARAM =
+        ACCESS_CONTROL_PARAM_PREFIX + "case_access_group_id_%s_%s";
+
+    public static final String CASE_ACCESS_CATEGORY_PARAM =
+        ACCESS_CONTROL_PARAM_PREFIX + "case_access_category_%s_%s";
 
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
                                        CaseDataAccessControl caseDataAccessControl,
@@ -66,25 +94,26 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
             .map(groupedSearchRoleAssignments -> {
                 final int count = index.incrementAndGet();
                 String innerQuery = EMPTY;
-                SearchRoleAssignment representative = groupedSearchRoleAssignments.get(0);
+                SearchRoleAssignment representative = groupedSearchRoleAssignments.getFirst();
                 Set<String> readableCaseStates = getReadableCaseStates(representative, caseStates, caseType);
                 if (readableCaseStates.isEmpty()) {
                     return innerQuery;
                 }
 
                 innerQuery = addOptionalInQueryForCaseGroupId(representative.getCaseAccessGroupId(),
-                    innerQuery);
+                    innerQuery, params, paramName, count);
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getJurisdiction(),
-                    innerQuery, JURISDICTION);
+                    innerQuery, JURISDICTION, params, String.format(JURISDICTION_PARAM, count, paramName));
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getRegion(),
-                    innerQuery, REGION);
+                    innerQuery, REGION, params, String.format(REGION_PARAM, count, paramName));
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getLocation(),
-                    innerQuery, LOCATION);
+                    innerQuery, LOCATION, params, String.format(LOCATION_PARAM, count, paramName));
                 innerQuery = addInQueryForReference(params, paramName, innerQuery,
                     groupedSearchRoleAssignments, count);
                 innerQuery = addInQueryForState(params, paramName, readableCaseStates, caseStates, innerQuery, count);
                 innerQuery = addInQueryForClassification(params, paramName, innerQuery, representative, count);
-                innerQuery = addInQueryForCaseAccessCategory(caseType, representative, innerQuery);
+                innerQuery = addInQueryForCaseAccessCategory(caseType, representative, innerQuery,
+                    params, paramName, count);
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).filter(strQuery -> !StringUtils.isEmpty(strQuery)).collect(Collectors.joining(OR));
@@ -105,15 +134,22 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return parentQuery;
     }
 
-    private String addOptionalInQueryForCaseGroupId(String caseAccessGroupId, String parentQuery) {
+    private String addOptionalInQueryForCaseGroupId(String caseAccessGroupId,
+                                                    String parentQuery,
+                                                    Map<String, Object> params,
+                                                    String paramName,
+                                                    int count) {
         if (!getApplicationParams().getCaseGroupAccessFilteringEnabled()) {
             return parentQuery;
         }
         if (StringUtils.isBlank(caseAccessGroupId)) {
             return parentQuery;
         }
+        String caseAccessGroupIdParam = String.format(CASE_ACCESS_GROUP_ID_PARAM, count, paramName);
+        params.put(caseAccessGroupIdParam, caseAccessGroupId);
         return parentQuery + getOperator(parentQuery, AND)
-            + "data->'CaseAccessGroups' @> '[{\"value\":{\"caseAccessGroupId\": \"" + caseAccessGroupId + "\"}}]'";
+            + "data->'CaseAccessGroups' @> jsonb_build_array(jsonb_build_object('value', "
+            + "jsonb_build_object('caseAccessGroupId', CAST(:" + caseAccessGroupIdParam + " AS text))))";
     }
 
     private String addInQueryForReference(Map<String, Object> params,
@@ -149,10 +185,13 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     private String addEqualsQueryForOptionalAttribute(String attribute,
                                                       String parentQuery,
-                                                      String matchName) {
+                                                      String matchName,
+                                                      Map<String, Object> params,
+                                                      String attributeParam) {
         if (StringUtils.isNotBlank(attribute)) {
+            params.put(attributeParam, attribute);
             parentQuery = parentQuery + getOperator(parentQuery, AND)
-                + String.format("%s='%s'", matchName, attribute);
+                + String.format("%s = :%s", matchName, attributeParam);
         }
         return parentQuery;
     }
@@ -166,8 +205,12 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType,
                                                    SearchRoleAssignment representative,
-                                                   String parentQuery) {
-        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(representative.getRoleAssignment(), caseType);
+                                                   String parentQuery,
+                                                   Map<String, Object> params,
+                                                   String paramName,
+                                                   int count) {
+        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(representative.getRoleAssignment(), caseType,
+            params, paramName, count);
         if (StringUtils.isNotBlank(caseAccessCategoriesQuery)) {
             parentQuery = parentQuery + getOperator(parentQuery, AND)
                 + String.format(QUERY_WRAPPER, caseAccessCategoriesQuery);
@@ -175,11 +218,27 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return parentQuery;
     }
 
-    private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignment, CaseTypeDefinition caseType) {
+    private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignment,
+                                                CaseTypeDefinition caseType,
+                                                Map<String, Object> params,
+                                                String paramName,
+                                                int count) {
         List<String> caseAccessCategories = getCaseAccessCategories(roleAssignment, caseType);
 
+        AtomicInteger categoryIndex = new AtomicInteger();
         return caseAccessCategories.stream()
-            .map(cac -> CASE_ACCESS_CATEGORY + " LIKE '" + cac + "%'")
+            .map(cac -> {
+                String cacParam = String.format(CASE_ACCESS_CATEGORY_PARAM,
+                    count + "_" + categoryIndex.incrementAndGet(), paramName);
+                params.put(cacParam, escapeLikeWildcards(cac) + "%");
+                return CASE_ACCESS_CATEGORY + " LIKE :" + cacParam + " ESCAPE '\\'";
+            })
             .collect(Collectors.joining(" OR "));
+    }
+
+    private static String escapeLikeWildcards(String value) {
+        return value.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
     }
 }

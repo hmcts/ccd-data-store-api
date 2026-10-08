@@ -121,3 +121,36 @@ Scenario: must return pagination metadata successfully for correct Last State Mo
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-048.02 # Access control parameters are namespaced (abac$...) so that no case field name can collide with,
+          # and therefore rebind, an access control predicate value. This pins that the namespace is
+          # unreachable from the API: the reserved character is rejected before the query is ever built.
+Scenario: must return 400 when a case field name targets the reserved access control parameter namespace
+
+    Given a user with [a detailed profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [contains a case field name inside the reserved access control parameter namespace],
+      And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store],
+
+     Then a negative response is received,
+      And the response [contains an error message : Field Names Invalid],
+      And the response has all the details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-048.03 # A case field criterion and the access control predicates are bound into the same query, from two
+          # separate parameter namespaces. This pins that they coexist: the search is accepted, the criterion
+          # is bound and applied, and no parameter fails to resolve at execution time.
+Scenario: must apply a case field search criterion alongside the access control predicates
+
+    Given a user with [a detailed profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [filters on a case field value that no case holds],
+      And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store],
+
+     Then a positive response is received,
+      And the response [returns the pagination metadata],
+      And the response [contains pagination results count as 0],
+      And the response has all the details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
