@@ -122,8 +122,10 @@ public class QueryEndpoint {
         accessMap.put("read", CAN_READ);
     }
 
-    /*
-     * @deprecated see https://tools.hmcts.net/jira/browse/RDM-1421
+    /**
+     * Gets case types for a caseworker and jurisdiction.
+     *
+     * @deprecated see <a href="https://tools.hmcts.net/jira/browse/RDM-1421">RDM-1421</a>
      */
     @Deprecated
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types", method = RequestMethod.GET)

@@ -8,8 +8,7 @@ import org.mockito.MockitoAnnotations;
 
 import jakarta.validation.ConstraintValidatorContext;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CaseTypeIdValidatorTest {
 
@@ -41,54 +40,54 @@ public class CaseTypeIdValidatorTest {
     @Test
     public void failForNullCaseTypeId() {
         final boolean result = caseTypeIdValidator.isValid(null, constraintValidatorContext);
-        assertFalse("Null Case Type Id should not be valid", result);
+        assertThat(result).isFalse();
     }
 
     @Test
     public void failForBlankCaseTypeId() {
         final boolean result = caseTypeIdValidator.isValid("", constraintValidatorContext);
-        assertFalse("Blank Case Type Id should not be valid", result);
+        assertThat(result).isFalse();
     }
 
     @Test
     public void failForInvalidCharacter() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_INVALID_CHARACTER, constraintValidatorContext);
-        assertFalse("Case Type Id " + CASE_TYPE_ID_INVALID_CHARACTER + " should not be valid", result);
+        assertThat(result).isFalse();
     }
 
     @Test
     public void failForNonAsciiLetter() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_INVALID_NON_ASCII, constraintValidatorContext);
-        assertFalse("Case Type Id " + CASE_TYPE_ID_INVALID_NON_ASCII + " should not be valid", result);
+        assertThat(result).isFalse();
     }
 
     @Test
     public void passForValidCaseTypeIdUpperCase() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_VALID_UPPER_CASE, constraintValidatorContext);
-        assertTrue("Case Type Id " + CASE_TYPE_ID_VALID_UPPER_CASE + " should be valid", result);
+        assertThat(result).isTrue();
     }
 
     @Test
     public void passForValidCaseTypeIdLowerCase() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_VALID_LOWER_CASE, constraintValidatorContext);
-        assertTrue("Case Type Id " + CASE_TYPE_ID_VALID_LOWER_CASE + " should be valid", result);
+        assertThat(result).isTrue();
     }
 
     @Test
     public void passForValidCaseTypeIdNumbers() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_VALID_NUMBERS, constraintValidatorContext);
-        assertTrue("Case Type Id " + CASE_TYPE_ID_VALID_NUMBERS + " should be valid", result);
+        assertThat(result).isTrue();
     }
 
     @Test
     public void passForValidCaseTypeIdHyphens() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_VALID_HYPHENS, constraintValidatorContext);
-        assertTrue("Case Type Id " + CASE_TYPE_ID_VALID_HYPHENS + " should be valid", result);
+        assertThat(result).isTrue();
     }
 
     @Test
     public void passForValidCaseTypeIdAll() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_VALID_ALL, constraintValidatorContext);
-        assertTrue("Case Type Id " + CASE_TYPE_ID_VALID_ALL + " should be valid", result);
+        assertThat(result).isTrue();
     }
 }

@@ -59,8 +59,8 @@ public class CriteriaFactoryTest {
 
         List<Criterion> result = subject.build(new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE), params);
         assertThat(result).hasSize(3);
-        assertThat(result.stream().filter(c -> c instanceof FieldDataCriterion)).hasSize(1);
-        assertThat(result.stream().filter(c -> c instanceof MetaDataCriterion)).hasSize(2);
+        assertThat(result.stream().filter(FieldDataCriterion.class::isInstance)).hasSize(1);
+        assertThat(result.stream().filter(MetaDataCriterion.class::isInstance)).hasSize(2);
     }
 
     @Test
