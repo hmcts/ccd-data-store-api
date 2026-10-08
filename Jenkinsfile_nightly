@@ -1,12 +1,15 @@
 #!groovy
 
+import groovy.json.JsonOutput
+import uk.gov.hmcts.contino.GithubAPI
+
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
     //CCD-3539 (Stop running Nightly builds on weekends) - At 07:00 on every day-of-week from Monday through Friday.  Original schedule was 'H 07 * * *'
     pipelineTriggers([cron('H 17 * * 1-5')])
 ])
 
-@Library("Infrastructure@2.12.1")
+@Library("Infrastructure@cve-dashboard")
 
 def type = "java"
 def product = "ccd"
@@ -104,6 +107,7 @@ env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
 
 withNightlyPipeline(type, product, component) {
+    enableCveDashboardIngestion()
 
     stage('Wait for ccd-definition-store-api job') {
         script {
@@ -139,127 +143,149 @@ withNightlyPipeline(type, product, component) {
             }
 
             def suppressionFile = ''
+            def baselineSuppressionFile = 'build/cve-suppression-baseline.xml'
+            def validatedCvesFile = 'build/validated-cve-suppressions.txt'
+            def slackNotificationChannel = '#nightly_cve_suppressions'
+            def credentialsId = env.GIT_CREDENTIALS_ID
+            def targetBranch = 'master'
+
+            withCredentials([
+                gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+            ]) {
+                sh "git fetch origin +refs/heads/${targetBranch}:refs/remotes/origin/${targetBranch}"
+            }
+
             script {
                 suppressionFile = sh(
                     script: './gradlew printSuppressionFile -q',
                     returnStdout: true
                 ).trim().split("=")[1]
 
-                echo "Suppression file and path: ${suppressionFile}"
+                def masterSuppression = sh(
+                    script: "git show origin/${targetBranch}:${suppressionFile}",
+                    returnStdout: true
+                )
+                writeFile(file: suppressionFile, text: masterSuppression)
+                writeFile(file: baselineSuppressionFile, text: masterSuppression)
 
+                echo "Suppression file and path: ${suppressionFile}"
                 sh """
                   echo 'Current contents of ${suppressionFile}:'
                   cat '${suppressionFile}'
                 """
             }
 
-            def slackNotificationChannel = '#nightly_cve_suppressions'
-            def branch = env.BRANCH_NAME
-
-            if (env.CHANGE_ID) {
-                // If this is a PR, push changes to the PR branch
-                branch = env.CHANGE_BRANCH
-            }
-
             sh './gradlew suppressCves'
 
-            // Store the list of changed files
-            def changedFiles = ''
+            // Store the list of changed files relative to the master baseline
+            def changedFiles = []
 
-            // Store the changes in the suppression file
-            def changes = ''
+            def suppressionChanged = false
 
             script {
-                // Stage all modified tracked files
-                sh 'git add -u'
-
-                changedFiles = sh(
-                    script: 'git diff --cached --name-only',
+                def workspaceChangedFiles = sh(
+                    script: 'git diff HEAD --name-only',
                     returnStdout: true
-                ).trim().split("\n").findAll { it?.trim() } as List
-
-                echo "List of changed files: ${changedFiles}"
-
-                if (changedFiles.isEmpty()) {
-                    echo "No changed files to extract."
-                } else {
-                    def fileName = sh(
-                        script: """
-                            echo '${changedFiles}' | tr -d '[]' | xargs basename
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    echo "Extracted file name: ${fileName}"
+                ).trim().readLines().findAll { it?.trim() }
+                def unexpectedChangedFiles = workspaceChangedFiles.findAll { it != suppressionFile }
+                if (unexpectedChangedFiles) {
+                    error("CVE suppression generation changed unexpected files: ${unexpectedChangedFiles}")
                 }
 
-                if (changedFiles.size() == 1 && changedFiles[0] == suppressionFile) {
+                if (readFile(file: baselineSuppressionFile) != readFile(file: suppressionFile)) {
+                    changedFiles = [suppressionFile]
+                    suppressionChanged = true
                     echo "✅ Only suppression file changed. Proceeding..."
-
-                    // Verify it includes CVE-related changes
-                    changes = sh(
-                        script: """
-                          git diff --cached ${suppressionFile} | grep '^+' | grep '<cve>' || true
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    if (changes) {
-                        echo "✅ CVE-related changes found in suppression file."
-                    } else {
-                        echo "⚠️ No CVE-related changes detected."
-                    }
-
                 } else {
-                    echo "✅ Suppression file not changed — marking step as successfull"
+                    echo "✅ Suppression file not changed — marking step as successful"
                 }
             }
 
-            if (changes) {
+            if (suppressionChanged && env.CHANGE_ID) {
+                echo "CVE suppression changes detected during PR validation; skipping automated PR creation."
+            } else if (suppressionChanged) {
+                sh(
+                    script: "./gradlew validateGeneratedCveSuppressions "
+                        + "-PbaselineSuppressionFile=${baselineSuppressionFile} "
+                        + "-PvalidatedCvesOutput=${validatedCvesFile}"
+                )
 
-                // Clean and format CVE lines
-                def simplifiedChanges = changes
+                def newCves = readFile(file: validatedCvesFile)
                     .readLines()
-                    .collect { it.replaceFirst(/\+/, '').trim() }                // Remove leading '+'
-                    .collect { it.replaceAll(/<\/?[^>]+>/, '') }                 // Strip XML/HTML tags
-                //.collect { it.replace('[Ticket]', '<https://yourtracker.example/TICKET-ID|Ticket>') } // Optional link
-                    .join('\n')
+                    .collect { it.trim() }
+                    .findAll { it }
+                def formattedCves = newCves.collect { "- `${it}`" }.join('\n')
 
-                def message = """
-                                📦 *CVE Suppression File Updated*
+                echo "Staged files: ${changedFiles}"
+                echo "New CVEs: ${newCves}"
 
-                                *Detected CVE changes (Please create Jira backlog ticket):*
+                def automationBranch = "automated/cve-suppressions-${env.BUILD_NUMBER}"
+                def automationWorkspace = "${pwd(tmp: true)}/cve-suppressions-${env.BUILD_NUMBER}"
+                def githubProject = new GithubAPI(this).currentProject()
+                def generatedSuppression = readFile(file: suppressionFile)
 
-                                ${simplifiedChanges}
+                echo "Creating ${automationBranch} from origin/${targetBranch}"
+                sh "git worktree add --no-track -b '${automationBranch}' '${automationWorkspace}' origin/${targetBranch}"
+                try {
+                    writeFile(file: "${automationWorkspace}/${suppressionFile}", text: generatedSuppression)
 
-                                *Build Info:*
-                                • *Job*: ${env.JOB_NAME}
-                                • *Build*: #${env.BUILD_NUMBER}
-                                • *URL*: ${env.BUILD_URL}
-                               """.stripIndent().trim()
+                    dir(automationWorkspace) {
+                        sh "git add -- '${suppressionFile}'"
+                        def automationChangedFiles = sh(
+                            script: 'git diff --cached --name-only',
+                            returnStdout: true
+                        ).trim().readLines()
+                        if (automationChangedFiles != [suppressionFile]) {
+                            error("Expected only ${suppressionFile} to change, found: ${automationChangedFiles}")
+                        }
+
+                        sh 'git commit -m "Suppressing CVE - Actions"'
+
+                        withCredentials([
+                            gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
+                        ]) {
+                            sh "git push origin HEAD:refs/heads/${automationBranch}"
+                        }
+                    }
+                } finally {
+                    sh(returnStatus: true, script: "git worktree remove --force '${automationWorkspace}'")
+                }
+
+                def pullRequestResponse = httpRequest(
+                    acceptType: 'APPLICATION_JSON',
+                    authentication: credentialsId,
+                    consoleLogResponseBody: false,
+                    contentType: 'APPLICATION_JSON',
+                    httpMode: 'POST',
+                    requestBody: JsonOutput.toJson([
+                        title: 'Suppress newly detected CVEs',
+                        head: automationBranch,
+                        base: targetBranch,
+                        body: "Automated CVE suppression update generated and validated by ${env.JOB_NAME} #${env.BUILD_NUMBER}."
+                    ]),
+                    url: "https://api.github.com/repos/${githubProject}/pulls",
+                    validResponseCodes: '201'
+                )
+                def pullRequest = readJSON returnPojo: true, text: pullRequestResponse.content
+                def pullRequestNumber = pullRequest.number
+                def pullRequestUrl = pullRequest.html_url
+                def slackMessage = [
+                    '*ACTION REQUIRED: MANUAL MERGE NEEDED*',
+                    "*Merge PR #${pullRequestNumber} manually to fix the CVE suppression failure.*",
+                    '',
+                    "*New CVEs to suppress (${newCves.size()}):*",
+                    formattedCves,
+                    '',
+                    "*Pull request:* <${pullRequestUrl}|Open PR #${pullRequestNumber}>",
+                    "*Build:* <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
+                ].join('\n')
 
                 slackSend(
                     channel: slackNotificationChannel,
-                    color: '#439FE0',
-                    message: message
+                    color: 'danger',
+                    failOnError: true,
+                    message: slackMessage
                 )
-
-                echo "Staged files: ${changedFiles}"
-                echo "Changes: ${changes}"
-
-                echo "Commiting changes into branch ${branch}"
-                sh 'git commit -m "Suppressing CVE - Actions"'
-                echo "Pushing changes"
-
-                def credentialsId = env.GIT_CREDENTIALS_ID
-
-                withCredentials([
-                    gitUsernamePassword(credentialsId: credentialsId, gitToolName: 'Default')
-                ]) {
-                    sh """
-                        git push origin HEAD:${branch}
-                    """
-                }
             } else {
                 echo "✅ Suppression file not changed — skipping Slack notification"
             }
