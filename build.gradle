@@ -849,6 +849,10 @@ def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('
 //tags = tags + " and (@S-164 or @S-1025.3)"
 
 task functional(type: JavaExec) {
+    def tlsClientProtocols = System.getenv('BEFTA_TLS_CLIENT_PROTOCOLS')
+    if (tlsClientProtocols) {
+        systemProperty 'jdk.tls.client.protocols', tlsClientProtocols
+    }
     description = "Executes functional tests against an the CCD Data Store API instance just deployed"
     group = "Verification"
     dependsOn aatClasses
