@@ -68,6 +68,12 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 BeftaUtils.defaultLog("Will NOT create role assignments!");
             }
 
+            @Override
+            public synchronized void loadDataIfNotLoadedVeryRecently() {
+                super.loadDataIfNotLoadedVeryRecently();
+                IdamTestingSupportUserCreator.createUsersInIdam();
+            }
+
         };
     }
 

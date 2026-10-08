@@ -1,0 +1,21 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_DateCaseClosed",
+    "ID": "TextField",
+    "Label": "Text Field",
+    "HintText": "",
+    "FieldType": "Text",
+    "CategoryID": "",
+    "FieldTypeParameter": "",
+    "RegularExpression": "",
+    "SecurityClassification": "Public",
+    "Min": "",
+    "Max": "",
+    "DefaultHidden": "No",
+    "Searchable": "",
+    "FieldShowCondition": "",
+    "TabShowCondition": ""
+  }
+]

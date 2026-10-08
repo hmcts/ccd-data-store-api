@@ -11,17 +11,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.DateCaseClosedResponse;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.ClosedCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequestHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +36,7 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -58,6 +64,9 @@ class UICaseSearchControllerTest {
     private ElasticsearchSortService elasticsearchSortService;
 
     @Mock
+    private ClosedCaseSearchOperation closedCaseSearchOperation;
+
+    @Mock
     private ApplicationParams applicationParams;
 
     private CrossCaseTypeSearchRequestHelper crossCaseTypeSearchRequestHelper;
@@ -70,7 +79,8 @@ class UICaseSearchControllerTest {
         crossCaseTypeSearchRequestHelper = new CrossCaseTypeSearchRequestHelper(applicationParams);
 
         controller = new UICaseSearchController(caseSearchOperation, elasticsearchQueryHelper,
-            caseSearchResultViewGenerator,elasticsearchSortService, crossCaseTypeSearchRequestHelper);
+            caseSearchResultViewGenerator,elasticsearchSortService, closedCaseSearchOperation,
+            crossCaseTypeSearchRequestHelper);
     }
 
     @Test
@@ -169,6 +179,51 @@ class UICaseSearchControllerTest {
         assertAll(
             () -> assertThat(caseIds, is("1,2,3,4,5,6,7,8,9,10"))
         );
+    }
+
+    @Test
+    void shouldGetClosedCases() {
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC).minusDays(1);
+        DateCaseClosedResponse dateCaseClosedResponse =
+            new DateCaseClosedResponse(List.of("1234567890123456", "2345678901234567"));
+        when(closedCaseSearchOperation.execute(closedCasesDate)).thenReturn(dateCaseClosedResponse);
+
+        ResponseEntity<DateCaseClosedResponse> response = controller.getClosedCases(closedCasesDate);
+
+        verify(closedCaseSearchOperation).execute(closedCasesDate);
+        assertAll(
+            () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+            () -> assertThat(response.getBody(), is(dateCaseClosedResponse))
+        );
+    }
+
+    @Test
+    void shouldGetClosedCasesForCurrentDate() {
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC);
+        DateCaseClosedResponse dateCaseClosedResponse =
+            new DateCaseClosedResponse(List.of("1234567890123456"));
+        when(closedCaseSearchOperation.execute(closedCasesDate)).thenReturn(dateCaseClosedResponse);
+
+        ResponseEntity<DateCaseClosedResponse> response = controller.getClosedCases(closedCasesDate);
+
+        verify(closedCaseSearchOperation).execute(closedCasesDate);
+        assertAll(
+            () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+            () -> assertThat(response.getBody(), is(dateCaseClosedResponse))
+        );
+    }
+
+    @Test
+    void shouldRejectClosedCasesDateThatIsAfterCurrentDate() {
+        LocalDate closedCasesDate = LocalDate.now(ZoneOffset.UTC).plusDays(1);
+
+        BadSearchRequest exception = assertThrows(
+            BadSearchRequest.class,
+            () -> controller.getClosedCases(closedCasesDate)
+        );
+
+        verify(closedCaseSearchOperation, never()).execute(any());
+        assertThat(exception.getMessage(), is("Date is not valid"));
     }
 
     private List<SearchResultViewItem> searchResultViewItems(int numberOfEntries) {

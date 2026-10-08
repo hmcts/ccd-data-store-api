@@ -52,6 +52,8 @@ def secrets = [
         secret('ccd-befta-caseworker-1-no-profile-pwd', 'CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD'),
         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
+        secret('ccd-disposer-payment-user-email', 'CCD_DISPOSER_PAYMENT_USER_EMAIL'),
+        secret('ccd-disposer-payment-user-password', 'CCD_DISPOSER_PAYMENT_USER_PASSWORD'),
         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
         secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
         secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD'),
@@ -105,6 +107,7 @@ env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.IDAM_TESTING_SUPPORT_URL = "https://idam-testing-support-api.aat.platform.hmcts.net"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 // BEFTA retry env variables

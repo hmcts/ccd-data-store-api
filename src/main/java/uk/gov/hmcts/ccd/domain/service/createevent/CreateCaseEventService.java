@@ -30,20 +30,21 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.caseclosed.DateCaseClosedService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.caselinking.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessGroupUtils;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.ConditionalFieldRestorer;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.common.NewCaseUtils;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentTimestampService;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
@@ -113,6 +114,7 @@ public class CreateCaseEventService {
     private final CasePointerRepository pointerRepository;
     private final ConditionalFieldRestorer conditionalFieldRestorer;
     private final CaseAccessService caseAccessService;
+    private final DateCaseClosedService dateCaseClosedService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -153,7 +155,8 @@ public class CreateCaseEventService {
                                   final CasePointerRepository pointerRepository,
                                   final SynchronisedCaseProcessor synchronisedCaseProcessor,
                                   final ConditionalFieldRestorer conditionalFieldRestorer,
-                                  final CaseAccessService caseAccessService) {
+                                  final CaseAccessService caseAccessService,
+                                  final DateCaseClosedService dateCaseClosedService) {
 
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -190,6 +193,7 @@ public class CreateCaseEventService {
         this.synchronisedCaseProcessor = synchronisedCaseProcessor;
         this.conditionalFieldRestorer = conditionalFieldRestorer;
         this.caseAccessService = caseAccessService;
+        this.dateCaseClosedService = dateCaseClosedService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -334,6 +338,8 @@ public class CreateCaseEventService {
                 verifiedDocumentHashes
             );
         }
+
+        dateCaseClosedService.updateForExistingCase(finalCaseDetails, caseDetailsInDatabase, caseTypeDefinition);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsInDatabase)
