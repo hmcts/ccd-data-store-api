@@ -41,6 +41,15 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     void getUserCaseRolesAssignedToUser() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
 
+        String amResponseJson = roleAssignmentResponseJson(
+            userRoleAssignmentJson("89000", "[CREATOR]", CASE_ID_1),
+            userRoleAssignmentJson("89001", "[DEFENDANT]", CASE_ID_2),
+            userRoleAssignmentJson("89001", "[SOLICITOR]", CASE_ID_2)
+        );
+
+        stubFor(post(urlMatching("/am/role-assignments/query"))
+            .willReturn(okJson(amResponseJson).withStatus(200)));
+
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)

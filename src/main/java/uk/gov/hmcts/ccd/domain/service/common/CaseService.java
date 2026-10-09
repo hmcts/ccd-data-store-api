@@ -73,11 +73,13 @@ public class CaseService {
     /**
      * @param content     Data received from the client.
      * @param caseDetails of the case.
-     * @return <code>Optional&lt;CaseDetails&gt;</code> - CaseDetails wrapped in Optional
+     * @return returns and mutates the supplied CaseDetails.
      */
-    public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
+    public CaseDetails populateCurrentCaseDetailsWithData(CaseDataContent content, CaseDetails caseDetails) {
         if (content.getEventData() != null) {
             content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+        } else if (content.getData() != null) {
+            content.getData().forEach((key, value) -> caseDetails.getData().put(key, value));
         }
         return caseDetails;
     }
