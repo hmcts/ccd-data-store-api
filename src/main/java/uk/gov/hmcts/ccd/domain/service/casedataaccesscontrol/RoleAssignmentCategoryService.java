@@ -16,7 +16,9 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCate
 public class RoleAssignmentCategoryService {
 
     private static final Pattern PROFESSIONAL_ROLE =
-        Pattern.compile(".+-solicitor$|^caseworker-.+-localAuthority$", Pattern.CASE_INSENSITIVE);
+        Pattern.compile(
+            "^pui-case-manager$|^solicitor$|.+-solicitor$|^caseworker-.+-localAuthority$",
+            Pattern.CASE_INSENSITIVE);
     private static final Pattern CITIZEN_ROLE =
         Pattern.compile("^citizen(-.*)?$|^letter-holder$", Pattern.CASE_INSENSITIVE);
     private static final Pattern JUDICIAL_ROLE = Pattern.compile(".+-panelmember$",
