@@ -320,6 +320,8 @@ dependencies {
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+    // Version from the Spring Boot BOM. The App Insights agent bridges it, so Span.current() is the agent's span
+    implementation group: 'io.opentelemetry', name: 'opentelemetry-api'
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
     implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
@@ -753,9 +755,9 @@ test {
     jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 
     testLogging {
-        // set options for log level LIFECYCLE
+        // set options for log level LIFECYCLE: only failures are printed, so print them in full
         events "failed"
-        exceptionFormat "short"
+        exceptionFormat "full"
 
         // set options for log level DEBUG
         debug {
@@ -785,6 +787,26 @@ test {
 }
 
 check.dependsOn jacocoTestReport
+
+// The next test run deletes build/test-results/test, so keep each run's failing classes (with their captured
+// output) in build/test-failures/<timestamp>. Runs with no failures copy nothing.
+tasks.register('archiveFailedTestResults') {
+    description = 'Copies the JUnit XML of failed test classes to build/test-failures/<timestamp>'
+    def results = layout.buildDirectory.dir('test-results/test')
+    def archive = layout.buildDirectory.dir('test-failures')
+    doLast {
+        def failed = (results.get().asFile.listFiles() ?: []).findAll { file ->
+            file.name.endsWith('.xml') && (file.text.contains('<failure') || file.text.contains('<error'))
+        }
+        if (failed) {
+            def target = archive.get().dir(new Date().format('yyyyMMdd-HHmmss')).asFile
+            target.mkdirs()
+            failed.each { file -> java.nio.file.Files.copy(file.toPath(), new File(target, file.name).toPath()) }
+            logger.lifecycle("Archived ${failed.size()} failed test class result(s) to ${target}")
+        }
+    }
+}
+test.finalizedBy 'archiveFailedTestResults'
 
 task fortifyScan(type: JavaExec)  {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"

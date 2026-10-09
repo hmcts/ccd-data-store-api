@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -58,6 +59,7 @@ class AppInsightsJwtDecoderTest {
 
     private AppInsightsJwtDecoder appInsightsJwtDecoder;
     private Logger logger;
+    private Level previousLevel;
     private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeEach
@@ -65,6 +67,8 @@ class AppInsightsJwtDecoderTest {
         appInsightsJwtDecoder = new AppInsightsJwtDecoder(jwtDecoder, appInsights);
 
         logger = (Logger) LoggerFactory.getLogger(AppInsightsJwtDecoder.class);
+        previousLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
         listAppender = new ListAppender<>();
         listAppender.start();
         logger.addAppender(listAppender);
@@ -74,6 +78,7 @@ class AppInsightsJwtDecoderTest {
     void tearDown() {
         listAppender.stop();
         logger.detachAppender(listAppender);
+        logger.setLevel(previousLevel);
         RequestContextHolder.resetRequestAttributes();
     }
 
@@ -107,6 +112,24 @@ class AppInsightsJwtDecoderTest {
         assertThat(listAppender.list.get(0).getLevel()).isEqualTo(Level.WARN);
         assertThat(listAppender.list.get(0).getFormattedMessage())
             .contains("JWT validation failed: INVALID_SIGNATURE");
+    }
+
+    @Test
+    void decodeShouldLogFailureToCheckTokenAtDebugAndRethrowException() {
+        // What NimbusJwtDecoder throws when the key source cannot supply the signing keys, e.g. IDAM is down.
+        JwtException exception = new JwtException(
+            "An error occurred while attempting to decode the Jwt: Couldn't retrieve JWK set from URL");
+        when(jwtDecoder.decode(TOKEN)).thenThrow(exception);
+        setCurrentRequest("GET", "/cases/123");
+
+        assertThatThrownBy(() -> appInsightsJwtDecoder.decode(TOKEN)).isSameAs(exception);
+
+        Map<String, String> properties = captureAppInsightsProperties(JWT_VALIDATION_FAILURE_MESSAGE);
+        assertThat(properties.get(FAILURE_TYPE)).isEqualTo("OTHER");
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.get(0).getLevel()).isEqualTo(Level.DEBUG);
+        assertThat(listAppender.list.get(0).getFormattedMessage()).isEqualTo("JWT validation failed: OTHER");
     }
 
     @Test
