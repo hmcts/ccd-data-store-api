@@ -55,6 +55,22 @@ Scenario: must return 403 when request provides authentic credentials without au
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-256
+Scenario: must return 404 when an authenticated citizen no longer has access to start the event
+
+    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation],
+      And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data],
+      And a successful call [is made to remove Case Role] as in [F-055_Remove_Case_Assigned_User_role_for_Case],
+      And a user with [an active profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And it is submitted to call the [start event creation as citizen] operation of [CCD Data Store],
+
+     Then a negative response is received,
+      And the response [contains a HTTP 404 Not Found],
+      And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-254 @Ignore # expected 404 but got 400 (defect RDM-6665)
 Scenario: must return 404 if case is not found
 

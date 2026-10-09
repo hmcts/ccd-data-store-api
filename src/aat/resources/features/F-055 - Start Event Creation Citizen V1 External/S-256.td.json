@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-256",
+  "_extends_": "F-055_Base_Test_Data",
+  "title": "must return 404 when an authenticated citizen no longer has access to start the event",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "No case found for reference: ${[scenarioContext][childContexts][Citizen_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

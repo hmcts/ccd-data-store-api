@@ -51,3 +51,12 @@ Feature: F-131: Create Event External API CRUD Tests
     And it is submitted to call the [create event] operation of [CCD Data Store],
     Then a negative response is received
     And the response has all other details as expected.
+
+  @S-131.6
+  Scenario: User cannot start event creation without case access
+    Given a case that has just been created as in [F-131_CreateCase],
+    And a user [with no access to the case]
+    When a request is prepared with appropriate values,
+    And it is submitted to call the [Start event creation as Case worker] operation of [CCD Data Store],
+    Then a negative response is received
+    And the response has all other details as expected.
