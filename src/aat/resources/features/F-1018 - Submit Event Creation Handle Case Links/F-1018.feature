@@ -158,7 +158,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCaseworkerBase]
       And   another successful call [to create a case with a different case_type] as in [F-1018_CreateThirdCaseDifferentCaseTypePreRequisiteCaseworkerBase]
-      And   a successful call [to get an event token for the case just created] as in [F-1018-GetUpdateEventToken]
+      And   a successful call [to get an event token for the case just created] as in [S-1018.11-GetUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field as a collection]
       And   the request [specifying the case to be updated, as created in F-1018_CreateLinkedCasePreRequisiteCaseworkerBase, does not contain a CaseLink field]
@@ -314,7 +314,7 @@ Feature: F-1018: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1018_CreateCasePreRequisiteCitizenBase]
       And   another successful call [to create a case] as in [F-1018_CreateAnotherCasePreRequisiteCitizenBase]
-      And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1018-GetCitizenUpdateEventToken]
+      And   a successful call [to get an update event token for the case just created as a Citizen] as in [S-1018.21-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCitizenBase]
       And   the request [specifying the case to be updated, as created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase, does not contain a CaseLink field]

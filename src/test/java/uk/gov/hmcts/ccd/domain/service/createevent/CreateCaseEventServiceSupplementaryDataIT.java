@@ -87,7 +87,8 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
         CaseDataContent caseDataContent = newCaseDataContent()
             .withEvent(buildEvent())
             .withData(new HashMap<>())
-            .withToken(generateEventTokenNewCase("123", "PROBATE", CASE_01_TYPE, EVENT_ID))
+            .withToken(generateEventToken(jdbcTemplate, "123", "PROBATE", CASE_01_TYPE,
+                Long.valueOf(CASE_REFERENCE), EVENT_ID))
             .withIgnoreWarning(false)
             .build();
 
@@ -119,7 +120,8 @@ class CreateCaseEventServiceSupplementaryDataIT extends WireMockBaseTest {
         CaseDataContent caseDataContent = newCaseDataContent()
             .withEvent(buildEvent())
             .withData(new HashMap<>())
-            .withToken(generateEventTokenNewCase("123", "PROBATE", CASE_01_TYPE, EVENT_ID))
+            .withToken(generateEventToken(jdbcTemplate, "123", "PROBATE", CASE_01_TYPE,
+                Long.valueOf(CASE_REFERENCE), EVENT_ID))
             .withIgnoreWarning(false)
             .build();
 
