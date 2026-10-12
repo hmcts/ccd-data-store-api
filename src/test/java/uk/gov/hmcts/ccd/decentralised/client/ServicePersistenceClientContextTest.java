@@ -176,7 +176,8 @@ class ServicePersistenceClientContextTest {
         submitThroughFilter();
 
         verifySubmittedContext(latest);
-        assertEquals(request.getAttribute("client-context"), response.getHeader("client-context"));
+        assertEquals(mapper.readTree(MERGED),
+            mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader("client-context"))));
     }
 
     @Test
