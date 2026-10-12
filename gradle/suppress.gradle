@@ -144,17 +144,23 @@ Set<String> validateGeneratedCveSuppressions(String baselineSuppressionPath,
 }
 
 File resolveSuppressionFile() {
-    def suppressionFileValue = dependencyCheck.getSuppressionFiles()
-    if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, 'getOrNull')) {
+    def dependencyCheckExtension = project.extensions.getByName('dependencyCheck')
+    def suppressionFileValue = dependencyCheckExtension.getSuppressionFiles()
+    if (suppressionFileValue instanceof org.gradle.api.provider.Provider) {
         suppressionFileValue = suppressionFileValue.getOrNull()
-    } else if (suppressionFileValue?.metaClass?.respondsTo(suppressionFileValue, 'get')) {
-        suppressionFileValue = suppressionFileValue.get()
     }
     if (suppressionFileValue instanceof Collection) {
         suppressionFileValue = suppressionFileValue.find { it }?.toString()
     }
     if (!suppressionFileValue) {
-        throw new GradleException('No dependency-check suppression file is configured')
+        suppressionFileValue = dependencyCheckExtension.getSuppressionFile()
+        if (suppressionFileValue instanceof org.gradle.api.provider.Provider) {
+            suppressionFileValue = suppressionFileValue.getOrNull()
+        }
+    }
+    if (!suppressionFileValue) {
+        throw new GradleException('No dependency-check suppression file is configured. '
+                + 'Set dependencyCheck.suppressionFiles or dependencyCheck.suppressionFile.')
     }
     return project.file(suppressionFileValue)
 }
@@ -258,5 +264,11 @@ tasks.register('validateGeneratedCveSuppressions') {
             outputFile.parentFile.mkdirs()
             outputFile.setText(newCves.toList().sort().join('\n') + '\n', 'UTF-8')
         }
+    }
+}
+
+tasks.register('printSuppressionFile') {
+    doLast {
+        println "SUPPRESSION_FILE=${project.relativePath(resolveSuppressionFile())}"
     }
 }
