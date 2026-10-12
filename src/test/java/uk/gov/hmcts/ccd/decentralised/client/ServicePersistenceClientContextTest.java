@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.decentralised.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import feign.Feign;
 import org.junit.jupiter.api.AfterEach;
@@ -9,14 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -61,7 +63,7 @@ class ServicePersistenceClientContextTest {
           "revision": 1
         }
         """;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper mapper = JsonMapper.builder().build();
     private final MockHttpServletRequest request = new MockHttpServletRequest();
     private final MockHttpServletResponse response = new MockHttpServletResponse();
     private final ApplicationParams params = mock(ApplicationParams.class);
@@ -74,11 +76,14 @@ class ServicePersistenceClientContextTest {
     void setUp() {
         server = new WireMockServer(wireMockConfig().dynamicPort());
         server.start();
-        var converters = new HttpMessageConverters(new MappingJackson2HttpMessageConverter(mapper));
+        var converters = mock(FeignHttpMessageConverters.class);
+        when(converters.getConverters()).thenReturn(List.of(new JacksonJsonHttpMessageConverter(mapper)));
+        var convertersProvider = new StaticListableBeanFactory(Map.of("converters", converters))
+            .getBeanProvider(FeignHttpMessageConverters.class);
         final var api = Feign.builder()
             .contract(new SpringMvcContract())
-            .encoder(new SpringEncoder(() -> converters))
-            .decoder(new ResponseEntityDecoder(new SpringDecoder(() -> converters)))
+            .encoder(new SpringEncoder(convertersProvider))
+            .decoder(new ResponseEntityDecoder(new SpringDecoder(convertersProvider)))
             .target(ServicePersistenceAPI.class, server.baseUrl());
         final var resolver = mock(PersistenceStrategyResolver.class);
         var keyHolder = new IdempotencyKeyHolder();
