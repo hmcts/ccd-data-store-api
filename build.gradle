@@ -82,21 +82,16 @@ apply from: "$rootDir/gradle/suppress.gradle"
 
 tasks.register("printSuppressionFile") {
   doLast {
-    def suppressionFile = dependencyCheck.getSuppressionFiles()
-
-    if (suppressionFile instanceof org.gradle.api.provider.Provider) {
+    println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile.get()}"
+    def suppressionFile = dependencyCheck.getSuppressionFile()
+    if (suppressionFile?.metaClass?.respondsTo(suppressionFile, "getOrNull")) {
       suppressionFile = suppressionFile.getOrNull()
+    } else if (suppressionFile?.metaClass?.respondsTo(suppressionFile, "get")) {
+      suppressionFile = suppressionFile.get()
     }
-    if (suppressionFile instanceof Collection) {
-      suppressionFile = suppressionFile.find { it }?.toString()
-    } else if (suppressionFile != null) {
-      suppressionFile = suppressionFile.toString()
-    }
-
     if (!suppressionFile) {
       throw new GradleException("No dependency-check suppression file configured")
     }
-
     println "SUPPRESSION_FILE=${suppressionFile}"
   }
 }
