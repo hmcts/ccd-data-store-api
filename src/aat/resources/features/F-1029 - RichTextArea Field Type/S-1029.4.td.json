@@ -1,0 +1,43 @@
+{
+	"title": "must retrieve a RichTextArea field with its mark-up preserved",
+	"_guid_": "S-1029.4",
+	"_extends_": "GetCaseDetails__PositiveResponse_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a case Id that has just been created as in F-1029_CreateCasePreRequisiteCaseworker",
+		"contains the RichTextArea value exactly as it was submitted"
+	],
+
+	"prerequisites": [ {
+		"F-1029_CreateCasePreRequisiteCaseworker": "F-1029_CreateCasePreRequisiteCaseworker"
+	} ],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][F-1029_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "BEFTA_MASTER",
+			"case_type": "FT_MasterCaseType",
+
+			"data": {
+				"RichTextAreaField": "<p>Hello <strong>world</strong></p>",
+				"SearchCriteria": { }
+			},
+			"data_classification": {
+				"RichTextAreaField": "PUBLIC",
+				"SearchCriteria": "[[ANYTHING_PRESENT]]"
+			}
+		}
+	}
+}
