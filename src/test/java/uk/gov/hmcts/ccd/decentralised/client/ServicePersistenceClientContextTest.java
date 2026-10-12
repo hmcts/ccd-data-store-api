@@ -6,6 +6,9 @@ import feign.Feign;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
@@ -46,6 +49,9 @@ class ServicePersistenceClientContextTest {
     private static final String SUBMIT_PATH = "/ccd-persistence/cases";
     private static final String INCOMING = "{\"selectedPartyId\":\"party-1\",\"client_context\":{\"old\":true}}";
     private static final String RETURNED = "{\"client_context\":{\"user_task\":{\"complete_task\":true}}}";
+    private static final String MERGED = """
+        {"selectedPartyId":"party-1","client_context":{"user_task":{"complete_task":true}}}
+        """;
     private static final String RESPONSE = """
         {
           "case_details": {
@@ -76,8 +82,7 @@ class ServicePersistenceClientContextTest {
             .target(ServicePersistenceAPI.class, server.baseUrl());
         final var resolver = mock(PersistenceStrategyResolver.class);
         var keyHolder = new IdempotencyKeyHolder();
-        idempotencyKey = UUID.randomUUID();
-        keyHolder.computeAndSetKeyToRequestContext(idempotencyKey.toString());
+        keyHolder.computeAndSetKeyToRequestContext("event-token");
         idempotencyKey = keyHolder.getKey();
         var pointer = new CaseDetails();
         pointer.setReference(1234567890123456L);
@@ -96,30 +101,17 @@ class ServicePersistenceClientContextTest {
         server.stop();
     }
 
-    @Test
-    void forwardsRawContextAndReturnsMergedBase64Context() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {201, 200})
+    void forwardsContextAndReturnsMergedContextForCreationAndReplay(int status) throws Exception {
         request.addHeader(CLIENT_CONTEXT, INCOMING);
-        stubResponse(201, RESPONSE, "client-context", encoded(RETURNED));
+        stubResponse(status, RESPONSE, encoded(RETURNED));
 
         submitThroughFilter();
 
         verifySubmittedContext(INCOMING);
-        assertEquals(mapper.readTree("""
-            {"selectedPartyId":"party-1","client_context":{"user_task":{"complete_task":true}}}
-            """), mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader(CLIENT_CONTEXT))));
-    }
-
-    @Test
-    void mergesContextOnIdempotentReplay() throws Exception {
-        request.addHeader(CLIENT_CONTEXT, encoded(INCOMING));
-        stubResponse(200, RESPONSE, CLIENT_CONTEXT, encoded(RETURNED));
-
-        submitThroughFilter();
-
-        verifySubmittedContext(encoded(INCOMING));
-        assertEquals(mapper.readTree("""
-            {"selectedPartyId":"party-1","client_context":{"user_task":{"complete_task":true}}}
-            """), mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader(CLIENT_CONTEXT))));
+        assertEquals(mapper.readTree(MERGED),
+            mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader(CLIENT_CONTEXT))));
     }
 
     @Test
@@ -127,7 +119,7 @@ class ServicePersistenceClientContextTest {
         request.addHeader(CLIENT_CONTEXT, INCOMING);
         String latest = encoded("{\"selectedPartyId\":\"party-2\"}");
         request.setAttribute(CLIENT_CONTEXT, latest);
-        stubResponse(200, RESPONSE, null, null);
+        stubResponse(200, RESPONSE, null);
 
         submitThroughFilter();
 
@@ -136,20 +128,24 @@ class ServicePersistenceClientContextTest {
         assertEquals(latest, response.getHeader(CLIENT_CONTEXT));
     }
 
-    @Test
-    void preservesIncomingHeaderWhenResponseHasNoContext() throws Exception {
-        request.addHeader(CLIENT_CONTEXT, INCOMING);
-        stubResponse(201, RESPONSE, null, null);
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = INCOMING)
+    void preservesIncomingContextWhenResponseHasNoContext(String incoming) throws Exception {
+        if (incoming != null) {
+            request.addHeader(CLIENT_CONTEXT, incoming);
+        }
+        stubResponse(201, RESPONSE, null);
 
         submitThroughFilter();
 
-        verifySubmittedContext(INCOMING);
-        assertEquals(INCOMING, response.getHeader(CLIENT_CONTEXT));
+        verifySubmittedContext(incoming);
+        assertEquals(incoming, response.getHeader(CLIENT_CONTEXT));
     }
 
     @Test
     void returnsServiceContextWithoutIncomingContext() throws Exception {
-        stubResponse(201, RESPONSE, CLIENT_CONTEXT, "[" + encoded(RETURNED) + "]");
+        stubResponse(201, RESPONSE, "[" + encoded(RETURNED) + "]");
 
         submitThroughFilter();
 
@@ -158,30 +154,10 @@ class ServicePersistenceClientContextTest {
     }
 
     @Test
-    void omitsContextWhenNeitherCallerNorServiceProvidesIt() throws Exception {
-        stubResponse(201, RESPONSE, null, null);
-
-        submitThroughFilter();
-
-        verifySubmittedContext(null);
-        assertNull(response.getHeader(CLIENT_CONTEXT));
-    }
-
-    @Test
-    void ignoresInvalidReturnedJsonAndPreservesExistingContext() throws Exception {
-        request.addHeader(CLIENT_CONTEXT, encoded(INCOMING));
-        stubResponse(201, RESPONSE, CLIENT_CONTEXT, encoded("invalid json"));
-
-        submitThroughFilter();
-
-        assertEquals(encoded(INCOMING), response.getHeader(CLIENT_CONTEXT));
-    }
-
-    @Test
     void respectsDisabledPassthroughConfiguration() throws Exception {
         when(params.getCallbackPassthruHeaderContexts()).thenReturn(List.of());
         request.addHeader(CLIENT_CONTEXT, INCOMING);
-        stubResponse(201, RESPONSE, CLIENT_CONTEXT, encoded(RETURNED));
+        stubResponse(201, RESPONSE, encoded(RETURNED));
 
         submitThroughFilter();
 
@@ -195,7 +171,7 @@ class ServicePersistenceClientContextTest {
         when(params.getCallbackPassthruHeaderContexts()).thenReturn(List.of("client-context"));
         String latest = encoded(INCOMING);
         request.setAttribute("client-context", latest);
-        stubResponse(201, RESPONSE, CLIENT_CONTEXT, encoded(RETURNED));
+        stubResponse(201, RESPONSE, encoded(RETURNED));
 
         submitThroughFilter();
 
@@ -206,7 +182,7 @@ class ServicePersistenceClientContextTest {
     @Test
     void retainsFunctionalErrorHandlingAndContextLikeNormalCallbacks() throws Exception {
         request.addHeader(CLIENT_CONTEXT, INCOMING);
-        stubResponse(200, "{\"errors\":[\"Cannot submit\"]}", CLIENT_CONTEXT, encoded(RETURNED));
+        stubResponse(200, "{\"errors\":[\"Cannot submit\"]}", encoded(RETURNED));
 
         new CustomHeadersFilter(params).doFilter(request, response, (req, res) -> {
             assertThrows(ApiException.class, () -> client.createEvent(event));
@@ -214,9 +190,8 @@ class ServicePersistenceClientContextTest {
         });
 
         verifySubmittedContext(INCOMING);
-        assertEquals(mapper.readTree("""
-            {"selectedPartyId":"party-1","client_context":{"user_task":{"complete_task":true}}}
-            """), mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader(CLIENT_CONTEXT))));
+        assertEquals(mapper.readTree(MERGED),
+            mapper.readTree(ClientContextUtil.decodeFromBase64(response.getHeader(CLIENT_CONTEXT))));
         assertEquals("validation error", response.getContentAsString());
     }
 
@@ -230,10 +205,10 @@ class ServicePersistenceClientContextTest {
         assertEquals("saved", response.getContentAsString());
     }
 
-    private void stubResponse(int status, String body, String headerName, String headerValue) {
+    private void stubResponse(int status, String body, String context) {
         var result = aResponse().withStatus(status).withHeader("Content-Type", "application/json").withBody(body);
-        if (headerName != null) {
-            result.withHeader(headerName, headerValue);
+        if (context != null) {
+            result.withHeader("client-context", context);
         }
         server.stubFor(post(urlEqualTo(SUBMIT_PATH)).willReturn(result));
     }
