@@ -80,26 +80,7 @@ dependencyCheck {
 
 apply from: "$rootDir/gradle/suppress.gradle"
 
-tasks.register("printSuppressionFile") {
-  doLast {
-    def suppressionFile = dependencyCheck.getSuppressionFiles()
 
-    if (suppressionFile instanceof org.gradle.api.provider.Provider) {
-      suppressionFile = suppressionFile.getOrNull()
-    }
-    if (suppressionFile instanceof Collection) {
-      suppressionFile = suppressionFile.find { it }?.toString()
-    } else if (suppressionFile != null) {
-      suppressionFile = suppressionFile.toString()
-    }
-
-    if (!suppressionFile) {
-      throw new GradleException("No dependency-check suppression file configured")
-    }
-
-    println "SUPPRESSION_FILE=${suppressionFile}"
-  }
-}
 
 application {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
@@ -256,8 +237,8 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'         // commons-validator
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'        // feign-form-spring
     implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'                       // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.15'         // spring-cloud-starter-openfeign
-    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.15'            // service-auth-provider-java-client
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.17'         // spring-cloud-starter-openfeign
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.17'            // service-auth-provider-java-client
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'   // spring-cloud-starter-openfeign
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'            // spring-boot-starter-data-jpa
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'  // spring-boot-starter-data-jpa  (held at 3.1.0 due to methods with same signature getSchemaManager())
