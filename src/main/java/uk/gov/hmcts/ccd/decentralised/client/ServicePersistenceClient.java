@@ -84,7 +84,7 @@ public class ServicePersistenceClient {
         String contextHeader = clientContextHeader();
         String clientContext = contextHeader == null ? null : currentClientContext(contextHeader);
         var responseEntity = api.submitEvent(uri, idempotencyKey.toString(), clientContext, caseEvent);
-        var response = Objects.requireNonNull(responseEntity.getBody(), "Missing decentralised submit response body");
+        var response = responseEntity.getBody();
         if (contextHeader != null) {
             String returnedContext = responseEntity.getHeaders().getFirst(contextHeader);
             if (returnedContext != null) {
