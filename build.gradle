@@ -80,26 +80,7 @@ dependencyCheck {
 
 apply from: "$rootDir/gradle/suppress.gradle"
 
-tasks.register("printSuppressionFile") {
-  doLast {
-    def suppressionFile = dependencyCheck.getSuppressionFiles()
 
-    if (suppressionFile instanceof org.gradle.api.provider.Provider) {
-      suppressionFile = suppressionFile.getOrNull()
-    }
-    if (suppressionFile instanceof Collection) {
-      suppressionFile = suppressionFile.find { it }?.toString()
-    } else if (suppressionFile != null) {
-      suppressionFile = suppressionFile.toString()
-    }
-
-    if (!suppressionFile) {
-      throw new GradleException("No dependency-check suppression file configured")
-    }
-
-    println "SUPPRESSION_FILE=${suppressionFile}"
-  }
-}
 
 application {
     mainClass = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
