@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,9 +23,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -57,6 +60,7 @@ class DataBlockGeneratorTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String FIELD_ID = "FieldId";
+    private static final String FIELD_ID_2 = "FieldId2";
     private static final String FIELD_ALIAS = "FieldAlias";
     private static final String TEXT_FIELD = "TextValue";
     private static final String NESTED_FIELD_1 = "NestedField1";
@@ -91,20 +95,8 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = newCaseType()
             .withCaseFields(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
-                        .build())
-                    .build(),
-                newCaseField()
-                    .withId("dontPublished")
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
-                        .build())
-                    .build()
+                complexField(FIELD_ID, FieldTypeDefinition.YES_OR_NO),
+                complexField("dontPublished", FieldTypeDefinition.YES_OR_NO)
             ))
             .build();
 
@@ -142,27 +134,15 @@ class DataBlockGeneratorTest {
 
         caseTypeDefinition = newCaseType()
             .withCaseFields(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.MONEY_GBP)
-                        .withType(FieldTypeDefinition.MONEY_GBP)
-                        .build())
-                    .build(),
-                newCaseField()
-                    .withId("dontPublished")
-                    .withFieldType(aFieldType()
-                        .withId(FieldTypeDefinition.YES_OR_NO)
-                        .withType(FieldTypeDefinition.YES_OR_NO)
-                        .build())
-                    .build()
+                complexField(FIELD_ID, MONEY_GBP),
+                complexField("dontPublished", YES_OR_NO),
+                complexField(FIELD_ID_2, NUMBER)
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, IntNode.valueOf(6080));
+        data.put(FIELD_ID_2, DecimalNode.valueOf(BigDecimal.valueOf(70.10)));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -170,10 +150,13 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
-        assertAll(
-            () -> assertEquals(6080, result.get(FIELD_ID).intValue()),
-            () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
+
+        Optional.ofNullable(result.get(FIELD_ID_2)).ifPresentOrElse(
+            value -> assertEquals(BigDecimal.valueOf(70.10), value.decimalValue()),
+            () -> assertEquals(6080, result.get(FIELD_ID).intValue())
         );
+        MatcherAssert.assertThat(result.size(), Matchers.is(1));
+
     }
 
     @Test
@@ -1180,15 +1163,7 @@ class DataBlockGeneratorTest {
             .build();
 
         caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(YES_OR_NO)
-                        .withType(YES_OR_NO)
-                        .build())
-                    .build()
-            ))
+            .withCaseFields(List.of(complexField(FIELD_ID, YES_OR_NO)))
             .build();
 
         Map<String, JsonNode> data = new HashMap<>();
@@ -1220,15 +1195,7 @@ class DataBlockGeneratorTest {
             .build();
 
         caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(YES_OR_NO)
-                        .withType(YES_OR_NO)
-                        .build())
-                    .build()
-            ))
+            .withCaseFields(List.of(complexField(FIELD_ID, YES_OR_NO)))
             .build();
 
         Map<String, JsonNode> data = new HashMap<>();
@@ -1260,16 +1227,7 @@ class DataBlockGeneratorTest {
             .build();
 
         caseTypeDefinition = newCaseType()
-            .withCaseFields(List.of(
-                newCaseField()
-                    .withId(FIELD_ID)
-                    .withFieldType(aFieldType()
-                        .withId(NUMBER)
-                        .withType(NUMBER)
-                        .build())
-                    .build()
-            ))
-            .build();
+            .withCaseFields(List.of(complexField(FIELD_ID, NUMBER))).build();
 
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, NullNode.getInstance());

@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseRichTextAreaFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "RichTextArea",
+  "type": "RichTextArea"
+}
