@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.decentralised.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedAuditEvent;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseDetails;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
-import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.infrastructure.IdempotencyKeyHolder;
+import uk.gov.hmcts.ccd.util.ClientContextUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService.CLIENT_CONTEXT;
 
 @RequiredArgsConstructor
 @Service
@@ -31,6 +34,8 @@ public class ServicePersistenceClient {
     private final ServicePersistenceAPI api;
     private final PersistenceStrategyResolver resolver;
     private final IdempotencyKeyHolder idempotencyKeyHolder;
+    private final HttpServletRequest request;
+    private final ApplicationParams applicationParams;
 
     /**
      * Retrieves case details from a decentralised service.
@@ -76,7 +81,17 @@ public class ServicePersistenceClient {
             throw new IllegalStateException("No idempotency key set for the request context.");
         }
 
-        DecentralisedSubmitEventResponse response = api.submitEvent(uri, idempotencyKey.toString(), caseEvent);
+        String contextHeader = clientContextHeader();
+        String clientContext = contextHeader == null ? null : currentClientContext(contextHeader);
+        var responseEntity = api.submitEvent(uri, idempotencyKey.toString(), clientContext, caseEvent);
+        var response = Objects.requireNonNull(responseEntity.getBody(), "Missing decentralised submit response body");
+        if (contextHeader != null) {
+            String returnedContext = responseEntity.getHeaders().getFirst(contextHeader);
+            if (returnedContext != null) {
+                request.setAttribute(contextHeader, ClientContextUtil.mergeClientContexts(clientContext,
+                    ClientContextUtil.removeEnclosingSquareBrackets(returnedContext)));
+            }
+        }
 
         // Handle functional errors and warnings returned by the service
         if (!isEmpty(response.getErrors())
@@ -107,6 +122,20 @@ public class ServicePersistenceClient {
         // The decentralised service doesn't know about our internal ID. We enrich the object here for internal use.
         returnedCaseDetails.setId(casePointer.getId());
         return details;
+    }
+
+    private String clientContextHeader() {
+        if (request == null || applicationParams.getCallbackPassthruHeaderContexts() == null) {
+            return null;
+        }
+        return applicationParams.getCallbackPassthruHeaderContexts().stream()
+            .filter(CLIENT_CONTEXT::equalsIgnoreCase)
+            .findFirst().orElse(null);
+    }
+
+    private String currentClientContext(String headerName) {
+        Object context = request.getAttribute(headerName);
+        return context == null ? request.getHeader(headerName) : context.toString();
     }
 
     public List<AuditEvent> getCaseHistory(CaseDetails caseDetails) {
