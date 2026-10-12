@@ -32,6 +32,7 @@ jobs:
           # Exemptions
           # Note: Renovate PRs typically have the "dependencies" label which is also excluded
           exempt-pr-labels: 'pinned,dependencies,keep_open'
+          exempt-issue-labels: 'pinned,dependencies,keep_open'
           exempt-all-pr-assignees: false
           exempt-all-issue-assignees: false
           
