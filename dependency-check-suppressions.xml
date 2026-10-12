@@ -294,9 +294,6 @@
     <cve>CVE-2026-78604</cve>
   </suppress>
   <suppress>
-    <cve>CVE-2025-7962</cve>
-  </suppress>
-  <suppress>
     <notes>
         file name: spring-security-config-6.5.7.jar
         </notes>
