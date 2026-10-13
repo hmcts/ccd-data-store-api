@@ -73,6 +73,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
+        if ("validBuildingLocation".equals(key)) {
+            return selectValidBuildingLocation(scenarioContext.getTestData().getActualResponse()
+                                                   .getBody().get("arrayInMap"));
+        }
         String docAmUrl = EnvironmentVariableUtils.getRequiredVariable("CASE_DOCUMENT_AM_URL");
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
@@ -140,6 +144,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
+        } else if (key.toString().startsWith("contains ") && key.toString().contains(" and does not contain ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String[] expectedValues = key.toString().split(" and does not contain ", 2);
+                String expectedPresentValueStr = expectedValues[0].replace("contains ", "");
+                String expectedAbsentValueStr = expectedValues[1];
+
+                if (actualValueStr.contains(expectedPresentValueStr)
+                    && !actualValueStr.contains(expectedAbsentValueStr)) {
+                    return actualValueStr;
+                }
+                return "response did not match plain text expectations";
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
         } else if (key.toString().startsWith("contains ")) {
             try {
                 String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
@@ -199,6 +219,29 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             return UUID.randomUUID();
         }
         return super.calculateCustomValue(scenarioContext, key);
+    }
+
+    private Map<?, ?> selectValidBuildingLocation(Object locations) {
+        if (locations instanceof List<?>) {
+            // Reference data is unordered and can contain buildings without a region.
+            // Always select the same complete record for case creation, criteria and assertions.
+            for (Object location : (List<?>) locations) {
+                if (location instanceof Map<?, ?>) {
+                    Map<?, ?> building = (Map<?, ?>) location;
+                    boolean complete = Arrays.asList("epimms_id", "building_location_name", "region_id", "region")
+                        .stream().allMatch(field -> {
+                            Object value = building.get(field);
+                            return value != null && !value.toString().isBlank()
+                                && !"null".equalsIgnoreCase(value.toString().trim());
+                        });
+                    if (complete) {
+                        return building;
+                    }
+                }
+            }
+        }
+        throw new FunctionalTestException("No building location with non-blank epimms_id, building_location_name, "
+                                              + "region_id and region found in location reference data");
     }
 
     private boolean elasticSearchFunctionalTestsEnabled() {
