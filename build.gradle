@@ -275,7 +275,7 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.10'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.20'
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.85'
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.86'
     implementation platform("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
     implementation platform("tools.jackson:jackson-bom:${jackson3Version}")
     implementation group: 'tools.jackson.core', name: 'jackson-core', version: jackson3Version
