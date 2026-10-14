@@ -280,10 +280,10 @@ class JwkSourceRecoveryIT {
             jwksUri(wireMock),
             50,             // connect timeout, ms
             100,            // read timeout, ms
-            50,             // retrieval deadline, ms: the connect timeout, so the worst case stays 300
+            50,             // retrieval deadline, ms
             51200,          // size limit, bytes
             500L,           // cache time to live
-            320L,           // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 300
+            320L,           // cache refresh timeout: above 2 attempts x deadline = 100
             150L,           // refresh ahead time
             // Rate limit interval below the poll interval, so polling cannot exhaust the two retrievals it
             // allows per window.
@@ -313,12 +313,12 @@ class JwkSourceRecoveryIT {
             jwksUri(wireMock),
             200,            // connect timeout, ms
             2_500,          // read timeout, ms: must outlast the 2s endpoint delay
-            // Retrieval deadline, ms: also must outlast it. The delay holds back the response headers, so the deadline
-            // passes before the body arrives, and the first body read would end the request.
+            // Retrieval deadline, ms: also must outlast it, or the caller abandons the request while the delay is still
+            // holding back the response headers.
             2_500,
             51200,          // size limit, bytes
             11_500L,        // cache time to live: the refresh starts about 500ms in
-            10_100L,        // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 10000
+            10_100L,        // cache refresh timeout: above 2 attempts x deadline = 5000
             900L,           // refresh ahead time
             100L,           // rate limit minimum interval
             60_000L,        // outage tolerance

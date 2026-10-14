@@ -251,8 +251,7 @@ class JwkSetStartupRetryIT {
     }
 
     @Test
-    @DisplayName("a trickling IDAM holds a background attempt for no longer than max(connect, deadline) + read per "
-        + "request")
+    @DisplayName("a trickling IDAM holds a background attempt for no longer than the deadline per request")
     void tricklingEndpointDoesNotPinTheRetryThread() {
         // 20 chunks over 10s: one every 500ms, half the read timeout, so no read times out. Without the deadline, each
         // request would run for the full 10s.
@@ -267,10 +266,10 @@ class JwkSetStartupRetryIT {
         retry.stop();
 
         long boundMs = properties.retrievalAttempts() * properties.attemptWorstCaseMs();
-        assertThat(boundMs).isEqualTo(2 * (600 + 1000));
+        assertThat(boundMs).isEqualTo(2 * 600);
         assertThat(attempts)
             .allSatisfy(attempt -> assertThat(attempt.durationMs())
-                .as("each request is cut off within max(200, 600) + 1000 = 1600ms, and there are two; slack %dms",
+                .as("each request is cut off at the 600ms deadline, and there are two; slack %dms",
                     WORST_CASE_SLACK_MS)
                 .isLessThan(boundMs + WORST_CASE_SLACK_MS));
         assertThat(appInsights.eventsOfType(JwkSourceTelemetry.RETRIAL))
@@ -401,10 +400,10 @@ class JwkSetStartupRetryIT {
             jwksUri(wireMock),
             50,             // connect timeout, ms
             100,            // read timeout, ms
-            50,             // retrieval deadline, ms: the connect timeout, so the worst case stays 300
+            50,             // retrieval deadline, ms
             51200,          // size limit, bytes
             3_000L,         // cache time to live
-            320L,           // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 300
+            320L,           // cache refresh timeout: above 2 attempts x deadline = 100
             1_000L,         // refresh ahead time
             RATE_LIMIT_MS,
             30_000L,        // outage tolerance
@@ -419,7 +418,7 @@ class JwkSetStartupRetryIT {
             600,            // retrieval deadline, ms
             51200,          // size limit, bytes
             5_000L,         // cache time to live
-            3_400L,         // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 3200
+            3_400L,         // cache refresh timeout: above 2 attempts x deadline = 1200
             1_000L,         // refresh ahead time
             RATE_LIMIT_MS,
             30_000L,        // outage tolerance

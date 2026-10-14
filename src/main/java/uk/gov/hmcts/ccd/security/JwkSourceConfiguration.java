@@ -14,6 +14,7 @@ import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,9 +38,8 @@ import java.util.Set;
  * <p>This source avoids that behaviour by:
  * <ul>
  *     <li>using explicit connect and read timeouts, so network failures are detected within seconds, and a deadline
- *         on each request, checked as the body is read, so a key set sent slowly cannot hold the cache lock for longer
- *         than {@link JwksProperties#attemptWorstCaseMs()} per attempt ({@link BodyDeadlineResourceRetriever}, which
- *         also lists what the deadline does not cover);</li>
+ *         on each request, so an IDAM that answers slowly cannot hold the cache lock for longer than
+ *         {@link JwksProperties#attemptWorstCaseMs()} per attempt ({@link TimeLimitedResourceRetriever});</li>
  *     <li>refreshing keys in the background before they expire, so user requests do not wait for a refresh;</li>
  *     <li>retrying once after failed retrieval ({@link JwksProperties#retrying()}), and only then falling back
  *         to the last known keys for {@link JwksProperties#outageToleranceMs()}, with the remaining outage window
@@ -114,7 +114,7 @@ public class JwkSourceConfiguration {
 
     /**
      * The bean is {@link java.io.Closeable}, so Spring automatically shuts down the refresh-ahead
-     * executors when the application context closes.
+     * executors, and the retrieval threads ({@link TimeLimitedResourceRetriever}), when the application context closes.
      *
      * <p>The layer order is fixed by {@code JWKSourceBuilder#build()}. From the network outwards,
      * the layers are {@link ObservedJWKSetSource}, retry, outage tolerance, health reporting, rate limiting, and
@@ -133,12 +133,7 @@ public class JwkSourceConfiguration {
             properties.cacheRefreshTimeoutMs(), properties.refreshAheadTimeMs(), properties.rateLimitMinIntervalMs(),
             properties.outageToleranceMs());
 
-        URLBasedJWKSetSource<SecurityContext> urlSource = new URLBasedJWKSetSource<>(properties.url(),
-            new BodyDeadlineResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
-                properties.sizeLimitBytes(), properties.retrievalDeadlineMs()));
-
-        JWKSourceBuilder<SecurityContext> builder =
-            JWKSourceBuilder.create(new ObservedJWKSetSource<>(urlSource, telemetry));
+        JWKSourceBuilder<SecurityContext> builder = getJwkSourceBuilder(telemetry);
         if (properties.retrying()) {
             builder.retrying(telemetry.retryingEventListener());
         }
@@ -150,6 +145,20 @@ public class JwkSourceConfiguration {
             .cache(properties.cacheTtlMs(), properties.cacheRefreshTimeoutMs())
             .refreshAheadCache(properties.refreshAheadTimeMs(), true, telemetry.cachingEventListener())
             .build();
+    }
+
+    private @NonNull JWKSourceBuilder<SecurityContext> getJwkSourceBuilder(JwkSourceTelemetry telemetry) {
+        TimeLimitedResourceRetriever retriever = new TimeLimitedResourceRetriever(
+            new BodyDeadlineResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
+                properties.sizeLimitBytes(), properties.retrievalDeadlineMs()), properties.retrievalDeadlineMs());
+        URLBasedJWKSetSource<SecurityContext> urlSource = new URLBasedJWKSetSource<>(properties.url(), retriever) {
+            @Override
+            public void close() {
+                retriever.close();
+            }
+        };
+
+        return JWKSourceBuilder.create(new ObservedJWKSetSource<>(urlSource, telemetry));
     }
 
     @Bean

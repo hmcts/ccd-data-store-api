@@ -123,10 +123,10 @@ class IdamJwksHealthIndicatorTest {
             jwksUri(wireMock),
             50,             // connect timeout, ms
             100,            // read timeout, ms
-            50,             // retrieval deadline, ms: the connect timeout, so the worst case stays 300
+            50,             // retrieval deadline, ms
             51200,          // size limit, bytes
             500L,           // cache time to live
-            320L,           // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 300
+            320L,           // cache refresh timeout: above 2 attempts x deadline = 100
             150L,           // refresh ahead time
             10L,            // rate limit interval, below the poll interval
             outageToleranceMs,

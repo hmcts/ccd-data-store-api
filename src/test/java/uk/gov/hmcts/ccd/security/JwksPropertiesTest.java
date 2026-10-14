@@ -43,102 +43,83 @@ class JwksPropertiesTest {
         @Test
         @DisplayName("rejects a cache refresh timeout sized for one attempt when the retrieval is retried")
         void rejectsCacheRefreshTimeoutSizedForOneAttempt() {
-            // 10000ms was an earlier default. It outlasts one attempt (max(2000, 2500) + 5000 = 7500ms) but not
-            // the retry, which runs inside the same lock: 2 x 7500 = 15000ms. JwkSourceRefreshWaitIT shows a waiter
-            // sized like this timing out on a retrieval that then succeeds.
+            // 4000ms outlasts one attempt (the 2500ms deadline) but not the retry, which runs inside the same lock:
+            // 2 x 2500 = 5000ms. JwkSourceRefreshWaitIT shows a waiter sized like this timing out on a retrieval that
+            // then succeeds.
             Builder builder = productionDefaults()
-                .connectTimeoutMs(2000)
-                .readTimeoutMs(5000)
                 .retrievalDeadlineMs(2500)
-                .cacheRefreshTimeoutMs(10_000);
+                .cacheRefreshTimeoutMs(4000);
 
             assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("cache-refresh-timeout-ms (10000)")
-                .hasMessageContaining("2 x (max(2000, 2500) + 5000) = 15000");
+                .hasMessageContaining("cache-refresh-timeout-ms (4000)")
+                .hasMessageContaining("2 x 2500 = 5000");
         }
 
         @Test
         @DisplayName("names the formula in the message")
         void namesTheFormula() {
-            assertThatThrownBy(productionDefaults().cacheRefreshTimeoutMs(10_000)::build)
+            assertThatThrownBy(productionDefaults().cacheRefreshTimeoutMs(4000)::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("oidc.jwks.cache-refresh-timeout-ms (10000) must be greater than the retrieval attempts "
-                    + "times (max(oidc.jwks.connect-timeout-ms, oidc.jwks.retrieval-deadline-ms) + "
-                    + "oidc.jwks.read-timeout-ms) (2 x (max(2000, 2500) + 5000) = 15000); otherwise a thread waiting "
-                    + "on an in-flight retrieval gives up before that retrieval can complete, which is the failure "
-                    + "this configuration exists to prevent");
+                .hasMessage("oidc.jwks.cache-refresh-timeout-ms (4000) must be greater than the retrieval attempts "
+                    + "times oidc.jwks.retrieval-deadline-ms (2 x 2500 = 5000); otherwise a thread waiting on an "
+                    + "in-flight retrieval gives up before that retrieval can complete, which is the failure this "
+                    + "configuration exists to prevent");
         }
 
         @Test
         @DisplayName("rejects a cache refresh timeout exactly equal to the retrieval worst case")
         void rejectsCacheRefreshTimeoutEqualToRetrievalWorstCase() {
-            Builder builder = productionDefaults()
-                .connectTimeoutMs(2000)
-                .readTimeoutMs(5000)
-                .retrievalDeadlineMs(2500)
-                .cacheRefreshTimeoutMs(15_000);
+            Builder builder = productionDefaults().retrievalDeadlineMs(2500);
 
-            assertThatThrownBy(builder::build)
+            assertThatThrownBy(builder.cacheRefreshTimeoutMs(5000)::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("cache-refresh-timeout-ms (15000)");
+                .hasMessageContaining("cache-refresh-timeout-ms (5000)");
+            assertThatCode(builder.cacheRefreshTimeoutMs(5001)::build).doesNotThrowAnyException();
         }
 
         @Test
-        @DisplayName("accepts the production defaults with a 2000ms margin: 17000 > 2 x (max(2000, 2500) + 5000)")
-        void productionDefaultsPassTheNewFormula() {
+        @DisplayName("accepts the production defaults: 17000 > 2 x 2500")
+        void productionDefaultsPassTheFormula() {
             JwksProperties properties = productionDefaults().build();
 
             assertThat(properties.retrievalDeadlineMs()).isEqualTo(2500);
-            assertThat(properties.attemptWorstCaseMs()).isEqualTo(7500L);
+            assertThat(properties.attemptWorstCaseMs()).isEqualTo(2500L);
             assertThat(properties.cacheRefreshTimeoutMs())
                 .isEqualTo(17_000L)
-                .isEqualTo(properties.retrievalAttempts() * properties.attemptWorstCaseMs() + 2000);
+                .isGreaterThan(properties.retrievalAttempts() * properties.attemptWorstCaseMs());
         }
 
         @Test
-        @DisplayName("takes the connect timeout when it is longer than the deadline")
-        void takesTheConnectTimeoutWhenLonger() {
-            // A connection that takes its full timeout reaches its first read after the deadline has passed, and that
-            // read can still block for the read timeout: 2 x (3000 + 5000) = 16000, which a 16000 wait does not exceed.
-            Builder builder = productionDefaults()
-                .connectTimeoutMs(3000)
-                .retrievalDeadlineMs(2500);
+        @DisplayName("does not count the connect and read timeouts: the caller waits for the deadline at most")
+        void doesNotCountTheConnectAndReadTimeouts() {
+            JwksProperties properties = productionDefaults()
+                .connectTimeoutMs(10_000)
+                .readTimeoutMs(30_000)
+                .build();
 
-            assertThat(builder.cacheRefreshTimeoutMs(16_100).build().attemptWorstCaseMs()).isEqualTo(8000L);
-            assertThatThrownBy(builder.cacheRefreshTimeoutMs(16_000)::build)
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("(2 x (max(3000, 2500) + 5000) = 16000)");
+            assertThat(properties.attemptWorstCaseMs()).isEqualTo(2500L);
         }
 
         @Test
-        @DisplayName("rejects a deadline too long for the production wait: 2 x (4000 + 5000) = 18000 > 17000")
+        @DisplayName("rejects a deadline too long for the production wait: 2 x 8500 = 17000")
         void rejectsALongerDeadlineAgainstTheDefaultWait() {
-            assertThatThrownBy(productionDefaults().retrievalDeadlineMs(4000)::build)
+            assertThatCode(productionDefaults().retrievalDeadlineMs(8499)::build).doesNotThrowAnyException();
+            assertThatThrownBy(productionDefaults().retrievalDeadlineMs(8500)::build)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("cache-refresh-timeout-ms (17000)")
-                .hasMessageContaining("(2 x (max(2000, 4000) + 5000) = 18000)");
-        }
-
-        @Test
-        @DisplayName("still counts the read timeout: a read in progress when the deadline passes runs to its end")
-        void countsTheReadTimeout() {
-            // Deadline unchanged; a longer read timeout alone takes the worst case to 17000, which the 17000 wait does
-            // not exceed.
-            assertThatThrownBy(productionDefaults().readTimeoutMs(6000)::build)
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("(2 x (max(2000, 2500) + 6000) = 17000)");
+                .hasMessageContaining("(2 x 8500 = 17000)");
         }
 
         @Test
         @DisplayName("sizes the worst case for a single attempt when retrying is disabled")
         void sizesWorstCaseForOneAttemptWithoutRetry() {
-            assertThatCode(() -> productionDefaults().retrying(false).cacheRefreshTimeoutMs(10_000).build())
+            assertThatCode(() -> productionDefaults().retrying(false).cacheRefreshTimeoutMs(2600).build())
                 .doesNotThrowAnyException();
 
-            assertThatThrownBy(productionDefaults().retrying(false).cacheRefreshTimeoutMs(7500)::build)
+            assertThatThrownBy(productionDefaults().retrying(false).cacheRefreshTimeoutMs(2500)::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("1 x (max(2000, 2500) + 5000) = 7500");
+                .hasMessageContaining("1 x 2500 = 2500");
         }
 
         @Test

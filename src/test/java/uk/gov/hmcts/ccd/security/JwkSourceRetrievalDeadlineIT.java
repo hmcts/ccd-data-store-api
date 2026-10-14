@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.function.IntSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -35,17 +36,18 @@ import static uk.gov.hmcts.ccd.security.JwkTestSupport.tokenSignedWith;
  * after the expiry queues on that lock and fails with "Timeout while waiting for cache refresh", even though its
  * {@code kid} is in the cached set.
  *
- * <p>With the deadline, each attempt is cut off at the first chunk that arrives after {@value #DEADLINE_MS}ms, the
- * retry is cut off too, and the outage-tolerant layer serves the cached keys, which the cache stores again. The request
- * finds a fresh entry.
+ * <p>With the deadline, each attempt is abandoned after {@value #DEADLINE_MS}ms, the retry is too, and the
+ * outage-tolerant layer serves the cached keys, which the cache stores again. The request finds a fresh entry.
+ *
+ * <p>The second test is the same, but IDAM sends the chunk framing slowly: the extension of the key set's chunk-size
+ * line, a byte every 100ms for 10s. The JDK reads that line inside one {@code read()} that returns no data until it
+ * ends, so only the caller-side deadline ({@link TimeLimitedResourceRetriever}) ends the attempt.
  *
  * <p>Timeline from the first retrieval, in ms: the scheduled refresh starts at 500 (TTL 4400 - refresh ahead 500 -
- * refresh timeout 3400). WireMock sends a chunk at once and then one every 500ms, so each attempt is cut off by the
- * chunk sent at about 1000ms, the first to arrive after the deadline: by about 1500 and 2500. The re-cached set lasts
- * until about 6900. The request is made at 4700, after the first entry has expired: about 2200ms after the retry is
- * cut off, and 2200ms before the re-cached entry expires. If the scheduler runs late, the request finds the refresh
- * still in flight and waits for it, for at most the validated worst case {@code 2 x (max(200, 600) + 1000) = 3200ms},
- * inside the 3400ms it is allowed to wait.
+ * refresh timeout 3400). Each attempt is abandoned at its 600ms deadline: by about 1100 and 1700. The re-cached set
+ * lasts until about 6100. The request is made at 4700, after the first entry has expired, and 1400ms before the
+ * re-cached entry expires. If the scheduler runs late, the request finds the refresh still in flight and waits for
+ * it, for at most the validated worst case {@code 2 x 600 = 1200ms}, inside the 3400ms it is allowed to wait.
  */
 class JwkSourceRetrievalDeadlineIT {
 
@@ -54,7 +56,7 @@ class JwkSourceRetrievalDeadlineIT {
     /** Room for a healthy retrieval on a loaded build, and low enough for the wait below to be validated. */
     private static final int DEADLINE_MS = 600;
     private static final long CACHE_TTL_MS = 4_400L;
-    /** Above 2 x (max(connect, deadline) + read) = 3200. */
+    /** Above 2 x deadline = 1200, and short enough for a 10s trickle to outlast it. */
     private static final long CACHE_REFRESH_TIMEOUT_MS = 3_400L;
     private static final long REFRESH_AHEAD_MS = 500L;
 
@@ -64,6 +66,8 @@ class JwkSourceRetrievalDeadlineIT {
      */
     private static final int TRICKLE_CHUNKS = 20;
     private static final int TRICKLE_TOTAL_MS = 10_000;
+    /** 100 bytes, one every 100ms: 10s, like the body trickle. */
+    private static final int TRICKLE_FRAMING_BYTES = 100;
 
     private WireMockServer wireMock;
     private RecordingAppInsights appInsights;
@@ -88,15 +92,41 @@ class JwkSourceRetrievalDeadlineIT {
     @Test
     @DisplayName("a valid kid is served from the cached keys after expiry while the scheduled refresh trickles")
     void validKidIsServedWhileTheScheduledRefreshTrickles() {
-        String token = tokenSignedWith(originalKey());
         stubHealthy(wireMock, originalJwkSet());
-        NimbusJwtDecoder decoder = decoder(properties());
+
+        validKidIsServedWhileTheScheduledRefreshIsStuck(jwksUri(wireMock),
+            () -> stubTrickling(wireMock, originalJwkSet(), TRICKLE_CHUNKS, TRICKLE_TOTAL_MS),
+            () -> retrievalAttempts(wireMock));
+    }
+
+    @Test
+    @DisplayName("a valid kid is served from the cached keys after expiry while the scheduled refresh is stuck on "
+        + "slow chunk framing")
+    void validKidIsServedWhileTheScheduledRefreshIsStuckOnSlowChunkFraming() throws IOException {
+        try (RawJwksServer server = new RawJwksServer(RawJwksServer.healthy())) {
+            validKidIsServedWhileTheScheduledRefreshIsStuck(server.uri(),
+                () -> server.respondWith(RawJwksServer.slowChunkExtension(TRICKLE_FRAMING_BYTES)),
+                () -> server.requests() - 1);
+        }
+    }
+
+    /**
+     * Loads the key set, makes IDAM answer slowly, and decodes a token with a valid {@code kid} after the loaded set
+     * has expired.
+     *
+     * @param retrievalAttempts the requests made since the load
+     */
+    private void validKidIsServedWhileTheScheduledRefreshIsStuck(String uri, Runnable makeIdamSlow,
+                                                                 IntSupplier retrievalAttempts) {
+        String token = tokenSignedWith(originalKey());
+        NimbusJwtDecoder decoder = decoder(properties(uri));
 
         assertThat(decoder.decode(token).getSubject()).isEqualTo(SUBJECT);
         long loadedAt = System.nanoTime();
-        stubTrickling(wireMock, originalJwkSet(), TRICKLE_CHUNKS, TRICKLE_TOTAL_MS);
+        int loads = retrievalAttempts.getAsInt();
+        makeIdamSlow.run();
 
-        await().atMost(Duration.ofSeconds(5)).until(() -> retrievalAttempts(wireMock) >= 1);
+        await().atMost(Duration.ofSeconds(5)).until(() -> retrievalAttempts.getAsInt() > loads);
         // Past the expiry of the set cached at start, so the request cannot be answered from the original entry.
         await().pollDelay(Duration.ofMillis(CACHE_TTL_MS + 300)).until(() ->
             System.nanoTime() - loadedAt > Duration.ofMillis(CACHE_TTL_MS + 300).toNanos());
@@ -128,7 +158,8 @@ class JwkSourceRetrievalDeadlineIT {
             .first()
             .satisfies(event -> assertThat(event.properties().get(JwkSourceTelemetry.DETAIL))
                 .contains("IDAM JWK set retrieval exceeded its " + DEADLINE_MS + "ms deadline"));
-        assertThat(retrievalAttempts(wireMock)).as("both attempts reached the trickling endpoint").isGreaterThan(1);
+        assertThat(retrievalAttempts.getAsInt() - loads).as("both attempts reached the slow endpoint")
+            .isGreaterThan(1);
     }
 
     private NimbusJwtDecoder decoder(JwksProperties properties) {
@@ -139,9 +170,9 @@ class JwkSourceRetrievalDeadlineIT {
             .build();
     }
 
-    private JwksProperties properties() {
+    private JwksProperties properties(String uri) {
         return new JwksProperties(
-            jwksUri(wireMock),
+            uri,
             CONNECT_TIMEOUT_MS,
             READ_TIMEOUT_MS,
             DEADLINE_MS,

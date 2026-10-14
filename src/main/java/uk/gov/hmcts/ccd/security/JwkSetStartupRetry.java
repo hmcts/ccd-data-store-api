@@ -78,10 +78,9 @@ public class JwkSetStartupRetry implements SmartLifecycle {
     }
 
     /**
-     * Stops retrying. A retry already in progress is interrupted, but the HTTP read does not respond to interrupts, so
-     * it runs until its retrieval returns: at most {@link JwksProperties#retrievalAttempts()} x
-     * {@link JwksProperties#attemptWorstCaseMs()} when IDAM sends the response headers promptly. The deadline
-     * does not cut off slow headers and a slow DNS lookup ({@link BodyDeadlineResourceRetriever}).
+     * Stops retrying. A retry already in progress is interrupted; one waiting on its retrieval stops waiting at once
+     * ({@link TimeLimitedResourceRetriever}), and none runs for longer than
+     * {@link JwksProperties#retrievalAttempts()} x {@link JwksProperties#attemptWorstCaseMs()}.
      * The thread is a daemon, so it cannot hold up the JVM's exit.
      */
     @Override

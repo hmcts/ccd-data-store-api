@@ -249,10 +249,10 @@ class JwkSourceFailureModeIT {
             jwksUri(wireMock),
             50,       // connect timeout, ms
             100,                      // read timeout, ms
-            50,                       // retrieval deadline, ms: the connect timeout, so the worst case stays 300
+            50,                       // retrieval deadline, ms
             51200,                    // size limit, bytes
             cacheTtlMs,
-            320L, // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 300
+            320L, // cache refresh timeout: above 2 attempts x deadline = 100
             100L,                     // refresh ahead time
             rateLimitMinIntervalMs,
             outageToleranceMs,

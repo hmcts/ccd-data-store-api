@@ -26,14 +26,13 @@ import java.util.concurrent.TimeUnit;
  * {@code getInputStream()} returns a checked stream. Everything else is Nimbus's own, on the JDK's
  * {@link HttpURLConnection}. A custom {@code SSLSocketFactory} is not supported; HTTPS uses the JVM default.
  *
- * <p>Bound: a read can block for up to the read timeout before the deadline is checked, so a request ends within
- * {@code max(connect time + time to headers, deadline) + read timeout}. With prompt headers that is
- * {@code max(connect timeout, deadline) + read timeout}, which {@link JwksProperties} validates the cache wait against.
+ * <p>Bound: a read can block for up to the read timeout before the deadline is checked, so a request with a slow body
+ * ends within {@code max(connect time + time to headers, deadline) + read timeout}.
  *
- * <p>Limits: the deadline only fires on body data, so slow response headers (each read bounded only by the read
- * timeout), slow DNS (inside {@code connect()}, before the connect timeout, bounded only by the OS resolver) and
- * redirect hops (each hop's own connect and headers; the JDK follows redirects by default) are not cut off. Their time
- * still counts, so headers arriving after the deadline fail at the first body read.
+ * <p>Limits: the deadline only fires when a read returns body data. Slow response headers, a slow DNS lookup, redirect
+ * hops, and chunk framing sent slowly (a chunk-size line, its extensions or the trailers, which the JDK reads inside
+ * one {@code read()} that returns no data until they end) are not cut off here. {@link TimeLimitedResourceRetriever},
+ * which wraps this class, releases the caller at the deadline in every one of those cases.
  *
  * <p>On close, a chunked body closes the socket; a keep-alive body with a {@code Content-Length} up to 512 KB
  * ({@code http.KeepAlive.remainingData}) is drained in the background by the JDK's keep-alive cleaner (5 s per read),

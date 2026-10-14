@@ -14,10 +14,15 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSetBasedJWKSource;
+import com.nimbusds.jose.jwk.source.JWKSetSource;
+import com.nimbusds.jose.jwk.source.JWKSetSourceWrapper;
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.jwk.source.URLBasedJWKSetSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.ResourceRetriever;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +32,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
@@ -87,6 +94,23 @@ class JwkSourceConfigurationTest {
         jwkSource = buildSource();
 
         assertThat(signingKeys(jwkSource)).extracting(JWK::getKeyID).containsExactly(ORIGINAL_KEY_ID);
+    }
+
+    @Test
+    @DisplayName("closing the source closes the time-limited retriever beneath it")
+    void closingTheSourceClosesTheRetriever() throws Exception {
+        jwkSource = buildSource();
+
+        ((Closeable) jwkSource).close();
+
+        JWKSetSource<SecurityContext> source = ((JWKSetBasedJWKSource<SecurityContext>) jwkSource).getJWKSetSource();
+        while (source instanceof JWKSetSourceWrapper<SecurityContext> wrapper) {
+            source = wrapper.getSource();
+        }
+        ResourceRetriever retriever = ((URLBasedJWKSetSource<SecurityContext>) source).getResourceRetriever();
+        URL url = URI.create(jwksUri(wireMock)).toURL();
+        assertThat(retriever).isInstanceOf(TimeLimitedResourceRetriever.class);
+        assertThatThrownBy(() -> retriever.retrieveResource(url)).hasMessage("IDAM JWK set retriever is closed");
     }
 
     @Test
@@ -476,10 +500,10 @@ class JwkSourceConfigurationTest {
             jwksUri(wireMock),
             50,     // connect timeout, ms
             100,                    // read timeout, ms
-            50,                     // retrieval deadline, ms: the connect timeout, so the worst case stays 300
+            50,                     // retrieval deadline, ms
             51200,                  // size limit, bytes
             CACHE_TTL_MS,           // cache time to live
-            320L,                   // cache refresh timeout: above 2 attempts x (max(connect, deadline) + read) = 300
+            320L,                   // cache refresh timeout: above 2 attempts x deadline = 100
             100L,                   // refresh ahead time
             50L,                    // rate limit minimum interval
             OUTAGE_TOLERANCE_MS,    // outage tolerance

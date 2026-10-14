@@ -50,21 +50,19 @@ import static uk.gov.hmcts.ccd.security.JwkTestSupport.startWireMock;
  *
  * <p>The endpoint makes the first attempt run to its read timeout and answers the retry slowly but successfully, so
  * the retrieval takes longer than one attempt under the original connect + read rule, but succeeds. Timings are
- * scaled down from production's {@code 2 x (max(2000, 2500) + 5000)} so the test runs in seconds.
+ * scaled down from production's so the test runs in seconds.
  *
  * <p>The retrieval takes about 1500 (first attempt's read timeout) + 800 (retry) = 2300ms. The margins are:
  * <ul>
  *     <li>retry against its own read timeout and its deadline, both 1500: 1500 - 800 = 700ms. The delay holds back
- *         the response headers, so a retry response later than the read timeout fails on it, and one later than the
- *         deadline fails at its first body read. Either fails the retrieval itself, and both tests with it, so this
- *         is the largest margin chosen directly;</li>
+ *         the response headers, so a retry response later than either fails. That fails the retrieval itself, and
+ *         both tests with it, so this is the largest margin chosen directly;</li>
  *     <li>single-attempt wait against the retrieval: 2300 - 1900 = 400ms, so that the waiter still gives up first even
  *         if it starts waiting late;</li>
  *     <li>retrying wait against the retrieval: 6100 - 2300 = 3800ms. Any delay the retry survives, this waiter
  *         survives too;</li>
- *     <li>the first attempt's response against its read timeout: 3000 - 1500 = 1500ms. A fixed delay is never shorter
- *         than configured, so a slow build only widens it. The first attempt never reads a body, so its deadline
- *         plays no part.</li>
+ *     <li>the first attempt's response against its read timeout and deadline: 3000 - 1500 = 1500ms. A fixed delay is
+ *         never shorter than configured, so a slow build only widens it.</li>
  * </ul>
  */
 class JwkSourceRefreshWaitIT {
@@ -81,7 +79,7 @@ class JwkSourceRefreshWaitIT {
      */
     private static final long SINGLE_ATTEMPT_WAIT_MS = 1_900L;
 
-    /** Just above two attempts, 2 x (max(250, 1500) + 1500) = 6000, the bound the current rule enforces. */
+    /** Above two attempts, 2 x 1500 = 3000, the bound the current rule enforces, by more than a slow build needs. */
     private static final long RETRYING_WAIT_MS = 6_100L;
 
     /** Longer than the read timeout, so the first attempt fails and is retried. */
@@ -122,7 +120,7 @@ class JwkSourceRefreshWaitIT {
         assertThatThrownBy(() -> properties(SINGLE_ATTEMPT_WAIT_MS))
             .as("the current rule must reject this wait, which is why the source is built without JwksProperties")
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("2 x (max(250, 1500) + 1500) = 6000");
+            .hasMessageContaining("2 x 1500 = 3000");
 
         // The same layers JwkSourceConfiguration builds, with the wait the original rule allowed.
         jwkSource = JWKSourceBuilder.<SecurityContext>create(

@@ -23,9 +23,9 @@ import java.net.URL;
  * @param uri                    JWK set endpoint
  * @param connectTimeoutMs       TCP connect timeout for retrieval
  * @param readTimeoutMs          socket read timeout for retrieval
- * @param retrievalDeadlineMs    how long one request may run, from its start, before a read that returns body data
- *                               ends it ({@link BodyDeadlineResourceRetriever}). Each retry is a new request with its
- *                               own deadline
+ * @param retrievalDeadlineMs    how long the calling thread waits for one request before abandoning it
+ *                               ({@link TimeLimitedResourceRetriever}). Each retry is a new request with its own
+ *                               deadline
  * @param sizeLimitBytes         maximum accepted response size
  * @param cacheTtlMs             how long a retrieved key set can be used before it needs refreshing
  * @param cacheRefreshTimeoutMs  how long a thread waits for another thread's in-flight retrieval
@@ -72,18 +72,11 @@ public record JwksProperties(
     }
 
     /**
-     * The longest one request can take when IDAM sends the response headers promptly:
-     * {@code max(connect timeout, deadline) + read timeout}. The deadline is checked only when a read returns, and a
-     * read can block for up to the read timeout. A connection that takes longer than the deadline gets one read
-     * before the check, so the larger of the two is what counts. Time spent waiting for the headers, or on a slow DNS
-     * lookup, adds to this; see {@link BodyDeadlineResourceRetriever}.
+     * The longest the calling thread waits for one request: the deadline, wherever the request is stuck (DNS,
+     * connect, headers, body). See {@link TimeLimitedResourceRetriever}.
      */
     public long attemptWorstCaseMs() {
-        return attemptWorstCaseMs(connectTimeoutMs, readTimeoutMs, retrievalDeadlineMs);
-    }
-
-    private static long attemptWorstCaseMs(int connectTimeoutMs, int readTimeoutMs, int retrievalDeadlineMs) {
-        return (long) Math.max(connectTimeoutMs, retrievalDeadlineMs) + readTimeoutMs;
+        return retrievalDeadlineMs;
     }
 
     /**
@@ -141,20 +134,17 @@ public record JwksProperties(
         // loses the cache-lock race can time out with "Timeout while waiting for cache refresh" while the
         // retrieval is still progressing normally. Nimbus does not enforce this relationship, so we validate
         // it here instead of relying on a property-file comment.
-        // Worst case: every attempt the retrieval can make runs for max(connect, deadline) + read (see
+        // Worst case: every attempt the retrieval can make holds the lock for up to the deadline (see
         // attemptWorstCaseMs). The retry happens inside the lock the waiter is queued on, so the waiter has to outlast
-        // all attempts, not one. Slow response headers and a slow DNS lookup are outside this bound, as they were
-        // outside the previous connect + read one.
+        // all attempts, not one.
         int attempts = retrievalAttempts(retrying);
-        long worstCaseRetrievalMs =
-            attempts * attemptWorstCaseMs(connectTimeoutMs, readTimeoutMs, retrievalDeadlineMs);
+        long worstCaseRetrievalMs = (long) attempts * retrievalDeadlineMs;
         require(cacheRefreshTimeoutMs > worstCaseRetrievalMs,
             "oidc.jwks.cache-refresh-timeout-ms (%d) must be greater than the retrieval attempts times "
-                + "(max(oidc.jwks.connect-timeout-ms, oidc.jwks.retrieval-deadline-ms) + oidc.jwks.read-timeout-ms) "
-                + "(%d x (max(%d, %d) + %d) = %d); otherwise a thread waiting on an in-flight retrieval gives up "
-                + "before that retrieval can complete, which is the failure this configuration exists to prevent",
-            cacheRefreshTimeoutMs, attempts, connectTimeoutMs, retrievalDeadlineMs, readTimeoutMs,
-            worstCaseRetrievalMs);
+                + "oidc.jwks.retrieval-deadline-ms (%d x %d = %d); otherwise a thread waiting on an in-flight "
+                + "retrieval gives up before that retrieval can complete, which is the failure this configuration "
+                + "exists to prevent",
+            cacheRefreshTimeoutMs, attempts, retrievalDeadlineMs, worstCaseRetrievalMs);
 
         // Reproduces JWKSourceBuilder's own constraints, so the message names the property rather than surfacing as
         // an IllegalStateException from deep inside the builder.
