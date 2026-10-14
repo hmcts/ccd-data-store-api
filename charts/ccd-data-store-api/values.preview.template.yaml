@@ -315,7 +315,7 @@ ccd-definition-store-api:
   java:
     releaseNameOverride: "{{ .Release.Name }}-ccd-definition-store"
     ingressHost: ccd-definition-store-${SERVICE_FQDN}
-    image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+    image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1800
     imagePullPolicy: Always
     devmemoryRequests: 2048Mi
     devcpuRequests: 2000m

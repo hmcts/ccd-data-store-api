@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-945.3_Update_Case_NotClosedForPayment",
+  "_extends_": "F-945_Update_Case_Base",
+  "title": "Move case out of closed for payment",
+  "specs": [
+    "to submit updateCase event with post state not closed for payment",
+    "contains Update token created as in S-945.3_GetToken_UpdateCase_NotClosedForPayment"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-944.2_Create_Case_NotClosed][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-945.3_GetToken_UpdateCase_NotClosedForPayment][testData][actualResponse][body][token]}",
+      "event": {
+        "id": "updateToNotClosedForPaymentCase"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "state": "CaseNotClosedForPayment"
+    }
+  }
+}
