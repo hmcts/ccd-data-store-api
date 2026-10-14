@@ -192,6 +192,8 @@ definitions:
       order:
         type: integer
         format: int32
+      caseFieldSubfieldCode:
+        type: string
 
   WorkBasketResult:
     type: object

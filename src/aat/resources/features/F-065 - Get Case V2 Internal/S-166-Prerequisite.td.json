@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-166-Prerequisite",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
+  "specs": [
+    "to create a token for case creation with CaseTypeTab ListElementCode"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CTT_Subfield_Valid",
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "createCase"
+    }
+  }
+}
