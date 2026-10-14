@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
@@ -84,7 +84,7 @@ class AuthorisedStartEventOperationTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
-    private CaseDetailsRepository caseDetailsRepository;
+    private GetCaseOperation getCaseOperation;
     @Mock
     private AuthorisedStartEventOperation authorisedStartEventOperation;
     @Mock
@@ -150,7 +150,7 @@ class AuthorisedStartEventOperationTest {
 
         authorisedStartEventOperation = new AuthorisedStartEventOperation(classifiedStartEventOperation,
             caseDefinitionRepository,
-            caseDetailsRepository,
+            getCaseOperation,
             accessControlService,
             uidService,
             draftGateway,
@@ -176,6 +176,8 @@ class AuthorisedStartEventOperationTest {
             eq(creationAccessProfiles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq("Open"), eq(caseTypeDefinition), eq(accessProfiles),
             eq(CAN_UPDATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseStateWithCriteria(eq("Open"), eq(caseTypeDefinition), eq(accessProfiles),
+            eq(CAN_READ))).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
             eq(caseFieldDefinitions),
             eq(accessProfiles),
@@ -358,7 +360,7 @@ class AuthorisedStartEventOperationTest {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
-            doReturn(caseDetailsOptional).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            doReturn(caseDetailsOptional).when(getCaseOperation).execute(CASE_REFERENCE);
         }
 
         @Test
@@ -406,7 +408,7 @@ class AuthorisedStartEventOperationTest {
                 classifiedStartEventOperation,
                 accessControlService,
                 uidService,
-                caseDetailsRepository);
+                getCaseOperation);
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
@@ -415,12 +417,12 @@ class AuthorisedStartEventOperationTest {
                 () -> assertThat(output.getCaseDetails().getDataClassification(),
                     is(equalTo(JacksonUtils.convertValue(authorisedCaseDetailsClassificationNode)))),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
-                () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
+                () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
+                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+                () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
                 () -> inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING),
-                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                     eq(accessProfiles),
                     eq(CAN_READ)),
@@ -445,14 +447,14 @@ class AuthorisedStartEventOperationTest {
             authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             InOrder inOrder = inOrder(uidService,
-                caseDetailsRepository,
+                getCaseOperation,
                 caseDefinitionRepository,
                 caseAccessService,
                 accessControlService,
                 classifiedStartEventOperation);
 
             inOrder.verify(uidService).validateUID(CASE_REFERENCE);
-            inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            inOrder.verify(getCaseOperation).execute(CASE_REFERENCE);
             inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
             inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE);
             inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition,
@@ -463,6 +465,10 @@ class AuthorisedStartEventOperationTest {
                 CAN_UPDATE);
             inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(),
                 eq(accessProfiles), eq(CAN_CREATE));
+            inOrder.verify(accessControlService).canAccessCaseStateWithCriteria("Open",
+                caseTypeDefinition,
+                accessProfiles,
+                CAN_READ);
             inOrder.verify(accessControlService).canAccessCaseStateWithCriteria("Open",
                 caseTypeDefinition,
                 accessProfiles,

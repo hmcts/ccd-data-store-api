@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -22,6 +20,8 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -40,7 +40,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final CaseDetailsRepository caseDetailsRepository;
+    private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final UIDService uidService;
     private final CaseAccessService caseAccessService;
@@ -49,8 +49,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
-                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                         final CaseDetailsRepository caseDetailsRepository,
+                                         @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+                                         final GetCaseOperation getCaseOperation,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
                                          @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
@@ -58,7 +58,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.caseDetailsRepository = caseDetailsRepository;
+        this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.uidService = uidService;
         this.caseAccessService = caseAccessService;
@@ -82,8 +82,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             throw new BadRequestException("Case reference is not valid");
         }
 
-        Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(
-            caseReference);
+        Optional<CaseDetails> caseDetailsOptional = getCaseOperation.execute(caseReference);
         if (caseDetailsOptional.isEmpty()) {
             throw new CaseNotFoundException(caseReference);
         }
@@ -191,6 +190,13 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             accessProfiles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        }
+
+        if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
+            caseTypeDefinition,
+            accessProfiles,
+            CAN_READ)) {
+            throw new CaseNotFoundException(caseDetails.getReferenceAsString());
         }
 
         if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
