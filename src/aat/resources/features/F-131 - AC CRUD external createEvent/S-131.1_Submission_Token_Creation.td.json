@@ -2,6 +2,16 @@
   "_guid_" : "S-131.1_Submission_Token_Creation",
   "_extends_" : "F-131_Token_Creation_Base",
 
+  "specs": [
+    "to create a token for event submission"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
