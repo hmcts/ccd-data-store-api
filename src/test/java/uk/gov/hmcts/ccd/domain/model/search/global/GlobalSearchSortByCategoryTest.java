@@ -4,8 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class GlobalSearchSortByCategoryTest {
 
@@ -15,20 +14,18 @@ class GlobalSearchSortByCategoryTest {
 
         // ARRANGE / ACT / ASSERT
         assertAll(
-            () -> assertEquals(
-                GlobalSearchSortByCategory.CASE_NAME,
-                GlobalSearchSortByCategory.getEnum(GlobalSearchSortByCategory.CASE_NAME.getCategoryName())
-            ),
-            () -> assertEquals(
-                GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME,
-                GlobalSearchSortByCategory.getEnum(
-                    GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME.getCategoryName()
-                )
-            ),
-            () -> assertEquals(
-                GlobalSearchSortByCategory.CREATED_DATE,
-                GlobalSearchSortByCategory.getEnum(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName())
-            )
+            () -> assertThat(GlobalSearchSortByCategory.getEnum(GlobalSearchSortByCategory.CASE_NAME.getCategoryName()))
+                .isEqualTo(GlobalSearchSortByCategory.CASE_NAME),
+            () -> assertThat(GlobalSearchSortByCategory.getEnum(
+                GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME.getCategoryName()))
+                .isEqualTo(GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME),
+            () -> assertThat(
+                GlobalSearchSortByCategory.getEnum(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName()))
+                .isEqualTo(GlobalSearchSortByCategory.CREATED_DATE),
+            () -> assertThat(
+                GlobalSearchSortByCategory.getEnum(GlobalSearchSortByCategory.NEXT_HEARING_DATE.getCategoryName()))
+                .isEqualTo(GlobalSearchSortByCategory.NEXT_HEARING_DATE)
+
         );
     }
 
@@ -37,7 +34,7 @@ class GlobalSearchSortByCategoryTest {
     void shouldReturnNullForInvalidCategoryName() {
 
         // ARRANGE / ACT / ASSERT
-        assertNull(GlobalSearchSortByCategory.getEnum("BAD_VALUE"));
+        assertThat(GlobalSearchSortByCategory.getEnum("BAD_VALUE")).isNull();
 
     }
 

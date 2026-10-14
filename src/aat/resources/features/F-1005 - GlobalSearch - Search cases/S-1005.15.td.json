@@ -1,0 +1,69 @@
+{
+  "title": "Does not return the next hearing date without child field read access",
+  "_guid_": "S-1005.15",
+  "_extends_": "F-1005_SearchCaseBase",
+
+  "specs": [
+    "parent and hearing ID read access but no hearing date read access",
+    "contains the reference for the case with next hearing details",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "returns the case without the next hearing date"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
+        ],
+        "CCDJurisdictionIds": [
+          "BEFTA_MASTER"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCaseWithNextHearingDetails][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess": "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseWithNextHearingDetails][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId": "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription": "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}

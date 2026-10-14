@@ -1,0 +1,35 @@
+{
+  "_guid_": "F-1005_CreateCaseWithNextHearingDetails",
+  "_extends_": "F-1005_CreateCasePreRequisiteCaseworker",
+
+  "request": {
+    "body": {
+      "data": {
+        "nextHearingDetails": {
+          "hearingID": "1234567890",
+          "hearingDateTime": "2026-10-12T09:30:00.000"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "nextHearingDetails": {
+          "hearingID": "1234567890",
+          "hearingDateTime": "2026-10-12T09:30:00.000"
+        }
+      },
+      "data_classification": {
+        "nextHearingDetails": {
+          "classification": "PUBLIC",
+          "value": {
+            "hearingID": "PUBLIC",
+            "hearingDateTime": "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}
