@@ -86,21 +86,6 @@ final class RawJwksServer implements Closeable {
         };
     }
 
-    static Script headersAfter(int delayMs) {
-        return out -> {
-            Thread.sleep(delayMs); // NOSONAR - the server sends its headers late; not a wait
-            healthy().respond(out);
-        };
-    }
-
-    static Script lastChunkAfter(int delayMs) {
-        return out -> {
-            sendChunkedHeadersAndKeySet(out);
-            Thread.sleep(delayMs); // NOSONAR - the server sends its last chunk late; not a wait
-            send(out, "0\r\n\r\n");
-        };
-    }
-
     /** The status line at once, then a header trickled a byte at a time, then the rest of a healthy response. */
     static Script slowHeaders() {
         return out -> {

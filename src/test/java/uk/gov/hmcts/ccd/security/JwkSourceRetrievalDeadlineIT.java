@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ccd.security.JwkTestSupport.tokenSignedWith;
  *
  * <p>The second test is the same, but IDAM sends the chunk framing slowly: the extension of the key set's chunk-size
  * line, a byte every 100ms for 10s. The JDK reads that line inside one {@code read()} that returns no data until it
- * ends, so only the caller-side deadline ({@link TimeLimitedResourceRetriever}) ends the attempt.
+ * ends; the deadline ({@link TimeLimitedResourceRetriever}) ends the attempt all the same.
  *
  * <p>Timeline from the first retrieval, in ms: the scheduled refresh starts at 500 (TTL 4400 - refresh ahead 500 -
  * refresh timeout 3400). Each attempt is abandoned at its 600ms deadline: by about 1100 and 1700. The re-cached set

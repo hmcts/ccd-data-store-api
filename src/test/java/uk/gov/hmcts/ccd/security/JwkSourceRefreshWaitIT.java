@@ -10,6 +10,7 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.JWKSourceBuilder;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,7 +126,8 @@ class JwkSourceRefreshWaitIT {
         // The same layers JwkSourceConfiguration builds, with the wait the original rule allowed.
         jwkSource = JWKSourceBuilder.<SecurityContext>create(
                 URI.create(jwksUri(wireMock)).toURL(),
-                new BodyDeadlineResourceRetriever(CONNECT_TIMEOUT_MS, READ_TIMEOUT_MS, 51_200, DEADLINE_MS))
+                new TimeLimitedResourceRetriever(
+                    new DefaultResourceRetriever(CONNECT_TIMEOUT_MS, READ_TIMEOUT_MS, 51_200), DEADLINE_MS))
             .retrying(telemetry.retryingEventListener())
             .outageTolerant(300_000L, telemetry.outageEventListener())
             .rateLimited(1_000L, telemetry.rateLimitedEventListener())

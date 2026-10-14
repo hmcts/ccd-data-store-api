@@ -8,7 +8,9 @@ import com.nimbusds.jose.jwk.JWKMatcher;
 import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.boot.actuate.health.Status;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -72,6 +75,23 @@ class JwkSetStartupRetryIT {
     private CapturedLogs telemetryLogs;
     private CapturedLogs configurationLogs;
     private final List<Attempt> attempts = new CopyOnWriteArrayList<>();
+
+    /**
+     * One retrieval before any test, so the first test's start-up retrieval does not pay for loading the HTTP stack and
+     * warming WireMock. Cold, both of its attempts can overrun the 50ms deadline, and it then starts as if IDAM were
+     * down.
+     */
+    @BeforeAll
+    static void warmUp() throws IOException {
+        WireMockServer idam = startWireMock();
+        try (TimeLimitedResourceRetriever retriever = new TimeLimitedResourceRetriever(
+            new DefaultResourceRetriever(1_000, 1_000, 51_200), 5_000)) {
+            stubHealthy(idam, originalJwkSet());
+            retriever.retrieveResource(URI.create(jwksUri(idam)).toURL());
+        } finally {
+            idam.stop();
+        }
+    }
 
     @BeforeEach
     void setUp() {

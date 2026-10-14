@@ -18,14 +18,14 @@ import java.util.concurrent.TimeoutException;
 /**
  * Runs each retrieval on its own virtual thread and waits at most {@code deadlineMs} for it, so the calling thread,
  * which holds Nimbus's cache lock, is released at the deadline wherever the request is stuck: DNS, connect, response
- * headers, chunk framing, trailers or body.
+ * headers, chunk framing, trailers or body. Connect and read timeouts bound each socket operation, not the request, so
+ * without this an IDAM that trickles its response holds the lock for as long as it keeps sending.
  *
  * <p>At the deadline it interrupts the retrieval and throws
- * {@code IOException("IDAM JWK set retrieval exceeded its <n>ms deadline")}, the message
- * {@link BodyDeadlineResourceRetriever} uses; Nimbus retries once, then serves the cached keys. Interrupting a
- * virtual thread blocked in a socket read or write closes the socket ({@link java.net.Socket}), so the abandoned
- * request ends at once, over HTTP and HTTPS. A DNS lookup does not respond to the interrupt: it runs until the
- * resolver returns, then the request fails.
+ * {@code IOException("IDAM JWK set retrieval exceeded its <n>ms deadline")}; Nimbus retries once, then serves the
+ * cached keys. Interrupting a virtual thread blocked in a socket read or write closes the socket
+ * ({@link java.net.Socket}), so the abandoned request ends at once, over HTTP and HTTPS. A DNS lookup does not respond
+ * to the interrupt: it runs until the resolver returns, then the request fails.
  *
  * <p>At most {@value #MAX_IN_FLIGHT} retrievals run at once. When that many are still running, the next one fails at
  * once instead of queueing behind them. Errors from the retrieval are rethrown as they are. {@link #close()} stops

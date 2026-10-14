@@ -13,6 +13,7 @@ import com.nimbusds.jose.jwk.source.URLBasedJWKSetSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -149,8 +150,8 @@ public class JwkSourceConfiguration {
 
     private @NonNull JWKSourceBuilder<SecurityContext> getJwkSourceBuilder(JwkSourceTelemetry telemetry) {
         TimeLimitedResourceRetriever retriever = new TimeLimitedResourceRetriever(
-            new BodyDeadlineResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
-                properties.sizeLimitBytes(), properties.retrievalDeadlineMs()), properties.retrievalDeadlineMs());
+            new DefaultResourceRetriever(properties.connectTimeoutMs(), properties.readTimeoutMs(),
+                properties.sizeLimitBytes()), properties.retrievalDeadlineMs());
         URLBasedJWKSetSource<SecurityContext> urlSource = new URLBasedJWKSetSource<>(properties.url(), retriever) {
             @Override
             public void close() {
