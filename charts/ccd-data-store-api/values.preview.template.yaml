@@ -129,6 +129,8 @@ elastic:
 elasticsearch:
   image: hmctsprod.azurecr.io/imported/elastic/elasticsearch
   imageTag: 9.2.3
+  securityContext:
+    allowPrivilegeEscalation: false
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
   createCert: false
@@ -158,11 +160,15 @@ logstash:
   image: "hmctsprod.azurecr.io/imported/elastic/logstash"
   imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
+  securityContext:
+    allowPrivilegeEscalation: false
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctsprod.azurecr.io/curl:7.70.0
       command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
+      securityContext:
+        allowPrivilegeEscalation: false
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
