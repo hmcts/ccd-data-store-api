@@ -55,7 +55,6 @@ Feature: F-131: Create Event External API CRUD Tests
     Given a user [with no U access for the CaseType],
     And a successful call [to create a token for case creation] as in [S-131.5_CreateCase_Token_Creation]
     And a case that has just been created as in [F-131.5_CreateCase],
-    And a successful call [to create a token for event submission] as in [S-131.5_Submission_Token_Creation]
     When a request is prepared with appropriate values,
     And the request [attempts to create an event for the previously created case]
     And it is submitted to call the [create event] operation of [CCD Data Store],
