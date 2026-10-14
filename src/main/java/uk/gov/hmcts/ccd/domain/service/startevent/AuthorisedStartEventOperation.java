@@ -24,7 +24,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -112,7 +111,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private CaseTypeDefinition getCaseType(String caseTypeId) {
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
         return caseTypeDefinition;
     }

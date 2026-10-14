@@ -33,7 +33,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -54,6 +53,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 
@@ -226,6 +226,20 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING)
             );
+        }
+
+        @Test
+        @DisplayName("should return not found when case type is unknown")
+        void shouldReturnNotFoundWhenCaseTypeIsUnknown() {
+            doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_CASE_TYPE_FOUND));
+            verify(classifiedStartEventOperation, never()).triggerStartForCaseType(CASE_TYPE_ID,
+                EVENT_TRIGGER_ID, IGNORE_WARNING);
         }
 
         @Test
@@ -496,10 +510,13 @@ class AuthorisedStartEventOperationTest {
 
             doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-            assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                authorisedStartEventOperation.triggerStartForCase(
                 CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_CASE_TYPE_FOUND));
         }
 
         @Test
