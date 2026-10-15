@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-1016.7_GetUpdateSuspendedCaseTokenCaseworker",
+  "_extends_": "F-1016_GetEventTokenBase",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "updateCaseSubmitSuspendedTTL"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "updateCaseSubmitSuspendedTTL"
+    }
+  }
+}

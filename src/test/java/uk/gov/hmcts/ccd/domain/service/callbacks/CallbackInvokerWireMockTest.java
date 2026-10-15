@@ -19,6 +19,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import jakarta.inject.Inject;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -39,7 +41,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
     "http.client.read.timeout=500",
     "http.client.connection.timeout=200"
     })
-public class CallbackInvokerWireMockTest extends WireMockBaseTest {
+class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
     private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
@@ -52,7 +54,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() {
         // IDAM
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
@@ -64,7 +66,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
+    void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
@@ -87,7 +89,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
+    void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
@@ -105,7 +107,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldRespectReadTimeout() throws Exception {
+    void aboutToSubmitShouldRespectReadTimeout() throws Exception {
         String submitUrl = hostUrl + "/about-to-submit-timeout";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(submitUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
@@ -125,8 +127,9 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    public void aboutToSubmitShouldFailFastOnConnectTimeout() {
-        String unreachableUrl = "http://10.255.255.1:9/unreachable-callback";
+    void aboutToSubmitShouldFailFastWhenCallbackConnectionFails() throws IOException {
+        int unusedPort = findUnusedLocalPort();
+        String unreachableUrl = "http://127.0.0.1:" + unusedPort + "/unreachable-callback";
         caseEventDefinition.setCallBackURLAboutToSubmitEvent(unreachableUrl);
         caseEventDefinition.setRetriesTimeoutURLAboutToSubmitEvent(Lists.newArrayList(0));
 
@@ -136,10 +139,16 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
                 caseEventDefinition, caseDetails, caseDetails, caseTypeDefinition, false));
         Duration duration = Duration.between(start, Instant.now());
 
-        MatcherAssert.assertThat("connect timeout should not wait for default 30s",
+        MatcherAssert.assertThat("connection failure should not wait for default 30s",
             duration.toMillis() < 2_000L);
         MatcherAssert.assertThat("exception should mention unsuccessful callback",
             ex.getMessage(), CoreMatchers.containsString("Callback to service has been unsuccessful"));
+    }
+
+    private int findUnusedLocalPort() throws IOException {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            return serverSocket.getLocalPort();
+        }
     }
 
 }

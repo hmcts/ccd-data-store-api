@@ -144,10 +144,10 @@ class PseudoRoleToAccessProfileGeneratorTest {
     }
 
     private ComplexACL complexAclWithRole(String role) {
-        return TestBuildersUtil.ComplexACLBuilder.aComplexACL().withRole(role).build();
+        return TestBuildersUtil.ComplexACLBuilder.aComplexACL().accessProfile(role).build();
     }
 
     private AccessControlList aclWithRole(String role) {
-        return TestBuildersUtil.AccessControlListBuilder.anAcl().withRole(role).build();
+        return AccessControlList.builder().accessProfile(role).build();
     }
 }

@@ -58,7 +58,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
@@ -97,10 +96,10 @@ class AuthorisedGetCaseViewOperationTest {
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
-    private static final AccessControlList acl1 = anAcl().withRole("caseworker-sscs")
-        .withCreate(true).withRead(true).withUpdate(true).withDelete(true).build();
-    private static final AccessControlList acl2 = anAcl().withRole("caseworker-sscs-clerk")
-        .withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
+    private static final AccessControlList acl1 = AccessControlList.builder().accessProfile("caseworker-sscs")
+        .create(true).read(true).update(true).delete(true).build();
+    private static final AccessControlList acl2 = AccessControlList.builder().accessProfile("caseworker-sscs-clerk")
+        .create(false).read(true).update(false).delete(false).build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
         .withJurisdiction(jurisdiction)
