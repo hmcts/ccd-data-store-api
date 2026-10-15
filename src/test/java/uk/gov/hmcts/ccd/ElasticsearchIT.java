@@ -70,6 +70,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -187,6 +188,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
     private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
     private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
+    private static final String SUPPLEMENTARY_DATA_CASE_REFERENCE = "1589460056217857";
     private static final Long GLOBAL_DOCS_SIZE = 1000L;
 
     @Inject
@@ -817,6 +819,59 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getCases().getFirst().getSupplementaryData()
                     .get("SDField3").asText(), is("SDField3Value"))
             );
+        }
+
+        @Test
+        void shouldReturnRequestedOrgKeyedSupplementaryDataFromFlattenedField() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(),
+                    SUPPLEMENTARY_DATA_CASE_REFERENCE))
+                .supplementaryData(Collections.singletonList("new_case.*"))
+                .build();
+
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                "orgcases", false);
+
+            Map<String, JsonNode> supplementaryData =
+                caseSearchResultViewResource.getCases().getFirst().getSupplementaryData();
+            assertAll(
+                () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
+                () -> assertThat(supplementaryData.size(), is(1)),
+                () -> assertThat(supplementaryData.get("new_case").get("OrgY").asBoolean(), is(true)),
+                () -> assertThat(supplementaryData.get("new_case").get("OrgZ").asBoolean(), is(false))
+            );
+        }
+
+        @Test
+        void shouldSearchOrgKeyedSupplementaryDataWhenMappedAsFlattenedFields() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(boolQuery()
+                    .must(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(),
+                        SUPPLEMENTARY_DATA_CASE_REFERENCE))
+                    .must(matchQuery("supplementary_data.new_case.OrgY", "true"))
+                    .must(rangeQuery("supplementary_data.orgs_assigned_users.OrgZ").gte(2500).lte(2500)))
+                .build();
+
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                "orgcases", false);
+
+            assertThat(caseSearchResultViewResource.getTotal(), is(1L));
+        }
+
+        @Test
+        void shouldReturnErrorForOneSidedRangeOnFlattenedOrgKeyedSupplementaryData() throws Exception {
+            ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+                .query(boolQuery()
+                    .must(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(),
+                        SUPPLEMENTARY_DATA_CASE_REFERENCE))
+                    .must(rangeQuery("supplementary_data.orgs_assigned_users.OrgZ").gte(2500)))
+                .build();
+
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, "orgcases", 400);
+
+            assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                containsString("[range] queries on keyed [flattened] fields must include both an upper "
+                    + "and a lower bound"));
         }
 
         @Test
