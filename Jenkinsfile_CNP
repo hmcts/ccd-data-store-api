@@ -1,6 +1,5 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
-import uk.gov.hmcts.contino.GithubAPI
 properties(
     [
         [
@@ -14,6 +13,7 @@ properties(
 @Library("Infrastructure@cve-dashboard")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
@@ -107,6 +107,9 @@ env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"
+env.OIDC_ALLOWED_ISSUERS = "https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
+env.VERIFY_OIDC_ISSUER = "true"
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
@@ -154,6 +157,30 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
     enableHighLevelDataSetup()
+
+    // Temporary PR diagnostic: verify the schema before BEFTA tries to add roles.
+    before('highleveldatasetup') {
+        onPR {
+            timeout(time: 5, unit: 'MINUTES') {
+                def subscription = env.NONPROD_SUBSCRIPTION_NAME ?: 'nonprod'
+                def previewEnvironment = env.PREVIEW_ENVIRONMENT_NAME ?: 'preview'
+                def namespace = env.TEAM_NAMESPACE ?: product
+                withAksClient(subscription, previewEnvironment, product) {
+                    new Kubectl(this, subscription, namespace).login()
+                    withEnv(["SCHEMA_CHECK_NAMESPACE=${namespace}",
+                             "SCHEMA_CHECK_RELEASE=ccd-data-store-api-${env.BRANCH_NAME.toLowerCase()}"]) {
+                        try {
+                            sh(label: 'Check definition-store schema before setup',
+                               script: 'bash scripts/check-preview-definition-schema.sh')
+                        } finally {
+                            archiveArtifacts allowEmptyArchive: true,
+                                artifacts: 'definition-store-schema-diagnostics/**'
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     afterAlways('test') {
       // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
