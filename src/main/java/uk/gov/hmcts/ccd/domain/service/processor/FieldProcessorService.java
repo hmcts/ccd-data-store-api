@@ -82,8 +82,9 @@ public class FieldProcessorService {
 
             if (!isNullOrEmpty(node) && caseField.isPresent() && caseEventField.isPresent()) {
                 for (CaseDataFieldProcessor processor : caseDataFieldProcessors) {
-                    node = processor.execute(node, caseField.get(), caseEventField.get(),
-                        wizardPageField(wizardPageFields, caseField.get().getId()));
+                    CaseFieldDefinition caseFieldDefinition = caseField.orElseThrow();
+                    node = processor.execute(node, caseFieldDefinition, caseEventField.orElseThrow(),
+                        wizardPageField(wizardPageFields, caseFieldDefinition.getId()));
                 }
             }
 
@@ -114,7 +115,7 @@ public class FieldProcessorService {
     private boolean isNullOrEmpty(final JsonNode node) {
         return node == null
             || node.isNull()
-            || (node.isTextual() && (null == node.asText() || node.asText().trim().length() == 0))
+            || (node.isTextual() && (null == node.asText() || node.asText().trim().isEmpty()))
             || (node.isObject() && node.toString().equals("{}"));
     }
 }
