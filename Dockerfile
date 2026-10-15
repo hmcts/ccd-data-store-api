@@ -7,7 +7,7 @@ FROM hmctsprod.azurecr.io/base/java${PLATFORM}:21-distroless
 USER hmcts
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
-COPY lib/applicationinsights.json /opt/app
+COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/core-case-data.jar /opt/app/
 
 EXPOSE 4452

@@ -4,8 +4,5 @@
 !Dockerfile
 !acb.tpl.yaml
 !acb.yaml
-!build/
-!build/libs/
 !build/libs/core-case-data.jar
-!lib/
 !lib/applicationinsights.json
