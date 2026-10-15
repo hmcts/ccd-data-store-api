@@ -35,7 +35,7 @@ ext {
     set('beftaJacksonVersion', '2.19.4')
     set('jackson3Version', '3.2.3')
     set('httpcore5Version', '5.4.4')
-    set('cveKotlinVersion', '2.4.20')
+    set('cveKotlinVersion', '2.4.21')
     set('opentelemetryVersion', '1.66.0')
     set('netty.version', '4.1.136.Final')
     set('snakeyaml.version', '2.2')
