@@ -32,7 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -41,15 +41,20 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 
 class AuthorisedStartEventOperationTest {
@@ -137,7 +142,11 @@ class AuthorisedStartEventOperationTest {
         classifiedStartEvent = new StartEventResult();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
-        caseDetailsOptional = Optional.of(newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build());
+        CaseDetails existingCaseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
+        existingCaseDetails.setId(CASE_REFERENCE);
+        existingCaseDetails.setReference(Long.valueOf(CASE_REFERENCE));
+        existingCaseDetails.setState("Open");
+        caseDetailsOptional = Optional.of(existingCaseDetails);
 
         authorisedStartEventOperation = new AuthorisedStartEventOperation(classifiedStartEventOperation,
             caseDefinitionRepository,
@@ -151,11 +160,22 @@ class AuthorisedStartEventOperationTest {
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(creationAccessProfiles);
         when(caseAccessService.getCreationAccessProfiles(anyString())).thenReturn(creationAccessProfiles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
             .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_UPDATE))
+            .thenReturn(true);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, creationAccessProfiles, CAN_READ))
             .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, creationAccessProfiles, CAN_CREATE))
+            .thenReturn(true);
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(), eq(accessProfiles),
+            eq(CAN_CREATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(),
+            eq(creationAccessProfiles), eq(CAN_CREATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseStateWithCriteria(eq("Open"), eq(caseTypeDefinition), eq(accessProfiles),
+            eq(CAN_UPDATE))).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
             eq(caseFieldDefinitions),
             eq(accessProfiles),
@@ -209,6 +229,20 @@ class AuthorisedStartEventOperationTest {
         }
 
         @Test
+        @DisplayName("should return not found when case type is unknown")
+        void shouldReturnNotFoundWhenCaseTypeIsUnknown() {
+            doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_CASE_TYPE_FOUND));
+            verify(classifiedStartEventOperation, never()).triggerStartForCaseType(CASE_TYPE_ID,
+                EVENT_TRIGGER_ID, IGNORE_WARNING);
+        }
+
+        @Test
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
@@ -227,6 +261,22 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING)
             );
+        }
+
+        @Test
+        @DisplayName("should reject start when user lacks event create access")
+        void shouldRejectStartWhenUserLacksEventCreateAccess() {
+            when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(),
+                eq(creationAccessProfiles), eq(CAN_CREATE))).thenReturn(false);
+
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_EVENT_FOUND));
+            verify(classifiedStartEventOperation, never()).triggerStartForCaseType(CASE_TYPE_ID,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
         }
     }
 
@@ -280,6 +330,22 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING)
             );
+        }
+
+        @Test
+        @DisplayName("should reject start when user lacks event create access")
+        void shouldRejectStartWhenUserLacksEventCreateAccess() {
+            when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(),
+                eq(creationAccessProfiles), eq(CAN_CREATE))).thenReturn(false);
+
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_EVENT_FOUND));
+            verify(classifiedStartEventOperation, never()).triggerStartForCaseType(CASE_TYPE_ID,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
         }
     }
 
@@ -373,15 +439,84 @@ class AuthorisedStartEventOperationTest {
         }
 
         @Test
+        @DisplayName("should verify update access before delegating start event")
+        void shouldVerifyUpdateAccessBeforeDelegatingStartEvent() {
+
+            authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+
+            InOrder inOrder = inOrder(uidService,
+                caseDetailsRepository,
+                caseDefinitionRepository,
+                caseAccessService,
+                accessControlService,
+                classifiedStartEventOperation);
+
+            inOrder.verify(uidService).validateUID(CASE_REFERENCE);
+            inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+            inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE);
+            inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition,
+                accessProfiles,
+                CAN_READ);
+            inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition,
+                accessProfiles,
+                CAN_UPDATE);
+            inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(),
+                eq(accessProfiles), eq(CAN_CREATE));
+            inOrder.verify(accessControlService).canAccessCaseStateWithCriteria("Open",
+                caseTypeDefinition,
+                accessProfiles,
+                CAN_UPDATE);
+            inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+        }
+
+        @Test
+        @DisplayName("should reject start when user lacks update event access")
+        void shouldRejectStartWhenUserLacksUpdateEventAccess() {
+            when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID), any(), eq(accessProfiles),
+                eq(CAN_CREATE))).thenReturn(false);
+
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_EVENT_FOUND));
+            verify(classifiedStartEventOperation, never()).triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+        }
+
+        @Test
+        @DisplayName("should hide case when user has no case access")
+        void shouldHideCaseWhenUserHasNoCaseAccess() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
+                .thenReturn(false);
+
+            CaseNotFoundException exception = assertThrows(CaseNotFoundException.class,
+                () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE, EVENT_TRIGGER_ID,
+                    IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is("No case found for reference: " + CASE_REFERENCE));
+            verify(classifiedStartEventOperation, never()).triggerStartForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
+        }
+
+        @Test
         @DisplayName("should fail if case type not found")
         void shouldFailIfNoCaseTypeFound() {
 
             doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-            assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                authorisedStartEventOperation.triggerStartForCase(
                 CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING));
+
+            assertThat(exception.getMessage(), is(NO_CASE_TYPE_FOUND));
         }
 
         @Test
