@@ -12,7 +12,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_Citizen_MidEventUpdate"
+    "Token_Creation": "F-1024_Case_Data_Create_Token_Creation_MidEventUpdate"
   } ],
 
   "users": {

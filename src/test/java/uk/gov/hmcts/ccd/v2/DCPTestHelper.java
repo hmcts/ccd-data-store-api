@@ -17,6 +17,7 @@ public class DCPTestHelper {
     public static final String STANDARD_DATE = "StandardDate";
     public static final String STANDARD_DATE_TIME = "StandardDateTime";
     public static final String COMPLEX_FIELD = "ComplexField";
+    public static final String DCP_COLLECTION_ITEM_ID = "1c811aa0-116c-45ad-a315-ecd94801a42f";
 
     private DCPTestHelper() {
         // Utility class
@@ -37,13 +38,17 @@ public class DCPTestHelper {
     }
 
     public static String validateContent() {
+        return validateContent(null);
+    }
+
+    public static String validateContent(String eventToken) {
         return """
             {
                 "data": {
                   "TextField": "Case 1 Text",
                   "CollectionComplexDateTime": [
                     {
-                      "id": "ID",
+                      "id": "1c811aa0-116c-45ad-a315-ecd94801a42f",
                       "value": {
                         "DateField": "07-05-1963",
                         "DateTimeField": "2008-04-02T16:37",
@@ -64,31 +69,39 @@ public class DCPTestHelper {
                   "summary": "",
                   "description": ""
                 },
-                "case_reference": "1587051668000989"
-            }""";
+                "case_reference": "1587051668000989",
+                "event_token": "%s"
+            }""".formatted(eventToken == null ? "" : eventToken);
     }
 
     public static String invalidValidateContent() {
-        return "{\n"
-            + "    \"data\": {\n"
-            + "      \"TextField\": \"Case 1 Text\",\n"
-            + "      \"CollectionComplexDateTime\": [\n"
-            + "        {\n"
-            + "          \"id\": \"ID\",\n"
-            + "          \"value\": {\n"
-            + "            \"NestedComplex\": {\n"
-            + "              \"DateField\": \"2000\"\n"
-            + "            }\n"
-            + "          }\n"
-            + "        }\n"
-            + "      ]\n"
-            + "    },\n"
-            + "    \"event\": {\n"
-            + "      \"id\": \"UPDATE\",\n"
-            + "      \"summary\": \"\",\n"
-            + "      \"description\": \"\"\n"
-            + "    }\n"
-            + "}";
+        return invalidValidateContent(null);
+    }
+
+    public static String invalidValidateContent(String eventToken) {
+        return """
+            {
+                "data": {
+                  "TextField": "Case 1 Text",
+                  "CollectionComplexDateTime": [
+                    {
+                      "id": "1c811aa0-116c-45ad-a315-ecd94801a42f",
+                      "value": {
+                        "NestedComplex": {
+                          "DateField": "2000"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "event": {
+                  "id": "UPDATE",
+                  "summary": "",
+                  "description": ""
+                },
+                "case_reference": "1587051668000989",
+                "event_token": "%s"
+            }""".formatted(eventToken == null ? "" : eventToken);
     }
 
     public static String createCaseRequestContent(String eventToken) {
