@@ -15,13 +15,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 
 import static uk.gov.hmcts.ccd.security.JwkTestSupport.originalJwkSet;
 
 /**
  * Answers each connection with the current {@link Script}, sending each part of the response when the script says,
  * which WireMock cannot do for the response headers or the chunk framing. Records when the client closes the latest
- * connection: a read on the server side returns end of stream or fails.
+ * connection: a read on the server side returns end of stream or fails. Over HTTP, or over HTTPS with
+ * {@link #overTls}, where each send is its own TLS record, flushed when the script says.
  */
 final class RawJwksServer implements Closeable {
 
@@ -41,11 +45,20 @@ final class RawJwksServer implements Closeable {
     private volatile boolean finishedSending;
 
     RawJwksServer(Script script) throws IOException {
+        this(script, ServerSocketFactory.getDefault());
+    }
+
+    private RawJwksServer(Script script, ServerSocketFactory sockets) throws IOException {
         this.script = script;
         // Bound to 127.0.0.1, not the wildcard, so a server another fork binds to the same port number with
         // SO_REUSEADDR (WireMock's Jetty does) cannot answer this server's requests.
-        serverSocket = new ServerSocket(0, 50, InetAddress.getByName(LOOPBACK));
+        serverSocket = sockets.createServerSocket(0, 50, InetAddress.getByName(LOOPBACK));
         start(new Thread(this::acceptConnections, "raw-jwks-server"));
+    }
+
+    /** Serves HTTPS with the given server context; the handshake runs on the first read of the request. */
+    static RawJwksServer overTls(Script script, SSLContext tls) throws IOException {
+        return new RawJwksServer(script, tls.getServerSocketFactory());
     }
 
     enum Framing {
@@ -135,7 +148,8 @@ final class RawJwksServer implements Closeable {
     }
 
     String uri() {
-        return "http://" + LOOPBACK + ":" + serverSocket.getLocalPort() + JwkTestSupport.JWKS_PATH;
+        String scheme = serverSocket instanceof SSLServerSocket ? "https" : "http";
+        return scheme + "://" + LOOPBACK + ":" + serverSocket.getLocalPort() + JwkTestSupport.JWKS_PATH;
     }
 
     int requests() {
@@ -194,7 +208,7 @@ final class RawJwksServer implements Closeable {
                 // A GET has no body; anything else is ignored.
             }
         } catch (IOException e) {
-            // Reset by the client: closed too.
+            // Reset by the client, or an SSLException over TLS: closed too.
         }
         clientClosed = true;
     }
