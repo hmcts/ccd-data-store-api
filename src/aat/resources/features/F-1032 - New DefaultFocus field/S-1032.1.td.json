@@ -21,7 +21,11 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "tabs": "[[ANYTHING_PRESENT]]"
+      "tabs": [
+        {
+          "defaultFocus": true
+        }
+      ]
     }
   }
 }
