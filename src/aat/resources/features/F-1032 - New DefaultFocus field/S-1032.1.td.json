@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-1029.1",
+  "_guid_": "S-1032.1",
   "operationName": "GET /api/display/tab-structure/{id}",
-  "_extends_": "F-1029.1_Test_Data_Base",
+  "_extends_": "F-1032.1_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
     "contains valid caseType id which has defaultFocus value set for tab",
