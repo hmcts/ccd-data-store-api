@@ -228,11 +228,11 @@ class CaseServiceTest {
     }
 
     @Nested
-    @DisplayName("populateCurrentCaseDetailsWithUserInputs()")
+    @DisplayName("populateCurrentCaseDetailsWithData()")
     class PopulateCurrentCaseDetailsWithUserInputs {
         @Test
         @DisplayName("should return caseDetails")
-        void populateCurrentCaseDetailsWithEventFields() throws Exception {
+        void populateCurrentCaseDetailsWithData() throws Exception {
 
 
             Map<String, JsonNode> eventData = JacksonUtils.convertValue(MAPPER.readTree(
@@ -254,7 +254,7 @@ class CaseServiceTest {
                 .build();
             CaseDetails caseDetails = buildCaseDetails();
             caseDetails.setId("299");
-            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithData(caseDataContent, caseDetails);
 
             assertAll(
                 () -> assertThat(result.getId(), is(CaseServiceTest.this.caseDetails.getId())),
@@ -273,7 +273,7 @@ class CaseServiceTest {
             storedCase.setData(new HashMap<>(Map.of("name", new TextNode("Stored"),
                 "storedOnly", new TextNode("Retained"))));
 
-            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(content, storedCase);
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithData(content, storedCase);
 
             assertThat(result.getData(), is(Map.of("name", new TextNode("Event"),
                 "storedOnly", new TextNode("Retained"))));
@@ -290,7 +290,7 @@ class CaseServiceTest {
             CaseDetails storedCase = buildCaseDetails();
             storedCase.setData(new HashMap<>(storedData));
 
-            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(content, storedCase);
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithData(content, storedCase);
 
             assertThat(result.getData(), is(storedData));
         }
@@ -327,7 +327,7 @@ class CaseServiceTest {
             CaseDetails caseDetails = buildCaseDetails();
             caseDetails.setData(new HashMap<>(storedData));
 
-            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithData(caseDataContent, caseDetails);
 
             assertThat(result.getData(), is(expectedData));
         }

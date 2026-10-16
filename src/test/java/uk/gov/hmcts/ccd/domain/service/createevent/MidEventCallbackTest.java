@@ -120,7 +120,7 @@ class MidEventCallbackTest {
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
 
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(build, existingCaseDetails))
             .willReturn(caseDetails);
 
 
@@ -214,7 +214,7 @@ class MidEventCallbackTest {
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).thenReturn(caseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails)).willReturn(caseDetails);
+        given(caseService.populateCurrentCaseDetailsWithData(content, caseDetails)).willReturn(caseDetails);
 
         Map<String, JsonNode> result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
@@ -275,7 +275,7 @@ class MidEventCallbackTest {
         CaseDetails eventDataOnlyCaseDetails = caseDetails(fullCaseData);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, fullCaseData))
             .thenReturn(eventDataOnlyCaseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, eventDataOnlyCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(content, eventDataOnlyCaseDetails))
             .willReturn(eventDataOnlyCaseDetails);
 
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
@@ -341,7 +341,7 @@ class MidEventCallbackTest {
         when(caseService.createNewCaseDetails(Mockito.eq(CASE_TYPE_ID), Mockito.eq(JURISDICTION_ID),
             Mockito.isA(Map.class))).thenReturn(combineCaseDetails);
         given(caseService.getCaseDetails(JURISDICTION_ID, content.getCaseReference())).willReturn(existingCaseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, existingCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(content, existingCaseDetails))
             .willReturn(combineCaseDetails);
 
 
@@ -386,7 +386,7 @@ class MidEventCallbackTest {
 
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(build, existingCaseDetails))
             .willReturn(caseDetails);
 
 
@@ -430,7 +430,7 @@ class MidEventCallbackTest {
 
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
-        given(caseService.populateCurrentCaseDetailsWithEventFields(build, existingCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(build, existingCaseDetails))
             .willReturn(caseDetails);
 
 
@@ -464,7 +464,7 @@ class MidEventCallbackTest {
 
         given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willReturn(existingCaseDetails);
         given(caseService.clone(existingCaseDetails)).willReturn(existingCaseDetails);
-        given(caseService.populateCurrentCaseDetailsWithEventFields(content, existingCaseDetails))
+        given(caseService.populateCurrentCaseDetailsWithData(content, existingCaseDetails))
             .willReturn(populatedCaseDetails);
         given(timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)).willReturn(true);
         given(timeToLiveService.updateCaseDetailsWithTTL(populatedData, caseEventDefinition, caseTypeDefinition))
@@ -515,8 +515,8 @@ class MidEventCallbackTest {
             new CaseDataService(), null, null);
         given(caseService.clone(any())).willAnswer(invocation ->
             realCaseService.clone(invocation.getArgument(0)));
-        given(caseService.populateCurrentCaseDetailsWithEventFields(eq(content), any()))
-            .willAnswer(invocation -> realCaseService.populateCurrentCaseDetailsWithEventFields(
+        given(caseService.populateCurrentCaseDetailsWithData(eq(content), any()))
+            .willAnswer(invocation -> realCaseService.populateCurrentCaseDetailsWithData(
                 invocation.getArgument(0), invocation.getArgument(1)));
 
         given(timeToLiveService.isCaseTypeUsingTTL(caseTypeDefinition)).willReturn(true);
