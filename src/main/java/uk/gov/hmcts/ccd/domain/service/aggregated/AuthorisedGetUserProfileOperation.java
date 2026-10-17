@@ -45,7 +45,11 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()
                     .stream()
-                    .map(caseType -> verifyAccess(caseType.createCopy(), getAccessProfiles(caseType.getId()), access))
+                    .map(caseType -> verifyAccess(
+                        caseType.createCopy(),
+                        getAccessProfiles(caseType.getId(), access),
+                        access
+                    ))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList())
@@ -54,8 +58,11 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userProfile;
     }
 
-    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
-        return caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId, Predicate<AccessControlList> access) {
+        if (AccessControlService.CAN_CREATE == access) {
+            return caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
+        }
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
