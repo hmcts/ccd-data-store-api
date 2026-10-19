@@ -1,12 +1,12 @@
 #=====================================================
-@F-1032.1
-Feature: F-1032.1: Validate calls for the display/tab-structure endpoint for new column defaultFocus
+@F-1050.1
+Feature: F-1050.1: Validate calls for the display/tab-structure endpoint for new column defaultFocus
 #=====================================================
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
- @S-1032.1
+ @S-1050.1
   Scenario: Successful response for case type id with defaultFocus set on tab
 
     Given a user with [an active profile in CCD],
@@ -19,7 +19,7 @@ Feature: F-1032.1: Validate calls for the display/tab-structure endpoint for new
     And the response has all other details as expected.
 
 
-  @S-1032.2
+  @S-1050.2
   Scenario: must return case view history when the case reference exists
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
