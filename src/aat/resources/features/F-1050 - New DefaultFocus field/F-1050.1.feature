@@ -10,6 +10,7 @@ Feature: F-1050.1: Validate calls for the display/tab-structure endpoint for new
   Scenario: Successful response for case type id with defaultFocus set on tab
 
     Given a user with [an active profile in CCD],
+    And a case that has just been created as in [S-1050.1_Create_Case_Data],
     When a request is prepared with appropriate values,
     And the request [contains valid caseType id which has defaultFocus value set for tab],
     And it is submitted to call the [fetch a case for display for Case Worker] operation of [CCD Data Store],

@@ -3,6 +3,11 @@
   "productName": "CCD Data Store",
   "operationName": "fetch a case for display for Case Worker",
   "_extends_": "F-1050.1_Test_Data_Base",
+  "prerequisites": [
+    {
+      "Token_Creation": "S-1050.1_Create_Case_Data_Token_Creation"
+    }
+  ],
   "specs": [
     "an active profile in CCD",
     "contains valid caseType id which has defaultFocus value set for tab",
@@ -17,9 +22,9 @@
     },
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
+      "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "1234567890123456"
+      "cid": "${[scenarioContext][childContexts][S-1050.1_Create_Case_Data][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {
