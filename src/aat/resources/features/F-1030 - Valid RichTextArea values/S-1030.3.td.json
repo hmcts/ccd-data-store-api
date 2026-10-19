@@ -1,0 +1,92 @@
+{
+  "title": "must successfully update case with rich text field displaying as expected",
+  "_guid_": "S-1030.3",
+  "_extends_": "F-1030.3_Test_Data_Base",
+  "prerequisites": [
+    {
+      "Token_Creation": "S-1030.3_Case_Update_Token_Creation"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains a case with number field showing correctly",
+    "has 201 return code",
+    "contains correct values for case_data and data_classification",
+    "contains correctly configured event details",
+    "contains RichTextArea base type",
+    "RichTextArea has tags that are allowed list"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-1030.3_Create_Case_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "RichTextAreaField": "<p>Allowed</p>",
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": 12.88,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "case_data": {
+        "RichTextAreaField": "<p>Allowed</p>"
+      },
+      "data_classification": {
+        "RichTextAreaField": "PUBLIC"
+      }
+    }
+  }
+}
