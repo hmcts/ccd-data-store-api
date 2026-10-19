@@ -1,22 +1,25 @@
 {
   "_guid_": "S-1050.1",
-  "productName": "CCD Definition Store",
-  "operationName": "GET /api/display/tab-structure/{id}",
+  "productName": "CCD Data Store",
+  "operationName": "fetch a case for display for Case Worker",
   "_extends_": "F-1050.1_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
     "contains valid caseType id which has defaultFocus value set for tab",
-    "GET /api/display/tab-structure/{id}",
+    "fetch a case for display for Case Worker",
     "contains HTTP 200"
   ],
   "method": "GET",
-  "uri": "{{DEFINITION_STORE_HOST}}/api/display/tab-structure/{ctid}",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "ctid": "FT_MasterCaseType"
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "FT_MasterCaseType",
+      "cid": "1234567890123456"
     }
   },
   "expectedResponse": {

@@ -12,7 +12,7 @@ Feature: F-1050.1: Validate calls for the display/tab-structure endpoint for new
     Given a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
     And the request [contains valid caseType id which has defaultFocus value set for tab],
-    And it is submitted to call the [GET /api/display/tab-structure/{id}] operation of [CCD Data Store],
+    And it is submitted to call the [fetch a case for display for Case Worker] operation of [CCD Data Store],
 
     Then a positive response is received,
     And the response [contains HTTP 200],
