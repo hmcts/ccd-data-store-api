@@ -1,5 +1,6 @@
 {
   "_guid_": "S-1050.1",
+  "productName": "CCD Definition Store",
   "operationName": "GET /api/display/tab-structure/{id}",
   "_extends_": "F-1050.1_Test_Data_Base",
   "specs": [
@@ -9,7 +10,7 @@
     "contains HTTP 200"
   ],
   "method": "GET",
-  "uri": "/api/display/tab-structure/{ctid}",
+  "uri": "{{DEFINITION_STORE_HOST}}/api/display/tab-structure/{ctid}",
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
