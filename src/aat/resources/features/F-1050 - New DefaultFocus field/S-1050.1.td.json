@@ -30,11 +30,42 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "channels": "[[ANYTHING_PRESENT]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
       "tabs": [
         {
-          "defaultFocus": true
+          "id": "NameTab",
+          "label": "Details",
+          "order": 2,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": true,
+          "show_condition": null
+        },
+        {
+          "id": "CaseLinkTab",
+          "label": "Linked Cases",
+          "order": 3,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": false,
+          "show_condition": null
+        },
+        {
+          "id": "History",
+          "label": "History",
+          "order": 1,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": false,
+          "show_condition": null
         }
-      ]
+      ],
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }
