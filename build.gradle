@@ -242,6 +242,7 @@ task integration(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
+    mustRunAfter test
 }
 
 task aatTest(type: Test) {
@@ -250,6 +251,16 @@ task aatTest(type: Test) {
     testClassesDirs = sourceSets.aat.output.classesDirs
     classpath = sourceSets.aat.runtimeClasspath
     failFast = true
+}
+
+// Run the isolated cache tests in CI without requiring the AAT services or
+// environment variables used by the other tests in this source set.
+task tokenCacheTest(type: Test) {
+    description = "Runs functional-test token cache unit tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.aat.output.classesDirs
+    classpath = sourceSets.aat.runtimeClasspath
+    include 'uk/gov/hmcts/ccd/datastore/befta/FunctionalTestUserTokenCacheTest.class'
 }
 
 ext.libraries = [
@@ -706,6 +717,7 @@ compileTestJava {
 // adopted from
 // https://github.com/springfox/springfox/blob/fb780ee1f14627b239fba95730a69900b9b2313a/gradle/coverage.gradle
 jacocoTestReport {
+    dependsOn test, integration
     executionData(test, integration)
     doFirst {
         logger.lifecycle("{} Starting jacocoTestReport ...", timestamp())
@@ -775,15 +787,13 @@ jacocoTestReport {
     }
 }
 
-test {
+// Both suites need the same timeout, locale and JVM module access settings.
+configure([test, integration]) {
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    generateCucumberReports.enabled = true
     systemProperty 'java.locale.providers', 'CLDR'
 
     useJUnitPlatform()
-
-    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 
     testLogging {
         // set options for log level LIFECYCLE
@@ -801,11 +811,6 @@ test {
         info.events = ["failed", "skipped"]
     }
 
-    reports {
-        html.required = true
-        html.outputLocation = file("${buildDir}/reports/jacoco/html")
-    }
-
     jvmArgs = [
             '--add-modules', 'java.se',
             '--add-exports', 'java.base/jdk.internal.ref=ALL-UNNAMED',
@@ -815,9 +820,20 @@ test {
             '--add-opens', 'java.management/sun.management=ALL-UNNAMED',
             '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
     ]
+    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
-check.dependsOn jacocoTestReport
+test {
+    // These classes have their own integration task; execute them only once.
+    exclude 'uk/gov/hmcts/ccd/integrations/**'
+    generateCucumberReports.enabled = true
+    reports {
+        html.required = true
+        html.outputLocation = file("${buildDir}/reports/jacoco/html")
+    }
+}
+
+check.dependsOn jacocoTestReport, tokenCacheTest
 
 task fortifyScan(type: JavaExec)  {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
@@ -917,6 +933,12 @@ task functional(type: JavaExec) {
     }
 
     outputs.upToDateWhen { false }
+}
+
+// The adapter handles bounded JWT reuse. BEFTA's expire-after-access cache must
+// remain short so adapter refreshes obtain a new token, including on local runs.
+[smoke, functional].each {
+    it.environment 'BEFTA_USER_TOKEN_CACHE_TTL_SECONDS', '1'
 }
 
 project.ext {
