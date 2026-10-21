@@ -8,16 +8,22 @@
     "code is HTTP-200"
   ],
 
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccess_IdamRole"
+    }
+  },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
       "token": "[[ANYTHING_PRESENT]]",
       "case_details": {
         "id": null,
-        "jurisdiction": "AUTOTEST1",
+        "jurisdiction": "BEFTA_MASTER",
         "state": null,
         "version": null,
-        "case_type_id": "AAT",
+        "case_type_id": "FT_CaseAccess_IdamRole",
         "created_date": null,
         "last_modified": null,
         "last_state_modified_date": null,
