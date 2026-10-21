@@ -45,6 +45,9 @@
             "exists": true
           }
         },
+        "idamJwks": {
+          "status": "UP"
+        },
         "livenessState": "[[ANY_OBJECT_NULLABLE]]",
         "ping": {
           "status": "UP"
