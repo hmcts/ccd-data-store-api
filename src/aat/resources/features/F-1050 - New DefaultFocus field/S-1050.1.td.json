@@ -51,7 +51,7 @@
           "order": 3,
           "fields": "[[ANYTHING_PRESENT]]",
           "role": null,
-          "defaultFocus": false,
+          "defaultFocus": null,
           "show_condition": null
         },
         {
@@ -60,7 +60,7 @@
           "order": 1,
           "fields": "[[ANYTHING_PRESENT]]",
           "role": null,
-          "defaultFocus": false,
+          "defaultFocus": null,
           "show_condition": null
         }
       ],
