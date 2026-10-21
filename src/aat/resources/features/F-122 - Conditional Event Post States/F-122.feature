@@ -88,7 +88,7 @@ Feature: F-122: Conditional Event Post States
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-122-GetToken_CaseCreate],
     And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case],
-    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase],
+    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase2],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
@@ -105,7 +105,7 @@ Feature: F-122: Conditional Event Post States
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-122-GetToken_CaseCreate],
     And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case],
-    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase],
+    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase2],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
@@ -122,7 +122,7 @@ Feature: F-122: Conditional Event Post States
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-122-GetToken_CaseCreate],
     And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case],
-    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase],
+    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase2],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
@@ -139,7 +139,7 @@ Feature: F-122: Conditional Event Post States
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-122-GetToken_CaseCreate],
     And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case],
-    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase],
+    And a successful call [to get an event token for the case just created] as in [S-122-GetToken_UpdateCase2],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
