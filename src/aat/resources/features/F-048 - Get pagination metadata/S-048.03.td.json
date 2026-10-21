@@ -1,0 +1,40 @@
+{
+	"_guid_": "S-048.03",
+	"_extends_": "Base_Expecting_200",
+	"title": "must apply a case field search criterion alongside the access control predicates",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get the pagination metadata for a case data search for Case Worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"filters on a case field value that no case holds",
+		"returns the pagination metadata",
+		"contains pagination results count as 0"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		},
+		"queryParams": {
+			"case.TextField": "S-048.03 no case holds this value"
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"total_results_count": 0,
+			"total_pages_count": 0
+		}
+	}
+}
