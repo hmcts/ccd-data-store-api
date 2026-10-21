@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-141.12_CreateCase_Token_Creation",
+  "_extends_": "F-141_CreateCase_Token_Creation",
+
+  "request": {
+    "pathVariables": {
+      "etid": "CREATE",
+      "ctid": "FT_CaseFileView_2"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "case_type_id": "FT_CaseFileView_2"
+      },
+      "event_id": "CREATE"
+    }
+  }
+}

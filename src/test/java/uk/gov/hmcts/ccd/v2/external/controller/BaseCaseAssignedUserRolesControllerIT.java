@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.ccd.test.RoleAssignmentsHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import jakarta.inject.Inject;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -166,6 +168,9 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
         stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
             .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
+        stubFor(post(urlMatching("/am/role-assignments/query"))
+            .willReturn(okJson(RoleAssignmentsHelper.emptyRoleAssignmentResponseJson()).withStatus(200)));
     }
 
     protected HttpHeaders createHttpHeaders() {

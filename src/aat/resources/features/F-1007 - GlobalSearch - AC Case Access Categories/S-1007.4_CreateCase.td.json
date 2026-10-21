@@ -2,6 +2,11 @@
   "_guid_": "S-1007.4_CreateCase",
   "_extends_" : "F-1007_CreateCaseBase",
 
+  "prerequisites" : [ {
+    "Token_Creation": "F-1007_CreateCaseTokenCreation_1"
+  }
+  ],
+
   "request": {
     "pathVariables": {
       "ctid": "FT_CaseAccessCategories_1"
