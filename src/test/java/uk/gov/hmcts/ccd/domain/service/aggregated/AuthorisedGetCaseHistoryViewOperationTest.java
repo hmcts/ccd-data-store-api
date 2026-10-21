@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +30,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -102,8 +98,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation
             authorisedGetCaseHistoryViewOperation;
 
-    @BeforeEach
-    void resetStaticFields() {
+    private void resetStaticFields() {
         FIELD_1 = aViewField().withId("FIELD_1").build();
         FIELD_2 = aViewField().withId("FIELD_2").build();
         FIELD_3 = aViewField().withId("FIELD_3").build();
@@ -133,6 +128,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
     @BeforeEach
     void setUp() {
+        resetStaticFields();
         MockitoAnnotations.openMocks(this);
 
         FIELD_1.setAccessControlLists(ACCESS_CONTROL_LISTS);
@@ -182,7 +178,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
-        assertThat(caseHistoryView, CoreMatchers.is(TEST_CASE_HISTORY_VIEW));
+        assertThat(caseHistoryView).isEqualTo(TEST_CASE_HISTORY_VIEW);
         verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
@@ -200,7 +196,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         assertAll(
             () -> verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID),
-            () -> assertThat(actualCaseView.getTabs().length, is(0))
+            () -> assertThat(actualCaseView.getTabs()).isEmpty()
         );
     }
 
@@ -221,9 +217,9 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         assertAll(
             () -> verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID),
-            () -> assertThat(actualCaseView.getTabs().length, is(2)),
-            () -> assertNotEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED),
-            () -> assertNotEquals(actualCaseView.getTabs()[1], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
+            () -> assertThat(actualCaseView.getTabs())
+                .hasSize(2)
+                .doesNotContain(CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
         );
     }
 
@@ -244,8 +240,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         assertAll(
             () -> verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID),
-            () -> assertThat(actualCaseView.getTabs().length, is(1)),
-            () -> assertEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
+            () -> assertThat(actualCaseView.getTabs()).containsExactly(CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
         );
     }
 

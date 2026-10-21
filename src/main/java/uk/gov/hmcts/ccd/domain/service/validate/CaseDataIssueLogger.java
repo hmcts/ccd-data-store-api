@@ -57,8 +57,9 @@ public class CaseDataIssueLogger {
             findAnyUnexpectedEmptyCollectionIssueIn(newCaseDetails));
 
         if (!emptyCollectionsInCaseData.isEmpty()) {
+            CaseDetails caseDetailsToLog = newCaseDetails != null ? newCaseDetails : currentCaseDetails;
             log.debug("Case reference '{}' with state '{}' contains unexpected empty value in collection(s) '{}' "
-                    + "and the stacktrace - {}", newCaseDetails.getReference(), newCaseDetails.getState(),
+                    + "and the stacktrace - {}", caseDetailsToLog.getReference(), caseDetailsToLog.getState(),
                 emptyCollectionsInCaseData, new Exception().getStackTrace());
         }
 
