@@ -113,6 +113,20 @@ class IdamRepositoryTest {
     }
 
     @Test
+    @DisplayName("Get empty User Roles by UserId when IDAM omits roles")
+    void shouldGetEmptyUserRolesByUserIdWhenRolesMissing() {
+        mockGetDataStoreSystemUserAccessToken();
+        UserDetails userDetails = UserDetails.builder()
+            .id(USER_ID)
+            .roles(null)
+            .build();
+        given(idamClient.getUserByUserId(TEST_USER_TOKEN, USER_ID)).willReturn(userDetails);
+
+        List<String> idamUserRoles = idamRepository.getUserRoles(USER_ID);
+        assertThat(idamUserRoles).isNotNull().isEmpty();
+    }
+
+    @Test
     @DisplayName("Get DataStore's SystemUser access token")
     void shouldGetDataStoreSystemUserAccessToken() {
 
