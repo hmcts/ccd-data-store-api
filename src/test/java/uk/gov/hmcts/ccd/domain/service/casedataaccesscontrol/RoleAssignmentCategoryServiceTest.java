@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -96,6 +97,17 @@ class RoleAssignmentCategoryServiceTest {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("caseworker"));
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldGetRoleCategoryForUserWithNoRoles() {
+
+            given(idamRepository.getUserRoles(USER_ID))
+                .willReturn(emptyList());
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
