@@ -98,7 +98,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
                 .map(fieldProcessorService::processCaseViewField)
                 .toArray(CaseViewField[]::new);
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
-                                   tab.getShowCondition(), tab.getRole());
+                                   tab.getShowCondition(), tab.getRole(), tab.getDefaultFocus());
 
         }).toArray(CaseViewTab[]::new);
     }

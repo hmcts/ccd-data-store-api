@@ -1,0 +1,191 @@
+[ {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "[CASE_REFERENCE]",
+  "ListElementCode" : "",
+  "Label" : "Case Reference",
+  "DisplayOrder" : 1,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "TextField",
+  "ListElementCode" : "",
+  "Label" : "Text Field",
+  "DisplayOrder" : 2,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "TextAreaField",
+  "ListElementCode" : "",
+  "Label" : "TextAreaField",
+  "DisplayOrder" : 3,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "DateField",
+  "ListElementCode" : "",
+  "Label" : "DateField",
+  "DisplayOrder" : 4,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "AddressField",
+  "ListElementCode" : "",
+  "Label" : "AddressField",
+  "DisplayOrder" : 5,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "PhoneField",
+  "ListElementCode" : "",
+  "Label" : "PhoneField",
+  "DisplayOrder" : 6,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "NumberField",
+  "ListElementCode" : "",
+  "Label" : "NumberField",
+  "DisplayOrder" : 7,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "YesNoField",
+  "ListElementCode" : "",
+  "Label" : "YesNoField",
+  "DisplayOrder" : 8,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "CollectionField",
+  "ListElementCode" : "",
+  "Label" : "CollectionField",
+  "DisplayOrder" : 9,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "AddressUKField",
+  "ListElementCode" : "",
+  "Label" : "AddressUKField",
+  "DisplayOrder" : 10,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "MarritalStatus",
+  "ListElementCode" : "",
+  "Label" : "MarritalStatus",
+  "DisplayOrder" : 11,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "MoneyField",
+  "ListElementCode" : "",
+  "Label" : "MoneyField",
+  "DisplayOrder" : 12,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "DocumentField",
+  "ListElementCode" : "",
+  "Label" : "DocumentField",
+  "DisplayOrder" : 13,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "EmailField",
+  "ListElementCode" : "",
+  "Label" : "EmailField",
+  "DisplayOrder" : 14,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "MultiSelectField",
+  "ListElementCode" : "",
+  "Label" : "MultiSelectField",
+  "DisplayOrder" : 15,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "LabelField",
+  "ListElementCode" : "",
+  "Label" : "LabelData",
+  "DisplayOrder" : 16,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "[STATE]",
+  "ListElementCode" : "",
+  "Label" : "State",
+  "DisplayOrder" : 17,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "CaseLinkField",
+  "ListElementCode" : "",
+  "Label" : "CaseLink",
+  "DisplayOrder" : 18,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+}, {
+  "LiveFrom" : "01/01/2017",
+  "LiveTo" : "",
+  "CaseTypeID" : "FT_MasterCaseType",
+  "CaseFieldID" : "CaseAccessGroups",
+  "ListElementCode" : "",
+  "Label" : "CaseAccessGroups",
+  "DisplayOrder" : 19,
+  "ResultsOrdering" : "",
+  "DisplayContextParameter" : ""
+} ]
