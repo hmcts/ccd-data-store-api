@@ -1,18 +1,20 @@
 package uk.gov.hmcts.ccd;
 
+import com.nimbusds.jose.proc.JWSKeySelector;
+import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
+import uk.gov.hmcts.ccd.security.JwksProperties;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
@@ -40,9 +43,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
 
     @Value("${oidc.issuer}")
     private String issuerOverride;
@@ -70,6 +70,22 @@ public class SecurityConfiguration {
         "/v2/api-docs/**",
         "/testing-support/cleanup-case-type/**"
     };
+
+    // Data store never starts an authorisation code flow, and its only client registration is client_credentials.
+    // Resolving no authorisation requests lets /oauth2/authorization/** fall through to the normal authentication
+    // checks (401) instead of redirecting to IDAM or failing with a 500.
+    private static final OAuth2AuthorizationRequestResolver NO_AUTHORIZATION_REQUESTS =
+        new OAuth2AuthorizationRequestResolver() {
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+                return null;
+            }
+
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+                return null;
+            }
+        };
 
     @Inject
     public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
@@ -115,15 +131,28 @@ public class SecurityConfiguration {
                 .anyRequest()
                 .authenticated())
             .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
-            .oauth2Client(Customizer.withDefaults());
+            .oauth2Client(client ->
+                client.authorizationCodeGrant(grant ->
+                    grant.authorizationRequestResolver(NO_AUTHORIZATION_REQUESTS)));
         return http.build();
     }
 
     @Bean
-    JwtDecoder jwtDecoder(AppInsights appInsights) {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
+    JwtDecoder jwtDecoder(AppInsights appInsights, JwksProperties jwksProperties,
+                          JWSKeySelector<SecurityContext> idamJwsKeySelector) {
+        // JwkSourceConfiguration supplies the key selector, so JWK retrieval uses explicit timeouts, refreshes
+        // ahead of expiry off the request path, and continues serving cached keys during an IDAM outage.
+        // The rest of the processor is left to Spring Security, including JWT type verification and claim
+        // validation via the OAuth2TokenValidator below.
+        // The builder needs a URI, but keys are retrieved only by idamJwkSource, through the selector set here.
+        // The JWK source the builder creates from this URI is replaced before it is used and never fetches.
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwksProperties.uri())
+            .jwtProcessorCustomizer(processor ->
+                processor.setJWSKeySelector(idamJwsKeySelector))
+            .build();
 
-        // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
+        // The issuer validator uses the configured oidc.issuer, not one discovered from IDAM. It is not enabled yet
+        // (see the FIXME below), so only the timestamps are validated.
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
         // FIXME : enable `withIssuer` once idam migration done RDM-8094
