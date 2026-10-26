@@ -35,7 +35,7 @@ ext {
     set('beftaJacksonVersion', '2.19.4')
     set('jackson3Version', '3.2.3')
     set('httpcore5Version', '5.4.4')
-    set('cveKotlinVersion', '2.4.20')
+    set('cveKotlinVersion', '2.4.21')
     set('opentelemetryVersion', '1.66.0')
     set('netty.version', '4.1.136.Final')
     set('snakeyaml.version', '2.2')
@@ -46,12 +46,12 @@ ext {
     pactProviderVersion = '4.7.5'
     lombokVersion = '1.18.48'
     lombokBindingVersion = '0.2.0'
-    mockito = '5.23.0'
+    mockito = '5.24.0'
     elasticVersion = '9.5.5'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.9'
-    beftaFwVersion = '9.2.11'
-    ccdTestDefinitionVersion = '7.26.13_CCD-8295-SNAPSHOT2'
+    beftaFwVersion = '7.26.16_CCD-3828-SNAPSHOT2'
+    ccdTestDefinitionVersion = '7.26.12'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -75,7 +75,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.14'
+        force 'net.bytebuddy:byte-buddy:1.18.15-jdk5'
     }
 }
 
@@ -268,14 +268,14 @@ dependencies {
 
     // start::CVE Vulnerability dependency overrides                                                // MAIN PARENT DEPENDEDNCY
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.2'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'                   // java-property-to-json
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre'                  // java-property-to-json
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.10.0'               // spring-hateoas
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.10'                  // spring-security-oauth2-jose
     runtimeOnly group: 'com.zaxxer', name: 'HikariCP', version: '6.3.3'                             // spring-boot-starter-data-jpa
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.20'
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.85'
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.86'
     implementation platform("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
     implementation platform("tools.jackson:jackson-bom:${jackson3Version}")
     implementation group: 'tools.jackson.core', name: 'jackson-core', version: jackson3Version
@@ -348,9 +348,9 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.2'
     implementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre'
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.3.1'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
     implementation group: 'com.sun.mail', name: 'mailapi', version: '2.0.2'
