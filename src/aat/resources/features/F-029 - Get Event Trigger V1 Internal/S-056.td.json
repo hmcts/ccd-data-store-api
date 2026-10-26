@@ -1,7 +1,7 @@
 {
   "_guid_": "S-056",
   "_extends_": "F-029_Test_Data_Base",
-  "title": "must return the display context parameter for an EventToComplexTypes field",
+  "title": "must return the display context parameter configured for StaffUser in EventToComplexTypes",
   "user": {
     "_extends_": "BeftaMasterCaseworker"
   },
@@ -5316,6 +5316,10 @@
           "label": "Data Field Types Page",
           "order": 1,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
             {
               "case_field_id": "CaseLinkField",
               "order": 1,

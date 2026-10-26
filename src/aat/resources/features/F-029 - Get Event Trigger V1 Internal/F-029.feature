@@ -22,7 +22,7 @@ Scenario: must return successfully the current case event data filtered by case 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-056
-Scenario: must return the display context parameter for an EventToComplexTypes field
+Scenario: must return the display context parameter configured for StaffUser in EventToComplexTypes
 
     Given a user with [an active profile in CCD],
 

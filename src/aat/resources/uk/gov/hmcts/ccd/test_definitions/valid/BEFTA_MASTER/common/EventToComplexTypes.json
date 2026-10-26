@@ -1,0 +1,12 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "ID": "FT_MasterCaseType",
+    "CaseEventID": "createCase",
+    "CaseFieldId": "StaffUserComplexField",
+    "ListElementCode": "staffUser",
+    "FieldDisplayOrder": 1,
+    "DisplayContextParameter": "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)"
+  }
+]
