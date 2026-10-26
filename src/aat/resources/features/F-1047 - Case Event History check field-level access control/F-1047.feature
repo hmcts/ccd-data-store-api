@@ -4,6 +4,8 @@ Feature: F-1047: Public case event history enforces case-field read access
   # The local event-list query omits snapshots. FT_Decentralisation supplies populated history.
   # TextField and _stubProcessedBy are PUBLIC: differences below must come from field ACLs.
   # BEFTA compares response maps strictly, so an extra denied field fails the scenario.
+  # S-1047.3 uses an ordinary reader with case/event/state R and no field ACLs.
+  # Its current-case prerequisite verifies the reader permissions before checking history.
   # S-1047.4 requires the nested history fixture in ccd-test-stubs-service.
   # Only the solicitor reader role has access to these extra roots; the flat scenarios remain unchanged.
 
@@ -42,6 +44,7 @@ Feature: F-1047: Public case event history enforces case-field read access
     Given a successful call [to start decentralised case creation] as in [F1047_CreateCase_Token],
     And a successful call [to create a decentralised case as a citizen] as in [F1047_CreateCase],
     And a successful call [to confirm the same historical snapshot contains both fields for an authorised caseworker] as in [F1047_GetHistory_AsMaster],
+    And a successful call [to confirm the history reader has no current case-field access] as in [F1047_GetCase_WithoutFieldAccess],
     And a user with [an active profile in CCD],
     And a user with [case and event read access but no case-field read access],
     When a request is prepared with appropriate values,

@@ -28,7 +28,7 @@
     "LiveTo": "",
     "CaseTypeID": "FT_Decentralisation",
     "CaseEventID": "createCase",
-    "UserRole": "caseworker-caa",
+    "UserRole": "caseworker-befta_jurisdiction_3",
     "CRUD": "R"
   }
 ]

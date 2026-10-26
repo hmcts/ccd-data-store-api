@@ -17,6 +17,10 @@
     "body": {
       "arrayInMap": [
         {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "event.id"
+        },
+        {
           "id": "[[ANYTHING_PRESENT]]",
           "case_reference": "[[ANYTHING_PRESENT]]",
           "event": {

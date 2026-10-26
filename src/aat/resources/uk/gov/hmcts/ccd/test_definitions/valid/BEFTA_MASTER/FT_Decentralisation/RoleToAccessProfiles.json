@@ -24,10 +24,10 @@
   {
     "LiveFrom": "01/01/2017",
     "LiveTo": "",
-    "RoleName": "idam:caseworker-caa",
+    "RoleName": "idam:caseworker-befta_jurisdiction_3",
     "Authorisation": "",
     "CaseTypeID": "FT_Decentralisation",
-    "AccessProfiles": "caseworker-caa",
+    "AccessProfiles": "caseworker-befta_jurisdiction_3",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""

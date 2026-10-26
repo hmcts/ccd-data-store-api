@@ -205,6 +205,20 @@ class EventHistoryFieldAccessTest {
     }
 
     @Test
+    @DisplayName("A reader with case and event access but no field access receives an empty snapshot")
+    void historyOmitsAllFieldsWhenOnlyEventIsReadable() {
+        caseType.getCaseFieldDefinitions().forEach(field -> field.setAccessControlLists(List.of(acl(STAFF))));
+        when(source.getEvents(CASE_REFERENCE)).thenReturn(List.of(event));
+
+        List<AuditEvent> result = authorised.getEvents(CASE_REFERENCE);
+
+        assertThat(result).hasSize(1);
+        assertMetadata(result.getFirst());
+        assertThat(result.getFirst().getData()).isEmpty();
+        assertThat(result.getFirst().getDataClassification()).isEmpty();
+    }
+
+    @Test
     @DisplayName("Control: unreadable events remain excluded despite having populated snapshots")
     void eventWithoutReadAccessIsExcluded() {
         when(source.getEvents(CASE_REFERENCE)).thenReturn(List.of(event));
