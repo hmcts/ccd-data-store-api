@@ -1,0 +1,46 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "RoleName": "idam:caseworker-befta_master",
+    "Authorisation": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "AccessProfiles": "caseworker-befta_master",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": ""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "RoleName": "idam:citizen",
+    "Authorisation": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "AccessProfiles": "citizen",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": ""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "RoleName": "idam:caseworker-caa",
+    "Authorisation": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "AccessProfiles": "caseworker-caa",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": ""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "RoleName": "idam:caseworker-befta_master-solicitor",
+    "Authorisation": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "AccessProfiles": "caseworker-befta_master-solicitor",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": ""
+  }
+]

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -50,7 +51,10 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         List<AuditEvent> auditEvents = getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
-        return secureEvents(caseTypeId, auditEvents.get(0).getCaseDataId(), auditEvents);
+        if (auditEvents == null || auditEvents.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        return secureEvents(caseTypeId, auditEvents.getFirst().getCaseDataId(), auditEvents);
     }
 
     @Override
@@ -69,10 +73,10 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     private List<AuditEvent> secureEvents(List<AuditEvent> events) {
-        if (events == null || events.size() == 0) {
+        if (events == null || events.isEmpty()) {
             return Lists.newArrayList();
         }
-        return secureEvents(events.get(0).getCaseTypeId(), events.get(0).getCaseDataId(), events);
+        return secureEvents(events.getFirst().getCaseTypeId(), events.getFirst().getCaseDataId(), events);
     }
 
     private List<AuditEvent> secureEvents(String caseTypeId, String caseId, List<AuditEvent> events) {
@@ -101,9 +105,32 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             return Lists.newArrayList();
         }
 
-        return accessControlService.filterCaseAuditEventsByReadAccess(events,
+        List<AuditEvent> authorisedEvents = accessControlService.filterCaseAuditEventsByReadAccess(events,
             caseTypeDefinition.getEvents(),
             accessProfiles);
+
+        authorisedEvents.forEach(event -> filterEventFieldsByReadAccess(event, accessProfiles, caseTypeDefinition));
+        return authorisedEvents;
+    }
+
+    private void filterEventFieldsByReadAccess(AuditEvent event, Set<AccessProfile> accessProfiles,
+                                             CaseTypeDefinition caseTypeDefinition) {
+        if (event.getData() != null) {
+            event.setData(JacksonUtils.convertValue(accessControlService.filterCaseFieldsByAccess(
+                JacksonUtils.convertValueJsonNode(event.getData()),
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                accessProfiles,
+                CAN_READ,
+                false)));
+        }
+        if (event.getDataClassification() != null) {
+            event.setDataClassification(JacksonUtils.convertValue(accessControlService.filterCaseFieldsByAccess(
+                JacksonUtils.convertValueJsonNode(event.getDataClassification()),
+                caseTypeDefinition.getCaseFieldDefinitions(),
+                accessProfiles,
+                CAN_READ,
+                true)));
+        }
     }
 
 }
