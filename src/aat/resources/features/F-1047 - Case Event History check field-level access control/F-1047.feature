@@ -1,6 +1,7 @@
 @F-1047 @crud
 Feature: F-1047: Public case event history enforces case-field read access
 
+
   # The local event-list query omits snapshots. FT_Decentralisation supplies populated history.
   # TextField and _stubProcessedBy are PUBLIC: differences below must come from field ACLs.
   # BEFTA compares response maps strictly, so an extra denied field fails the scenario.
