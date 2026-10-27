@@ -130,6 +130,8 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-demo-builds')
     }
     onPR {
+        // CCD-8316: use the stub PR supplying the F-1047 nested-history fixture.
+        env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "https://ccd-test-stubs-service-pr-516.preview.platform.hmcts.net"
         enableSlackNotifications('#ccd-pr-builds')
         enablePactAs([
             AppPipelineDsl.PactRoles.PROVIDER
