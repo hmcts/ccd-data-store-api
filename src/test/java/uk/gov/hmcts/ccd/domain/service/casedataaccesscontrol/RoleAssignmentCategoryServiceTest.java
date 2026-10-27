@@ -13,8 +13,7 @@ import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -45,7 +44,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(PROFESSIONAL));
+            assertThat(roleCategory).isEqualTo(PROFESSIONAL);
         }
 
         @Test
@@ -56,7 +55,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(PROFESSIONAL));
+            assertThat(roleCategory).isEqualTo(PROFESSIONAL);
         }
 
         @Test
@@ -67,7 +66,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(CITIZEN));
+            assertThat(roleCategory).isEqualTo(CITIZEN);
         }
 
         @Test
@@ -78,7 +77,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(CITIZEN));
+            assertThat(roleCategory).isEqualTo(CITIZEN);
         }
 
         @Test
@@ -89,7 +88,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(JUDICIAL));
+            assertThat(roleCategory).isEqualTo(JUDICIAL);
         }
 
         @Test
@@ -100,7 +99,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+            assertThat(roleCategory).isEqualTo(LEGAL_OPERATIONS);
         }
 
         @Test
@@ -111,7 +110,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+            assertThat(roleCategory).isEqualTo(LEGAL_OPERATIONS);
         }
 
     }
