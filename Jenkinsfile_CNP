@@ -143,9 +143,11 @@ withPipeline(type, product, component) {
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-ccd-data-store-api-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
         env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
+        env.GROUP_ACCESS_ENABLED = "true"
     }
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+    echo "Group Access FT Enabled = ${env.GROUP_ACCESS_ENABLED ?: 'false'}"
 
     syncBranchesWithMaster(branchesToSync)
     overrideVaultEnvironments(vaultOverrides)
