@@ -1,6 +1,6 @@
 {
 	"_guid_": "Case_Creation_Using_Caseworker1_Role",
-	"_extends_": "Case_Creation_Data_Base",
+	"_extends_": "Befta_Case_Creation_Base_Data",
 
 	"users": {
 		"invokingUser": {

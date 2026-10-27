@@ -11,7 +11,8 @@ Background: Load test data for the scenario
 Scenario: Trigger the aboutToStart callback event for a caseworker for a new case which has not been started yet.
 
     Given a user with [an active profile in CCD],
-      And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
       And the request [is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and the Case ID just created],
@@ -41,7 +42,8 @@ Scenario: Trigger the aboutToStart callback event for a caseworker for an invali
 Scenario: Trigger the aboutToStart callback event for a caseworker for an invalid Jurisdiction ID
 
     Given a user with [an active profile in CCD],
-      And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
       And the request [is prepared with an invalid Jurisdiction ID],
@@ -56,7 +58,8 @@ Scenario: Trigger the aboutToStart callback event for a caseworker for an invali
 Scenario: Return error code 422 when an event request could not be processed.
 
     Given a user with [an active profile in CCD],
-      And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role],
+      And a successful call [to create a token for case creation] as in [Befta_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
       And a successful call [to fire a START_PROGRESS event on the case just created] as in [S-249_Update_Case_State],
 
     When a request is prepared with appropriate values,
@@ -72,7 +75,7 @@ Scenario: Return error code 422 when an event request could not be processed.
 Scenario: must return a negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
-      And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
       And the request [does not provide valid authentication credentials in CCD],
@@ -87,7 +90,7 @@ Scenario: must return a negative response when request does not provide valid au
 Scenario: must return a negative response when request provides authentic credentials without authorized access to the operation
 
     Given a user with [an active profile in CCD],
-      And a case that has just been created as in [Case_Creation_Using_Caseworker1_Role],
+      And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Case_Creation_Using_Caseworker1_Role],
 
      When a request is prepared with appropriate values,
       And the request [does not provide valid authorization credentials for an operation in CCD],
