@@ -3,7 +3,7 @@
   "productName": "CCD Test Stub Service",
   "operationName": "Retrieve unfiltered nested history fixture",
   "method": "GET",
-  "uri": "{{BEFTA_TEST_STUB_SERVICE_BASE_URL}}/ccd-persistence/cases/{cid}/history",
+  "uri": "{{F1047_TEST_STUB_SERVICE_BASE_URL}}/ccd-persistence/cases/{cid}/history",
   "specs": [
     "to confirm the upstream snapshot contains unknown complex and collection children"
   ],
