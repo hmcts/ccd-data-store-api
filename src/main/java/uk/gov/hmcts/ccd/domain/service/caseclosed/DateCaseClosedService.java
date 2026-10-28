@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedEntity;
 import uk.gov.hmcts.ccd.data.caseclosed.DateCaseClosedRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
@@ -45,7 +46,9 @@ public class DateCaseClosedService {
     }
 
     private String getStateCategory(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
-        return caseTypeService.findState(caseTypeDefinition, caseDetails.getState()).getStateCategory();
+        return caseTypeService.findStateIfPresent(caseTypeDefinition, caseDetails.getState())
+            .map(CaseStateDefinition::getStateCategory)
+            .orElse(null);
     }
 
     private void saveDateCaseClosed(CaseDetails caseDetails, String stateCategory) {

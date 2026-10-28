@@ -49,8 +49,8 @@ class DateCaseClosedServiceTest {
     @Test
     void shouldSaveDateCaseClosedWhenNewCaseStateCategoryContainsClosedForPayment() {
         CaseDetails caseDetails = caseDetails(CLOSED_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT, End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, CLOSED_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, End")));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE)).thenReturn(Optional.empty());
 
         dateCaseClosedService.updateForNewCase(caseDetails, caseTypeDefinition);
@@ -70,7 +70,7 @@ class DateCaseClosedServiceTest {
     @Test
     void shouldNotSaveDateCaseClosedWhenNewCaseStateCategoryDoesNotContainClosedForPayment() {
         CaseDetails caseDetails = caseDetails(OPEN_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE)).thenReturn(Optional.of(state("End")));
 
         dateCaseClosedService.updateForNewCase(caseDetails, caseTypeDefinition);
 
@@ -80,8 +80,8 @@ class DateCaseClosedServiceTest {
     @Test
     void shouldNotSaveDateCaseClosedWhenStateCategoryOnlyPartiallyMatchesClosedForPayment() {
         CaseDetails caseDetails = caseDetails(OPEN_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT EXAMPLE, End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT EXAMPLE, End")));
 
         dateCaseClosedService.updateForNewCase(caseDetails, caseTypeDefinition);
 
@@ -92,9 +92,9 @@ class DateCaseClosedServiceTest {
     void shouldSaveDateCaseClosedWhenExistingCaseCurrentStateCategoryContainsClosedForPayment() {
         CaseDetails caseDetails = caseDetails(CLOSED_STATE);
         final CaseDetails caseDetailsBefore = caseDetails(OPEN_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT, End"));
-        when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, CLOSED_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, End")));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE)).thenReturn(Optional.of(state("End")));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE)).thenReturn(Optional.empty());
 
         dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
@@ -112,10 +112,10 @@ class DateCaseClosedServiceTest {
         existingDateCaseClosedEntity.setCcdCaseNumber(CASE_REFERENCE);
         existingDateCaseClosedEntity.setState("PreviousClosedForPayment");
         existingDateCaseClosedEntity.setStateCategory("CLOSED FOR PAYMENT, Archived");
-        when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT, End"));
-        when(caseTypeService.findState(caseTypeDefinition, "PreviousClosedForPayment"))
-            .thenReturn(state("CLOSED FOR PAYMENT, Archived"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, CLOSED_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, End")));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, "PreviousClosedForPayment"))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, Archived")));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE))
             .thenReturn(Optional.of(existingDateCaseClosedEntity));
 
@@ -137,9 +137,9 @@ class DateCaseClosedServiceTest {
     void shouldDeleteDateCaseClosedWhenExistingCaseMovesOutOfClosedForPaymentStateCategory() {
         CaseDetails caseDetails = caseDetails(OPEN_STATE);
         CaseDetails caseDetailsBefore = caseDetails(CLOSED_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
-        when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT, End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE)).thenReturn(Optional.of(state("End")));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, CLOSED_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, End")));
 
         dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
 
@@ -151,9 +151,9 @@ class DateCaseClosedServiceTest {
     void shouldLeaveOneDateCaseClosedRowWhenCaseLeavesAndReEntersClosedForPayment() {
         final CaseDetails closedCaseDetails = caseDetails(CLOSED_STATE);
         final CaseDetails openCaseDetails = caseDetails(OPEN_STATE);
-        when(caseTypeService.findState(caseTypeDefinition, CLOSED_STATE))
-            .thenReturn(state("CLOSED FOR PAYMENT, End"));
-        when(caseTypeService.findState(caseTypeDefinition, OPEN_STATE)).thenReturn(state("End"));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, CLOSED_STATE))
+            .thenReturn(Optional.of(state("CLOSED FOR PAYMENT, End")));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE)).thenReturn(Optional.of(state("End")));
         when(dateCaseClosedRepository.findByCcdCaseNumber(CASE_REFERENCE)).thenReturn(Optional.empty());
 
         dateCaseClosedService.updateForExistingCase(openCaseDetails, closedCaseDetails, caseTypeDefinition);
@@ -169,6 +169,34 @@ class DateCaseClosedServiceTest {
             () -> assertThat(captor.getValue().getStateCategory()).isEqualTo("CLOSED FOR PAYMENT, End"),
             () -> assertThat(captor.getValue().getStateChangeDate()).isEqualTo(STATE_CHANGE_DATE)
         );
+    }
+
+    @Test
+    void shouldContinueWhenEventMovesCaseOutOfStateRemovedFromDefinition() {
+        CaseDetails caseDetails = caseDetails(OPEN_STATE);
+        CaseDetails caseDetailsBefore = caseDetails("DeletedState");
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, OPEN_STATE))
+            .thenReturn(Optional.of(state("End")));
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, "DeletedState"))
+            .thenReturn(Optional.empty());
+
+        dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
+
+        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
+        verify(dateCaseClosedRepository, never()).deleteByCcdCaseNumber(any());
+    }
+
+    @Test
+    void shouldContinueWhenCaseRemainsInStateRemovedFromDefinition() {
+        CaseDetails caseDetails = caseDetails("DeletedState");
+        CaseDetails caseDetailsBefore = caseDetails("DeletedState");
+        when(caseTypeService.findStateIfPresent(caseTypeDefinition, "DeletedState"))
+            .thenReturn(Optional.empty());
+
+        dateCaseClosedService.updateForExistingCase(caseDetails, caseDetailsBefore, caseTypeDefinition);
+
+        verify(dateCaseClosedRepository, never()).save(any(DateCaseClosedEntity.class));
+        verify(dateCaseClosedRepository, never()).deleteByCcdCaseNumber(any());
     }
 
     private CaseDetails caseDetails(String state) {
