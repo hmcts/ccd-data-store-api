@@ -30,15 +30,14 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+		"_extends_": "CCD_Safe_403_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
 			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Access Denied",
-			"path": "/caseworkers/Some_wrong_uid/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
+			"message": "Forbidden"
 		}
 	}
 }

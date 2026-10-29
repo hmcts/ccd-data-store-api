@@ -16,15 +16,14 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
       "_extends_": "NegativeResponseBody",
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case exist with id=157375164884070311"
+      "message" : "Not Found"
 		}
 	}
 }

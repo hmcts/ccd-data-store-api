@@ -13,7 +13,7 @@
     }
 	},
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
     "headers" : {
       "Connection": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANY_NULLABLE]]",
@@ -22,9 +22,7 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case type found",
-      "path": "/internal/case-types/FT_CRUD_2/work-basket-inputs",
+      "message": "Not Found",
       "details": "Unable to find the case type, please try a search or return to the case list overview page.",
       "callbackErrors" : null,
       "callbackWarnings" : null

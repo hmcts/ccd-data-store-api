@@ -16,12 +16,11 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_400_Response",
+		"_extends_": "CCD_Safe_400_Response",
 		"headers" : {
 			"Connection" : "close"
 		},
 		"body" : {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
 			"message" : "Case reference is not valid",
 			"details" : null,
 			"callbackErrors" : null,

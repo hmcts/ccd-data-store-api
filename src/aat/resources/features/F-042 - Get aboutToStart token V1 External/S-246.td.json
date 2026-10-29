@@ -16,18 +16,16 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_400_Response",
+		"_extends_": "CCD_Safe_400_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
 			"timestamp": "[[ANYTHING_PRESENT]]",
 			"status": 400,
 			"error": "Bad Request",
 			"message": "Case reference is not valid",
-			"path": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

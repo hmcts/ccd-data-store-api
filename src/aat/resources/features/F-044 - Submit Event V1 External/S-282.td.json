@@ -20,12 +20,10 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_409_Response",
+		"_extends_": "CCD_Safe_409_Response",
 		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException",
 			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "The case data has been altered outside of this transaction.",
-			"path": "[[ANYTHING_PRESENT]]",
+			"message": "Conflict",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

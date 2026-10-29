@@ -18,7 +18,7 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+		"_extends_": "CCD_Safe_403_Response",
 		"headers": {
 			"Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
 			"Date" : "[[ANYTHING_PRESENT]]",
@@ -28,8 +28,7 @@
 		},
 		"body": {
 			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Access Denied",
-			"path": "[[ANYTHING_PRESENT]]"
+			"message": "Forbidden"
 		}
 	}
 }

@@ -16,14 +16,13 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_400_Response",
+		"_extends_": "CCD_Safe_400_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"exception": "[[ANYTHING_PRESENT]]",
-			"message": "[[ANYTHING_PRESENT]]",
+			"message": "Bad Request",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

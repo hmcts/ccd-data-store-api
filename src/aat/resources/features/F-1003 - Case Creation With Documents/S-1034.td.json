@@ -18,10 +18,9 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
+    "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException",
-      "message" : "The user has provided an invalid hashToken for document {\"timestamp\":\"2020-04-29T10:33:58.676+0000\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"0c84e136-b4fa-49c8-b81b-ea3e65c4a41a\",\"path\":\"/cases/documents/attachToCase\"}",
+      "message" : "Forbidden",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

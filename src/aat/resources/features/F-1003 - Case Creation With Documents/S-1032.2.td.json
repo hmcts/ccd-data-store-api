@@ -11,10 +11,9 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
+    "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "message": "The request was rejected because the URL contained a potentially malicious String \"%25\"",
-      "path" : "/case-types/BEFTA_%25CASETYPE_2_1/cases"
+      "message": "Forbidden"
     }
   }
 }

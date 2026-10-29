@@ -17,13 +17,13 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+		"_extends_": "CCD_Safe_403_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-			"message": "Access Denied"
+			"message": "Forbidden"
 		}
 	}
 }

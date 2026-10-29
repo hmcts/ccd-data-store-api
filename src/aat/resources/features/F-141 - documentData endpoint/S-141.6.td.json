@@ -30,7 +30,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "headers" : {
       "Connection": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANY_NULLABLE]]",
@@ -39,12 +39,10 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 400,
       "error" : "Bad Request",
-      "message" : "002 Invalid categoryId",
-      "path" : "/documentData/caseref/${[scenarioContext][childContexts][F-141_CreateCase][testData][actualResponse][body][id]}",
+      "message" : "Bad Request",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

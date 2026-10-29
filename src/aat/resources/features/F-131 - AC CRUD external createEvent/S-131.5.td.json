@@ -25,7 +25,7 @@
   },
 
   "expectedResponse": {
-    "_extends_" : "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
       "headers": {
         "Connection" : "keep-alive",
         "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
@@ -33,9 +33,7 @@
         "Transfer-Encoding" : "chunked"
       },
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case type found",
-      "path": "[[ANYTHING_PRESENT]]",
+      "message": "Not Found",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

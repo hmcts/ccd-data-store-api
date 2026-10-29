@@ -30,14 +30,12 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "body" : {
-      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 400,
       "error" : "Bad Request",
       "message" : "Input not valid",
-      "path" : "/globalSearch",
       "details" : [ "Sort direction invalid" ],
       "callbackErrors" : null,
       "callbackWarnings" : null

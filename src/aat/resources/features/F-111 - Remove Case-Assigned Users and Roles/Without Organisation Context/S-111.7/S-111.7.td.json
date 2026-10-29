@@ -34,10 +34,9 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
+    "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException",
-      "message": "Client service not authorised to perform operation",
+      "message": "Forbidden",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

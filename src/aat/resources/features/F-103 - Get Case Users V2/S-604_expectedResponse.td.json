@@ -1,11 +1,10 @@
 {	"_guid_": "S-604_expectedResponse",
 
-  "_extends_": "Common_403_Response",
+  "_extends_": "CCD_Safe_403_Response",
   "body": {
-    "message": "Access to other user's case role assignments not granted",
+    "message": "Forbidden",
     "details": null,
     "callbackErrors": null,
-    "callbackWarnings": null,
-    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException"
+    "callbackWarnings": null
   }
 }

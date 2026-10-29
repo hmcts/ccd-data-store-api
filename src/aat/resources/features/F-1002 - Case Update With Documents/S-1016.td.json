@@ -25,12 +25,10 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp": "[[ANYTHING_PRESENT]]",
       "message" : "Case data validation failed",
-      "path": "/cases/${[scenarioContext][childContexts][F-1002-Case_Creation_Data][testData][actualResponse][body][id]}/events",
       "details" : {
         "field_errors" : [ {
           "id" : "DocumentField1",

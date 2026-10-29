@@ -36,13 +36,11 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_409_Response",
+    "_extends_": "CCD_Safe_409_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException",
       "status": 409,
       "error": "Conflict",
-      "message": "Unfortunately we were unable to save your work to the case as another action happened at the same time.\nPlease review the case and try again.",
-      "path": "[[ANY_STRING_NOT_NULLABLE]]",
+      "message": "Conflict",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null,

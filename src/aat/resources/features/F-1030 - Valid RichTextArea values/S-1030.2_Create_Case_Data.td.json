@@ -64,12 +64,10 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Enter valid tags for RichTextArea field",
-      "path": "[[ANYTHING_PRESENT]]",
+      "message": "Bad Request",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

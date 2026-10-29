@@ -16,16 +16,14 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"headers" : {
 			"Content-Encoding" : "gzip",
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
 			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Cannot find event INVALID_TRIGGER_ID for case type AAT_AUTH_15",
-			"path" : "[[ANYTHING_PRESENT]]",
+			"message" : "Not Found",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

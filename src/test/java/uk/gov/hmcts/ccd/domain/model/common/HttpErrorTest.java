@@ -77,7 +77,7 @@ public class HttpErrorTest {
         final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
                 new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestReasonException(), request);
 
-        assertThat(error.getError(), is(equalTo("Some error reason")));
+        assertThat(error.getError(), is(equalTo("Internal Server Error")));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class HttpErrorTest {
         final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
                 new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(MESSAGE), request);
 
-        assertThat(error.getMessage(), is(equalTo(MESSAGE)));
+        assertThat(error.getMessage(), is(equalTo("Internal Server Error")));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class HttpErrorTest {
         final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
             new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestReasonException(), PATH, null);
 
-        assertThat(error.getError(), is(equalTo("Some error reason")));
+        assertThat(error.getError(), is(equalTo("Internal Server Error")));
     }
 
     @Test

@@ -26,7 +26,7 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
     "headers" : {
       "Connection": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "[[ANY_NULLABLE]]",
@@ -35,12 +35,10 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp": "[[ANYTHING_PRESENT]]",
       "status": 404,
       "error": "Not Found",
-      "message": "No case found",
-      "path": "/documentData/caseref/1648717404042371",
+      "message": "Not Found",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

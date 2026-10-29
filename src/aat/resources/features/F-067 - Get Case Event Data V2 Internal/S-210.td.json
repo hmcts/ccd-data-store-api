@@ -16,12 +16,10 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Event not found",
-      "path": "[[ANYTHING_PRESENT]]",
+      "message": "Bad Request",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings":	null

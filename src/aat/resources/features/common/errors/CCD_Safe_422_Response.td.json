@@ -1,0 +1,15 @@
+{
+  "_guid_": "CCD_Safe_422_Response",
+  "responseCode": 422,
+  "responseMessage": "Unprocessable Content",
+  "headers": {
+    "_extends_": "Common_422_Response_Headers"
+  },
+  "body": {
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "status": 422,
+    "error": "Unprocessable Content",
+    "message": "Unprocessable Content",
+    "code": "INVALID_REQUEST"
+  }
+}

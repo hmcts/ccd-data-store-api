@@ -17,16 +17,14 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-			"exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
 			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "No case found for reference: 1234567890123456",
-			"path": "[[ANYTHING_PRESENT]]",
+			"message": "Not Found",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

@@ -25,12 +25,10 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "[[ANYTHING_PRESENT]]",
-      "path": "/cases/${[scenarioContext][childContexts][F-1002-Case_Creation_Data][testData][actualResponse][body][id]}/events",
+      "message": "Not Found",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

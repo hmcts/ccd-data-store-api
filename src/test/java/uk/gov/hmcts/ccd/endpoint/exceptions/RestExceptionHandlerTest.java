@@ -75,9 +75,9 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
     private static final String TEST_URL = "/caseworkers/123/profile";
 
     private static final String SQL_EXCEPTION_MESSAGE =
-        "SQL Exception thrown during API operation";
+        "Internal Server Error";
     private static final String ERROR_RESPONSE_BODY =
-        "{\"errorMessage\":\"SQL Exception thrown during API operation\"}";
+        "{\"errorMessage\":\"Internal Server Error\",\"code\":\"INTERNAL_ERROR\"}";
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
     private GetUserProfileOperation mockService;
@@ -88,6 +88,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
     private AppInsights appInsights;
 
     private Logger logger;
+    private Level originalLevel;
     private ListAppender<ILoggingEvent> listAppender;
 
     @Captor
@@ -98,6 +99,8 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         MockitoAnnotations.openMocks(this);
 
         logger = (Logger) LoggerFactory.getLogger(RestExceptionHandler.class);
+        originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
 
         // create and start a ListAppender
         listAppender = new ListAppender<>();
@@ -107,7 +110,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         logger.addAppender(listAppender);
 
         // only create classUnderTest after logger configuration
-        RestExceptionHandler classUnderTest = new RestExceptionHandler(appInsights);
+        RestExceptionHandler classUnderTest = new RestExceptionHandler(appInsights, true);
 
         // any controller will do as these tests will force it to error
         final UserProfileEndpoint controller = new UserProfileEndpoint(mockService);
@@ -118,8 +121,35 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
     @AfterEach
     public void tearDown() {
+        logger.setLevel(originalLevel);
         listAppender.stop();
         logger.detachAppender(listAppender);
+    }
+
+    @Test
+    public void agentLoggingModeDoesNotAlsoSendSdkExceptionTelemetry() {
+        RestExceptionHandler handler = new RestExceptionHandler(appInsights, false);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/verify");
+        RuntimeException exception = new RuntimeException("PRIVATE_DIAGNOSTIC");
+        handler.handleException(request, exception);
+        org.mockito.Mockito.verifyNoInteractions(appInsights);
+        assertThat(listAppender.list.get(listAppender.list.size() - 1).getThrowableProxy().getMessage(),
+            is("PRIVATE_DIAGNOSTIC"));
+    }
+
+    @Test
+    public void infoLoggingRetainsAndTracksDiagnosticExceptions() throws Exception {
+        logger.setLevel(Level.INFO);
+        RuntimeException exception = new RuntimeException("SECRET jdbc internal-host");
+        setupMockServiceToThrowException(exception);
+        mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL)).andExpect(status().isInternalServerError());
+        org.mockito.Mockito.verify(appInsights).trackException(exception);
+        for (ILoggingEvent event : listAppender.list) {
+            assertThat(event.getFormattedMessage(), not(containsString("SECRET")));
+            org.junit.jupiter.api.Assertions.assertEquals(
+                exception.getMessage(), event.getThrowableProxy().getMessage());
+        }
     }
 
     @Test
@@ -411,7 +441,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         List<ILoggingEvent> logsList = listAppender.list;
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
-        assertThat(lastLogEntry.getMessage(), containsString(myUniqueExceptionMessage));
+        assertThat(lastLogEntry.getMessage(), not(containsString(myUniqueExceptionMessage)));
     }
 
     @Test
@@ -519,7 +549,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         List<ILoggingEvent> logsList = listAppender.list;
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
-        assertThat(lastLogEntry.getMessage(), containsString(myUniqueExceptionMessage));
+        assertThat(lastLogEntry.getMessage(), not(containsString(myUniqueExceptionMessage)));
     }
 
     @Test
@@ -570,7 +600,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         List<ILoggingEvent> logsList = listAppender.list;
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.WARN)));
-        assertThat(lastLogEntry.getMessage(), containsString(myUniqueExceptionMessage));
+        assertThat(lastLogEntry.getMessage(), not(containsString(myUniqueExceptionMessage)));
     }
 
     @Test
@@ -629,10 +659,10 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         List<ILoggingEvent> logsList = listAppender.list;
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.WARN)));
-        assertThat(lastLogEntry.getFormattedMessage(), containsString(expectedException.getMessage()));
+        assertThat(lastLogEntry.getFormattedMessage(), not(containsString(expectedException.getMessage())));
         // check logging field names
-        assertThat(lastLogEntry.getFormattedMessage(), containsString(fieldErrors.get(0).getId()));
-        assertThat(lastLogEntry.getFormattedMessage(), containsString(fieldErrors.get(1).getId()));
+        assertThat(lastLogEntry.getFormattedMessage(), not(containsString(fieldErrors.get(0).getId())));
+        assertThat(lastLogEntry.getFormattedMessage(), not(containsString(fieldErrors.get(1).getId())));
         // check not logging validation messages
         assertThat(lastLogEntry.getFormattedMessage(), not(containsString(fieldErrors.get(0).getMessage())));
         assertThat(lastLogEntry.getFormattedMessage(), not(containsString(fieldErrors.get(1).getMessage())));
@@ -678,7 +708,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
         result.andExpect(status().isInternalServerError());
         result.andExpect(content()
-            .string(ERROR_RESPONSE_BODY));
+            .json(ERROR_RESPONSE_BODY));
     }
 
     @Test
@@ -697,7 +727,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
         assertThat(lastLogEntry.getMessage(),
-            containsString(SQL_EXCEPTION_MESSAGE));
+            containsString("Request failed"));
     }
 
     @Test
@@ -729,7 +759,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         List<ILoggingEvent> logsList = listAppender.list;
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
-        assertThat(lastLogEntry.getMessage(), containsString(exceptionMessage));
+        assertThat(lastLogEntry.getMessage(), not(containsString(exceptionMessage)));
     }
 
     @Test
@@ -785,10 +815,13 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
         // check the very basics
         result.andExpect(status().is(expectedHttpError.getStatus()));
-        result.andExpect(jsonPath("$.exception").value(expectedException.getClass().getName()));
+        result.andExpect(jsonPath("$.exception").doesNotExist());
 
         // check a bit more
-        result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
+        result.andExpect(jsonPath("$.message")
+            .value(expectedException instanceof CaseValidationException
+                ? "Case data validation failed"
+                : HttpStatus.valueOf(expectedHttpError.getStatus()).getReasonPhrase()));
     }
 
     private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException)
