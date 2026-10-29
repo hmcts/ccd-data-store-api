@@ -85,6 +85,7 @@
           "acls" : "[[ANYTHING_PRESENT]]"
         } ],
         "role" : null,
+        "defaultFocus" : null,
         "show_condition" : null
       } ],
       "metadataFields" : "[[ANYTHING_PRESENT]]",
