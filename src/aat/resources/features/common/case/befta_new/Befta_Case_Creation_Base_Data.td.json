@@ -8,6 +8,7 @@
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
 	"specs": [
+		"by a privileged user with full ACL to create a case of this case type",
 		"to create a full case"
 	],
 

@@ -1,6 +1,6 @@
 {
 	"_guid_": "Case_Creation_Using_Caseworker1_Role",
-	"_extends_": "Case_Creation_Data_Base",
+	"_extends_": "Befta_Case_Creation_Base_Data",
 
 	"users": {
 		"invokingUser": {
@@ -14,6 +14,7 @@
 			"ctid": "BEFTA_CASETYPE_1_1"
 		},
 		"body": {
+			"event_token": "${[scenarioContext][parentContext][childContexts][Befta_Default_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
 			"data": {
 				"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
 			}

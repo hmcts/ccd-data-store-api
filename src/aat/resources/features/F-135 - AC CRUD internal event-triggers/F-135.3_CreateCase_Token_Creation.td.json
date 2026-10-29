@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-135.3_CreateCase_Token_Creation",
+  "_extends_": "F-135_CreateCase_Token_Creation",
+
+  "uri": "/case-types/FT_CRUD_3/event-triggers/{etid}",
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "case_type_id": "FT_CRUD_3"
+      }
+    }
+  }
+}

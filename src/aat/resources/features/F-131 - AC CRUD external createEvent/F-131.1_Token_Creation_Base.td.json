@@ -1,0 +1,29 @@
+{
+  "_guid_" : "F-131.1_Token_Creation_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "method": "GET",
+  "uri": "/cases/{caseId}/event-triggers/{etid}",
+  "specs": ["to create a token for event creation"],
+  "users": {
+    "invokingUser": { "_extends_": "BeftaMasterCaseworker" }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Experimental": "true"
+    },
+    "pathVariables": { "etid": "event1", "caseId": "" }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No event found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

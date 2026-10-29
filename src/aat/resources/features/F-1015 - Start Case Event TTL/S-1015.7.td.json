@@ -20,6 +20,8 @@
 
   "request": {
     "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
       "etid": "updateCaseNoTTLInc"
     }

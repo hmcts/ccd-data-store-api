@@ -11,7 +11,8 @@
 
   "request": {
     "pathVariables": {
-      "etid": "eyJhbGciOiJIUzUxMiJ9"
+      "ctid": "FT_CaseAccess_IdamRole",
+      "etid": "eyJhbGciOiJIUzUxMjJ9"
     }
   },
 
@@ -19,7 +20,7 @@
     "_extends_": "Common_404_Response",
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "Cannot find event eyJhbGciOiJIUzUxMiJ9 for case type AAT",
+      "message": "No event found",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

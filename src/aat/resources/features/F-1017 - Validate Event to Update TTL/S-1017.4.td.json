@@ -5,7 +5,7 @@
   "title": "TTL.Suspended changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1017_GetUpdateSuspendedCaseTokenCitizen"
+    "Token_Creation": "S-1017_GetUpdateToken_ModifiedSuspendedTTL_Citizen"
   } ],
 
   "specs": [

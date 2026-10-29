@@ -21,8 +21,10 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "No case found",
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "No case found for reference: 1234123412341238",
 			"path": "/cases/1234123412341238",
 			"details": null,
 			"callbackErrors": null,

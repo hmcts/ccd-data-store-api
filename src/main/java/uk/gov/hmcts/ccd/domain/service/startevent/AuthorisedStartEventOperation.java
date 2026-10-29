@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -22,11 +20,18 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 
 @Slf4j
 @Service
@@ -35,7 +40,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final CaseDetailsRepository caseDetailsRepository;
+    private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final UIDService uidService;
     private final CaseAccessService caseAccessService;
@@ -44,8 +49,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
-                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                         final CaseDetailsRepository caseDetailsRepository,
+                                         @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+                                         final GetCaseOperation getCaseOperation,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
                                          @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
@@ -53,7 +58,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.caseDetailsRepository = caseDetailsRepository;
+        this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.uidService = uidService;
         this.caseAccessService = caseAccessService;
@@ -62,6 +67,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventResult triggerStartForCaseType(String caseTypeId, String eventId, Boolean ignoreWarning) {
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
+        verifyCreateStartAccess(eventId, caseTypeDefinition, caseAccessService.getCaseCreationRoles(caseTypeId));
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                         eventId,
                                                                                         ignoreWarning));
@@ -75,20 +82,20 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             throw new BadRequestException("Case reference is not valid");
         }
 
-        Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(
-            caseReference);
+        Optional<CaseDetails> caseDetailsOptional = getCaseOperation.execute(caseReference);
         if (caseDetailsOptional.isEmpty()) {
             throw new CaseNotFoundException(caseReference);
         }
 
-        return caseDetailsOptional.map(
-                caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(),
-                    startEventOperation.triggerStartForCase(caseReference, eventId, ignoreWarning)))
-            .orElseThrow(() -> {
-                log.error("event={} could not be started for case={} in state={}",
-                    eventId, caseReference, caseDetailsOptional.get().getState());
-                return new ValidationException(caseReference);
-            });
+        final CaseDetails caseDetails = caseDetailsOptional.get();
+        final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
+        final Set<AccessProfile> accessProfiles =
+            caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+
+        verifyUpdateStartAccess(eventId, caseDetails, caseTypeDefinition, accessProfiles);
+
+        return verifyReadAccess(caseDetails.getCaseTypeId(),
+            startEventOperation.triggerStartForCase(caseReference, eventId, ignoreWarning));
     }
 
     @Override
@@ -103,7 +110,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private CaseTypeDefinition getCaseType(String caseTypeId) {
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
         return caseTypeDefinition;
     }
@@ -150,6 +157,54 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                     true)));
         }
         return startEventResult;
+    }
+
+    private void verifyCreateStartAccess(String eventId,
+                                         CaseTypeDefinition caseTypeDefinition,
+                                         Set<AccessProfile> accessProfiles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+        }
+
+        if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
+            caseTypeDefinition.getEvents(),
+            accessProfiles,
+            CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        }
+    }
+
+    private void verifyUpdateStartAccess(String eventId,
+                                         CaseDetails caseDetails,
+                                         CaseTypeDefinition caseTypeDefinition,
+                                         Set<AccessProfile> accessProfiles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_UPDATE)) {
+
+            throw new CaseNotFoundException(caseDetails.getReferenceAsString());
+        }
+
+        if (!accessControlService.canAccessCaseEventWithCriteria(eventId,
+            caseTypeDefinition.getEvents(),
+            accessProfiles,
+            CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        }
+
+        if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
+            caseTypeDefinition,
+            accessProfiles,
+            CAN_READ)) {
+            throw new CaseNotFoundException(caseDetails.getReferenceAsString());
+        }
+
+        if (!accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
+            caseTypeDefinition,
+            accessProfiles,
+            CAN_UPDATE)) {
+            throw new ResourceNotFoundException(NO_CASE_STATE_FOUND);
+        }
     }
 
 
