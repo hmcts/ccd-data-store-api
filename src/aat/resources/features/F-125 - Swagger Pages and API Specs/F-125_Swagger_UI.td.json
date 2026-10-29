@@ -13,8 +13,6 @@
     "responseMessage" : "OK",
     "headers" : {
       "Accept-Ranges" : "bytes",
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "${[scenarioContext][customValues][approximately 1190]}",
       "Content-Type" : "text/html"
     },
     "body" : {
