@@ -14,7 +14,8 @@
     "body" : {
       "configUrl" : "/v3/api-docs/swagger-config",
       "oauth2RedirectUrl" : "[[ANYTHING_PRESENT]]",
-      "urls" : "[[ANYTHING_PRESENT]]"
+      "urls" : "[[ANYTHING_PRESENT]]",
+      "validatorUrl" : ""
     }
   }
 }
