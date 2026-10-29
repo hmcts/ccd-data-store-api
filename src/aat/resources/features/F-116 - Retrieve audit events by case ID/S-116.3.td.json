@@ -16,7 +16,7 @@
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "No case found ( case reference = '1111222233334444' )",
       "path": "/cases/1111222233334444/events",
       "details": null,
