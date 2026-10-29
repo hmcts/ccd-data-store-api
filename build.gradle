@@ -75,7 +75,7 @@ dependencyUpdates.resolutionStrategy = {
     }
 
     resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.18.15-jdk5'
+        force 'net.bytebuddy:byte-buddy:1.18.16-jdk5'
     }
 }
 
