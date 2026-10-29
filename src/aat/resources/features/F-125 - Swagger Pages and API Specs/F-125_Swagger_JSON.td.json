@@ -8,6 +8,8 @@
   "method": "GET",
   "uri": "/v3/api-docs",
 
+  "request": {},
+
   "expectedResponse": {
     "headers" : {
       "Content-Type" : "application/json"

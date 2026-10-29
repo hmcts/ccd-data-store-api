@@ -8,6 +8,8 @@
   "method": "GET",
   "uri": "/v3/api-docs/swagger-config",
 
+  "request": {},
+
   "expectedResponse": {
     "responseCode" : 200,
     "responseMessage" : "OK",

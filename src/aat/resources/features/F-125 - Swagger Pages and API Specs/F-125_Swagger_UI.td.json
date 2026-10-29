@@ -8,6 +8,8 @@
   "method": "GET",
   "uri": "/swagger-ui/index.html",
 
+  "request": {},
+
   "expectedResponse": {
     "responseCode" : 200,
     "responseMessage" : "OK",
