@@ -13,11 +13,10 @@
     "body": {
       "state": "CaseCreated",
       "data": {
-        "TextField": "Decentralised case"
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
       },
-      "data_classification": {
-        "TextField": "PUBLIC"
-      }
+      "data_classification": { }
     }
   }
 }
