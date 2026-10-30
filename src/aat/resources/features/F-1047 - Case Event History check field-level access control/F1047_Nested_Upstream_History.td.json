@@ -1,0 +1,93 @@
+{
+  "_guid_": "F1047_Nested_Upstream_History",
+  "productName": "CCD Test Stub Service",
+  "operationName": "Retrieve unfiltered nested history fixture",
+  "method": "GET",
+  "uri": "{{F1047_TEST_STUB_SERVICE_BASE_URL}}/ccd-persistence/cases/{cid}/history",
+  "specs": [
+    "to confirm the upstream snapshot contains unknown complex and collection children"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F1047_Nested_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "event.id"
+        },
+        {
+          "id": "[[ANYTHING_PRESENT]]",
+          "case_reference": "[[ANYTHING_PRESENT]]",
+          "event": {
+            "id": "createCase",
+            "event_name": "Create a case",
+            "summary": null,
+            "description": null,
+            "case_type_id": "FT_Decentralisation",
+            "created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+            "state_id": "CaseCreated",
+            "data": {
+              "TextField": "Decentralised case",
+              "_stubProcessedBy": "ccd-test-stubs-service",
+              "HistoryParty": {
+                "name": "History party",
+                "retiredSecret": "Retired party secret",
+                "address": {
+                  "postcode": "EX1 1AA",
+                  "retiredSecret": "Retired address secret"
+                }
+              },
+              "HistoryPartyWithACL": {
+                "name": "History party",
+                "retiredSecret": "Retired party secret",
+                "address": {
+                  "postcode": "EX1 1AA",
+                  "retiredSecret": "Retired address secret"
+                }
+              },
+              "HistoryDocuments": [
+                {
+                  "id": "10470000-0000-0000-0000-000000000001",
+                  "value": {
+                    "title": "History document 1",
+                    "retiredSecret": "Retired document secret 1"
+                  }
+                },
+                {
+                  "id": "10470000-0000-0000-0000-000000000002",
+                  "value": {
+                    "title": "History document 2",
+                    "retiredSecret": "Retired document secret 2"
+                  }
+                }
+              ],
+              "HistoryDocumentsWithACL": [
+                {
+                  "id": "10470000-0000-0000-0000-000000000001",
+                  "value": {
+                    "title": "History document 1",
+                    "retiredSecret": "Retired document secret 1"
+                  }
+                },
+                {
+                  "id": "10470000-0000-0000-0000-000000000002",
+                  "value": {
+                    "title": "History document 2",
+                    "retiredSecret": "Retired document secret 2"
+                  }
+                }
+              ]
+            },
+            "case_type_version": 1,
+            "security_classification": "PUBLIC"
+          }
+        }
+      ]
+    }
+  }
+}

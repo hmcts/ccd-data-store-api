@@ -1,0 +1,33 @@
+{
+  "_guid_": "F1047_GetCase_WithoutFieldAccess",
+  "_extends_": "GetCaseDetails__PositiveResponse_Base",
+  "specs": [
+    "to confirm the history reader has no current case-field access"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker3"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F1047_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_Decentralisation",
+      "state": "CaseCreated",
+      "security_classification": "PUBLIC",
+      "id": "${[scenarioContext][testData][request][pathVariables][cid]}",
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][testData][request][pathVariables][cid]}"
+        }
+      },
+      "data": {},
+      "data_classification": {}
+    }
+  }
+}

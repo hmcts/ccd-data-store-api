@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-1047.3",
+  "_extends_": "F1047_Test_Data_Base",
+  "title": "A reader with case and event access but no field access receives an empty snapshot",
+  "specs": [
+    "an active profile in CCD",
+    "case and event read access but no case-field read access",
+    "contains the event with an empty historical snapshot",
+    "contains the reference of the case just created"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker3"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "_extends_": "F1047_Expected_Audit_Event",
+          "data": {}
+        }
+      ]
+    }
+  }
+}
