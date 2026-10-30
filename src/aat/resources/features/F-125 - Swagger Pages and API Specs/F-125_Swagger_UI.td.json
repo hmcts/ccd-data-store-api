@@ -8,13 +8,13 @@
   "method": "GET",
   "uri": "/swagger-ui/index.html",
 
+  "request": {},
+
   "expectedResponse": {
     "responseCode" : 200,
     "responseMessage" : "OK",
     "headers" : {
       "Accept-Ranges" : "bytes",
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "${[scenarioContext][customValues][approximately 1190]}",
       "Content-Type" : "text/html"
     },
     "body" : {

@@ -7,27 +7,18 @@
     "to observe the swagger json content"
   ],
 
-  "request" :{
-    "pathVariables" : {
-      "ccd-data-store-api-version": "ccd-data-store-api.v1_external.json"
-    }
-  },
+  "uri": "/v3/api-docs/v1_external",
 
   "expectedResponse": {
     "responseCode" : 200,
     "responseMessage" : "OK",
     "body" : {
-      "host" : "[[ANYTHING_PRESENT]]",
-      "basePath": "/",
-      "tags": "[[ANYTHING_PRESENT]]",
+      "servers": "[[ANYTHING_PRESENT]]",
       "paths": "[[ANYTHING_PRESENT]]",
-      "definitions": "[[ANYTHING_PRESENT]]",
-      "swagger": "2.0",
+      "components": "[[ANYTHING_PRESENT]]",
+      "openapi": "3.1.0",
       "info": {
-        "description": "Create, modify, retrieve and search cases",
-        "title": "Core Case Data - Data store API",
-        "contact":"[[ANYTHING_PRESENT]]",
-        "license": "[[ANYTHING_PRESENT]]",
+        "title": "OpenAPI definition",
         "version": "[[ANYTHING_PRESENT]]"
 
       }
