@@ -1,0 +1,6 @@
+{
+  "_guid_": "DisposerPaymentUser",
+
+  "username": "[[$CCD_DISPOSER_PAYMENT_USER_EMAIL]]",
+  "password": "[[$CCD_DISPOSER_PAYMENT_USER_PASSWORD]]"
+}

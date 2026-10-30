@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,6 +75,45 @@ class CaseTypeServiceTest {
                 exception = assertThrows(ResourceNotFoundException.class, () -> subject.findState(c, "ngitb"));
             assertThat(exception.getMessage(),
                 is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
+        }
+
+        @Test
+        @DisplayName("finds a state that is still in the definition")
+        void findStateIfPresentReturnsState() {
+            final CaseTypeDefinition c = new CaseTypeDefinition();
+            final CaseStateDefinition caseStateDefinition = buildCaseState("ngitb");
+            c.setStates(Arrays.asList(buildCaseState("hemanth"), caseStateDefinition));
+
+            final Optional<CaseStateDefinition> found = subject.findStateIfPresent(c, "ngitb");
+
+            assertThat(found.isPresent(), is(true));
+            assertThat(found.get(), is(caseStateDefinition));
+        }
+
+        @Test
+        @DisplayName("returns empty when the state has been removed from the definition")
+        void findStateIfPresentReturnsEmptyWhenStateRemoved() {
+            final CaseTypeDefinition c = new CaseTypeDefinition();
+            c.setStates(Arrays.asList(buildCaseState("hemanth"), buildCaseState("ngitw")));
+
+            assertThat(subject.findStateIfPresent(c, "ngitb").isEmpty(), is(true));
+        }
+
+        @Test
+        @DisplayName("returns empty when the case type has no states")
+        void findStateIfPresentReturnsEmptyWhenStatesMissing() {
+            final CaseTypeDefinition c = new CaseTypeDefinition();
+
+            assertThat(subject.findStateIfPresent(c, "ngitb").isEmpty(), is(true));
+        }
+
+        @Test
+        @DisplayName("returns empty when the state id is absent")
+        void findStateIfPresentReturnsEmptyWhenStateIdMissing() {
+            final CaseTypeDefinition c = new CaseTypeDefinition();
+            c.setStates(List.of(buildCaseState("ngitb")));
+
+            assertThat(subject.findStateIfPresent(c, null).isEmpty(), is(true));
         }
 
         private CaseStateDefinition buildCaseState(final String name) {

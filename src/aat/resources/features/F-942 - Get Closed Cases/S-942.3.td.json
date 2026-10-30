@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-942.3",
+  "_extends_": "F-942_Test_Data_Base",
+  "title": "Return 401 if user is unauthorised",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a dummy user id",
+    "contains Date field",
+    "code is HTTP-401"
+  ],
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer abc"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body": null
+  }
+}

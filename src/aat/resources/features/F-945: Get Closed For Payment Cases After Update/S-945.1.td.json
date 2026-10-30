@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-945.1",
+  "_extends_": "F-944_Get_Closed_For_Payment_Cases_Base",
+  "title": "Return updated case when update event post state is closed for payment",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains today's Date field"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "caseReferences": [
+        "${}${[scenarioContext][childContexts][S-944.2_Create_Case_NotClosed][testData][actualResponse][body][id]}"
+      ]
+    }
+  }
+}

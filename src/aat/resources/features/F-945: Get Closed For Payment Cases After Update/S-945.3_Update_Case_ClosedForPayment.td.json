@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-945.3_Update_Case_ClosedForPayment",
+  "_extends_": "F-945_Update_Case_Base",
+  "title": "Move case into closed for payment",
+  "specs": [
+    "to submit updateCase event with post state closed for payment"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-944.2_Create_Case_NotClosed][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-945.3_GetToken_UpdateCase_ClosedForPayment][testData][actualResponse][body][token]}",
+      "event": {
+        "id": "updateToClosedForPaymentCase"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "state": "CaseClosedForPayment"
+    }
+  }
+}
