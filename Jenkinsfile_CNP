@@ -110,6 +110,8 @@ env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"
 env.OIDC_ALLOWED_ISSUERS = "https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
 env.VERIFY_OIDC_ISSUER = "true"
+env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
+env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
@@ -213,6 +215,15 @@ withPipeline(type, product, component) {
           reportFiles          : "index.html",
           reportName           : "Integration Test Report"
         ]
+    }
+
+    // Set IDAM_API_URL_BASE post high-level data setup where it would have been overridden
+    before('smoketest:preview') {
+        env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
+    }
+
+    before('smoketest:aat') {
+        env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
     }
 
     afterAlways('smoketest:preview') {

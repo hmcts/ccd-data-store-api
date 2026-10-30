@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
+import uk.gov.hmcts.ccd.security.IdamSecurityConfig;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
@@ -39,22 +40,30 @@ import java.util.function.Function;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import uk.gov.hmcts.ccd.security.MultiIssuerValidator;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final String issuerUri;
     private final String primaryIssuer;
     private final String configuredAllowedIssuers;
+  
+    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
+
+    private final IdamSecurityConfig idamSecurityConfig;
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final CustomHeadersFilter customHeadersFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
+        "/v3/api-docs/**",
         "/v2/**",
         "/health/liveness",
         "/health/readiness",
@@ -64,8 +73,6 @@ public class SecurityConfiguration {
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**",
-        "/v2/api-docs",
-        "/v2/api-docs/**",
         "/testing-support/cleanup-case-type/**"
     };
 
@@ -123,11 +130,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(AppInsights appInsights) {
+    public JwtDecoder jwtDecoder(AppInsights appInsights) {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // See docs/security/jwt-issuer-validation.md for discovery and issuer enforcement.
-        jwtDecoder.setJwtValidator(jwtValidator(primaryIssuer, configuredAllowedIssuers));
+        // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
+        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
+        OAuth2TokenValidator<Jwt> multiIssuerValidation = 
+            new MultiIssuerValidator(idamSecurityConfig.getAllowedIssuers());
+        OAuth2TokenValidator<Jwt> validator = 
+            new DelegatingOAuth2TokenValidator<>(withTimestamp, multiIssuerValidation);
+
+        jwtDecoder.setJwtValidator(validator);
         return new AppInsightsJwtDecoder(jwtDecoder, appInsights);
     }
 
