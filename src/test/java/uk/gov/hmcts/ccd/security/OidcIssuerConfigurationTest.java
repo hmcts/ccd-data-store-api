@@ -21,54 +21,55 @@ class OidcIssuerConfigurationTest {
     private static final String LEGACY_FORGEROCK_ISSUER =
         "https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts";
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" "})
-    void shouldOnlyHavePrimaryIssuerWhenAllowedIssuersMissing(String configuredAllowedIssuers) {
-        assertThat(OidcIssuerConfiguration.allowedIssuers(PUBLIC_IDAM_ISSUER, configuredAllowedIssuers))
-            .containsExactly(PUBLIC_IDAM_ISSUER);
+    @Test
+    void shouldTrimAndDeduplicateConfiguredIssuers() {
+        assertThat(OidcIssuerConfiguration.allowedIssuers(
+            " " + PUBLIC_IDAM_ISSUER + ", " + FORGEROCK_ISSUER + ", " + FORGEROCK_ISSUER + " "))
+            .containsExactly(PUBLIC_IDAM_ISSUER, FORGEROCK_ISSUER);
     }
 
     @Test
-    void shouldIncludePrimaryAndConfiguredAllowedIssuers() {
-        assertThat(
-            OidcIssuerConfiguration.allowedIssuers(
-                PUBLIC_IDAM_ISSUER,
-                " " + FORGEROCK_ISSUER + ", " + LEGACY_FORGEROCK_ISSUER + " , " + FORGEROCK_ISSUER + " "
-            )
-        ).containsExactly(PUBLIC_IDAM_ISSUER, FORGEROCK_ISSUER, LEGACY_FORGEROCK_ISSUER);
+    void shouldAcceptAnAllowListWithoutAPrimaryIssuer() {
+        assertThat(OidcIssuerConfiguration.allowedIssuers(FORGEROCK_ISSUER))
+            .containsExactly(FORGEROCK_ISSUER);
     }
 
     @ParameterizedTest
     @MethodSource("allowedIssuerListsWithEmptyEntries")
     void shouldIgnoreEmptyEntriesInConfiguredAllowedIssuerList(String configuredAllowedIssuers,
                                                               String[] expectedIssuers) {
-        assertThat(OidcIssuerConfiguration.allowedIssuers(PUBLIC_IDAM_ISSUER, configuredAllowedIssuers))
+        assertThat(OidcIssuerConfiguration.allowedIssuers(configuredAllowedIssuers))
             .containsExactly(expectedIssuers);
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" "})
-    void shouldRejectBlankPrimaryIssuerEvenWhenAllowedIssuersAreConfigured(String primaryIssuer) {
-        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(primaryIssuer, FORGEROCK_ISSUER))
+    @ValueSource(strings = {" ", ",", " , , "})
+    void shouldRejectAnEmptyAllowList(String configuredAllowedIssuers) {
+        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(configuredAllowedIssuers))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("oidc.issuer must not be blank");
+            .hasMessage("idam.security.allowed-issuers must contain at least one issuer");
+    }
+
+    @Test
+    void shouldReturnAnImmutableAllowList() {
+        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(FORGEROCK_ISSUER).add(PUBLIC_IDAM_ISSUER))
+            .isInstanceOf(UnsupportedOperationException.class);
     }
 
     private static Stream<Arguments> allowedIssuerListsWithEmptyEntries() {
         return Stream.of(
             Arguments.of(
                 ", " + FORGEROCK_ISSUER,
-                new String[]{PUBLIC_IDAM_ISSUER, FORGEROCK_ISSUER}
+                new String[]{FORGEROCK_ISSUER}
             ),
             Arguments.of(
                 FORGEROCK_ISSUER + ",",
-                new String[]{PUBLIC_IDAM_ISSUER, FORGEROCK_ISSUER}
+                new String[]{FORGEROCK_ISSUER}
             ),
             Arguments.of(
                 FORGEROCK_ISSUER + ",," + LEGACY_FORGEROCK_ISSUER,
-                new String[]{PUBLIC_IDAM_ISSUER, FORGEROCK_ISSUER, LEGACY_FORGEROCK_ISSUER}
+                new String[]{FORGEROCK_ISSUER, LEGACY_FORGEROCK_ISSUER}
             )
         );
     }

@@ -12,7 +12,7 @@ Read `docs/security/jwt-issuer-validation.md` first for the detailed behavior, c
 ## Workflow
 
 1. Check current diffs with `git status --short` before editing.
-2. Review `SecurityConfiguration` and confirm how `IDAM_OIDC_URL` and `OIDC_ISSUER` are used.
+2. Review `SecurityConfiguration` and confirm how discovery (`IDAM_OIDC_URL`) and trust (`OIDC_ALLOWED_ISSUERS` / `idam.security.allowed-issuers`) are kept separate. Data Store does not require `OIDC_ISSUER`.
 3. For code changes, check:
    - `src/main/java/uk/gov/hmcts/ccd/SecurityConfiguration.java`
    - `src/test/java/uk/gov/hmcts/ccd/JwtIssuerValidatorTest.java`

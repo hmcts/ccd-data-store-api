@@ -55,7 +55,7 @@ import static org.mockito.Mockito.doAnswer;
     "spring.jpa.hibernate.ddl-auto=none",
     "spring.flyway.enabled=false",
     "spring.security.oauth2.client.provider.oidc.issuer-uri=${IDAM_OIDC_URL:http://localhost:5000/o}",
-    "oidc.issuer=${OIDC_ISSUER:http://localhost:5000/o}"
+    "idam.security.allowed-issuers=${OIDC_ALLOWED_ISSUERS:http://localhost:5000/o}"
 })
 class CaseLinkServiceExternalDbDeadlockIT {
 

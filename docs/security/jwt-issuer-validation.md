@@ -1,196 +1,101 @@
 # JWT issuer validation
 
-## Service
+## Current contract
 
-`ccd-data-store-api`
+`ccd-data-store-api` uses the same allow-list contract as master:
 
-## Summary
-
-- re-enables issuer validation in `ccd-data-store-api`, so JWTs must match configured issuers as well as pass timestamp checks
-- follows the single configured issuer approach by default, with optional `OIDC_ALLOWED_ISSUERS` support for migration
-- any change to this repo's JWT issuer configuration should remain consistent with the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and the externally agreed service issuer policy
-
-## HMCTS Guidance
-
-- [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
-- Use that guidance as the reference point for service-level issuer decisions and configuration recommendations.
-
-## Current approach
-
-| Area | Current approach in this repo |
+| Setting | Purpose |
 |---|---|
-| JWT validation | Signature, timestamp, and issuer are all enforced |
-| Discovery / JWKS source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
-| Enforced issuer | `oidc.issuer` / `OIDC_ISSUER`, plus optional `oidc.allowed-issuers` / `OIDC_ALLOWED_ISSUERS` |
-| Issuer model | `OIDC_ISSUER` remains the primary issuer; optional additional issuers may be configured during migration |
+| `IDAM_OIDC_URL` | OIDC discovery and signing-key retrieval only |
+| `OIDC_ALLOWED_ISSUERS` | Complete comma-separated list of trusted token `iss` values |
+| `idam.security.allowed-issuers` | Spring property consumed by the decoder; direct overrides remain supported |
+| `VERIFY_OIDC_ISSUER` | Enables the functional-test issuer pre-check in Jenkins |
 
-## Context
+`OIDC_ISSUER` is neither required nor consumed by this repository. There is no implicit
+primary issuer. Include every accepted issuer explicitly in the allow-list.
 
-- `src/main/java/uk/gov/hmcts/ccd/SecurityConfiguration.java` builds the decoder from `spring.security.oauth2.client.provider.oidc.issuer-uri`.
-- The service separately configures trusted issuers because the discovered issuer is not always the value trusted for validation.
-- The previous implementation instantiated issuer validation from `oidc.issuer` but only applied `JwtTimestampValidator`, which meant an unexpected `iss` claim could still be accepted if signature and timestamps were valid.
+Main application configuration preserves master's local defaults when the environment variable
+is absent: `http://idam-web-public:9002/o,http://fr-am:8080/openam/oauth2/hmcts`.
+Deployed environments must supply their intended list explicitly. An explicitly blank list
+fails startup. Test configurations provide isolated local values.
 
-## Implemented fix
+Discovery and trust are separate. Do not derive trusted issuer values from `IDAM_OIDC_URL`,
+the discovery response, or token input. Confirm configuration against real caller tokens
+without storing or logging complete bearer tokens.
 
-`SecurityConfiguration.jwtDecoder()` now uses:
+## Implementation
 
-```java
-OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-OAuth2TokenValidator<Jwt> withIssuer = new JwtClaimValidator<>(
-    "iss",
-    OidcIssuerConfiguration.allowedIssuers(primaryIssuer, configuredAllowedIssuers)::contains
-);
-OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
+`SecurityConfiguration.jwtDecoder()` discovers signing keys using `issuer-uri`, then applies
+`jwtValidator(configuredAllowedIssuers)`. The shared `OidcIssuerConfiguration` parser trims
+entries, ignores empty comma-separated entries, removes duplicates, and rejects an empty list.
+
+The validator combines `JwtTimestampValidator` with `JwtClaimValidator` for exact issuer
+membership. Signature checks remain with `NimbusJwtDecoder`. Missing and unexpected issuer
+claims are rejected. No discovery issuer is accepted implicitly.
+
+The old `IdamSecurityConfig` and `MultiIssuerValidator` classes are replaced by this path;
+the existing `idam.security.allowed-issuers` property and `OIDC_ALLOWED_ISSUERS` environment
+variable remain compatible with master. The intermediate branch-only `oidc.issuer` and
+`oidc.allowed-issuers` settings are no longer used.
+
+## Deployment and pipeline alignment
+
+Base, AAT and preview chart values already define `OIDC_ALLOWED_ISSUERS`. Their existing
+lists are preserved. CNP and nightly verification use the same three-entry AAT list:
+
+```text
+https://idam-web-public.aat.platform.hmcts.net/o
+https://hmcts-access.aat.platform.hmcts.net/o
+https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
 ```
 
-## Runtime model
+Jenkins variables configure the test process; Helm configures the deployed application.
+They must both include issuers used by the tests and application callers.
 
-| Setting | Purpose | Notes |
-|---|---|---|
-| `spring.security.oauth2.client.provider.oidc.issuer-uri` | OIDC discovery and JWKS lookup | Built from `IDAM_OIDC_URL` |
-| `oidc.issuer` | Primary enforced token `iss` value | Supplied from `OIDC_ISSUER` |
-| `oidc.allowed-issuers` | Optional additional accepted token `iss` values | Supplied from comma-separated `OIDC_ALLOWED_ISSUERS`; only `OIDC_ISSUER` is accepted when unset |
-| `IDAM_OIDC_URL` | Discovery base URL | Not the source of truth for token `iss` |
-| `OIDC_ISSUER` | Primary expected JWT issuer | Must match a real caller token `iss` exactly |
-| `OIDC_ALLOWED_ISSUERS` | Optional migration issuer list | Use only for explicit additional issuer values that must be accepted |
+`verifyFunctionalTestJwtIssuer` obtains a test token and checks its `iss` against the complete
+`OIDC_ALLOWED_ISSUERS` list before high-level data setup, smoke or functional tests. This
+pre-check inspects the token payload; the application's decoder separately verifies signatures.
+Local invocation is opt-in through `VERIFY_OIDC_ISSUER=true` and requires IDAM and test credentials.
+`verifyOidcIssuerPolicy` checks that trusted issuers are not derived from discovery settings.
 
-For this repo, the FORGEROCK issuer used in deployed environments is an explicit `OIDC_ISSUER` value supplied by Helm/Jenkins configuration. It is not a value inferred automatically when issuer settings are absent. `OIDC_ALLOWED_ISSUERS` is optional; if unset, validation accepts only the primary `OIDC_ISSUER` value.
+For other CCD-7109 repositories, assess their master branches independently before changing
+their configuration contract. This update is limited to Data Store and does not modify them.
 
 ## Tests
 
-| Test | Coverage |
-|---|---|
-| `src/test/java/uk/gov/hmcts/ccd/JwtIssuerValidatorTest.java` | Fast validator coverage for accepting primary/additional issuers, rejecting unexpected/missing issuers, and rejecting expired tokens |
-| `src/test/java/uk/gov/hmcts/ccd/security/OidcIssuerConfigurationTest.java` | Primary issuer behavior when optional allowed issuers are unset, comma-separated parsing, blank config rejection |
-| `src/test/java/uk/gov/hmcts/ccd/integrations/SecurityConfigurationJwtDecoderIssuerValidationIT.java` | Full-stack wiring coverage for `SecurityConfiguration` creating the OIDC-discovered decoder and rejecting a signed JWT whose `iss` does not match configured issuers |
+- `JwtIssuerValidatorTest`: accepts listed issuers and rejects unlisted, missing and expired issuers/tokens.
+- `OidcIssuerConfigurationTest`: parses a complete allow-list, trims and deduplicates entries,
+  rejects null/blank/empty lists and returns an immutable set.
+- `SecurityConfigurationJwtDecoderIssuerValidationIT`: uses the configured decoder and signed JWTs;
+  accepts both configured issuers and rejects unexpected or missing issuers, without a primary-issuer setting.
 
-The test fixtures use valid JWT timelines so failures reflect validator behavior rather than builder constraints.
+Run the focused tests with `OIDC_ISSUER` unset. The integration tests require Docker for PostgreSQL.
+Runtime tests do not prove live issuer values or all external callers are aligned.
 
-Coverage is intentionally two-layered here: validator-only behavior in `JwtIssuerValidatorTest` and full
-`SecurityConfiguration` decoder wiring in `SecurityConfigurationJwtDecoderIssuerValidationIT`. A lighter Spring
-web-security slice test was not kept because it introduced unwanted test-context complexity in this repo.
+Local verification on 30 October 2026: 22 focused tests passed with `OIDC_ISSUER` and
+`OIDC_ALLOWED_ISSUERS` unset in the test process, including four full-stack decoder tests
+using an explicit test allow-list. AAT and contract-test compilation, main/test Checkstyle,
+and `verifyOidcIssuerPolicy` passed. The verifier now calls the current `getIdamOidcToken()`
+helper API. CNP and nightly lists were checked against the preview list. Live IDAM/AAT
+execution was not repeated; the earlier local AAT attempt was blocked by unavailable IDAM.
 
-## Configuration and deployment notes
+## History and review against master
 
-Before rollout, confirm:
+Historically, Data Store configured `OIDC_ISSUER` while issuer enforcement was disabled.
+Master commit `7f0fcdace` (CCD-7454, 28 October 2026) replaced this with `OIDC_ALLOWED_ISSUERS`
+and enabled `MultiIssuerValidator`. Cached master `891ba8a7d` already validates timestamps
+and issuer membership.
 
-- each environment supplies the intended `OIDC_ISSUER`
-- any `OIDC_ALLOWED_ISSUERS` value contains only explicitly accepted migration issuers
-- the `iss` claim in real caller tokens matches `OIDC_ISSUER` or an explicitly configured allowed issuer
-- no pipeline or release-time override is supplying an older issuer value
-- external callers, smoke tests, and AAT clients obtain tokens whose `iss` claim matches this service's configured OIDC issuers
+An intermediate CCD-7109 implementation reintroduced a mandatory primary issuer. That created
+a deployment gap because base/AAT charts supplied only the allow-list. This implementation
+removes that requirement and preserves master's public configuration contract.
 
-### Guidance alignment
+The constructor initialization error, duplicate injection, duplicate preview keys and obsolete
+issuer path have also been addressed. Current review uses cached master; GitHub SSH fetch
+failed, so remote freshness and live environment values remain unverified.
 
-| Item | Current repo state |
-|---|---|
-| Service issuer model | Single configured primary issuer, with optional explicit migration allow-list |
-| Issuer pattern used for this service | Canonical FORGEROCK issuer pattern, consistent with the HMCTS guidance in the [HMCTS Guidance](#hmcts-guidance) section and the external service issuer policy for `ccd-data-store-api` |
-| Repo wiring status | Base Helm values remain aligned to the FORGEROCK primary issuer; PR preview uses the public AAT IDAM issuer as primary and allows the ForgeRock issuer for CCD gateway/callback tokens during migration |
+## HMCTS guidance
 
-Preview could not be switched to only `https://idam-web-public.aat.platform.hmcts.net/o` because the PR functional
-issuer verifier gets a real token through the CCD gateway OAuth client, and that token currently has the FORGEROCK
-`iss` value. During migration, configure `OIDC_ALLOWED_ISSUERS` with the additional public IDAM or ForgeRock issuer
-values that must be accepted instead of disabling issuer validation.
-
-Do not infer `OIDC_ISSUER` or `OIDC_ALLOWED_ISSUERS` from the public OIDC discovery URL. In preview/AAT for this repo,
-the correct issuer values had to be taken from decoded real tokens and did not always match the public
-`IDAM_OIDC_URL` base.
-
-Smoke and functional pipeline runs now perform a pre-check that acquires a real test token and fails fast if its
-`iss` claim does not match `OIDC_ISSUER` or an explicit `OIDC_ALLOWED_ISSUERS` value.
-This verifier is enabled in CI via `VERIFY_OIDC_ISSUER=true` and remains opt-in for local runs.
-Because the verifier runs in the build JVM before deployed app env is available, issuer changes may need updating in
-both Jenkins test env and Helm app config.
-
-If external services still send tokens with a different issuer, this change will reject them with `401` until configuration or token issuance is aligned.
-
-For local running, `IDAM_OIDC_URL` should point to the local OIDC discovery base, usually `http://localhost:5000`, and `OIDC_ISSUER` must exactly match the `iss` claim in the local access tokens being used. Common local values are `OIDC_ISSUER=http://fr-am:8080/openam/oauth2/hmcts` or `OIDC_ISSUER=http://localhost:5000/o`, depending on how the local token source is configured.
-
-## How to derive `OIDC_ISSUER`
-
-- Do not guess the issuer from the public discovery URL alone.
-- Decode only the JWT payload from a real access token for the target environment and inspect the `iss` claim.
-- Do not store or document full bearer tokens. Record only the derived issuer value.
-
-Example:
-
-```bash
-TOKEN='eyJ...'
-PAYLOAD=$(printf '%s' "$TOKEN" | cut -d '.' -f2)
-python3 - <<'PY' "$PAYLOAD"
-import base64, json, sys
-payload = sys.argv[1]
-payload += '=' * (-len(payload) % 4)
-print(json.loads(base64.urlsafe_b64decode(payload))["iss"])
-PY
-```
-
-- JWTs are `header.payload.signature`.
-- The second segment is base64url-encoded JSON.
-- This decodes the payload only. It does not verify the signature.
-
-## Migration allow-list usage
-
-Set `OIDC_ALLOWED_ISSUERS` only when the service genuinely needs to accept more than the primary issuer during
-migration. Do not repeat `OIDC_ISSUER` in this list; the primary issuer is always accepted by the application.
-
-For example, if `OIDC_ISSUER` is set to `https://idam-web-public.aat.platform.hmcts.net/o`, the additional ForgeRock
-issuer can be allowed with:
-
-```text
-OIDC_ALLOWED_ISSUERS=https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
-```
-
-Do not use `OIDC_ALLOWED_ISSUERS` to derive issuers from discovery configuration. Remove migration issuers once callers
-have moved to the target issuer.
-
-## Current implementation status
-
-| Area | Current status |
-|---|---|
-| Decoder / validator chain | `SecurityConfiguration` enforces timestamp and configured issuer validation |
-| Additional action needed | Set `OIDC_ALLOWED_ISSUERS` only where migration requires multiple accepted issuers |
-
-## Merge checklist
-
-Before merging JWT issuer-validation changes, confirm:
-
-- the active `JwtDecoder` is built from `spring.security.oauth2.client.provider.oidc.issuer-uri`
-- the active validator chain includes both `JwtTimestampValidator` and issuer claim validation
-- there is no disabled, commented-out, or alternate runtime path that leaves issuer validation off
-- `issuer-uri` is used for discovery and JWKS lookup only
-- `oidc.issuer` / `OIDC_ISSUER` is used as the primary enforced token `iss` value only
-- `oidc.allowed-issuers` / `OIDC_ALLOWED_ISSUERS` contains only explicit migration issuers, when set
-- `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL
-- app config, Helm values, preview values, and CI/Jenkins values are aligned for the target environment
-- if `OIDC_ISSUER` changed, it was verified against a real token for the target environment
-- there is a test that accepts a token with the expected issuer
-- there is a test that rejects a token with an unexpected issuer
-- there is a test that rejects an expired token
-- there is decoder-level coverage using a signed token, not only validator-only coverage
-- CI or build verification checks that a real token issuer matches configured OIDC issuers, or the repo documents why that does not apply
-- comments and docs do not describe the old insecure behavior
-
-Do not merge if:
-
-- issuer validation is constructed but not applied
-- only timestamp validation is active
-- `OIDC_ISSUER` or `OIDC_ALLOWED_ISSUERS` was inferred rather than verified
-- Helm and CI/Jenkins issuer values disagree without explanation
-- only happy-path tests exist
-
-## Configuration Policy
-
-| Policy | Requirement |
-|---|---|
-| Discovery | `spring.security.oauth2.client.provider.oidc.issuer-uri` is used for OIDC discovery and JWKS lookup only |
-| Enforcement | `oidc.issuer` / `OIDC_ISSUER` is the primary enforced JWT issuer; `oidc.allowed-issuers` / `OIDC_ALLOWED_ISSUERS` may add explicit migration issuers |
-| Derivation | Do not derive `OIDC_ISSUER` or `OIDC_ALLOWED_ISSUERS` from `IDAM_OIDC_URL` or the discovery URL |
-| Production-like environments | Must provide `OIDC_ISSUER` explicitly |
-| Local / test-only defaults | Acceptable only when static, intentional, and clearly scoped to non-production use |
-| Build guard | `verifyOidcIssuerPolicy` fails if OIDC issuer validation config is derived from discovery config |
-
-## References
-
-See [HMCTS Guidance](#hmcts-guidance).
+[JWT issuer validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
+remains the external reference for service-level issuer decisions. Validate deployed values
+against the agreed environment policy before rollout.

@@ -871,14 +871,14 @@ task verifyOidcIssuerPolicy {
             def file = file(path)
             file.exists() && file.readLines().any { line ->
                 def normalized = line.replaceAll(/\s+/, '')
-                (normalized.startsWith('oidc.issuer=') || normalized.startsWith('oidc.allowed-issuers='))
+                normalized.startsWith('idam.security.allowed-issuers=')
                     && (normalized.contains('IDAM_OIDC_URL') || normalized.contains('idam.api.url'))
             }
         }
 
         if (!violations.isEmpty()) {
             throw new GradleException(
-                "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+                "OIDC issuer policy violation. Do not derive trusted issuers from discovery config in: ${violations.join(', ')}"
             )
         }
     }

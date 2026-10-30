@@ -24,8 +24,7 @@ public final class JwtIssuerVerificationApp {
 
     public static void main(String[] args) throws Exception {
         Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(
-            Env.require("OIDC_ISSUER"),
-            System.getenv("OIDC_ALLOWED_ISSUERS")
+            Env.require("OIDC_ALLOWED_ISSUERS")
         );
         String idamBaseUrl = Env.require("IDAM_API_URL_BASE");
         CredentialValuePair credentials = firstAvailableCredentials(List.of(
@@ -34,7 +33,7 @@ public final class JwtIssuerVerificationApp {
         ));
 
         IdamHelper idamHelper = new IdamHelper(idamBaseUrl, OAuth2.INSTANCE);
-        String accessToken = idamHelper.getIdamOauth2Token(credentials.username(), credentials.password());
+        String accessToken = idamHelper.getIdamOidcToken(credentials.username(), credentials.password());
         String actualIssuer = decodeIssuer(accessToken);
 
         if (!allowedIssuers.contains(actualIssuer)) {

@@ -23,7 +23,6 @@ import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
-import uk.gov.hmcts.ccd.security.IdamSecurityConfig;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.OidcIssuerConfiguration;
 import uk.gov.hmcts.ccd.security.filters.ExceptionHandlingFilter;
@@ -40,26 +39,20 @@ import java.util.function.Function;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import uk.gov.hmcts.ccd.security.MultiIssuerValidator;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final String primaryIssuer;
     private final String configuredAllowedIssuers;
-  
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
 
-    private final IdamSecurityConfig idamSecurityConfig;
+    private final String issuerUri;
+
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
     private final SecurityLoggingFilter securityLoggingFilter;
     private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final CustomHeadersFilter customHeadersFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
-    private final ApplicationParams applicationParams;
 
     private static final String[] AUTH_WHITELIST = {
         "/v3/api-docs",
@@ -84,11 +77,9 @@ public class SecurityConfiguration {
                                  final SecurityUtils securityUtils,
                                  final ApplicationParams applicationParams,
                                  @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}") String issuerUri,
-                                 @Value("${oidc.issuer}") String primaryIssuer,
-                                 @Value("${oidc.allowed-issuers:}") String configuredAllowedIssuers,
+                                 @Value("${idam.security.allowed-issuers}") String configuredAllowedIssuers,
                                  @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
         this.issuerUri = issuerUri;
-        this.primaryIssuer = primaryIssuer;
         this.configuredAllowedIssuers = configuredAllowedIssuers;
         this.customHeadersFilter = new CustomHeadersFilter(applicationParams);
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
@@ -134,20 +125,13 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder)JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // See docs/security/jwt-issuer-validation.md for discovery and issuer enforcement.
-        // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
-        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> multiIssuerValidation = 
-            new MultiIssuerValidator(idamSecurityConfig.getAllowedIssuers());
-        OAuth2TokenValidator<Jwt> validator = 
-            new DelegatingOAuth2TokenValidator<>(withTimestamp, multiIssuerValidation);
-
-        jwtDecoder.setJwtValidator(validator);
+        jwtDecoder.setJwtValidator(jwtValidator(configuredAllowedIssuers));
         return new AppInsightsJwtDecoder(jwtDecoder, appInsights);
     }
 
-    static OAuth2TokenValidator<Jwt> jwtValidator(String primaryIssuer, String configuredAllowedIssuers) {
+    static OAuth2TokenValidator<Jwt> jwtValidator(String configuredAllowedIssuers) {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(primaryIssuer, configuredAllowedIssuers);
+        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(configuredAllowedIssuers);
         OAuth2TokenValidator<Jwt> withIssuer = new JwtClaimValidator<>(
             "iss",
             issuer -> issuer != null && allowedIssuers.contains(issuer.toString())

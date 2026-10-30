@@ -10,7 +10,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
@@ -38,12 +37,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ccd.util.KeyGenerator.getRsaJWK;
 
 // Proves SecurityConfiguration wires the real OIDC-discovered JwtDecoder with issuer validation.
-@TestPropertySource(properties = "idam.s2s-authorised.services=ccd_gw")
+@TestPropertySource(properties = {
+    "idam.s2s-authorised.services=ccd_gw",
+    "idam.security.allowed-issuers=http://allowed-issuer,http://additional-issuer"
+})
 @ActiveProfiles("jwt-issuer-probe")
 @Import(SecurityConfigurationJwtDecoderIssuerValidationIT.AuthenticationProbe.class)
 class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest {
 
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
+    private static final String EXPECTED_ISSUER = "http://allowed-issuer";
     private static final String PROBE_URL = "/jwt-issuer-test";
     private static final Instant VALID_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
     private static final Instant VALID_EXPIRES_AT = Instant.parse("2999-01-01T00:00:00Z");
@@ -54,12 +57,9 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    @Value("${oidc.issuer}")
-    private String expectedIssuer;
-
     @Test
     void shouldAcceptJwtWithExpectedIssuerThroughConfiguredDecoder() {
-        ResponseEntity<String> response = authenticate(expectedIssuer);
+        ResponseEntity<String> response = authenticate(EXPECTED_ISSUER);
 
         assertThat(response.getStatusCode().value())
             .withFailMessage("Expected authenticated response, got %s: %s",
@@ -67,6 +67,16 @@ class SecurityConfigurationJwtDecoderIssuerValidationIT extends WireMockBaseTest
             .isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("123");
         WireMock.verify(1, getRequestedFor(urlEqualTo("/s2s/details")));
+    }
+
+    @Test
+    void shouldAcceptSecondAllowedIssuerThroughConfiguredDecoder() {
+        assertThat(authenticate("http://additional-issuer").getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    void shouldRejectMissingIssuerThroughConfiguredDecoder() {
+        assertThat(authenticate(null).getStatusCode().value()).isEqualTo(401);
     }
 
     @Test

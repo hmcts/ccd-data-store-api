@@ -29,16 +29,16 @@ class JwtIssuerValidatorTest {
     @Test
     void shouldAcceptJwtFromAdditionalAllowedIssuer() {
         assertFalse(
-            validator(ADDITIONAL_ISSUER)
+            validator(VALID_ISSUER + "," + ADDITIONAL_ISSUER)
                 .validate(buildJwt(ADDITIONAL_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT))
                 .hasErrors()
         );
     }
 
     @Test
-    void shouldKeepPrimaryIssuerWhenAdditionalAllowedIssuersConfigured() {
+    void shouldAcceptFirstIssuerWhenMultipleIssuersConfigured() {
         assertFalse(
-            validator(ADDITIONAL_ISSUER)
+            validator(VALID_ISSUER + "," + ADDITIONAL_ISSUER)
                 .validate(buildJwt(VALID_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT))
                 .hasErrors()
         );
@@ -65,12 +65,18 @@ class JwtIssuerValidatorTest {
         );
     }
 
+    @Test
+    void shouldRejectIssuerNotExplicitlyInTheAllowList() {
+        assertTrue(validator(ADDITIONAL_ISSUER)
+            .validate(buildJwt(VALID_ISSUER, VALID_ISSUED_AT, VALID_EXPIRES_AT)).hasErrors());
+    }
+
     private OAuth2TokenValidator<Jwt> validator() {
-        return validator(null);
+        return validator(VALID_ISSUER);
     }
 
     private OAuth2TokenValidator<Jwt> validator(String allowedIssuers) {
-        return SecurityConfiguration.jwtValidator(VALID_ISSUER, allowedIssuers);
+        return SecurityConfiguration.jwtValidator(allowedIssuers);
     }
 
     private Jwt buildJwt(String issuer, Instant issuedAt, Instant expiresAt) {
