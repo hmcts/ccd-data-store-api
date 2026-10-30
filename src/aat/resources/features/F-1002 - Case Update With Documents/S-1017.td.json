@@ -28,12 +28,10 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANYTHING_PRESENT]]",
       "message" : "Case ID is not valid",
-      "path": "/cases/${[scenarioContext][testData][request][pathVariables][cid]}/events",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

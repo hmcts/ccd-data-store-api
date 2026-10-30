@@ -1,0 +1,15 @@
+{
+  "_guid_": "CCD_Safe_412_Response",
+  "responseCode": 412,
+  "responseMessage": "Precondition Failed",
+  "headers": {
+    "_extends_": "Common_412_Response_Headers"
+  },
+  "body": {
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "status": 412,
+    "error": "Precondition Failed",
+    "message": "Precondition Failed",
+    "code": "REQUEST_FAILED"
+  }
+}

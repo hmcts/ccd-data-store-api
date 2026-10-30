@@ -16,13 +16,12 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
     "headers": {
       "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANYTHING_PRESENT]]",
-      "message" : "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzI1NiJ9'.",
+      "message" : "Not Found",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

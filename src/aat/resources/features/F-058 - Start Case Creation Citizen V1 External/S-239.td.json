@@ -16,9 +16,9 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
+    "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "message": "Access Denied"
+      "message": "Forbidden"
     }
   }
 }

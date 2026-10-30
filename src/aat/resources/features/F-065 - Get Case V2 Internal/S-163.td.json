@@ -16,14 +16,12 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
     "headers": {
       "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case found",
-      "path": "/internal/cases/1234123412341238",
+      "message": "Not Found",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

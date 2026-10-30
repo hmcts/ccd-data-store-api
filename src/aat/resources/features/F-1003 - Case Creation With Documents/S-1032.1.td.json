@@ -11,11 +11,9 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "body": {
-      "exception": "jakarta.validation.ConstraintViolationException",
-      "message": "createCase.caseTypeId: Case Type Id is invalid",
-      "path" : "/case-types/BEFTA_%2526%255E%2524%25C2%25A3CASETYPE_2_1/cases",
+      "message": "Bad Request",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

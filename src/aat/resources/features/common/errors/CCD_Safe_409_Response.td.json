@@ -1,0 +1,15 @@
+{
+  "_guid_": "CCD_Safe_409_Response",
+  "responseCode": 409,
+  "responseMessage": "Conflict",
+  "headers": {
+    "_extends_": "Common_409_Response_Headers"
+  },
+  "body": {
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "status": 409,
+    "error": "Conflict",
+    "message": "Conflict",
+    "code": "REQUEST_FAILED"
+  }
+}

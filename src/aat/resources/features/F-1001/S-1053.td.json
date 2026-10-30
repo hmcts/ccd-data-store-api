@@ -23,11 +23,9 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
-      "message" : "Document ${[scenarioContext][testData][request][pathVariables][documentId]} is not found in the case : ${[scenarioContext][childContexts][S-1053-Case_Creation_Main][testData][actualResponse][body][id]}",
-      "path" : "/cases/${[scenarioContext][childContexts][S-1053-Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "message" : "Not Found",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

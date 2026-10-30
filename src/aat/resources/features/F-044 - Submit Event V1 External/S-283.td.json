@@ -26,15 +26,13 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_422_Response",
+		"_extends_": "CCD_Safe_422_Response",
 		"headers": {
 			"vary" : "accept-encoding"
 		},
 		"body" : {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
 			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Pre-state condition is not valid for case with state: TODO; and event trigger: STOP_PROGRESS",
-			"path" : "[[ANYTHING_PRESENT]]",
+			"message" : "Unprocessable Content",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

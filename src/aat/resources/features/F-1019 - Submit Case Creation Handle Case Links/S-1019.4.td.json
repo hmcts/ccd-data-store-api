@@ -36,12 +36,10 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "error" : "Unprocessable Entity",
       "message" : "Case data validation failed",
-      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
       "details" : {
         "field_errors": [
           {

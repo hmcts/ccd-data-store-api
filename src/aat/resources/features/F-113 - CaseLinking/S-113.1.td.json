@@ -18,7 +18,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
@@ -27,12 +27,10 @@
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
     },
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
       "status" : 422,
       "error" : "Unprocessable Entity",
       "message" : "Case data validation failed",
-      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
       "details" : {
         "field_errors" : [ {
           "id" : "CaseLinkField.CaseReference",

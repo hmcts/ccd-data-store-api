@@ -1,0 +1,15 @@
+{
+  "_guid_": "CCD_Safe_403_Response",
+  "responseCode": 403,
+  "responseMessage": "Forbidden",
+  "headers": {
+    "_extends_": "Common_403_Response_Headers"
+  },
+  "body": {
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "status": 403,
+    "error": "Forbidden",
+    "message": "Forbidden",
+    "code": "ACCESS_DENIED"
+  }
+}

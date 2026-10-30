@@ -38,13 +38,11 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ApiException",
       "status": 422,
       "error": "Unprocessable Entity",
-      "message": "Unable to proceed because there are one or more callback Errors or Warnings",
-      "path": "[[ANY_STRING_NOT_NULLABLE]]",
+      "message": "Unprocessable Content",
       "details": null,
       "callbackErrors": [
         "Simulated decentralised validation error"
