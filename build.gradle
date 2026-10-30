@@ -344,7 +344,7 @@ dependencies {
 
     // HMCTS
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.1.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
@@ -363,7 +363,7 @@ dependencies {
     implementation group: 'io.vavr', name: 'vavr', version: '0.11.0'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
-    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.7.0'
+    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.7.1'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.5'
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.4'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.1'
@@ -853,17 +853,20 @@ task smoke(type: JavaExec) {
         into "$buildDir/test-results/test"
     }
 
-    generateCucumberReports.enabled = true
+    generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
     args = ['--plugin', "json:${rootDir}/target/cucumber.json",
             '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
             '--tags', '@Smoke and not @Ignore',
             '--glue', 'uk.gov.hmcts.befta.player',
-            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 
+            'src/aat/resources/features'
+    ]
     jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
     finalizedBy {
+        generateCucumberReports.enabled = true
         generateCucumberReports {
             doLast{
                 delete "${rootDir}/BEFTA Report for Smoke Tests/"

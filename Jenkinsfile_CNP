@@ -107,6 +107,9 @@ env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
+env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
+
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
@@ -186,6 +189,15 @@ withPipeline(type, product, component) {
           reportFiles          : "index.html",
           reportName           : "Integration Test Report"
         ]
+    }
+
+    // Set IDAM_API_URL_BASE post high-level data setup where it would have been overridden
+    before('smoketest:preview') {
+        env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
+    }
+
+    before('smoketest:aat') {
+        env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
     }
 
     afterAlways('smoketest:preview') {
