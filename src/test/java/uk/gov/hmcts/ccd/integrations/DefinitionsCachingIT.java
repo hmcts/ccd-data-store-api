@@ -51,6 +51,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
+@DirtiesContext
 public class DefinitionsCachingIT {
 
     private static final String ID_1 = "case1";

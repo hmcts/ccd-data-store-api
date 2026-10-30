@@ -10,6 +10,14 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.assertj.core.api.Assertions;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.AfterAll;
@@ -187,6 +195,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
     private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
     private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
+    private static final String EXTERNAL_VERSIONING_INDEX = "external_versioning_test_cases";
+    private static final String EXTERNAL_VERSIONING_DOCUMENT_ID = "1234567890123456";
     private static final Long GLOBAL_DOCS_SIZE = 1000L;
 
     @Inject
@@ -234,7 +244,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             .withEnv("xpack.security.enabled", "false")
             .waitingFor(Wait.forHttp("/_cluster/health")
                 .forStatusCode(200)
-                .withStartupTimeout(Duration.ofMinutes(1)));
+                .withStartupTimeout(Duration.ofMinutes(3)));
 
         container.start();
         log.info("Elastic search {} started.", elasticVersion);
@@ -261,6 +271,89 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         stubSuccess(BUILDING_LOCATIONS_PATH, buildings, BUILDING_LOCATIONS_STUB_ID);
         stubSuccess(SERVICES_PATH, orgServices, SERVICES_STUB_ID);
+    }
+
+    @Test
+    void shouldRejectOlderExternalVersionAfterNewerVersionIsIndexed() throws IOException {
+        // Proves the Logstash ES write contract: external versioning rejects stale case versions.
+        createExternalVersioningIndex();
+
+        ElasticResponse newerVersion = putExternalVersionedDocument(2, "{\"case_version\":2,\"value\":\"latest\"}");
+        ElasticResponse olderVersion = putExternalVersionedDocument(1, "{\"case_version\":1,\"value\":\"stale\"}");
+        ElasticResponse storedDocument = getExternalVersionedDocument();
+
+        JsonNode stored = mapper.readTree(storedDocument.body());
+
+        Assertions.assertThat(newerVersion.status()).isIn(200, 201);
+        Assertions.assertThat(olderVersion.status()).isEqualTo(409);
+        Assertions.assertThat(storedDocument.status()).isEqualTo(200);
+        Assertions.assertThat(stored.path("_version").asInt()).isEqualTo(2);
+        Assertions.assertThat(stored.path("_source").path("value").asText()).isEqualTo("latest");
+        Assertions.assertThat(stored.path("_source").path("case_version").asInt()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldMigrateInternalVersionsToBigintExternalVersions() throws IOException {
+        createExternalVersioningIndex();
+        for (int i = 0; i < 50; i++) {
+            HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX + "/_doc/"
+                + EXTERNAL_VERSIONING_DOCUMENT_ID));
+            request.setEntity(new StringEntity("{\"value\":\"internal\"}",
+                org.apache.http.entity.ContentType.APPLICATION_JSON));
+            Assertions.assertThat(executeElasticRequest(request).status()).isIn(200, 201);
+        }
+        Assertions.assertThat(putExternalVersionedDocument(7, "{\"value\":\"unsafe\"}").status())
+            .isEqualTo(409);
+        Assertions.assertThat(putExternalVersionedDocument(10000000001L, "{\"value\":\"latest\"}").status())
+            .isEqualTo(200);
+        Assertions.assertThat(putExternalVersionedDocument(10000000000L, "{\"value\":\"stale\"}").status())
+            .isEqualTo(409);
+        JsonNode stored = mapper.readTree(getExternalVersionedDocument().body());
+        Assertions.assertThat(stored.path("_version").asLong()).isEqualTo(10000000001L);
+        Assertions.assertThat(stored.path("_source").path("value").asText()).isEqualTo("latest");
+    }
+
+    private static void createExternalVersioningIndex() {
+        executeElasticRequest(new HttpDelete(elasticUrl("/"
+            + EXTERNAL_VERSIONING_INDEX)));
+        HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX));
+
+        ElasticResponse response = executeElasticRequest(request);
+
+        Assertions.assertThat(response.status()).isIn(200, 201);
+    }
+
+    private static ElasticResponse putExternalVersionedDocument(long version, String json) {
+        HttpPut request = new HttpPut(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX + "/_doc/"
+            + EXTERNAL_VERSIONING_DOCUMENT_ID + "?version=" + version + "&version_type=external&refresh=true"));
+        request.setHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
+        request.setEntity(new StringEntity(json, org.apache.http.entity.ContentType.APPLICATION_JSON));
+
+        return executeElasticRequest(request);
+    }
+
+    private static ElasticResponse getExternalVersionedDocument() {
+        return executeElasticRequest(new HttpGet(elasticUrl("/" + EXTERNAL_VERSIONING_INDEX + "/_doc/"
+            + EXTERNAL_VERSIONING_DOCUMENT_ID)));
+    }
+
+    private static ElasticResponse executeElasticRequest(HttpRequestBase request) {
+        PortableHttpClient httpClient = new PortableHttpClient();
+        return httpClient.execute(request, response -> {
+            try {
+                String body = response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity());
+                return new ElasticResponse(response.getStatusLine().getStatusCode(), body);
+            } catch (IOException e) {
+                throw new PortableHttpClient.HttpRequestException(e);
+            }
+        });
+    }
+
+    private static String elasticUrl(String path) {
+        return "http://" + container.getHttpHostAddress() + path;
+    }
+
+    private record ElasticResponse(int status, String body) {
     }
 
     @Nested

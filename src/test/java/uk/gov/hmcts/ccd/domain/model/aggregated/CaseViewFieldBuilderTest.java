@@ -35,7 +35,6 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
@@ -48,12 +47,27 @@ public class CaseViewFieldBuilderTest {
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
-        .withUpdate(true).withDelete(false).build();
-    private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
-        .withUpdate(false).withDelete(true).build();
-    private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
-        .withUpdate(true).withDelete(false).build();
+    private static final AccessControlList acl1 = AccessControlList.builder()
+        .accessProfile("role1")
+        .create(true)
+        .read(true)
+        .update(true)
+        .delete(false)
+        .build();
+    private static final AccessControlList acl2 = AccessControlList.builder()
+        .accessProfile("role2")
+        .create(true)
+        .read(true)
+        .update(false)
+        .delete(true)
+        .build();
+    private static final AccessControlList acl3 = AccessControlList.builder()
+        .accessProfile("role3")
+        .create(false)
+        .read(false)
+        .update(true)
+        .delete(false)
+        .build();
     private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = aFieldType().withId("Text").withType("Text")
         .build();
     private static final CaseFieldDefinition CASE_FIELD = newCaseField()
@@ -340,12 +354,27 @@ public class CaseViewFieldBuilderTest {
         private final FieldTypeDefinition familyFieldTypeDefinition =
             aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyNames).withComplexField(members)
                 .withComplexField(address).build();
-        private final AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true)
-            .withUpdate(true).withDelete(false).build();
-        private final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true)
-            .withUpdate(false).withDelete(true).build();
-        private final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false)
-            .withUpdate(true).withDelete(false).build();
+        private final AccessControlList acl1 = AccessControlList.builder()
+            .accessProfile("role1")
+            .create(true)
+            .read(true)
+            .update(true)
+            .delete(false)
+            .build();
+        private final AccessControlList acl2 = AccessControlList.builder()
+            .accessProfile("role2")
+            .create(true)
+            .read(true)
+            .update(false)
+            .delete(true)
+            .build();
+        private final AccessControlList acl3 = AccessControlList.builder()
+            .accessProfile("role3")
+            .create(false)
+            .read(false)
+            .update(true)
+            .delete(false)
+            .build();
         private final CaseFieldDefinition family = newCaseField()
             .withId(FAMILY)
             .withFieldType(familyFieldTypeDefinition)
