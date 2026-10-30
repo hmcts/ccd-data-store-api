@@ -1,0 +1,10 @@
+{
+  "case_field_id": "Address",
+  "case_fields_complex": [
+    {
+      "reference": "Address.Line1",
+      "order": 1,
+      "display_context_parameter": "#TABLE(Line1, Line2)"
+    }
+  ]
+}
