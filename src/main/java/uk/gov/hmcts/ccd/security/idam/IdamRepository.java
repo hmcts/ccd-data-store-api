@@ -34,7 +34,7 @@ public class IdamRepository {
     @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
         try {
-            return idamClient.getUserInfo("Bearer " + jwtToken);
+            return withNonNullRoles(idamClient.getUserInfo("Bearer " + jwtToken));
         } catch (FeignException exception) {
             log.error("FeignException: retrieve user info: {} ", exception.getMessage());
 
@@ -44,6 +44,14 @@ public class IdamRepository {
                 throw new ServiceException(exception.getMessage(), exception);
             }
         }
+    }
+
+    private UserInfo withNonNullRoles(UserInfo userInfo) {
+        if (userInfo != null && userInfo.getRoles() == null) {
+            return new UserInfo(userInfo.getSub(), userInfo.getUid(), userInfo.getName(),
+                userInfo.getGivenName(), userInfo.getFamilyName(), List.of());
+        }
+        return userInfo;
     }
 
     private boolean isClientError(FeignException exception) {

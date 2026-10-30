@@ -96,4 +96,18 @@ class JwtGrantedAuthoritiesConverterTest {
         assertNotNull(authorities);
         assertEquals(1, authorities.size());
     }
+
+    @Test
+    @DisplayName("Should return empty authorities when user info has empty roles")
+    void shouldReturnEmptyAuthoritiesWhenUserInfoHasEmptyRoles() {
+        Jwt jwt = Mockito.mock(Jwt.class);
+        when(jwt.hasClaim(anyString())).thenReturn(true);
+        when(jwt.getClaim(anyString())).thenReturn("access_token");
+        when(jwt.getTokenValue()).thenReturn("access_token");
+        UserInfo userInfo = UserInfo.builder().roles(List.of()).build();
+        when(idamRepository.getUserInfo(anyString())).thenReturn(userInfo);
+        Collection<GrantedAuthority> authorities = converter.convert(jwt);
+        assertNotNull(authorities);
+        assertEquals(0, authorities.size());
+    }
 }

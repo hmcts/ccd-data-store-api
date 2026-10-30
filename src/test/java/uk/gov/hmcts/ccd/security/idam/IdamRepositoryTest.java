@@ -50,10 +50,33 @@ class IdamRepositoryTest {
     @Test
     @DisplayName("Get user info if token is passed")
     void shouldGetUserInfo() {
-        UserInfo userInfo = UserInfo.builder().build();
+        UserInfo userInfo = UserInfo.builder().roles(ROLES).build();
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
         UserInfo result = idamRepository.getUserInfo(TEST_USER_TOKEN);
         assertThat(result).isSameAs(userInfo);
+    }
+
+    @Test
+    @DisplayName("Get user info with empty roles when IDAM omits roles")
+    void shouldGetUserInfoWithEmptyRolesWhenRolesMissing() {
+        UserInfo userInfo = UserInfo.builder()
+            .sub("user@example.com")
+            .uid(USER_ID)
+            .name("Test User")
+            .givenName("Test")
+            .familyName("User")
+            .roles(null)
+            .build();
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
+
+        UserInfo result = idamRepository.getUserInfo(TEST_USER_TOKEN);
+
+        assertThat(result.getRoles()).isNotNull().isEmpty();
+        assertThat(result.getSub()).isEqualTo("user@example.com");
+        assertThat(result.getUid()).isEqualTo(USER_ID);
+        assertThat(result.getName()).isEqualTo("Test User");
+        assertThat(result.getGivenName()).isEqualTo("Test");
+        assertThat(result.getFamilyName()).isEqualTo("User");
     }
 
     @Test
