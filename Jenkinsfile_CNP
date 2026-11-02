@@ -111,6 +111,7 @@ env.OIDC_ALLOWED_ISSUERS = "https://idam-web-public.aat.platform.hmcts.net/o,htt
 env.VERIFY_OIDC_ISSUER = "true"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
+env.CCD_API_GATEWAY_OAUTH2_SCOPE = env.OAUTH2_SCOPE_VARIABLES
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"

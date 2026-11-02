@@ -104,6 +104,7 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
+env.CCD_API_GATEWAY_OAUTH2_SCOPE = env.OAUTH2_SCOPE_VARIABLES
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
