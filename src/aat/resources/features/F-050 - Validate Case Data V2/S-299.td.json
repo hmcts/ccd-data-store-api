@@ -26,7 +26,6 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
-			"message": "Forbidden"
 		}
 	}
 }

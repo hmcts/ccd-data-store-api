@@ -22,9 +22,6 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"status": 400,
-			"error": "Bad Request",
 			"message": "Case reference is not valid",
 			"details": null,
 			"callbackErrors": null,

@@ -33,7 +33,6 @@
         "Transfer-Encoding" : "chunked"
       },
     "body" : {
-      "message": "Not Found",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

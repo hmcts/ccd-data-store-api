@@ -21,7 +21,6 @@
       "Content-Encoding": "gzip"
     },
     "body": {
-      "message": "Not Found",
       "details": "Unable to find the case type, please try a search or return to the case list overview page.",
       "callbackErrors": null,
       "callbackWarnings": null

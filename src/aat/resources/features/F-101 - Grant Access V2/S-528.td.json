@@ -31,9 +31,6 @@
 			"Content-Type": "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"status" : 400,
-			"error" : "Bad Request",
 			"message" : "Case ID is not valid",
 			"details" : null,
 			"callbackErrors" : null,

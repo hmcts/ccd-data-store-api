@@ -22,7 +22,6 @@
       "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
-      "message": "Not Found",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

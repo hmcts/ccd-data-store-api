@@ -33,8 +33,6 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Bad Request",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

@@ -18,7 +18,6 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_412_Response",
 		"body": {
-			"message": "Precondition Failed"
 		}
 	}
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -85,7 +86,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
 
     private CaseDetails getCaseDetails(String caseReference) {
         if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+            throw new BadRequestException(ValidationMessages.CASE_REFERENCE_INVALID);
         }
 
         return caseDetailsRepository.findByReference(caseReference).orElseThrow(

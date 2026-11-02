@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
@@ -482,7 +483,7 @@ public class CreateCaseEventService {
 
     private CaseDetails getCaseDetails(final String caseReference, boolean refresh) {
         if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+            throw new BadRequestException(ValidationMessages.CASE_REFERENCE_INVALID);
         }
         return caseDetailsRepository.findByReference(caseReference, refresh)
             .orElseThrow(() ->

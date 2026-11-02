@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
@@ -217,11 +218,11 @@ public class UIDefinitionController {
     )
     @ApiResponse(
         responseCode = "400",
-        description = "Access can only be 'create', 'read' or 'update'"
+        description = ValidationMessages.ACCESS_INVALID
     )
     public ResponseEntity<JurisdictionViewResource> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
-            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+            throw new BadRequestException(ValidationMessages.ACCESS_INVALID);
         }
         JurisdictionDisplayProperties[] jurisdictions =
             getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();

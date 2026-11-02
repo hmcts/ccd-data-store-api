@@ -20,7 +20,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "message" : "Forbidden",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

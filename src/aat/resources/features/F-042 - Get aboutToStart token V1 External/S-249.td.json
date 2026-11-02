@@ -27,7 +27,6 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"error": "Unprocessable Entity",
 			"message": "The case status did not qualify for the event",
 			"details": null
 		}

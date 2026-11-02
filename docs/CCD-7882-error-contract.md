@@ -11,15 +11,14 @@ additional troubleshooting. Dependency and health diagnostics retain their origi
 and respect the source logger threshold. Support must not need to enable DEBUG and reproduce
 an incident to obtain its original failure details.
 
-This policy supersedes the DEBUG-only descriptions and test expectations in earlier verification
-entries below. Those entries describe historical checks. Deployment acceptance still requires
+Deployment acceptance requires
 administrator-only log access, suitable retention and verification of logging/Application Insights
 collection. Local tests do not establish those infrastructure controls.
 
 
 Branch `CCD-7882_Verbose_Error_Messages` was created from local `master` on 20 October 2026.
 
-HttpError serialisation omits exception class and request path, uses standard status descriptions and a stable category code, and refuses Throwable details. Constraint violations no longer return exception causes. Explicit field-validation details and callback errors/warnings remain. SQL errors retain errorMessage with generic text and add code. Edited advice handlers emit fixed category/status summaries at normal levels. Original exceptions and explicit exception telemetry are emitted only when that handler logger has DEBUG enabled; third-party/agent instrumentation still needs environment verification.
+HttpError serialisation omits exception class and request path, uses standard status descriptions and a stable category code, and refuses Throwable details. Constraint violations no longer return exception causes. Explicit field-validation details and callback errors/warnings remain. SQL errors retain errorMessage with generic text and add code. Edited advice handlers emit fixed category/status summaries at normal levels. Original exceptions are logged at WARN/ERROR. Explicit SDK exception telemetry is opt-in; third-party/agent instrumentation still needs environment verification.
 
 Spring Boot JSON fallback omits exception, message, trace, binding errors and reflected paths even when requested through query parameters. HTML fallback uses a fixed generic page. Health status remains available; component diagnostics are hidden.
 
@@ -35,7 +34,7 @@ These are local source/test results. Deployed BEFTA/ITHC, ingress/upstream error
 
 ## Review fixes
 
-57 focused error-contract/fallback/logging tests passed; main/test Checkstyle passed. The INFO regression asserts no raw exception event or explicit exception telemetry, and DEBUG regressions preserve diagnostic collection. This policy covers the edited advice handlers, not every dependency logger.
+57 focused error-contract/fallback/logging tests passed; main/test Checkstyle passed. Current INFO and DEBUG regressions retain diagnostic exceptions. Explicit SDK telemetry is disabled by default to avoid duplicating agent collection. This policy covers the edited advice handlers, not every dependency logger.
 
 ## Authoritative remediation and support requirement
 
@@ -47,12 +46,10 @@ still log the detailed information, but access to the log will be restricted to 
 An event reference is optional. It does not prescribe DEBUG-only logging or require support
 to restart a service to obtain diagnostics.
 
-Response sanitisation and administrator diagnostics are separate requirements. DEBUG-only
-implementation details described elsewhere in this note record the implementation, not an
-acceptance criterion from the finding. If production DEBUG is disabled and no other approved
-mechanism records the detailed failure, that is a support/acceptance gap: enabling DEBUG after
-an incident cannot recover its missing diagnostics. A safe category/status summary alone does
-not satisfy the detailed-log requirement.
+Response sanitisation and administrator diagnostics are separate requirements. A safe
+category/status summary alone does not satisfy the detailed-log requirement. Detailed
+failures must remain available at normal log levels; enabling DEBUG after an incident
+cannot recover missing diagnostics.
 
 Before release, verify that detailed failures are recorded and accessible only to administrators,
 including the deployed logging/Application Insights configuration, while public responses stay

@@ -21,7 +21,6 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
 			"message" : "The case status did not qualify for the event",
 			"details" : null,
 			"callbackErrors" : null,

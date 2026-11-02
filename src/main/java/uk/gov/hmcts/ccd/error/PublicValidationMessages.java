@@ -10,22 +10,22 @@ import java.util.Set;
 /** Explicitly reviewed public messages; dynamic exception diagnostics remain private. */
 public final class PublicValidationMessages {
     private static final Set<String> BAD_REQUEST_MESSAGES = Set.of(
-        "Case reference is not valid",
-        "Case ID is not valid",
-        "Case Type Id is not valid",
-        "Missing start trigger token",
-        "Start trigger token has expired. Please restart the event.",
-        "Access can only be 'create', 'read' or 'update'",
-        "Sort order field is invalid.",
-        "003 Wrong CaseVersion",
-        "002 Invalid categoryId"
+        ValidationMessages.CASE_REFERENCE_INVALID,
+        ValidationMessages.CASE_ID_INVALID,
+        ValidationMessages.CASE_TYPE_INVALID,
+        ValidationMessages.START_TRIGGER_TOKEN_MISSING,
+        ValidationMessages.START_TRIGGER_TOKEN_EXPIRED,
+        ValidationMessages.ACCESS_INVALID,
+        ValidationMessages.SORT_ORDER_INVALID,
+        ValidationMessages.CASE_VERSION_INVALID,
+        ValidationMessages.CATEGORY_ID_INVALID
     );
     private static final Set<String> VALIDATION_MESSAGES = Set.of(
         EventValidator.EVENT_NOT_SPECIFIED,
         EventValidator.SUMMARY_TOO_LONG,
         EventValidator.DESCRIPTION_TOO_LONG,
-        "The case status did not qualify for the event",
-        "Case data validation failed"
+        ValidationMessages.EVENT_STATE_INVALID,
+        ValidationMessages.CASE_DATA_INVALID
     );
 
     private PublicValidationMessages() {

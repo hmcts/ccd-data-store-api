@@ -22,7 +22,7 @@
       "Content-Encoding": "gzip"
     },
     "body": {
-      "message": "Bad Request",
+      "message": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

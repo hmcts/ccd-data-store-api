@@ -18,7 +18,6 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_404_Response",
 		"body" : {
-			"message" : "Not Found",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

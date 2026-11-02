@@ -40,9 +40,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_422_Response",
     "body": {
-      "status": 422,
-      "error": "Unprocessable Entity",
-      "message": "Unprocessable Content",
       "details": null,
       "callbackErrors": [
         "Simulated decentralised validation error"

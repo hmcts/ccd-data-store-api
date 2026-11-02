@@ -39,10 +39,6 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 400,
-      "error" : "Bad Request",
-      "message" : "Bad Request",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

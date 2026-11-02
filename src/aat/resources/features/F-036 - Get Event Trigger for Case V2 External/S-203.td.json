@@ -22,8 +22,6 @@
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Not Found",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

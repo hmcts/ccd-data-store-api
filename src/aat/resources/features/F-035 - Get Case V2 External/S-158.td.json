@@ -21,7 +21,6 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"message": "Not Found",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

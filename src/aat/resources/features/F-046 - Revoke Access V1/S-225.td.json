@@ -27,8 +27,6 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Forbidden"
 		}
 	}
 }

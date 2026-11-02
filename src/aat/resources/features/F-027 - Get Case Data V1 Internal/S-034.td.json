@@ -22,7 +22,6 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body" : {
-			"message" : "Forbidden"
 		}
 	}
 }

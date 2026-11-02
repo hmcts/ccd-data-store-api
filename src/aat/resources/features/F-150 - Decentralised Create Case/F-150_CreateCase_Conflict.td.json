@@ -38,9 +38,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_409_Response",
     "body": {
-      "status": 409,
-      "error": "Conflict",
-      "message": "Conflict",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null,

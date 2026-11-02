@@ -95,9 +95,6 @@
     },
     "body": {
       "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
-      "message" : "Unprocessable Content",
       "details" : "Unable to process field DateField with value 23-01. Expected format to be either dd or yyyy-MM-dd",
       "callbackErrors" : null,
       "callbackWarnings" : null

@@ -32,9 +32,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_400_Response",
     "body" : {
-      "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 400,
-      "error" : "Bad Request",
       "message" : "Input not valid",
       "details" : [ "Sort direction invalid" ],
       "callbackErrors" : null,

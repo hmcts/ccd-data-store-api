@@ -38,7 +38,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_422_Response",
     "body": {
-      "error" : "Unprocessable Entity",
       "message" : "Case data validation failed",
       "details" : {
         "field_errors": [

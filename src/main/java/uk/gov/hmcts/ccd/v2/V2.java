@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2;
 
+import uk.gov.hmcts.ccd.error.ValidationMessages;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -89,7 +91,7 @@ public final class V2 {
         public static final String EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE =
             "Event trigger is not known for given case type";
         public static final String EVENT_TRIGGER_HAS_PRE_STATE = "Event trigger has pre state defined";
-        public static final String CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_ID_INVALID = ValidationMessages.CASE_ID_INVALID;
         public static final String CASE_ALTERED = "Case altered outside of transaction";
         public static final String CASE_ROLE_REQUIRED = "Case role missing";
         public static final String CASE_ROLE_INVALID = "Case role does not exist";
@@ -101,7 +103,7 @@ public final class V2 {
         public static final String CASE_AUDIT_EVENTS_NOT_FOUND = "Case audit events not found";
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
-        public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String ERROR_CASE_ID_INVALID = ValidationMessages.CASE_ID_INVALID;
         public static final String CASE_DOCUMENT_NOT_FOUND = "Case document not found";
         public static final String CASE_DOCUMENT_ID_INVALID = "Case document Id is not valid";
         public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
@@ -125,7 +127,7 @@ public final class V2 {
         public static final String AUTHENTICATION_TOKEN_INVALID =
             "Authentication failure due to invalid / expired tokens (IDAM / S2S).";
         public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
-        public static final String CASE_TYPE_INVALID = "Case Type Id is not valid";
+        public static final String CASE_TYPE_INVALID = ValidationMessages.CASE_TYPE_INVALID;
         public static final String DATE_STRING_INVALID = "Invalid date sent to search case query ";
         public static final String PARAM_NOT_NUM = "Parameter is not numeric";
     }

@@ -22,8 +22,6 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_403_Response",
 		"body": {
-			"timestamp": "[[ANYTHING_PRESENT]]",
-			"message": "Forbidden"
 		}
 	}
 }

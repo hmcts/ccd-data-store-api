@@ -28,8 +28,6 @@
     },
     "body" : {
       "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
       "message" : "Case data validation failed",
       "details" : {
         "field_errors" : [ {

@@ -30,7 +30,6 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "message": "Not Found",
       "details": null,
       "callbackErrors" : null,
       "callbackWarnings" : null

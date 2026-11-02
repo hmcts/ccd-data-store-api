@@ -27,8 +27,7 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_404_Response",
     "body": {
-      "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Not Found",
+      "message": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

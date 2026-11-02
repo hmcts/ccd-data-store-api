@@ -94,7 +94,7 @@ class SafeAuthenticationErrorsTest {
     }
 
     @Test
-    void logsSafeAuthenticationCodesWithDiagnosticsOnlyAtDebug() {
+    void logsSafeAuthenticationCodesWithDiagnosticsAtInfoAndDebug() {
         Logger logger = (Logger) LoggerFactory.getLogger(SafeAuthenticationErrors.class);
         Level previousLevel = logger.getLevel();
         ListAppender<ILoggingEvent> appender = new ListAppender<>();

@@ -22,7 +22,6 @@
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
 			"message" : "Case ID is not valid",
 			"details" : null,
 			"callbackErrors" : null,

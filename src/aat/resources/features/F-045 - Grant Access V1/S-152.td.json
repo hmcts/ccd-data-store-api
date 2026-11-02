@@ -23,7 +23,7 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"message": "Not Found",
+			"message": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

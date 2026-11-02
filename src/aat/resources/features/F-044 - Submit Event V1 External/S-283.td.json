@@ -31,8 +31,6 @@
 			"vary" : "accept-encoding"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Unprocessable Content",
 			"details" : null,
 			"callbackErrors" : null,
 			"callbackWarnings" : null

@@ -34,10 +34,7 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_422_Response",
     "body" : {
-      "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
-      "message" : "Unprocessable Content",
+      "message" : "[[ANYTHING_PRESENT]]",
       "details" : "[[ANYTHING_PRESENT]]",
       "callbackErrors" : null,
       "callbackWarnings" : null

@@ -26,7 +26,6 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Case data validation failed",
       "details": {
         "field_errors": [
