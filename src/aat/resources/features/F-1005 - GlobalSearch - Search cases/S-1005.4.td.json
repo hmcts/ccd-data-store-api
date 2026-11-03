@@ -33,9 +33,7 @@
     "_extends_": "CCD_Safe_400_Response",
     "body" : {
       "message" : "Input not valid",
-      "details" : [ "Sort direction invalid" ],
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "details" : [ "Sort direction invalid" ]
     }
   }
 }

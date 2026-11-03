@@ -31,9 +31,6 @@
 			"vary" : "accept-encoding"
 		},
 		"body" : {
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
 		}
 	}
 }

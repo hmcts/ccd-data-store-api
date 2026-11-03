@@ -18,10 +18,7 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_400_Response",
 		"body" : {
-			"message" : "Case reference is not valid",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
+			"message" : "Case reference is not valid"
 		}
 	}
 }

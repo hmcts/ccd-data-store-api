@@ -29,9 +29,7 @@
     "_extends_": "CCD_Safe_422_Response",
     "body" : {
       "message" : "[[ANYTHING_PRESENT]]",
-      "details" : "[[ANYTHING_PRESENT]]",
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "details" : "[[ANYTHING_PRESENT]]"
     }
   }
 }

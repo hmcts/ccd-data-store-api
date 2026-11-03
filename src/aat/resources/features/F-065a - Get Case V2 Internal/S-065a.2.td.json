@@ -22,9 +22,6 @@
       "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }

@@ -34,9 +34,7 @@
           "id" : "CaseLinkField.CaseReference",
           "message" : "5555104840597777 does not correspond to an existing CCD case."
         } ]
-      },
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      }
     }
   }
 }

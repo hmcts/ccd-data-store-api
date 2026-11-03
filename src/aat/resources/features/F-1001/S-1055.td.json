@@ -24,9 +24,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_400_Response",
     "body" : {
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
     }
   }
 }

@@ -26,9 +26,7 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "details": "Unable to find the case type, please try a search or return to the case list overview page."
     }
 	}
 }

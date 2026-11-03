@@ -18,8 +18,7 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_422_Response",
 		"body": {
-			"message": "The case status did not qualify for the event",
-			"details": null
+			"message": "The case status did not qualify for the event"
 		}
 	}
 }

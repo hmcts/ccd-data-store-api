@@ -22,9 +22,6 @@
       "Content-Encoding": "gzip"
     },
     "body": {
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }

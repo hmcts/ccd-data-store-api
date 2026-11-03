@@ -33,9 +33,6 @@
         "Transfer-Encoding" : "chunked"
       },
     "body" : {
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
     }
 
   }

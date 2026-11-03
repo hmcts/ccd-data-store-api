@@ -34,9 +34,7 @@
             "message": "abc is not a number"
           }
         ]
-      },
-      "callbackErrors": null,
-      "callbackWarnings": null
+      }
     }
   }
 }

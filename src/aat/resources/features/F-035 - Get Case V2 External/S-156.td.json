@@ -21,10 +21,7 @@
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"message": "[[ANYTHING_PRESENT]]",
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
+			"message": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }

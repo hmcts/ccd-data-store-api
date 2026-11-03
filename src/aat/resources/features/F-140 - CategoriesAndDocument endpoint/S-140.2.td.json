@@ -30,9 +30,6 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "details": null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
     }
 	}
 }

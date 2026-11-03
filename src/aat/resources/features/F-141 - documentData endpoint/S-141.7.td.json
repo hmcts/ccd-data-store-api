@@ -39,9 +39,7 @@
       "Strict-Transport-Security": "[[ANY_NULLABLE]]"
     },
     "body" : {
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "message": "003 Wrong CaseVersion"
     }
   }
 }

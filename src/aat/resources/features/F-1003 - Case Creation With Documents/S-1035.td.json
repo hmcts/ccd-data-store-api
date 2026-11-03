@@ -20,9 +20,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_403_Response",
     "body": {
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.exceptions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -14,6 +15,8 @@ import feign.Request;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -21,6 +24,9 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -124,6 +130,27 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
         logger.setLevel(originalLevel);
         listAppender.stop();
         logger.detachAppender(listAppender);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {400, 404})
+    void frameworkErrorsUseSanitisedHttpErrorInsteadOfProblemDetail(int statusCode) throws Exception {
+        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+        RestExceptionHandler handler = new RestExceptionHandler(appInsights, false);
+        var response = handler.handleExceptionInternal(new Exception("PRIVATE_DIAGNOSTIC"),
+            ProblemDetail.forStatusAndDetail(httpStatus, "PRIVATE_DIAGNOSTIC"), new HttpHeaders(), httpStatus,
+            new ServletWebRequest(new MockHttpServletRequest()));
+        var json = new ObjectMapper().findAndRegisterModules().valueToTree(response.getBody());
+
+        assertThat(response.getStatusCode().value(), is(statusCode));
+        assertThat(json.get("message").asText(), is(httpStatus.getReasonPhrase()));
+        assertThat(json.get("code").asText(), is(statusCode == 400 ? "INVALID_REQUEST" : "RESOURCE_NOT_FOUND"));
+        assertThat(json.has("callbackErrors") && json.get("callbackErrors").isNull(), is(true));
+        assertThat(json.has("callbackWarnings") && json.get("callbackWarnings").isNull(), is(true));
+        for (String field : List.of("type", "title", "detail", "instance", "exception", "path")) {
+            assertThat(json.has(field), is(false));
+        }
+        assertThat(json.toString(), not(containsString("PRIVATE_DIAGNOSTIC")));
     }
 
     @Test

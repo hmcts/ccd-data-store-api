@@ -28,9 +28,6 @@
 			"Content-Type": "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
 		}
 	}
 }

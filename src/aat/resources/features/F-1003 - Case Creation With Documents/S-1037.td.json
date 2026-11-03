@@ -31,9 +31,7 @@
           "id" : "DocumentField1",
           "message" : "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary does not match Document Management domain or expected URL path"
         } ]
-      },
-      "callbackErrors": null,
-      "callbackWarnings": null
+      }
     }
   }
 }

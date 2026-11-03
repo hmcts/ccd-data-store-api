@@ -16,10 +16,7 @@
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"message" : "The case status did not qualify for the event",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
+			"message" : "The case status did not qualify for the event"
 		}
 	}
 }

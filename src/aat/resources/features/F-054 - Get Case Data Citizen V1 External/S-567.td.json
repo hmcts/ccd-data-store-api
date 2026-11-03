@@ -21,10 +21,7 @@
 			"Connection" : "close"
 		},
 		"body" : {
-			"message" : "Case reference is not valid",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
+			"message" : "Case reference is not valid"
 		}
 	}
 }

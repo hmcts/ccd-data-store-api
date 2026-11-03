@@ -17,10 +17,7 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_400_Response",
     "body": {
-      "message": "Case Type Id is not valid",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "message": "Case Type Id is not valid"
     }
   }
 }

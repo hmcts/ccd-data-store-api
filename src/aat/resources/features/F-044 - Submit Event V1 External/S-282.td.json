@@ -22,9 +22,6 @@
 	"expectedResponse": {
 		"_extends_": "CCD_Safe_409_Response",
 		"body": {
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
 		}
 	}
 }

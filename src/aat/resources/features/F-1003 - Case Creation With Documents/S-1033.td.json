@@ -18,9 +18,6 @@
       "Content-Type" : "application/json"
     },
     "body": {
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }

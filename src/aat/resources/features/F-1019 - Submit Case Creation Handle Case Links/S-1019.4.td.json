@@ -46,9 +46,7 @@
             "message" : "number is not a string"
           }
         ]
-      },
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      }
     }
   }
 }

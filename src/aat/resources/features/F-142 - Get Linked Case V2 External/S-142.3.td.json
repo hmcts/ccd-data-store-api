@@ -27,9 +27,6 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_404_Response",
     "body": {
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }
