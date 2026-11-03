@@ -10,6 +10,9 @@
     "status": 412,
     "error": "Precondition Failed",
     "message": "Precondition Failed",
-    "code": "REQUEST_FAILED"
+    "code": "REQUEST_FAILED",
+    "details": null,
+    "callbackErrors": null,
+    "callbackWarnings": null
   }
 }

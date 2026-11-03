@@ -10,6 +10,9 @@
     "status": 403,
     "error": "Forbidden",
     "message": "Forbidden",
-    "code": "ACCESS_DENIED"
+    "code": "ACCESS_DENIED",
+    "details": null,
+    "callbackErrors": null,
+    "callbackWarnings": null
   }
 }
