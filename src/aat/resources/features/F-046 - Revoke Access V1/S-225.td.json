@@ -18,7 +18,7 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "CCD_Safe_403_Response",
+		"_extends_": "CCD_Safe_403_Fallback_Response",
 		"headers": {
 			"Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
 			"Date" : "[[ANYTHING_PRESENT]]",

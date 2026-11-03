@@ -18,7 +18,7 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "CCD_Safe_403_Response",
+		"_extends_": "CCD_Safe_403_Fallback_Response",
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Content-Encoding" : "gzip"

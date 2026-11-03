@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd;
 
 import jakarta.servlet.RequestDispatcher;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
@@ -18,8 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ErrorPageConfigurationTest {
 
-    @Test
-    void fallbackOmitsDiagnosticsEvenWhenRequested() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {403, 500})
+    void fallbackOmitsDiagnosticsEvenWhenRequested(int status) throws Exception {
 
         ErrorProperties properties = new Binder(new MapConfigurationPropertySource(
             PropertiesLoaderUtils.loadProperties(new ClassPathResource("application.properties"))))
@@ -27,7 +30,7 @@ class ErrorPageConfigurationTest {
         final BasicErrorController controller = new BasicErrorController(
             new ErrorPageConfiguration().safeErrorAttributes(), properties);
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, 500);
+        request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, status);
         request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, "/private/case-123");
         request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, new RuntimeException("internal diagnostic"));
         request.setAttribute(RequestDispatcher.ERROR_MESSAGE, "internal diagnostic");
@@ -35,8 +38,8 @@ class ErrorPageConfigurationTest {
         request.setParameter("message", "true");
         request.setParameter("errors", "true");
         assertThat(controller.error(request).getBody())
-            .doesNotContainKeys("exception", "trace", "message", "errors", "path");
-        assertThat(controller.error(request).getStatusCode().value()).isEqualTo(500);
+            .doesNotContainKeys("exception", "trace", "message", "errors", "path", "code");
+        assertThat(controller.error(request).getStatusCode().value()).isEqualTo(status);
     }
 
     @Test
