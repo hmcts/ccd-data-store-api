@@ -10,8 +10,7 @@
   ],
 
   "user": {
-    "username": "auto.test.cnp_invalid@gmail.com",
-    "password": "Pa55word12_wrong",
+    "_extends_": "InvalidUser",
     "token": "fakeToken",
     "id": "dummyval"
   },
