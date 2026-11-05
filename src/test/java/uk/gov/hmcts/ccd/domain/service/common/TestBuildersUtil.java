@@ -1601,6 +1601,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseTypeTabFieldBuilder withCaseFieldSubfieldCode(final String caseFieldSubfieldCode) {
+            caseTypeTabField.setCaseFieldSubfieldCode(caseFieldSubfieldCode);
+            return this;
+        }
+
     }
 
     public static class CaseTypeTabBuilder {
