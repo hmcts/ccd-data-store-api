@@ -13,6 +13,10 @@ import org.springframework.web.servlet.view.BeanNameViewResolver;
 
 import java.util.Map;
 
+/**
+ * Sanitises Spring Boot fallback errors that bypass RestExceptionHandler, such as filter sendError calls.
+ * Removes diagnostics from JSON responses and supplies a generic HTML error page for CCD-7882.
+ */
 @Configuration
 public class ErrorPageConfiguration {
 

@@ -101,6 +101,7 @@ public class SecurityConfiguration {
     @Bean
     @Profile("!SECURITY_MOCK")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // CCD-7882: resource-server failures bypass controller advice; sanitise their Bearer challenges here.
         SafeAuthenticationErrors safeErrors = new SafeAuthenticationErrors();
         http
             .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
@@ -129,9 +130,9 @@ public class SecurityConfiguration {
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> multiIssuerValidation = 
+        OAuth2TokenValidator<Jwt> multiIssuerValidation =
             new MultiIssuerValidator(idamSecurityConfig.getAllowedIssuers());
-        OAuth2TokenValidator<Jwt> validator = 
+        OAuth2TokenValidator<Jwt> validator =
             new DelegatingOAuth2TokenValidator<>(withTimestamp, multiIssuerValidation);
 
         jwtDecoder.setJwtValidator(validator);
