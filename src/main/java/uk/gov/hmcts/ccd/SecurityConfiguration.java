@@ -41,6 +41,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSecurity
+@Profile("!SECURITY_MOCK")
 public class SecurityConfiguration {
 
     private final String configuredAllowedIssuers;
