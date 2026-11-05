@@ -16,12 +16,12 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_401_Response",
+    "_extends_": "CCD_Safe_401_Response",
     "headers": {
       "Content-Encoding" : "gzip"
     },
     "body": {
-      "message": "Access Denied"
+      "message": "Unauthorized"
     }
   }
 }

@@ -16,14 +16,8 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"body": {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"error" : "Not Found",
-			 "message" : "Error when getting case type version. Unknown case type 'non-existing case type ID'.",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
 		}
 	}
 }

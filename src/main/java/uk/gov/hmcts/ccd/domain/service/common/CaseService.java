@@ -7,6 +7,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -101,7 +102,7 @@ public class CaseService {
 
     public CaseDetails getCaseDetails(String jurisdictionId, String caseReference) {
         if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+            throw new BadRequestException(ValidationMessages.CASE_REFERENCE_INVALID);
         }
         final Optional<CaseDetails> caseDetails =
             caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));

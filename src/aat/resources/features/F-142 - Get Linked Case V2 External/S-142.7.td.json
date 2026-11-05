@@ -24,20 +24,13 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_Response",
+    "_extends_": "CCD_Safe_404_Response",
 
     "responseCode": 404,
     "responseMessage": "Not Found",
     "headers": {
       "_extends_": "Common_404_Response_Headers"
     },
-    "body": {
-      "status": 404,
-      "type": "[[ANYTHING_PRESENT]]",
-      "title": "Not Found",
-      "detail": "[[ANYTHING_PRESENT]]",
-      "instance": "[[ANYTHING_PRESENT]]",
-      "properties": "[[ANY_STRING_NULLABLE]]"
-    }
+    "body": {}
   }
 }

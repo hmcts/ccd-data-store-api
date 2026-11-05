@@ -27,7 +27,6 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -161,9 +160,9 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
-        String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":" +
-            "\"No draft found ( draft reference = '7578590391163133' )\""));
+        JsonNode actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString());
+        assertEquals("Not Found", actualResponse.get("message").asText());
+        assertEquals("RESOURCE_NOT_FOUND", actualResponse.get("code").asText());
     }
 
     @Test
@@ -298,9 +297,9 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
-        String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":" +
-            "\"No draft found ( draft reference = '7578590391163133' )\""));
+        JsonNode actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString());
+        assertEquals("Not Found", actualResponse.get("message").asText());
+        assertEquals("RESOURCE_NOT_FOUND", actualResponse.get("code").asText());
     }
 
     @Test

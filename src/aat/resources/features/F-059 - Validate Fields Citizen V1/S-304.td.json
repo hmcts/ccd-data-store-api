@@ -18,13 +18,12 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     },
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "message": "Case data validation failed",
       "details": {
         "field_errors": [

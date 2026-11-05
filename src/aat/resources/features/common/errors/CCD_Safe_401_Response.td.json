@@ -1,0 +1,13 @@
+{
+  "_guid_": "CCD_Safe_401_Response",
+  "responseCode": 401,
+  "responseMessage": "Unauthorized",
+  "headers": {
+    "_extends_": "Common_401_Response_Headers"
+  },
+  "body": {
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "status": 401,
+    "error": "Unauthorized"
+  }
+}

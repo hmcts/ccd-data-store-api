@@ -6,10 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import uk.gov.hmcts.ccd.error.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,7 +28,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,22 +36,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     private final AppInsights appInsights;
+    private final boolean explicitExceptionTelemetry;
 
     @Autowired
-    public RestExceptionHandler(AppInsights appInsights) {
+    public RestExceptionHandler(AppInsights appInsights,
+                                @Value("${ccd.errors.explicit-telemetry-enabled:false}")
+                                boolean explicitExceptionTelemetry) {
         this.appInsights = appInsights;
+        this.explicitExceptionTelemetry = explicitExceptionTelemetry;
     }
 
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request,
                                                         final ApiException exception) {
-        LOG.error(exception.getMessage(), exception);
-        appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
             .withDetails(exception.getDetails())
             .withCallbackErrors(exception.getCallbackErrors())
             .withCallbackWarnings(exception.getCallbackWarnings());
+        logFailure(exception, error.getStatus(), false);
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
@@ -59,9 +63,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadSearchRequest.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleSearchRequestException(HttpServletRequest request, Exception exception) {
-        LOG.warn(exception.getMessage(), exception);
-        appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
+        logFailure(exception, error.getStatus(), true);
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
@@ -76,11 +79,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, String> customProperties = new HashMap<>();
         customProperties.put("CaseValidationError field IDs", StringUtils.join(exception.getFields(), ", "));
 
-        LOG.warn("{}: The following list of fields are in an invalid state: {}", exception.getMessage(),
-            exception.getFields(), exception);
-        appInsights.trackException(exception, customProperties, SeverityLevel.Warning);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
             .withDetails(exception.getDetails());
+        logFailure(exception, error.getStatus(), true, customProperties);
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
@@ -89,24 +90,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SQLException.class)
     @ResponseBody
     public ResponseEntity<Map> handleSQLException(final SQLException exception) {
-        final String errorMsg = "SQL Exception thrown during API operation";
-        appInsights.trackException(exception);
-
-        LOG.error(errorMsg);
+        final String errorMsg = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        logFailure(exception, HttpStatus.INTERNAL_SERVER_ERROR.value(), false);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Collections.singletonMap("errorMessage", errorMsg));
+            .body(Map.of("errorMessage", errorMsg, "code", ErrorCode.INTERNAL_ERROR));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleConstraintViolationException(final HttpServletRequest request,
                                                                         final Exception exception) {
-        LOG.error(exception.getMessage());
-        appInsights.trackException(exception);
 
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-            .withDetails(exception.getCause());
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST);
+        logFailure(exception, HttpStatus.BAD_REQUEST.value(), false);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
@@ -115,8 +112,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
-        LOG.error(exception.getMessage(), exception);
-        appInsights.trackException(exception);
 
         Throwable targetException;
 
@@ -129,6 +124,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus httpStatus = (targetException != null) ? getHttpStatus(targetException) : null;
 
         final HttpError<Serializable> error = new HttpError<>(exception, request, httpStatus);
+        logFailure(exception, error.getStatus(), false);
 
         return ResponseEntity
             .status(error.getStatus())
@@ -150,6 +146,35 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception exception, Object body,
+                                                              HttpHeaders headers, HttpStatusCode status,
+                                                              WebRequest request) {
+        logFailure(exception, status.value(), false);
+        return super.handleExceptionInternal(exception,
+            new HttpError<>(exception, request, HttpStatus.valueOf(status.value())), headers, status, request);
+    }
+
+    private void logFailure(Exception exception, int status, boolean warning) {
+        logFailure(exception, status, warning, null);
+    }
+
+    private void logFailure(Exception exception, int status, boolean warning, Map<String, String> customProperties) {
+        if (explicitExceptionTelemetry) {
+            if (customProperties == null) {
+                appInsights.trackException(exception);
+            } else {
+                appInsights.trackException(exception, customProperties,
+                    warning ? SeverityLevel.Warning : SeverityLevel.Error);
+            }
+        }
+        if (warning) {
+            LOG.warn("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
+        } else {
+            LOG.error("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
+        }
     }
 
     private HttpStatus getHttpStatus(final Throwable causeOfException) {

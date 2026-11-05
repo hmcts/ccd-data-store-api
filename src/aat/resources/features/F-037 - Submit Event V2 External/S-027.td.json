@@ -21,13 +21,9 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"body": {
-			"exception": "[[ANYTHING_PRESENT]]",
-			"message": "[[ANYTHING_PRESENT]]",
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
+			"message": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }

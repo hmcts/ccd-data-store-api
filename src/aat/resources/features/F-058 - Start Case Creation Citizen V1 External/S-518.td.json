@@ -16,13 +16,8 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "CCD_Safe_404_Response",
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "Error when getting case type version. Unknown case type 'eyJhbGciOiJIUzUxMiJ9'.",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
     }
   }
 }

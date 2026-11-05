@@ -20,7 +20,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_Response",
+    "_extends_": "CCD_Safe_400_Response",
     "responseCode": 400,
     "responseMessage": "Bad Request",
     "headers": {
@@ -29,13 +29,6 @@
       "Content-Type": "[[ANY_STRING_NULLABLE]]",
       "Vary": "Accept-Encoding"
     },
-    "body": {
-	  "status": 400,
-      "type": "[[ANYTHING_PRESENT]]",
-      "title": "Bad Request",
-      "detail": "Failed to read request",
-      "instance": "[[ANYTHING_PRESENT]]",
-      "properties": "[[ANY_STRING_NULLABLE]]"
-    }
+    "body": {}
   }
 }

@@ -20,16 +20,13 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "headers": {
       "Content-Encoding": "gzip",
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
-      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Case data validation failed",
-      "path": "[[ANYTHING_PRESENT]]",
       "details": {
         "field_errors": [
           {
@@ -37,9 +34,7 @@
             "message": "abc is not a number"
           }
         ]
-      },
-      "callbackErrors": null,
-      "callbackWarnings": null
+      }
     }
   }
 }

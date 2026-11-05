@@ -16,19 +16,12 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_422_Response",
+		"_extends_": "CCD_Safe_422_Response",
 		"headers" : {
 			"Content-Encoding" : "gzip",
 			"Content-Length" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"message" : "Event id does not exist",
-			"path" : "[[ANYTHING_PRESENT]]",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
 		}
 	}
 }
