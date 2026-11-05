@@ -92,4 +92,14 @@
     <cve>CVE-2026-103006</cve>
     <cve>CVE-2026-103008</cve>
   </suppress>
+  <suppress>
+    <notes>
+      False positive: CVE-2025-21199 affects the Azure Agent Installer for Backup and
+      Site Recovery, not the Application Insights Java SDK. Dependency Check incorrectly
+      maps applicationinsights-core to the microsoft:azure_agent CPE.
+      https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21199
+    </notes>
+    <packageUrl>pkg:maven/com.microsoft.azure/applicationinsights-core@3.7.8</packageUrl>
+    <cve>CVE-2025-21199</cve>
+  </suppress>
 </suppressions>
