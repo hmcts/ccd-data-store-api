@@ -91,6 +91,8 @@ env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
+env.OIDC_ALLOWED_ISSUERS = "https://idam-web-public.aat.platform.hmcts.net/o,https://hmcts-access.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
+env.VERIFY_OIDC_ISSUER = "true"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 env.RD_LOCATION_REF_API_BASE_URL = "http://rd-location-ref-api-aat.service.core-compute-aat.internal"
@@ -102,6 +104,7 @@ env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.servic
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA tests
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
+env.CCD_API_GATEWAY_OAUTH2_SCOPE = env.OAUTH2_SCOPE_VARIABLES
 
 // BEFTA retry env variables
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"

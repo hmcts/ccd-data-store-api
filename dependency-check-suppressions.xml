@@ -77,19 +77,4 @@
     <packageUrl>pkg:maven/org.springframework.data/spring-data-jpa@3.5.13</packageUrl>
     <cve>CVE-2026-47834</cve>
   </suppress>
-  <suppress>
-    <notes>Temporary Suppression
-        CVE-2026-103007 refer [Ticket]
-        CVE-2026-103009 refer [Ticket]
-        CVE-2026-102411 refer [Ticket]
-        CVE-2026-103005 refer [Ticket]
-        CVE-2026-103006 refer [Ticket]
-        CVE-2026-103008 refer [Ticket]</notes>
-    <cve>CVE-2026-103007</cve>
-    <cve>CVE-2026-103009</cve>
-    <cve>CVE-2026-102411</cve>
-    <cve>CVE-2026-103005</cve>
-    <cve>CVE-2026-103006</cve>
-    <cve>CVE-2026-103008</cve>
-  </suppress>
 </suppressions>
