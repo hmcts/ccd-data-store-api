@@ -425,6 +425,9 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
+    dependencies {
+        dependency 'org.springframework.cloud:spring-cloud-commons:5.0.3'
+    }
 }
 
 publishing {
