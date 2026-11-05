@@ -41,6 +41,7 @@ import uk.gov.hmcts.ccd.security.MultiIssuerValidator;
 
 @Configuration
 @EnableWebSecurity
+@Profile("!SECURITY_MOCK")
 public class SecurityConfiguration {
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
