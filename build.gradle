@@ -425,6 +425,9 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
+    dependencies {
+        dependency 'org.springframework.data:spring-data-jpa:3.5.14'
+    }
 }
 
 publishing {
