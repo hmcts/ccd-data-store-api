@@ -27,11 +27,16 @@
                     "range": {
                       "supplementary_data.orgs_assigned_users.OrgZ": {
                         "lte": 2499,
-                        "gte": 2498
+                        "gte": 2499
                       }
                     }
                   }
                 ]
+              }
+            },
+            {
+              "match": {
+                "reference": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
               }
             }
           ]
@@ -86,7 +91,7 @@
             "FixedRadioListField": "[[ANY_NULLABLE]]",
             "DateTimeField": "[[ANY_NULLABLE]]",
             "PhoneUKField": "[[ANY_NULLABLE]]",
-            "NumberField":"[[ANY_NULLABLE]]",
+            "NumberField": "[[ANY_NULLABLE]]",
             "MultiSelectListField": [
               "OPTION5",
               "OPTION4",
@@ -148,7 +153,11 @@
               "classification": "[[ANY_STRING_NOT_NULLABLE]]"
             }
           },
-          "supplementary_data": null,
+          "supplementary_data": {
+            "orgs_assigned_users": {
+              "OrgZ": 2499
+            }
+          },
           "after_submit_callback_response": "[[ANY_NULLABLE]]",
           "callback_response_status_code": "[[ANY_NULLABLE]]",
           "callback_response_status": "[[ANY_NULLABLE]]",

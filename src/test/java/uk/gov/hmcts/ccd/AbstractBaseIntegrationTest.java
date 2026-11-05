@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -19,6 +20,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -79,9 +81,29 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
+@DirtiesContext
 public abstract class AbstractBaseIntegrationTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
+
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AbstractBaseIntegrationTest.class);
+
+    protected static final String DROP_TABLE_FK_CONSTRAINT =
+        "SELECT 'ALTER TABLE \"'||nspname||'\".\"'||relname||'\" DROP CONSTRAINT \"'||conname||'\" %s;'" 
+        + "FROM pg_constraint " 
+        + "INNER JOIN pg_class ON conrelid=pg_class.oid " 
+        + "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace " 
+        + "WHERE relname = '%s'" 
+        + "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END,contype,nspname,relname,conname;";
+
+    protected static final String RECREATE_TABLE_FK_CONSTRAINT =
+        "SELECT 'ALTER TABLE \"'||nspname||'\".\"'||relname||'\" ADD CONSTRAINT \"'||conname||'\" '|| " 
+        + "pg_get_constraintdef(pg_constraint.oid)||';' " 
+        + "FROM pg_constraint " 
+        + "INNER JOIN pg_class ON conrelid=pg_class.oid " 
+        + "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace " 
+        + "WHERE relname = '%s'" 
+        + "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END DESC,contype DESC,nspname DESC,relname DESC,conname DESC;";
 
     protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
         MediaType.APPLICATION_JSON.getType(),
@@ -187,18 +209,65 @@ public abstract class AbstractBaseIntegrationTest {
         List<String> tables = determineTables(jdbcTemplate);
         List<String> sequences = determineSequences(jdbcTemplate);
 
-        String truncateTablesQuery =
-            "START TRANSACTION;\n"
-                + tables.stream()
-                    .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
-                    .collect(Collectors.joining("\n"))
-                + "\nCOMMIT;";
-        jdbcTemplate.execute(truncateTablesQuery);
+        String dropTableFKConstraintString = null;
+        String recreateTableFKConstraintString = null;
+        String casecadeString = "";
 
-        sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+        for (String tableName : tables) {
+            casecadeString = "";
+            if (!tableName.equals("case_users")) {
+                casecadeString = "CASCADE";
+            }
+            dropTableFKConstraintString = getFKConstraintToDrop(casecadeString, tableName);
+            recreateTableFKConstraintString = getFKConstraintToRecreate(tableName);
+            String truncateTablesQuery =
+                String.format(
+                    """
+                        START TRANSACTION;
+                        %s
+                        COMMIT;
+                        TRUNCATE TABLE %s CASCADE;
+                        ALTER TABLE %s DISABLE TRIGGER ALL;
+                        COMMIT;
+                        %s
+                        COMMIT;
+                        ALTER TABLE %s ENABLE TRIGGER ALL;
+                        END TRANSACTION;
+                        """,
+                    dropTableFKConstraintString, tableName, tableName, recreateTableFKConstraintString, tableName);
+
+            LOG.info("Executing :{}\n", truncateTablesQuery);
+
+            jdbcTemplate.execute(truncateTablesQuery);
+        }
+
+        sequences.forEach(sequence -> jdbcTemplate.execute(
+            String.format("ALTER SEQUENCE %s RESTART WITH 1", sequence)));
 
         cacheManager.getCacheNames().forEach(
             cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
+    }
+
+    private String getFKConstraintToDrop(String cascade, String tableName) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+
+        String formattedString = String.format(DROP_TABLE_FK_CONSTRAINT, cascade, tableName);
+
+        List result = jdbcTemplate.queryForList(formattedString, String.class);
+        return result.toString().replace("[", "")
+            .replace("]", "")
+            .replace(";,", ";");
+
+    }
+
+    private String getFKConstraintToRecreate(String tableName) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        String formattedString = String.format(RECREATE_TABLE_FK_CONSTRAINT, tableName);
+        List result = jdbcTemplate.queryForList(formattedString, String.class);
+        return result.toString().replace("[", "")
+            .replace("]", "")
+            .replace(";,", ";");
+
     }
 
     private List<String> determineTables(JdbcTemplate jdbcTemplate) {

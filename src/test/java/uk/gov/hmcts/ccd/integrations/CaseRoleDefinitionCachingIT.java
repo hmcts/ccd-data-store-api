@@ -16,7 +16,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 
 import static java.util.Collections.singletonList;
-
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 @DirtiesContext

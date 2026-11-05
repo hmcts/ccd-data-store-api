@@ -8,7 +8,7 @@ Feature: F-120 Additional supplementary data property returned by ES Search APIs
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
     And a user with [a valid profile]
 
-  @S-120.1 @Smoke @Ignore
+  @S-120.1 @Smoke
   Scenario: external search api returns supplementary data by default
     Given the request [is configured to search for the previously created case],
     And the request [does not explicitly request supplementary_data]
@@ -60,4 +60,3 @@ Feature: F-120 Additional supplementary data property returned by ES Search APIs
     Then the response [contains the previously created case],
     Then the response [contains the specified sub section of supplementary data],
     And the response has all other details as expected.
-

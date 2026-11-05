@@ -101,7 +101,8 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(eventId);
         caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_POST_STATE, eventId);
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE_POST_STATE,
+            Long.valueOf(caseReference), eventId);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setData(JacksonUtils.convertValue(data));
 
