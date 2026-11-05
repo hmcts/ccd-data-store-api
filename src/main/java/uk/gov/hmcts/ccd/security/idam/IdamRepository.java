@@ -34,7 +34,7 @@ public class IdamRepository {
     @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
         try {
-            return withNonNullRoles(idamClient.getUserInfo("Bearer " + jwtToken));
+            return idamClient.getUserInfo("Bearer " + jwtToken);
         } catch (FeignException exception) {
             log.error("FeignException: retrieve user info: {} ", exception.getMessage());
 
@@ -46,14 +46,6 @@ public class IdamRepository {
         }
     }
 
-    private UserInfo withNonNullRoles(UserInfo userInfo) {
-        if (userInfo != null && userInfo.getRoles() == null) {
-            return new UserInfo(userInfo.getSub(), userInfo.getUid(), userInfo.getName(),
-                userInfo.getGivenName(), userInfo.getFamilyName(), List.of());
-        }
-        return userInfo;
-    }
-
     private boolean isClientError(FeignException exception) {
         return exception.status() >= 400 && exception.status() <= 499;
     }
@@ -62,9 +54,6 @@ public class IdamRepository {
     public List<String> getUserRoles(String userId) {
         String dataStoreSystemUserToken = selfInstance.getDataStoreSystemUserAccessToken();
         List<String> roles = getUserByUserId(userId, dataStoreSystemUserToken).getRoles();
-        if (roles == null) {
-            roles = List.of();
-        }
         log.debug("System user queried user info from IDAM API. User Id={}. Roles={}.", userId, roles);
         return roles;
     }
