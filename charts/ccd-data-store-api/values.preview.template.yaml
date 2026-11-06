@@ -47,9 +47,8 @@ java:
     LOG_CALLBACK_DETAILS:
     DEFAULT_CACHE_TTL_SEC: 1
     BEFTA_TEST_STUB_SERVICE_BASE_URL: "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"
-    # CCD-8316: only decentralised persistence uses the F-1047 stub PR.
     SPRING_APPLICATION_JSON: |
-      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-pr-516-java/"}}}}
+      {"ccd":{"decentralised":{"case-type-service-urls":{"FT_Decentralisation":"http://ccd-test-stubs-service-aat.service.core-compute-aat.internal/"}}}}
   postgresql:
     enabled: true
     primary:
