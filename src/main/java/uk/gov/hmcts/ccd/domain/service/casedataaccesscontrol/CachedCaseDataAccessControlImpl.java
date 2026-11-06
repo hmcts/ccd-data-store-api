@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import static java.util.Comparator.comparingInt;
 @Service
 @RequestScope
 public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, AccessControl {
+
+    private static final String CASE_DETAILS_NOT_NULL = "caseDetails must not be null";
 
     private final NoCacheCaseDataAccessControl noCacheCaseDataAccessControl;
 
@@ -69,6 +72,7 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        Objects.requireNonNull(caseDetails, CASE_DETAILS_NOT_NULL);
         if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
             // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
             return noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails);
@@ -79,6 +83,7 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<AccessProfile> generateAccessProfilesForRestrictedCase(CaseDetails caseDetails) {
+        Objects.requireNonNull(caseDetails, CASE_DETAILS_NOT_NULL);
         if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
             // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
             return noCacheCaseDataAccessControl.generateAccessProfilesForRestrictedCase(caseDetails);
@@ -149,6 +154,7 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        Objects.requireNonNull(caseDetails, CASE_DETAILS_NOT_NULL);
         if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
             // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
             return noCacheCaseDataAccessControl.getUserClassifications(caseDetails);

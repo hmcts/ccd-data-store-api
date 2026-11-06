@@ -49,7 +49,7 @@ public class MultiSelectListValidator implements BaseTypeValidator {
         dataValue.forEach(value -> {
             final String textValue = value.asText();
 
-            final Boolean found = validValues.stream()
+            final boolean found = validValues.stream()
                 .anyMatch(validValue -> validValue.getCode().equals(textValue));
 
             if (!found) {
@@ -64,14 +64,14 @@ public class MultiSelectListValidator implements BaseTypeValidator {
         final BigDecimal minimum = caseFieldDefinition.getFieldTypeDefinition().getMin();
         if (!checkMin(minimum, uniqueValues.size())) {
             final String message = String.format("Select at least %d %s",
-                                                 minimum.intValue(), minimum.equals(ONE) ? "option" : "options");
+                minimum.intValue(), isOne(minimum) ? "option" : "options");
             results.add(new ValidationResult(message, dataFieldId));
         }
 
         final BigDecimal maximum = caseFieldDefinition.getFieldTypeDefinition().getMax();
         if (!checkMax(maximum, uniqueValues.size())) {
             final String message = String.format("Cannot select more than %d %s",
-                                                 maximum.intValue(), maximum.equals(ONE) ? "option" : "options");
+                maximum.intValue(), isOne(maximum) ? "option" : "options");
             results.add(new ValidationResult(message, dataFieldId));
         }
 
@@ -84,5 +84,9 @@ public class MultiSelectListValidator implements BaseTypeValidator {
 
     private Boolean checkMin(final BigDecimal min, final Integer actualLength) {
         return min == null || actualLength >= min.intValue();
+    }
+
+    private boolean isOne(final BigDecimal value) {
+        return value.compareTo(ONE) == 0;
     }
 }
