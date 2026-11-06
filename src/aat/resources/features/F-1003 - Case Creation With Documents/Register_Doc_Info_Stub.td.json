@@ -6,11 +6,14 @@
   ],
 
   "prerequisites": [
-    "UnRegister_All_Doc_Info_Stubs_By_Metadata"
+    "UnRegister_All_Doc_Info_Stubs_By_Metadata",
+    "UnRegister_All_Doc_Strip_Stubs_By_Metadata",
+    "UnRegister_All_Doc_Echo_Stubs_By_Metadata"
   ],
 
   "request": {
     "body": {
+      "priority": 0,
       "request": {
         "method": "POST",
         "urlPath": "/document_hash_callback",
@@ -49,6 +52,7 @@
     "_extends_": "Common_201_Response",
     "body": {
       "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "priority": 0,
       "request": {
         "urlPath": "/document_hash_callback",
         "method": "POST",
