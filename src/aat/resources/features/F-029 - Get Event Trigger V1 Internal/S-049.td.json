@@ -648,6 +648,10 @@
             "_extends_": "BaseFixedRadioListFieldType",
             "fixed_list_items": [
               {
+                "__ordering__": "unordered",
+                "__elementId__": "code"
+              },
+              {
                 "code": "RADIOVALUE3",
                 "label": "Radio Value 3",
                 "order": null
