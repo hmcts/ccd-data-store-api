@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -28,7 +29,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CompoundAccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.PersistenceStrategyResolver;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 
 import java.util.ArrayList;
@@ -278,6 +281,51 @@ class EventHistoryFieldAccessTest {
         JsonNode data = JacksonUtils.convertValueJsonNode(result.getData());
         assertSecureData(data);
         assertHistoricalNestedFields(data);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    @DisplayName("Single-event history prunes unknown nested fields while retaining readable values")
+    void singleEventOmitsUnknownNestedFields(boolean complexOverrides) throws Exception {
+        addHistoricalNestedFields(complexOverrides);
+        when(source.getEvent(caseDetails, CASE_TYPE, 24L)).thenReturn(Optional.of(event));
+
+        AuditEvent result = authorised.getEvent(caseDetails, CASE_TYPE, 24L).orElseThrow();
+
+        JsonNode data = JacksonUtils.convertValueJsonNode(result.getData());
+        assertMetadata(result);
+        assertSecureData(data);
+        assertHistoricalNestedFields(data);
+        assertAbsent(JacksonUtils.convertValueJsonNode(result.getDataClassification()), "internalNote");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    @DisplayName("Ordinary case reads preserve unknown nested fields within readable parents")
+    void ordinaryCaseReadPreservesUnknownNestedFields(boolean complexOverrides) throws Exception {
+        addHistoricalNestedFields(complexOverrides);
+        JsonNode original = snapshot();
+        caseDetails.setData(JacksonUtils.convertValue(original.deepCopy()));
+        caseDetails.setDataClassification(JacksonUtils.convertValue(
+            JacksonUtils.convertValueJsonNode(event.getDataClassification()).deepCopy()));
+        CaseStateDefinition state = new CaseStateDefinition();
+        state.setId("CaseCreated");
+        state.setAccessControlLists(List.of(acl(READER)));
+        caseType.setStates(List.of(state));
+        caseDetails.setState(state.getId());
+        GetCaseOperation classified = mock(GetCaseOperation.class);
+        CaseDataAccessControl caseDataAccess = mock(CaseDataAccessControl.class);
+        when(classified.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
+        when(caseDataAccess.generateAccessProfilesByCaseReference(CASE_REFERENCE)).thenReturn(PROFILES);
+        AuthorisedGetCaseOperation getCase = new AuthorisedGetCaseOperation(
+            classified, definitions, accessControl, caseDataAccess);
+
+        CaseDetails result = getCase.execute(CASE_REFERENCE).orElseThrow();
+
+        JsonNode data = JacksonUtils.convertValueJsonNode(result.getData());
+        assertSecureData(data);
+        assertThat(data.path("historicalDetails")).isEqualTo(original.path("historicalDetails"));
+        assertAbsent(JacksonUtils.convertValueJsonNode(result.getDataClassification()), "internalNote");
     }
 
     @ParameterizedTest
