@@ -170,6 +170,17 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
+    public JsonNode filterEventDataByReadAccess(final JsonNode eventData,
+                                               final List<CaseFieldDefinition> caseFieldDefinitions,
+                                               final Set<AccessProfile> accessProfiles) {
+        JsonNode filteredData = filterCaseFieldsByAccess(eventData, caseFieldDefinitions, accessProfiles,
+            CAN_READ, false);
+        caseFieldDefinitions.forEach(field ->
+            removeUnknownFields(filteredData.get(field.getId()), field.getFieldTypeDefinition()));
+        return filteredData;
+    }
+
+    @Override
     public JsonNode filterCaseFieldsByAccess(final JsonNode caseFields,
                                              final List<CaseFieldDefinition> caseFieldDefinitions,
                                              final Set<AccessProfile> accessProfiles,
@@ -179,9 +190,6 @@ public class AccessControlServiceImpl implements AccessControlService {
         getStream(caseFields).forEach(
             fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, accessProfiles, access)
                 .ifPresent(caseField -> {
-                    if (!isClassification) {
-                        removeUnknownFields(caseFields.get(fieldName), caseField.getFieldTypeDefinition());
-                    }
                     if (isEmpty(caseField.getComplexACLs())) {
                         filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {

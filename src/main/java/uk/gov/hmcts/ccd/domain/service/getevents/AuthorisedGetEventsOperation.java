@@ -116,12 +116,10 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     private void filterEventFieldsByReadAccess(AuditEvent event, Set<AccessProfile> accessProfiles,
                                              CaseTypeDefinition caseTypeDefinition) {
         if (event.getData() != null) {
-            event.setData(JacksonUtils.convertValue(accessControlService.filterCaseFieldsByAccess(
+            event.setData(JacksonUtils.convertValue(accessControlService.filterEventDataByReadAccess(
                 JacksonUtils.convertValueJsonNode(event.getData()),
                 caseTypeDefinition.getCaseFieldDefinitions(),
-                accessProfiles,
-                CAN_READ,
-                false)));
+                accessProfiles)));
         }
         if (event.getDataClassification() != null) {
             event.setDataClassification(JacksonUtils.convertValue(accessControlService.filterCaseFieldsByAccess(

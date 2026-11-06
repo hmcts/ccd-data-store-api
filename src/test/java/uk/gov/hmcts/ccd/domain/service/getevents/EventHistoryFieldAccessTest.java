@@ -282,8 +282,8 @@ class EventHistoryFieldAccessTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    @DisplayName("Shared case-read filter omits unknown children recursively without changing ACL semantics")
-    void sharedFilterOmitsUnknownNestedFields(boolean complexOverrides) throws Exception {
+    @DisplayName("Shared case-read filter preserves unknown children while enforcing field read access")
+    void sharedFilterPreservesUnknownNestedFields(boolean complexOverrides) throws Exception {
         addHistoricalNestedFields(complexOverrides);
         JsonNode original = snapshot();
 
@@ -291,7 +291,7 @@ class EventHistoryFieldAccessTest {
             caseType.getCaseFieldDefinitions(), PROFILES, CAN_READ, false);
 
         assertSecureData(result);
-        assertHistoricalNestedFields(result);
+        assertThat(result.path("historicalDetails")).isEqualTo(original.path("historicalDetails"));
         assertThat(original.path("historicalDetails").has("retiredSecret")).isTrue();
     }
 
