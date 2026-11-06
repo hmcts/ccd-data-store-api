@@ -19,7 +19,7 @@
 		"_extends_": "Common_404_Response",
 		"body": {
 			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message" : "No case found",
+			"message" : "Case not found",
 			"path" : "/cases/1234123412341238/events",
 			"details": null,
 			"callbackErrors": null,

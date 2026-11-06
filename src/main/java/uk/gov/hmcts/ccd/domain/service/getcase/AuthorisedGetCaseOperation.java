@@ -74,22 +74,31 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
             return Optional.empty();
         }
 
-        caseDetails.setData(JacksonUtils.convertValue(
+        final CaseDetails authorisedCaseDetails = copyCaseDetails(caseDetails);
+        authorisedCaseDetails.setData(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                JacksonUtils.convertValueJsonNode(authorisedCaseDetails.getData()),
                 caseType.getCaseFieldDefinitions(),
                 accessProfiles,
                 CAN_READ,
                 false)));
-        caseDetails.setDataClassification(JacksonUtils.convertValue(
+        authorisedCaseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
-                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                JacksonUtils.convertValueJsonNode(authorisedCaseDetails.getDataClassification()),
                 caseType.getCaseFieldDefinitions(),
                 accessProfiles,
                 CAN_READ,
                 true)));
 
-        return Optional.of(caseDetails);
+        return Optional.of(authorisedCaseDetails);
+    }
+
+    private CaseDetails copyCaseDetails(CaseDetails caseDetails) {
+        try {
+            return caseDetails.shallowClone();
+        } catch (CloneNotSupportedException exception) {
+            throw new IllegalStateException("Unable to copy case details before applying read access", exception);
+        }
     }
 
 }

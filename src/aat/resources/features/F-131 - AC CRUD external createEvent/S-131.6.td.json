@@ -1,0 +1,48 @@
+{
+  "_guid_" : "S-131.6",
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "title": "User cannot start event creation without case access",
+
+  "specs" : [
+    "with no access to the case",
+    "contains HTTP 404 status code"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+
+  "method": "GET",
+  "uri": "/cases/{caseId}/event-triggers/{etid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "Experimental": "true"
+    },
+    "pathVariables": {
+      "etid": "event1",
+      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "event_id" : "event1"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message" : "No case found for reference: ${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

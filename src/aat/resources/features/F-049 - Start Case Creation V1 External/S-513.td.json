@@ -22,7 +22,7 @@
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Cannot find event Dummy for case type AAT",
+			"message": "No event found",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

@@ -28,7 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
@@ -82,6 +81,7 @@ class AuthorisedGetCaseOperationTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState("Some State");
         caseDetails.setId(CASE_REFERENCE);
+        caseDetails.setData(Collections.singletonMap("originalField", JSON_NODE_FACTORY.textNode("originalValue")));
         Optional<CaseDetails> caseDetailsOptional = Optional.of(caseDetails);
         JsonNode filteredDataNode = JSON_NODE_FACTORY.objectNode();
         JsonNode testValueNode = JSON_NODE_FACTORY.objectNode();
@@ -146,7 +146,7 @@ class AuthorisedGetCaseOperationTest {
                 CASE_TYPE_ID,
                 CASE_REFERENCE);
 
-            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(result.get().getData());
             InOrder inOrder = inOrder(caseDefinitionRepository,
                 classifiedGetCaseOperation, accessControlService, caseDataAccessControl);
             assertAll(
@@ -161,7 +161,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(accessControlService, times(2))
                     .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFieldDefinitions()),
                         eq(accessProfiles), eq(CAN_READ), anyBoolean()),
-                () -> assertThat(result.get(), sameInstance(caseDetails)),
+                () -> assertThat(result.get() == caseDetails, is(false)),
+                () -> assertThat(caseDetails.getData().containsKey("originalField"), is(true)),
                 () -> assertThat(resultNode.has("testField"), is(true))
             );
         }
@@ -296,7 +297,7 @@ class AuthorisedGetCaseOperationTest {
         void shouldApplyAuthorizationWhenCaseFound() {
             final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);
 
-            JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
+            JsonNode resultNode = JacksonUtils.convertValueJsonNode(result.get().getData());
             InOrder inOrder = inOrder(caseDefinitionRepository,
                 classifiedGetCaseOperation, accessControlService, caseDataAccessControl);
             assertAll(
@@ -311,7 +312,8 @@ class AuthorisedGetCaseOperationTest {
                 () -> inOrder.verify(accessControlService, times(2))
                     .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseType.getCaseFieldDefinitions()),
                         eq(accessProfiles), eq(CAN_READ), anyBoolean()),
-                () -> assertThat(result.get(), sameInstance(caseDetails)),
+                () -> assertThat(result.get() == caseDetails, is(false)),
+                () -> assertThat(caseDetails.getData().containsKey("originalField"), is(true)),
                 () -> assertThat(resultNode.has("testField"), is(true)));
         }
 

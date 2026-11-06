@@ -42,6 +42,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
             throw new BadRequestException("Case reference is not valid");
         }
 
-        return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
+        return caseDetailsRepository.findByReference(caseReference);
     }
 }

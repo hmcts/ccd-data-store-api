@@ -39,7 +39,7 @@
       "timestamp": "[[ANYTHING_PRESENT]]",
       "status": 404,
       "error": "Not Found",
-      "message": "No case found",
+      "message": "Case not found",
       "path": "/documentData/caseref/1648717404042371",
       "details": null,
       "callbackErrors": null,
