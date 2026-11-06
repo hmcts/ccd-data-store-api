@@ -91,6 +91,13 @@
                   "update": true,
                   "delete": true,
                   "role": "caseworker-befta_master"
+                },
+                {
+                  "create": true,
+                  "read": true,
+                  "update": false,
+                  "delete": false,
+                  "role": "citizen"
                 }
               ]
             }

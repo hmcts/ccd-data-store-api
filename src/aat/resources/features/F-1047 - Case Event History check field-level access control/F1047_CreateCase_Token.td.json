@@ -1,0 +1,9 @@
+{
+  "_guid_": "F1047_CreateCase_Token",
+  "_extends_": "F-150_CreateCase_Token_Creation",
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  }
+}

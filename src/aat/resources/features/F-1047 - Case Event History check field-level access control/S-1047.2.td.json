@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-1047.2",
+  "_extends_": "F1047_Test_Data_Base",
+  "title": "A citizen sees the readable field and cannot retrieve the denied field from history",
+  "specs": [
+    "an active profile in CCD",
+    "read access to TextField but no read access to _stubProcessedBy",
+    "contains TextField and omits _stubProcessedBy from the historical snapshot",
+    "contains the reference of the case just created"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "_extends_": "F1047_Expected_Audit_Event",
+          "data": {
+            "TextField": "Decentralised case"
+          }
+        }
+      ]
+    }
+  }
+}
