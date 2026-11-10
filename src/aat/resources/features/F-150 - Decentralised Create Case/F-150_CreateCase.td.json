@@ -52,11 +52,10 @@
       "state": "CaseCreated",
       "security_classification": "PUBLIC",
       "data": {
-        "TextField": "Decentralised case"
+        "TextField": "Decentralised case",
+        "_stubProcessedBy": "ccd-test-stubs-service"
       },
-      "data_classification": {
-        "TextField": "PUBLIC"
-      },
+      "data_classification": "[[ANYTHING_PRESENT]]",
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
