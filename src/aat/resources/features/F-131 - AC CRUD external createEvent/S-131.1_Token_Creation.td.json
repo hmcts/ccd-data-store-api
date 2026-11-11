@@ -1,6 +1,6 @@
 {
   "_guid_" : "S-131.1_Token_Creation",
-  "_extends_" : "F-131_Token_Creation_Base",
+  "_extends_" : "F-131.1_Token_Creation_Base",
 
   "request": {
     "_extends_": "Common_Request",
@@ -9,6 +9,18 @@
       "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     },
     "event_id" : "event1"
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No event found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
   }
 
 }

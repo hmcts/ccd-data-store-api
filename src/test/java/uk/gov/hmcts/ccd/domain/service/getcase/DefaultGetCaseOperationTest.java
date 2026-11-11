@@ -24,7 +24,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 class DefaultGetCaseOperationTest {
 
     private static final String CASE_REFERENCE = "1234123412341234";
-    private static final Long CASE_REFERENCE_LONG = Long.valueOf(CASE_REFERENCE);
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
 
     @Mock
@@ -71,26 +70,26 @@ class DefaultGetCaseOperationTest {
         @Test
         @DisplayName("should return empty optional when case does not exist")
         void shouldReturnEmptyWhenCaseNotExist() {
-            doReturn(null).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             final Optional<CaseDetails> output = getCaseOperation.execute(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(output.isPresent(), is(false)),
-                () -> verify(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG)
+                () -> verify(caseDetailsRepository).findByReference(CASE_REFERENCE)
             );
         }
 
         @Test
         @DisplayName("should return case details when case exists")
         void shouldReturnCaseWhenExists() {
-            doReturn(CASE_DETAILS).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
+            doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             final Optional<CaseDetails> output = getCaseOperation.execute(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(output.get(), sameInstance(CASE_DETAILS)),
-                () -> verify(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG)
+                () -> verify(caseDetailsRepository).findByReference(CASE_REFERENCE)
             );
         }
 

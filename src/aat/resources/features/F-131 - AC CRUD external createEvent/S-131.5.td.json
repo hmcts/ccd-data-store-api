@@ -20,7 +20,7 @@
       "event": {
         "id" : "event1"
       },
-      "event_token": "${[scenarioContext][childContexts][S-131.5_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][S-131.5_CreateCase_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
