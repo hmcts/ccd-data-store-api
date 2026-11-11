@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-945.1_GetToken_UpdateCase",
+  "_extends_": "F-945_GetToken_UpdateCase_Base",
+  "title": "Create event token for updating case to closed for payment",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-944.2_Create_Case_NotClosed][testData][actualResponse][body][id]}",
+      "etid": "updateToClosedForPaymentCase"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "updateToClosedForPaymentCase"
+    }
+  }
+}
