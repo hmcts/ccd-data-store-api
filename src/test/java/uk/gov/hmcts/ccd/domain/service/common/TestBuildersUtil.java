@@ -1655,6 +1655,7 @@ public class TestBuildersUtil {
                 tabField.setCaseFieldDefinition(caseFieldDefinition);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
                 tabField.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
+                tabField.setDefaultFocus(true);
                 tabFields.add(tabField);
             });
             tab.setShowCondition("tabShowCondition");
