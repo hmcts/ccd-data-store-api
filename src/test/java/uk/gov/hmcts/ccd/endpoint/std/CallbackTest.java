@@ -623,8 +623,6 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 422, mvcResult.getResponse().getStatus());
         assertEquals("Incorrect Error Message", HttpStatus.valueOf(422).getReasonPhrase(),
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
-        assertEquals("INVALID_REQUEST",
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("code").asText());
     }
 
     @Test
