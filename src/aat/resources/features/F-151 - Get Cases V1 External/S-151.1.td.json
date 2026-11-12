@@ -44,7 +44,14 @@
           "last_state_modified_date": "[[ANYTHING_PRESENT]]",
           "security_classification": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][security_classification]}",
           "case_data": "[[ANYTHING_PRESENT]]",
-          "data_classification": "[[ANYTHING_PRESENT]]"
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "supplementary_data": null,
+          "after_submit_callback_response": null,
+          "callback_response_status_code": null,
+          "callback_response_status": null,
+          "callback_error_message": null,
+          "delete_draft_response_status_code": null,
+          "delete_draft_response_status": null
         }
       ]
     }
