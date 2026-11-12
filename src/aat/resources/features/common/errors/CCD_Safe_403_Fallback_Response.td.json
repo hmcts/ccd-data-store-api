@@ -8,6 +8,8 @@
   "body": {
     "timestamp": "[[ANYTHING_PRESENT]]",
     "status": 403,
-    "error": "Forbidden"
+    "error": "Forbidden",
+    "message": "Forbidden",
+    "path": "/"
   }
 }
