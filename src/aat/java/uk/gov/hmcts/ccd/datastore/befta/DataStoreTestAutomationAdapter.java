@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import com.google.common.collect.MapMaker;
 import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
@@ -18,14 +18,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+    // Weak identity keys keep scenarios isolated and allow completed contexts to be collected.
+    private static final Map<BackEndFunctionalTestScenarioContext, String> UNIQUE_STRINGS_PER_SCENARIO =
+        new MapMaker().weakKeys().makeMap();
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
@@ -39,22 +40,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (!ofNullable(System.getenv("GROUP_ACCESS_ENABLED")).map(Boolean::valueOf).orElse(false)) {
             throw new AssumptionViolatedException("Group Access not Enabled");
         }
-    }
-
-    @Before
-    public void createUID(Scenario scenario) {
-        String tag = getDataFileTag(scenario);
-        String uid = tag + UUID.randomUUID().toString();
-        uniqueStringsPerTestData.put(tag,uid);
-    }
-
-    private synchronized String getDataFileTag(Scenario scenario) {
-        return scenario.getSourceTagNames().stream()
-            .filter(t -> t.startsWith("@S-"))
-            .findFirst()
-            .map(t -> t.substring(1))
-            .map(Object::toString)
-            .orElse("error cant find tag");
     }
 
     @Override
@@ -79,6 +64,14 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
+        if ("UniqueString".equals(key)) {
+            BackEndFunctionalTestScenarioContext rootContext = scenarioContext;
+            while (rootContext.getParentContext() != null) {
+                rootContext = rootContext.getParentContext();
+            }
+            return UNIQUE_STRINGS_PER_SCENARIO.computeIfAbsent(
+                rootContext, context -> context.getCurrentScenarioTag() + UUID.randomUUID());
+        }
         if ("validBuildingLocation".equals(key)) {
             return selectValidBuildingLocation(scenarioContext.getTestData().getActualResponse()
                                                    .getBody().get("arrayInMap"));
@@ -125,15 +118,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         organisationIdentifierContextPath,
                                                                         previousValueContextPath,
                                                                         incrementBy);
-        } else if (key.toString().equals("UniqueString")) {
-
-            String scenarioTag;
-            try {
-                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
-            } catch (NullPointerException e) {
-                scenarioTag = scenarioContext.getCurrentScenarioTag();
-            }
-            return uniqueStringsPerTestData.get(scenarioTag);
         } else if (key.toString().startsWith("approximately ")) {
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
