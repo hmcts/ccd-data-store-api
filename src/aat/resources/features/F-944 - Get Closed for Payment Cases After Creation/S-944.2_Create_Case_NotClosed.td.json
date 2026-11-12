@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-944.2_Create_Case_NotClosed",
+  "_extends_": "F-944_Create_Case_Base",
+  "title": "Create a case in state category not closed for payment",
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-944.2_GetToken_CaseCreate_NotClosed][testData][actualResponse][body][token]}",
+      "event": {
+        "id": "createNotClosedForPaymentCase"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "state": "CaseNotClosedForPayment"
+    }
+  }
+}

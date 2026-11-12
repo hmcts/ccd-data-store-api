@@ -75,6 +75,7 @@
             }
           ],
           "role": null,
+          "defaultFocus" : null,
           "show_condition": null
         }
       ],
