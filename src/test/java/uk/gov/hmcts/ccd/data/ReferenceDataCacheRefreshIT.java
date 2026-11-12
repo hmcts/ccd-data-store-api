@@ -152,12 +152,16 @@ class ReferenceDataCacheRefreshIT extends AbstractReferenceDataIT {
         stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(initialBuildingLocations), BUILDING_LOCATIONS_STUB_ID);
         stubSuccess(SERVICES_PATH, objectToJsonString(initialServices), SERVICES_STUB_ID);
 
-        final List<BuildingLocation> cachedBuildingLocations = underTest.getBuildingLocations();
-        final List<ServiceReferenceData> cachedServices = underTest.getServices();
-
-        assertThat(cachedBuildingLocations)
-            .isNotEmpty();
-        assertThat(cachedServices)
-            .isNotEmpty();
+        // A scheduled refresh from the preceding test may still be completing.
+        await()
+            .atMost(Durations.FIVE_SECONDS)
+            .untilAsserted(() -> {
+                assertThat(underTest.getBuildingLocations())
+                    .isNotEmpty()
+                    .hasSameElementsAs(initialBuildingLocations);
+                assertThat(underTest.getServices())
+                    .isNotEmpty()
+                    .hasSameElementsAs(initialServices);
+            });
     }
 }
