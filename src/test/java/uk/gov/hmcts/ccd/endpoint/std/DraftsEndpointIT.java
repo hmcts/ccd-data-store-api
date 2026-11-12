@@ -162,7 +162,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         JsonNode actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString());
         assertEquals("Not Found", actualResponse.get("message").asText());
-        assertEquals("RESOURCE_NOT_FOUND", actualResponse.get("code").asText());
+        Assertions.assertFalse(actualResponse.has("code"));
     }
 
     @Test
@@ -299,7 +299,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         JsonNode actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString());
         assertEquals("Not Found", actualResponse.get("message").asText());
-        assertEquals("RESOURCE_NOT_FOUND", actualResponse.get("code").asText());
+        Assertions.assertFalse(actualResponse.has("code"));
     }
 
     @Test

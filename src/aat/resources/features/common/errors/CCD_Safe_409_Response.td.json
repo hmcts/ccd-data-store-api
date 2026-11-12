@@ -10,9 +10,10 @@
     "status": 409,
     "error": "Conflict",
     "message": "Conflict",
-    "code": "REQUEST_FAILED",
     "details": null,
     "callbackErrors": null,
-    "callbackWarnings": null
+    "callbackWarnings": null,
+    "exception": "Exception",
+    "path": "/"
   }
 }

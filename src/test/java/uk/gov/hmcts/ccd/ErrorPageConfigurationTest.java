@@ -38,7 +38,10 @@ class ErrorPageConfigurationTest {
         request.setParameter("message", "true");
         request.setParameter("errors", "true");
         assertThat(controller.error(request).getBody())
-            .doesNotContainKeys("exception", "trace", "message", "errors", "path", "code");
+            .doesNotContainKeys("exception", "trace", "errors", "code");
+        assertThat(controller.error(request).getBody())
+            .containsEntry("message", org.springframework.http.HttpStatus.valueOf(status).getReasonPhrase());
+        assertThat(controller.error(request).getBody()).containsEntry("path", "/");
         assertThat(controller.error(request).getStatusCode().value()).isEqualTo(status);
     }
 

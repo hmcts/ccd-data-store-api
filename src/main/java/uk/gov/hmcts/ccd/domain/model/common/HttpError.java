@@ -1,17 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import uk.gov.hmcts.ccd.error.ErrorCode;
 import uk.gov.hmcts.ccd.error.PublicValidationMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.util.UriUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -37,12 +33,12 @@ public class HttpError<T extends Serializable> implements Serializable {
     public HttpError(Exception exception, String path, HttpStatus status) {
         final var responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
-        this.exception = exception.getClass().getName();
+        this.exception = "Exception";
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = HttpStatus.valueOf(this.status).getReasonPhrase();
         this.message = PublicValidationMessages.messageFor(exception, this.status);
-        this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
+        this.path = "/";
     }
 
     public HttpError(Exception exception, HttpServletRequest request, HttpStatus upstreamPreferredHttpStatus) {
@@ -73,13 +69,8 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    @JsonIgnore
     public String getException() {
         return exception;
-    }
-
-    public ErrorCode getCode() {
-        return ErrorCode.fromStatus(status);
     }
 
     public Integer getStatus() {
@@ -98,7 +89,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         return message;
     }
 
-    @JsonIgnore
     public String getPath() {
         return path;
     }

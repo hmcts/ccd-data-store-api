@@ -18,14 +18,21 @@ public final class PublicValidationMessages {
         ValidationMessages.ACCESS_INVALID,
         ValidationMessages.SORT_ORDER_INVALID,
         ValidationMessages.CASE_VERSION_INVALID,
-        ValidationMessages.CATEGORY_ID_INVALID
+        ValidationMessages.CATEGORY_ID_INVALID,
+        "Field Names Invalid",
+        "Enter valid tags for RichTextArea field",
+        "Missing required case type. Please provide a case type or list of case types"
+            + " to search."
     );
     private static final Set<String> VALIDATION_MESSAGES = Set.of(
         EventValidator.EVENT_NOT_SPECIFIED,
         EventValidator.SUMMARY_TOO_LONG,
         EventValidator.DESCRIPTION_TOO_LONG,
         ValidationMessages.EVENT_STATE_INVALID,
-        ValidationMessages.CASE_DATA_INVALID
+        ValidationMessages.CASE_DATA_INVALID,
+        "No data provided",
+        "Cannot create case because of event is not specified",
+        "Cannot validate case field because of event is not specified"
     );
 
     private PublicValidationMessages() {

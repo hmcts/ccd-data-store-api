@@ -83,7 +83,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
     private static final String SQL_EXCEPTION_MESSAGE =
         "Internal Server Error";
     private static final String ERROR_RESPONSE_BODY =
-        "{\"errorMessage\":\"Internal Server Error\",\"code\":\"INTERNAL_ERROR\"}";
+        "{\"errorMessage\":\"Internal Server Error\"}";
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
     private GetUserProfileOperation mockService;
@@ -144,10 +144,12 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
         assertThat(response.getStatusCode().value(), is(statusCode));
         assertThat(json.get("message").asText(), is(httpStatus.getReasonPhrase()));
-        assertThat(json.get("code").asText(), is(statusCode == 400 ? "INVALID_REQUEST" : "RESOURCE_NOT_FOUND"));
+        assertThat(json.has("code"), is(false));
+        assertThat(json.get("exception").asText(), is("Exception"));
+        assertThat(json.get("path").asText(), is("/"));
         assertThat(json.has("callbackErrors") && json.get("callbackErrors").isNull(), is(true));
         assertThat(json.has("callbackWarnings") && json.get("callbackWarnings").isNull(), is(true));
-        for (String field : List.of("type", "title", "detail", "instance", "exception", "path")) {
+        for (String field : List.of("type", "title", "detail", "instance")) {
             assertThat(json.has(field), is(false));
         }
         assertThat(json.toString(), not(containsString("PRIVATE_DIAGNOSTIC")));
@@ -842,7 +844,7 @@ public class RestExceptionHandlerTest extends WireMockBaseTest {
 
         // check the very basics
         result.andExpect(status().is(expectedHttpError.getStatus()));
-        result.andExpect(jsonPath("$.exception").doesNotExist());
+        result.andExpect(jsonPath("$.exception").value("Exception"));
 
         // check a bit more
         result.andExpect(jsonPath("$.message")

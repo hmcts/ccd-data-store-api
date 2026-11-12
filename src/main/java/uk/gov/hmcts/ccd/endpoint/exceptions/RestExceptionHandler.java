@@ -94,7 +94,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         logFailure(exception, HttpStatus.INTERNAL_SERVER_ERROR.value(), false);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Map.of("errorMessage", errorMsg, "code", ErrorCode.INTERNAL_ERROR));
+            .body(Map.of("errorMessage", errorMsg));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -139,7 +139,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        LOG.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
+        logFailure(exception, status.value(), true);
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withMessage(ValidationError.ARGUMENT_INVALID)
             .withDetails(errors);
@@ -162,18 +162,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private void logFailure(Exception exception, int status, boolean warning, Map<String, String> customProperties) {
-        if (explicitExceptionTelemetry) {
-            if (customProperties == null) {
-                appInsights.trackException(exception);
-            } else {
-                appInsights.trackException(exception, customProperties,
-                    warning ? SeverityLevel.Warning : SeverityLevel.Error);
+        try (var diagnostics = uk.gov.hmcts.ccd.error.FailureDiagnostics.open(exception, status)) {
+            if (explicitExceptionTelemetry) {
+                if (customProperties == null) {
+                    appInsights.trackException(exception);
+                } else {
+                    appInsights.trackException(exception, customProperties,
+                        warning ? SeverityLevel.Warning : SeverityLevel.Error);
+                }
             }
-        }
-        if (warning) {
-            LOG.warn("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
-        } else {
-            LOG.error("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
+            if (warning) {
+                LOG.warn("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
+            } else {
+                LOG.error("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
+            }
         }
     }
 

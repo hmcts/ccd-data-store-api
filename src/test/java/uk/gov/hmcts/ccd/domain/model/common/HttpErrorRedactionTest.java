@@ -20,7 +20,9 @@ class HttpErrorRedactionTest {
         "Case reference is not valid", "Case ID is not valid", "Case Type Id is not valid",
         "Missing start trigger token", "Start trigger token has expired. Please restart the event.",
         "Access can only be 'create', 'read' or 'update'", "Sort order field is invalid.",
-        "003 Wrong CaseVersion", "002 Invalid categoryId"
+        "003 Wrong CaseVersion", "002 Invalid categoryId", "Field Names Invalid",
+        "Enter valid tags for RichTextArea field",
+        "Missing required case type. Please provide a case type or list of case types to search."
     })
     void preservesApprovedBadInputMessages(String message) {
         BadRequestException exception = new BadRequestException(message);
@@ -33,7 +35,9 @@ class HttpErrorRedactionTest {
         "Cannot create event because event is not specified",
         "An event summary must be less than 1024 characters",
         "An event description must be less than 65536 characters",
-        "The case status did not qualify for the event", "Case data validation failed"
+        "The case status did not qualify for the event", "Case data validation failed",
+        "No data provided", "Cannot create case because of event is not specified",
+        "Cannot validate case field because of event is not specified"
     })
     void preservesApprovedValidationMessages(String message) {
         ValidationException exception = new ValidationException(message);
@@ -79,15 +83,18 @@ class HttpErrorRedactionTest {
     }
 
     @Test
-    void serialisedErrorOmitsExceptionPathAndCause() throws Exception {
+    void serialisedErrorKeepsSafeLegacyFieldsWithoutDiagnostics() throws Exception {
         RuntimeException exception = new RuntimeException("SECRET jdbc://internal",
             new IllegalStateException("SECRET database cause"));
         HttpError<Serializable> error = new HttpError<Serializable>(exception, "/private-case-123",
             HttpStatus.BAD_REQUEST).withDetails(exception.getCause());
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String json = mapper.writeValueAsString(error);
-        assertThat(json).contains("INVALID_REQUEST", "Bad Request")
-            .doesNotContain("SECRET", "jdbc", "RuntimeException", "private-case", "cause", "exception", "path");
+        assertThat(json).contains("Bad Request")
+            .doesNotContain("SECRET", "jdbc", "RuntimeException", "private-case", "cause",
+                "INVALID_REQUEST", "\"code\"");
         assertThat(mapper.readTree(json).get("status").asInt()).isEqualTo(400);
+        assertThat(mapper.readTree(json).get("exception").asText()).isEqualTo("Exception");
+        assertThat(mapper.readTree(json).get("path").asText()).isEqualTo("/");
     }
 }

@@ -827,7 +827,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
                     is("Bad Request")),
-                () -> assertThat(exceptionNode.get("code").asText(), is("INVALID_REQUEST"))
+                () -> assertThat(exceptionNode.has("code"), is(false))
             );
         }
 
@@ -841,7 +841,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
                     is("Bad Request")),
-                () -> assertThat(exceptionNode.get("code").asText(), is("INVALID_REQUEST"))
+                () -> assertThat(exceptionNode.has("code"), is(false))
             );
         }
 
@@ -857,7 +857,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
                     is("Bad Request")),
-                () -> assertThat(exceptionNode.get("code").asText(), is("INVALID_REQUEST"))
+                () -> assertThat(exceptionNode.has("code"), is(false))
             );
         }
 
@@ -879,7 +879,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
                     is("Bad Request")),
-                () -> assertThat(exceptionNode.get("code").asText(), is("INVALID_REQUEST"))
+                () -> assertThat(exceptionNode.has("code"), is(false))
             );
         }
 
@@ -1865,7 +1865,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 assertAll(
                     () -> assertThat(exceptionNode.get("message").asText(),
                         is("Not Found")),
-                    () -> assertThat(exceptionNode.get("code").asText(), is("RESOURCE_NOT_FOUND"))
+                    () -> assertThat(exceptionNode.has("code"), is(false))
                 );
             }
 

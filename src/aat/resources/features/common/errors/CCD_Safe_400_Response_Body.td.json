@@ -4,8 +4,9 @@
   "status": 400,
   "error": "Bad Request",
   "message": "Bad Request",
-  "code": "INVALID_REQUEST",
   "details": null,
   "callbackErrors": null,
-  "callbackWarnings": null
+  "callbackWarnings": null,
+  "exception": "Exception",
+  "path": "/"
 }

@@ -10,9 +10,10 @@
     "status": 422,
     "error": "Unprocessable Entity",
     "message": "Unprocessable Entity",
-    "code": "INVALID_REQUEST",
     "details": null,
     "callbackErrors": null,
-    "callbackWarnings": null
+    "callbackWarnings": null,
+    "exception": "Exception",
+    "path": "/"
   }
 }

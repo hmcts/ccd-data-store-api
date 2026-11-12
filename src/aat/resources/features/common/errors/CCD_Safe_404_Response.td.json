@@ -10,9 +10,10 @@
     "status": 404,
     "error": "Not Found",
     "message": "Not Found",
-    "code": "RESOURCE_NOT_FOUND",
     "details": null,
     "callbackErrors": null,
-    "callbackWarnings": null
+    "callbackWarnings": null,
+    "exception": "Exception",
+    "path": "/"
   }
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.error;
 
-/** Stable public categories, independent of exception messages and implementation details. */
+/** Internal diagnostic categories; not added to public error responses. */
 public enum ErrorCode {
     INVALID_REQUEST,
     AUTHENTICATION_REQUIRED,
