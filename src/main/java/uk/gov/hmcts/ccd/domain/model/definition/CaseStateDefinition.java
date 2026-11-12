@@ -20,6 +20,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
     private Integer displayOrder = null;
     private String titleDisplay;
     private List<AccessControlList> accessControlLists;
+    private String stateCategory = null;
 
     @Schema(required = true)
     @JsonProperty("id")
@@ -84,6 +85,16 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
     }
 
     @JsonIgnore
+    public String getStateCategory() {
+        return stateCategory;
+    }
+
+    @JsonProperty("state_category")
+    public void setStateCategory(String stateCategory) {
+        this.stateCategory = stateCategory;
+    }
+
+    @JsonIgnore
     @Override
     public CaseStateDefinition createCopy() {
         CaseStateDefinition copy = new CaseStateDefinition();
@@ -93,6 +104,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         copy.setDisplayOrder(this.getDisplayOrder());
         copy.setTitleDisplay(this.getTitleDisplay());
         copy.setAccessControlLists(createACLCopyList(this.getAccessControlLists()));
+        copy.setStateCategory(this.getStateCategory());
 
         return copy;
     }
