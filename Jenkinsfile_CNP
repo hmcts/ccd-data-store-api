@@ -114,6 +114,8 @@ env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC" // use new OIDC authentication for BEFTA t
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles"
 
 // BEFTA retry env variables
+// Temporary diagnostic for intermittent TLS 1.3 bad_record_mac failures in functional tests.
+env.BEFTA_TLS_CLIENT_PROTOCOLS = "TLSv1.2"
 env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
