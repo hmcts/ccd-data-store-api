@@ -84,6 +84,7 @@
       "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
+      "message": "Enter valid tags for RichTextArea field"
     }
   }
 }

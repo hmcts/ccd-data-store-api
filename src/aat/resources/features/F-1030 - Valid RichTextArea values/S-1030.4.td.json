@@ -86,6 +86,7 @@
   "expectedResponse": {
     "_extends_": "CCD_Safe_400_Response",
     "body": {
+      "message": "Enter valid tags for RichTextArea field"
     }
   }
 }
