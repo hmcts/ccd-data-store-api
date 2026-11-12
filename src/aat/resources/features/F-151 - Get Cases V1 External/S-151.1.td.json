@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-151.1",
+  "title": "must return the newly created case when searching by case reference",
+  "productName": "CCD Data Store",
+  "operationName": "get case data for a given case type as a caseworker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "specs": [
+    "an active caseworker profile in CCD",
+    "contains the reference of the newly created case",
+    "contains only the newly created case and its data, along with an HTTP 200 OK"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "BEFTA_CASETYPE_1_1"
+    },
+    "queryParams": {
+      "case_reference": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body]}"
+      ]
+    }
+  }
+}
