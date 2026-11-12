@@ -5,4 +5,21 @@
   "CaseStateID" : "CaseCreated",
   "UserRole" : "caseworker-befta_master",
   "CRUD" : "CRUD"
-} ]
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseStateID": "CaseCreated",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseStateID": "CaseCreated",
+    "UserRole": "caseworker-befta_jurisdiction_3",
+    "CRUD": "R"
+  }
+]

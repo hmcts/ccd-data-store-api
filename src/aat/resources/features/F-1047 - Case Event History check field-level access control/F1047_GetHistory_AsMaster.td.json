@@ -1,0 +1,12 @@
+{
+  "_guid_": "F1047_GetHistory_AsMaster",
+  "_extends_": "S-1047.1",
+  "specs": [
+    "to confirm the same historical snapshot contains both fields for an authorised caseworker"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F1047_CreateCase][testData][actualResponse][body][id]}"
+    }
+  }
+}

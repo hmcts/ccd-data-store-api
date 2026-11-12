@@ -109,6 +109,10 @@ public interface AccessControlService {
                                                                             caseEventTrigger,
                                                                         Set<AccessProfile> accessProfiles);
 
+    JsonNode filterEventDataByReadAccess(JsonNode eventData,
+                                       List<CaseFieldDefinition> caseFieldDefinitions,
+                                       Set<AccessProfile> accessProfiles);
+
     JsonNode filterCaseFieldsByAccess(JsonNode caseFields,
                                       List<CaseFieldDefinition> caseFieldDefinitions,
                                       Set<AccessProfile> accessProfiles,

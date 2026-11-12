@@ -14,5 +14,21 @@
     "CaseEventID": "simulateDecentralisedConflict",
     "UserRole": "caseworker-befta_master",
     "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseEventID": "createCase",
+    "UserRole": "citizen",
+    "CRUD": "CR"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseEventID": "createCase",
+    "UserRole": "caseworker-befta_jurisdiction_3",
+    "CRUD": "R"
   }
 ]

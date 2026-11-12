@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -166,6 +167,17 @@ public class AccessControlServiceImpl implements AccessControlService {
             return !noAccessGranted;
         }
         return true;
+    }
+
+    @Override
+    public JsonNode filterEventDataByReadAccess(final JsonNode eventData,
+                                               final List<CaseFieldDefinition> caseFieldDefinitions,
+                                               final Set<AccessProfile> accessProfiles) {
+        JsonNode filteredData = filterCaseFieldsByAccess(eventData, caseFieldDefinitions, accessProfiles,
+            CAN_READ, false);
+        caseFieldDefinitions.forEach(field ->
+            removeUnknownFields(filteredData.get(field.getId()), field.getFieldTypeDefinition()));
+        return filteredData;
     }
 
     @Override
@@ -426,6 +438,26 @@ public class AccessControlServiceImpl implements AccessControlService {
         } else {
             AccessControlServiceImpl.LOG.error("Data submitted for unknown field '{}'", newFieldName);
             return false;
+        }
+    }
+
+    private void removeUnknownFields(JsonNode value, FieldTypeDefinition fieldType) {
+        if (value == null || value.isNull() || fieldType == null) {
+            return;
+        }
+        if (FieldTypeDefinition.COLLECTION.equalsIgnoreCase(fieldType.getType()) && value.isArray()) {
+            value.forEach(item -> removeUnknownFields(item.get(VALUE), fieldType.getCollectionFieldTypeDefinition()));
+        } else if (FieldTypeDefinition.COMPLEX.equalsIgnoreCase(fieldType.getType()) && value.isObject()) {
+            Iterator<String> fieldNames = value.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                Optional<CaseFieldDefinition> child = findCaseField(fieldType.getComplexFields(), fieldName);
+                if (child.isEmpty()) {
+                    fieldNames.remove();
+                } else {
+                    removeUnknownFields(value.get(fieldName), child.get().getFieldTypeDefinition());
+                }
+            }
         }
     }
 
