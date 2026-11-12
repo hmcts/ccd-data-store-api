@@ -1,0 +1,19 @@
+{
+  "_guid_": "F-122-UpdateEventBase2",
+  "_extends_": "F-122-UpdateEventBase",
+
+  "operationName": "submit updateCase2 event with TextField and EmailField values",
+
+  "specs": [
+    "contains Update token created as in S-122-GetToken_UpdateCase2"
+  ],
+
+  "request": {
+    "body": {
+      "event": {
+        "id": "updateCase2"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-122-GetToken_UpdateCase2][testData][actualResponse][body][token]}"
+    }
+  }
+}

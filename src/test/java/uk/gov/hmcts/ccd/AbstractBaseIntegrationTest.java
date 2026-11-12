@@ -332,21 +332,31 @@ public abstract class AbstractBaseIntegrationTest {
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
                                         String caseReference, String eventId) {
-        return generateEventToken(template, userId, jurisdictionId, caseTypeId, Long.valueOf(caseReference), eventId);
+        return generateEventToken(template, userId, caseReference, eventId);
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
                                         Long caseReference, String eventId) {
+        return generateEventToken(template, userId, caseReference, eventId);
+    }
+
+    protected String generateEventToken(JdbcTemplate template, String userId, String caseReference, String eventId) {
+        return generateEventToken(template, userId, Long.valueOf(caseReference), eventId);
+    }
+
+    protected String generateEventToken(JdbcTemplate template, String userId, Long caseReference, String eventId) {
+        final CaseDetails caseDetails = getCase(template, caseReference);
+
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(jurisdictionId);
+        jurisdictionDefinition.setId(caseDetails.getJurisdiction());
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(caseTypeId);
+        caseTypeDefinition.setId(caseDetails.getCaseTypeId());
 
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition,
+        return eventTokenService.generateToken(userId, caseDetails, caseEventDefinition,
             jurisdictionDefinition, caseTypeDefinition);
     }
 

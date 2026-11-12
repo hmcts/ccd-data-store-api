@@ -11,6 +11,9 @@
 	"request": {
 		"pathVariables": {
 			"ctid": "AAT_AUTH_8"
+		},
+		"body": {
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-156_Token_Creation][testData][actualResponse][body][token]}"
 		}
 	},
 

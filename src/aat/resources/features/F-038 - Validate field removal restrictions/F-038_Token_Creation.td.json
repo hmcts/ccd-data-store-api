@@ -1,0 +1,19 @@
+{
+	"_guid_": "F-038_Token_Creation",
+	"_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "PrivateCaseworker"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15",
+			"etid": "CREATE"
+		}
+	}
+}

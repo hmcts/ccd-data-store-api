@@ -14,8 +14,8 @@
 
 	"users": {
 		"invokingUser": {
-			"username": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL]]",
-			"password": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD]]"
+			"username": "auto.test12.cnp+private@gmail.com",
+			"password": "[[$CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD]]"
 		}
 	},
 
@@ -23,8 +23,8 @@
 		"_extends_": "Common_Request",
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "AUTOTEST1",
-			"ctid": "AAT_PRIVATE",
+			"jid": "AUTOTEST2",
+			"ctid": "AAT_PRIVATE2",
 			"etid": "CREATE"
 		}
 	},
