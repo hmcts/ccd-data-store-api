@@ -1,0 +1,27 @@
+# https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# Owner determined from HMCTS product ownership in cnp-flux-config and local chart maintainer metadata.
+
+* @hmcts/cdm
+
+# CI/CD and repository control files.
+/.github/ @hmcts/cdm
+/.github/workflows/ @hmcts/cdm
+
+# Deployment and runtime configuration.
+/charts/ @hmcts/cdm
+/infrastructure/ @hmcts/cdm
+/Dockerfile @hmcts/cdm
+/Jenkinsfile* @hmcts/cdm
+/acb.tpl.yaml @hmcts/cdm
+/docker-compose.yml @hmcts/cdm
+
+# Build and dependency control files.
+/build.gradle @hmcts/cdm
+/settings.gradle @hmcts/cdm
+/gradle/ @hmcts/cdm
+/gradlew @hmcts/cdm
+/gradlew.bat @hmcts/cdm
+/package.json @hmcts/cdm
+/package-lock.json @hmcts/cdm
+/yarn.lock @hmcts/cdm
+/.nvmrc @hmcts/cdm
