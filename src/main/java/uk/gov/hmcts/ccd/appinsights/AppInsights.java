@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.appinsights;
 
-import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
+import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,13 @@ public class AppInsights {
     public static final String URI = "URI";
     public static final String STATUS = "Http Status";
     public static final String CALLBACK_EVENT_NAME = "CALLBACK";
+    public static final String CALLBACK_DEPENDENCY_PROPERTY = "callback";
+    public static final String CALLBACK_TYPE_PROPERTY = "callbackType";
+    public static final String MANUAL_CALLBACK_DEPENDENCY_PROPERTY = "manualCallbackDependency";
+
+    private static final String HTTP_DEPENDENCY_TYPE = "Http";
+    private static final String HTTP_METHOD_POST = "POST";
+    private static final String UNKNOWN = "unknown";
 
     private final TelemetryClient telemetry;
 
@@ -81,13 +88,61 @@ public class AppInsights {
 
     public void trackCallbackEvent(
         CallbackType callbackType, String url, String httpStatus, java.time.Duration duration) {
-        Map<String, String> properties = ImmutableMap.of(
-            TYPE, callbackType.getValue(),
+        String safeUrl = nullSafe(url);
+        Map<String, String> properties = Map.of(
+            TYPE, callbackType != null ? callbackType.getValue() : "null",
             CALLBACK_DURATION, String.valueOf(duration.toMillis()) + " ms",
-            METHOD, "POST",
-            URI, url,
+            METHOD, HTTP_METHOD_POST,
+            URI, safeUrl,
             STATUS, httpStatus
         );
         telemetry.trackEvent(CALLBACK_EVENT_NAME, properties, null);
+    }
+
+    // Azure Portal callback dashboards filter dependency telemetry on customDimensions.callback == "true".
+    // manualCallbackDependency identifies this replacement telemetry so generic dependency KQL can exclude it.
+    public void trackCallbackDependency(
+        CallbackType callbackType, String url, String httpStatus, java.time.Duration duration) {
+
+        RemoteDependencyTelemetry dependencyTelemetry = new RemoteDependencyTelemetry();
+        String safeUrl = nullSafe(url);
+        String target = dependencyTarget(safeUrl);
+
+        dependencyTelemetry.setName(HTTP_METHOD_POST + " " + target);
+        dependencyTelemetry.setCommandName(safeUrl);
+        dependencyTelemetry.setType(HTTP_DEPENDENCY_TYPE);
+        dependencyTelemetry.setTarget(target);
+        dependencyTelemetry.setResultCode(httpStatus);
+        dependencyTelemetry.setDuration(new Duration(duration.toMillis()));
+        dependencyTelemetry.setSuccess(isSuccessfulHttpStatus(httpStatus));
+        dependencyTelemetry.getProperties().put(CALLBACK_DEPENDENCY_PROPERTY, "true");
+        dependencyTelemetry.getProperties().put(MANUAL_CALLBACK_DEPENDENCY_PROPERTY, "true");
+        if (callbackType != null) {
+            dependencyTelemetry.getProperties().put(CALLBACK_TYPE_PROPERTY, callbackType.getValue());
+        }
+
+        telemetry.trackDependency(dependencyTelemetry);
+    }
+
+    private String dependencyTarget(String url) {
+        try {
+            String host = java.net.URI.create(url).getHost();
+            return host != null ? host : url;
+        } catch (IllegalArgumentException e) {
+            return url;
+        }
+    }
+
+    private boolean isSuccessfulHttpStatus(String httpStatus) {
+        try {
+            int status = Integer.parseInt(httpStatus);
+            return status >= 200 && status < 400;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private String nullSafe(String value) {
+        return value != null ? value : UNKNOWN;
     }
 }
