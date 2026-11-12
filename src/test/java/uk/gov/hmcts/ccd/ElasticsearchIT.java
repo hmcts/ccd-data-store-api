@@ -82,6 +82,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.TestFixtures.fromFileAsString;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
@@ -187,6 +188,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
     private static final String REFERENCE_GLOBAL_SEARCH_05 = "1999866820969999";
     private static final String REFERENCE_GLOBAL_SEARCH_06 = "1999866820970009";
+    private static final String REFERENCE_GLOBAL_SEARCH_07 = "5555666677778888";
+    private static final String NEXT_HEARING_DATE_ROLE = "caseworker-autotest1-next-hearing-date";
     private static final Long GLOBAL_DOCS_SIZE = 1000L;
 
     @Inject
@@ -1961,7 +1964,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         }
 
-        @DisplayName("Criteria: should return case with lookup and ref-data populated")
+        @DisplayName("Criteria: should return case with lookup, ref-data and authorised next hearing date populated")
         @Test
         void shouldReturnCaseWithLookupAndRefDataPopulated() throws Exception {
 
@@ -1981,13 +1984,17 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             globalSearchRequest.setSearchCriteria(searchCriteria);
 
             // ACT
-            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
-                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+            String responseJson = executeRequestAsString(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED, NEXT_HEARING_DATE_ROLE);
+            GlobalSearchResponsePayload result = mapper.readValue(responseJson, GlobalSearchResponsePayload.class);
+            JsonNode responseBody = mapper.readTree(responseJson);
 
             // ASSERT
             assertAll(
                 () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
-                () -> assertThat(result.getResults().size(), is(1))
+                () -> assertThat(result.getResults().size(), is(1)),
+                () -> assertThat(responseBody.at("/results/0/nextHearingDate").asText(),
+                    is("2026-10-12T09:30:00.000"))
             );
             GlobalSearchResponsePayload.Result result1 = result.getResults().getFirst();
             assertAll(
@@ -1997,6 +2004,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result1.getCaseManagementCategoryId(), is("987")),
                 () -> assertThat(result1.getCaseManagementCategoryName(), is("Category label Order-02")),
                 () -> assertThat(result1.getCaseNameHmctsInternal(), is("Name Internal 01")),
+                () -> assertThat(result1.getNextHearingDate(), is("2026-10-12T09:30:00.000")),
                 () -> assertThat(result1.getOtherReferences().size(), is(1)),
                 () -> assertThat(result1.getOtherReferences().getFirst(), is(OTHER_REFERENCE_GLOBAL_SEARCH)),
                 // verify ref-data from: `/resources/mappings/refdata/get_building_locations.json`
@@ -2013,6 +2021,33 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 // verify lookup data from: `/resources/mappings/jurisdiction_autotest1.json`
                 () -> assertThat(result1.getCcdJurisdictionId(), is(JURISDICTION_GLOBAL_SEARCH)),
                 () -> assertThat(result1.getCcdJurisdictionName(), is("Auto Test 1"))
+            );
+        }
+
+        @DisplayName("Criteria: should omit missing and malformed next hearing dates from the response")
+        @Test
+        void shouldOmitUnavailableNextHearingDates() throws Exception {
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(
+                REFERENCE_GLOBAL_SEARCH_04,
+                REFERENCE_GLOBAL_SEARCH_07
+            ));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            String responseJson = executeRequestAsString(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED, NEXT_HEARING_DATE_ROLE);
+            JsonNode results = mapper.readTree(responseJson).path("results");
+
+            assertAll(
+                () -> assertThat(results.size(), is(2)),
+                () -> assertThat(results.findValuesAsText("caseReference"),
+                    hasItem(REFERENCE_GLOBAL_SEARCH_04)),
+                () -> assertThat(results.findValuesAsText("caseReference"),
+                    hasItem(REFERENCE_GLOBAL_SEARCH_07)),
+                () -> assertThat(results.findValues("nextHearingDate").isEmpty(), is(true))
             );
         }
 
@@ -2112,11 +2147,34 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(result1.getCaseManagementCategoryId(), is(nullValue())),
                 () -> assertThat(result1.getCaseManagementCategoryName(), is(nullValue())),
                 () -> assertThat(result1.getCaseNameHmctsInternal(), is(nullValue())),
+                () -> assertThat(result1.getNextHearingDate(), is(nullValue())),
                 () -> assertThat(result1.getOtherReferences().size(), is(0)), // i.e. empty
                 () -> assertThat(result1.getBaseLocationId(), is(nullValue())),
                 () -> assertThat(result1.getBaseLocationName(), is(nullValue())),
                 () -> assertThat(result1.getRegionId(), is(nullValue())),
                 () -> assertThat(result1.getRegionName(), is(nullValue()))
+            );
+        }
+
+        @DisplayName("ES Filters: should hide next hearing date when only hearing ID is authorised")
+        @Test
+        void shouldHideNextHearingDateWhenOnlyHearingIdIsAuthorised() throws Exception {
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1)),
+                () -> assertThat(result.getResults().getFirst().getCaseReference(),
+                    is(REFERENCE_GLOBAL_SEARCH_01)),
+                () -> assertThat(result.getResults().getFirst().getNextHearingDate(), is(nullValue()))
             );
         }
 
@@ -2179,7 +2237,15 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             // ARRANGE
             SearchCriteria searchCriteria = new SearchCriteria();
-            if (expectedCaseReferenceOrder.size() == 4) {
+            if (expectedCaseReferenceOrder.size() == 5) {
+                searchCriteria.setCaseReferences(List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_04,
+                    REFERENCE_GLOBAL_SEARCH_07
+                ));
+            } else if (expectedCaseReferenceOrder.size() == 4) {
                 searchCriteria.setCaseReferences(List.of(
                     REFERENCE_GLOBAL_SEARCH_01,
                     REFERENCE_GLOBAL_SEARCH_02,
@@ -2200,6 +2266,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             globalSearchRequest.setSortCriteria(sortCriteria);
 
             // ACT
+            // NEXT_HEARING_DATE_ROLE is intentionally omitted: sorting follows the existing Global Search policy
+            // and is applied before response fields are filtered by ACL.
             GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
                 AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
 
@@ -2223,19 +2291,24 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         private GlobalSearchResponsePayload executeRequest(GlobalSearchRequestPayload globalSearchRequest,
                                                            String... roles) throws Exception {
 
+            return mapper.readValue(executeRequestAsString(globalSearchRequest, roles),
+                GlobalSearchResponsePayload.class);
+        }
+
+        private String executeRequestAsString(GlobalSearchRequestPayload globalSearchRequest,
+                                              String... roles) throws Exception {
+
             MockUtils.setSecurityAuthorities(authentication, roles);
 
             MockHttpServletRequestBuilder postRequest = post(GlobalSearchEndpoint.GLOBAL_SEARCH_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsBytes(globalSearchRequest));
 
-            return ElasticsearchTestHelper.executeRequest(
-                postRequest,
-                200,
-                mapper,
-                mockMvc,
-                GlobalSearchResponsePayload.class
-            );
+            return mockMvc.perform(postRequest)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         }
     }
 
@@ -2368,6 +2441,47 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             ),
 
             Arguments.of(
+                "nextHearingDate.ASCENDING with missing and malformed dates last",
+                List.of(
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.NEXT_HEARING_DATE,
+                        GlobalSearchSortDirection.ASCENDING
+                    ),
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.CREATED_DATE,
+                        GlobalSearchSortDirection.ASCENDING
+                    )
+                ),
+                List.of(
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_04,
+                    REFERENCE_GLOBAL_SEARCH_07
+                )
+            ),
+            Arguments.of(
+                "nextHearingDate.DESCENDING with missing and malformed dates last",
+                List.of(
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.NEXT_HEARING_DATE,
+                        GlobalSearchSortDirection.DESCENDING
+                    ),
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.CREATED_DATE,
+                        GlobalSearchSortDirection.ASCENDING
+                    )
+                ),
+                List.of(
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_04,
+                    REFERENCE_GLOBAL_SEARCH_07
+                )
+            ),
+
+            Arguments.of(
                 "caseName.ASCENDING and createdDate.DESCENDING",
                 List.of(
                     createSortCriteria(
@@ -2409,6 +2523,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 REFERENCE_GLOBAL_SEARCH_02,
                 REFERENCE_GLOBAL_SEARCH_03,
                 REFERENCE_GLOBAL_SEARCH_01
+            );
+            case NEXT_HEARING_DATE -> throw new IllegalArgumentException(
+                "Next hearing date sort scenarios must specify missing value ordering explicitly"
             );
         };
 

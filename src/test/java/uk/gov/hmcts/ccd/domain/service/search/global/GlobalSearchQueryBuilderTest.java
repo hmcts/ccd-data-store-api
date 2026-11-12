@@ -34,14 +34,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalSearchQueryBuilderTest {
@@ -57,7 +54,6 @@ class GlobalSearchQueryBuilderTest {
     @InjectMocks
     private GlobalSearchQueryBuilder classUnderTest;
 
-
     @Nested
     @DisplayName("GlobalSearch Query")
     class GlobalSearchQuery {
@@ -68,14 +64,11 @@ class GlobalSearchQueryBuilderTest {
         @Test
         void shouldReturnEmptyBuilderForNullRequest() {
 
-            // ARRANGE
-
             // ACT
             QueryBuilder output = classUnderTest.globalSearchQuery(null);
 
             // ASSERT
-            assertFalse(toBoolQueryBuilder(output).hasClauses());
-
+            assertThat(toBoolQueryBuilder(output).hasClauses()).isFalse();
         }
 
         @DisplayName("Null Check: should return empty QueryBuilder when supplied with null SearchCriteria")
@@ -90,8 +83,7 @@ class GlobalSearchQueryBuilderTest {
             QueryBuilder output = classUnderTest.globalSearchQuery(request);
 
             // ASSERT
-            assertFalse(toBoolQueryBuilder(output).hasClauses());
-
+            assertThat(toBoolQueryBuilder(output).hasClauses()).isFalse();
         }
 
         @DisplayName("Term Filters: should add terms filter when corresponding SearchCriteria supplied")
@@ -127,8 +119,7 @@ class GlobalSearchQueryBuilderTest {
             );
 
             BoolQueryBuilder boolQueryBuilder = (BoolQueryBuilder) output;
-            assertEquals(2, Integer.valueOf(boolQueryBuilder.minimumShouldMatch()));
-
+            assertThat(Integer.valueOf(boolQueryBuilder.minimumShouldMatch())).isEqualTo(2);
         }
 
         @DisplayName("Term Filters: should skip terms filter when corresponding SearchCriteria is empty")
@@ -153,7 +144,6 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             assertAllTermsQuerySkipped(output);
-
         }
 
         @DisplayName("Term Filters: should skip terms filter when corresponding SearchCriteria is null")
@@ -212,8 +202,8 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             List<QueryBuilder> partyQueries = getShouldQueryBuilders(output, CaseDataPaths.SEARCH_PARTIES);
-            assertNotNull(partyQueries);
-            assertEquals(2, partyQueries.size());
+            assertThat(partyQueries).isNotNull();
+            assertThat(partyQueries).hasSize(2);
 
             // convert party list into a map based on partyName to allow checks without knowing order of list
             Map<String, NestedQueryBuilder> partyQueriesMap = new HashMap<>();
@@ -248,8 +238,7 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             List<QueryBuilder> partyQueries = getShouldQueryBuilders(output, CaseDataPaths.SEARCH_PARTIES);
-            assertNull(partyQueries);
-
+            assertThat(partyQueries).isNull();
         }
 
         @DisplayName("Parties Filter: should skip parties filter when parties SearchCriteria list is null")
@@ -268,8 +257,7 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             List<QueryBuilder> partyQueries = getShouldQueryBuilders(output, CaseDataPaths.SEARCH_PARTIES);
-            assertNull(partyQueries);
-
+            assertThat(partyQueries).isNull();
         }
 
         @DisplayName("Parties Filter: should skip parties filter when parties SearchCriteria has no properties")
@@ -309,44 +297,43 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             List<QueryBuilder> partyQueries = getShouldQueryBuilders(output, CaseDataPaths.SEARCH_PARTIES);
-            assertNull(partyQueries);
-
+            assertThat(partyQueries).isNull();
         }
 
         private void assertAllTermsQuerySkipped(QueryBuilder output) {
             assertAll(
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.REFERENCE)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.JURISDICTION)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.CASE_TYPE)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.STATE)),
-                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.REGION)),
-                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.BASE_LOCATION)),
-                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.OTHER_REFERENCE_VALUE))
+                () -> assertThat(getTermsQueryBuilder(output, GlobalSearchFields.REFERENCE)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, GlobalSearchFields.JURISDICTION)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, GlobalSearchFields.CASE_TYPE)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, GlobalSearchFields.STATE)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, CaseDataPaths.REGION)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, CaseDataPaths.BASE_LOCATION)).isNull(),
+                () -> assertThat(getTermsQueryBuilder(output, CaseDataPaths.OTHER_REFERENCE_VALUE)).isNull()
             );
         }
 
         private void assertTermsQuery(QueryBuilder output, String fieldName, List<String> expectedTerms) {
             TermsQueryBuilder termsQueryBuilder = getTermsQueryBuilder(output, fieldName);
-            assertNotNull(termsQueryBuilder);
+            assertThat(termsQueryBuilder).isNotNull();
 
             List<String> actualTerms = getValuesFromTermsQueryBuilder(termsQueryBuilder);
-            assertEquals(expectedTerms.size(), actualTerms.size());
+            assertThat(actualTerms).hasSize(expectedTerms.size());
             // NB: terms searches use: 'lowercase_normalizer'
             List<String> expectedTermsLowerCase
                 = expectedTerms.stream().map(String::toLowerCase).toList();
-            assertTrue(actualTerms.containsAll(expectedTermsLowerCase));
+            assertThat(actualTerms.containsAll(expectedTermsLowerCase)).isTrue();
         }
 
         private void assertWildcardQuery(QueryBuilder output, String fieldName, List<String> expectedValues) {
             List<WildcardQueryBuilder> wildcardQueryBuilderList = getWildcardQueryBuilder(output, fieldName);
-            assertNotNull(wildcardQueryBuilderList);
+            assertThat(wildcardQueryBuilderList).isNotNull();
             List<String> actualValues = getValuesFromWildcardQueryBuilder(wildcardQueryBuilderList);
-            assertEquals(expectedValues.size(), actualValues.size());
-            assertEquals(expectedValues, actualValues);
+            assertThat(actualValues).hasSize(expectedValues.size());
+            assertThat(actualValues).isEqualTo(expectedValues);
         }
 
         private void assertPartyQuery(Party expectedParty, NestedQueryBuilder actualPartyQuery) {
-            assertNotNull(actualPartyQuery);
+            assertThat(actualPartyQuery).isNotNull();
 
             // rip it into must queries for each party property
             assertAll(
@@ -386,10 +373,7 @@ class GlobalSearchQueryBuilderTest {
         private void assertNestedMatchPhrase(NestedQueryBuilder nestedQueryBuilder,
                                              String path,
                                              String expectedText) {
-            assertEquals(
-                expectedText,
-                getMatchPhraseValue(nestedQueryBuilder.query(), path)
-            );
+            assertThat(getMatchPhraseValue(nestedQueryBuilder.query(), path)).isEqualTo(expectedText);
         }
 
         private void assertNestedRangeQueryForDate(NestedQueryBuilder nestedQueryBuilder,
@@ -397,15 +381,15 @@ class GlobalSearchQueryBuilderTest {
                                                    String expectedDate) {
 
             RangeQueryBuilder rangeQueryBuilder = getRangeQueryBuilder(nestedQueryBuilder.query(), path);
-            assertNotNull(rangeQueryBuilder);
+            assertThat(rangeQueryBuilder).isNotNull();
             assertAll(
-                () -> assertEquals(expectedDate, rangeQueryBuilder.from().toString()),
-                () -> assertEquals(expectedDate, rangeQueryBuilder.to().toString())
+                () -> assertThat(rangeQueryBuilder.from().toString()).isEqualTo(expectedDate),
+                () -> assertThat(rangeQueryBuilder.to().toString()).isEqualTo(expectedDate)
             );
         }
 
         private BoolQueryBuilder toBoolQueryBuilder(QueryBuilder output) {
-            assertNotNull(output);
+            assertThat(output).isNotNull();
             assertInstanceOf(BoolQueryBuilder.class, output);
             return (BoolQueryBuilder) output;
         }
@@ -417,7 +401,7 @@ class GlobalSearchQueryBuilderTest {
             for (var mustQuery : boolQueryBuilder.must()) {
                 // NB: should query is wrapped in a bool in case a second object query is added
                 if (mustQuery instanceof BoolQueryBuilder) {
-                    List<QueryBuilder> shouldQueries = ((BoolQueryBuilder)mustQuery).should();
+                    List<QueryBuilder> shouldQueries = ((BoolQueryBuilder) mustQuery).should();
 
                     // if contains a should: check if Nested
                     if (CollectionUtils.isNotEmpty(shouldQueries)) {
@@ -439,7 +423,7 @@ class GlobalSearchQueryBuilderTest {
 
             for (var mustQuery : boolQueryBuilder.must()) {
                 if (mustQuery instanceof MatchPhraseQueryBuilder) {
-                    MatchPhraseQueryBuilder matchPhraseQueryBuilder = (MatchPhraseQueryBuilder)mustQuery;
+                    MatchPhraseQueryBuilder matchPhraseQueryBuilder = (MatchPhraseQueryBuilder) mustQuery;
 
                     if (fieldName.equalsIgnoreCase(matchPhraseQueryBuilder.fieldName())) {
                         var value = matchPhraseQueryBuilder.value();
@@ -468,7 +452,7 @@ class GlobalSearchQueryBuilderTest {
 
             for (var mustQuery : boolQueryBuilder.must()) {
                 if (mustQuery instanceof RangeQueryBuilder) {
-                    RangeQueryBuilder rangeQueryBuilder = (RangeQueryBuilder)mustQuery;
+                    RangeQueryBuilder rangeQueryBuilder = (RangeQueryBuilder) mustQuery;
 
                     if (fieldName.equalsIgnoreCase(rangeQueryBuilder.fieldName())) {
                         return rangeQueryBuilder;
@@ -484,7 +468,7 @@ class GlobalSearchQueryBuilderTest {
 
             for (var mustQuery : boolQueryBuilder.must()) {
                 if (mustQuery instanceof TermsQueryBuilder) {
-                    TermsQueryBuilder termsQueryBuilder = (TermsQueryBuilder)mustQuery;
+                    TermsQueryBuilder termsQueryBuilder = (TermsQueryBuilder) mustQuery;
 
                     if (fieldName.equalsIgnoreCase(termsQueryBuilder.fieldName())) {
                         return termsQueryBuilder;
@@ -501,13 +485,14 @@ class GlobalSearchQueryBuilderTest {
 
             for (var mustQuery : boolQueryBuilder.should()) {
                 if (mustQuery instanceof WildcardQueryBuilder) {
-                    WildcardQueryBuilder wildcardQueryBuilder = (WildcardQueryBuilder)mustQuery;
+                    WildcardQueryBuilder wildcardQueryBuilder = (WildcardQueryBuilder) mustQuery;
 
                     if (fieldName.equalsIgnoreCase(wildcardQueryBuilder.fieldName())) {
                         queries.add(wildcardQueryBuilder);
                     }
                 }
             }
+
             return queries;
         }
 
@@ -520,10 +505,10 @@ class GlobalSearchQueryBuilderTest {
             for (WildcardQueryBuilder wildcardQueryBuilder : wildcardQueryBuilderList) {
                 wildcardValues.add(wildcardQueryBuilder.value());
             }
+
             return wildcardValues;
         }
     }
-
 
     @Nested
     @DisplayName("GlobalSearch Sort")
@@ -533,14 +518,11 @@ class GlobalSearchQueryBuilderTest {
         @Test
         void shouldReturnEmptySortForNullRequest() {
 
-            // ARRANGE
-
             // ACT
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(null);
 
             // ASSERT
-            assertTrue(output.isEmpty());
-
+            assertThat(output).isEmpty();
         }
 
         @DisplayName("Null Check: should return empty sort list when supplied with null SortCriteria list")
@@ -555,8 +537,7 @@ class GlobalSearchQueryBuilderTest {
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(request);
 
             // ASSERT
-            assertTrue(output.isEmpty());
-
+            assertThat(output).isEmpty();
         }
 
         @DisplayName("Empty Check: should return empty sort list when supplied with empty SortCriteria list")
@@ -571,8 +552,7 @@ class GlobalSearchQueryBuilderTest {
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(request);
 
             // ASSERT
-            assertTrue(output.isEmpty());
-
+            assertThat(output).isEmpty();
         }
 
         @DisplayName("Empty Criteria Check: should return empty sort list when SortCriteria values are null or empty")
@@ -600,8 +580,7 @@ class GlobalSearchQueryBuilderTest {
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(request);
 
             // ASSERT
-            assertTrue(output.isEmpty());
-
+            assertThat(output).isEmpty();
         }
 
         @DisplayName("Bad Criteria Check: should return empty sort list when supplied with Bad SortCriteria")
@@ -620,8 +599,7 @@ class GlobalSearchQueryBuilderTest {
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(request);
 
             // ASSERT
-            assertTrue(output.isEmpty());
-
+            assertThat(output).isEmpty();
         }
 
         @DisplayName("Many Sort Criteria: should return sort list when supplied with valid SortCriteria")
@@ -641,14 +619,18 @@ class GlobalSearchQueryBuilderTest {
             sortCriteria3.setSortBy(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName());
             sortCriteria3.setSortDirection(null); // i.e. allow it to default
 
+            SortCriteria sortCriteria4 = new SortCriteria();
+            sortCriteria4.setSortBy(GlobalSearchSortByCategory.NEXT_HEARING_DATE.getCategoryName());
+            sortCriteria4.setSortDirection(GlobalSearchSortDirection.ASCENDING.name());
+
             GlobalSearchRequestPayload request = new GlobalSearchRequestPayload();
-            request.setSortCriteria(List.of(sortCriteria1, sortCriteria2, sortCriteria3));
+            request.setSortCriteria(List.of(sortCriteria1, sortCriteria2, sortCriteria3, sortCriteria4));
 
             // ACT
             List<FieldSortBuilder> output = classUnderTest.globalSearchSort(request);
 
             // ASSERT
-            assertEquals(3, output.size());
+            assertThat(output).hasSize(4);
             // :: NB: order of sort criteria should be preserved
             assertAll(
                 () -> assertSortCriteria(
@@ -665,7 +647,13 @@ class GlobalSearchQueryBuilderTest {
                     GlobalSearchSortByCategory.CREATED_DATE,
                     SortOrder.ASC, // i.e. defaulted
                     output.get(2)
-                )
+                ),
+                () -> assertSortCriteria(
+                    GlobalSearchSortByCategory.NEXT_HEARING_DATE,
+                    SortOrder.ASC,
+                    output.get(3)
+                ),
+                () -> assertThat(output.get(3).missing()).isEqualTo("_last")
             );
         }
 
@@ -673,13 +661,12 @@ class GlobalSearchQueryBuilderTest {
                                         SortOrder expectedSortOrder,
                                         FieldSortBuilder actualSortBuilder) {
             assertAll(
-                () -> assertEquals(expectedCategory.getField(), actualSortBuilder.getFieldName()),
-                () -> assertEquals(expectedSortOrder, actualSortBuilder.order())
+                () -> assertThat(actualSortBuilder.getFieldName()).isEqualTo(expectedCategory.getField()),
+                () -> assertThat(actualSortBuilder.order()).isEqualTo(expectedSortOrder)
             );
         }
 
     }
-
 
     @Nested
     @DisplayName("GlobalSearch Fields")
@@ -695,8 +682,21 @@ class GlobalSearchQueryBuilderTest {
             ArrayNode output = classUnderTest.globalSearchSourceFields();
 
             // ASSERT
-            assertNotNull(output);
-            assertFalse(output.isEmpty());
+            assertThat(output)
+                .isNotNull()
+                .isNotEmpty();
+        }
+
+        @DisplayName("Source fields: should include next hearing details")
+        @Test
+        void shouldIncludeNextHearingDetailsInGlobalSearchSourceFields() {
+
+            // ACT
+            ArrayNode output = classUnderTest.globalSearchSourceFields();
+
+            // ASSERT
+            assertThat(StreamSupport.stream(output.spliterator(), false).map(JsonNode::asText))
+                .contains(CaseDataPaths.NEXT_HEARING_DETAILS);
 
         }
 
@@ -704,15 +704,13 @@ class GlobalSearchQueryBuilderTest {
         @Test
         void shouldReturnNonEmptyGlobalSearchSupplementaryDataFields() {
 
-            // ARRANGE
-
             // ACT
             ArrayNode output = classUnderTest.globalSearchSupplementaryDataFields();
 
             // ASSERT
-            assertNotNull(output);
-            assertFalse(output.isEmpty());
-
+            assertThat(output)
+                .isNotNull()
+                .isNotEmpty();
         }
 
     }

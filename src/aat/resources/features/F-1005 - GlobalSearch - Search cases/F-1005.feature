@@ -203,3 +203,35 @@ Feature: F-1005: Global Search - Search cases
     Then a positive response is received,
      And the response [has 200 return code],
      And the response has all other details as expected.
+
+  @S-1005.14 @CCD-8236
+  Scenario: Returns the next hearing date after Logstash indexes a newly created case
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [F-1005_CreateCaseWithNextHearingDetails]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+
+    When a request is prepared with appropriate values
+    And the request [contains the reference for the case with next hearing details]
+    And the request [contains all the mandatory parameters]
+    And it is submitted to call the [Global Search] operation of [CCD Data Store]
+
+    Then a positive response is received,
+    And the response [has 200 return code],
+    And the response [returns the next hearing date],
+    And the response has all other details as expected.
+
+  @S-1005.15 @CCD-8236
+  Scenario: Does not return the next hearing date without child field read access
+    Given a user with [parent and hearing ID read access but no hearing date read access]
+    And a case that has just been created as in [F-1005_CreateCaseWithNextHearingDetails]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+
+    When a request is prepared with appropriate values
+    And the request [contains the reference for the case with next hearing details]
+    And the request [contains all the mandatory parameters]
+    And it is submitted to call the [Global Search] operation of [CCD Data Store]
+
+    Then a positive response is received,
+    And the response [has 200 return code],
+    And the response [returns the case without the next hearing date],
+    And the response has all other details as expected.

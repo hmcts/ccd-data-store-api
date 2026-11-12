@@ -207,6 +207,27 @@
             "analyzer": "standard",
             "search_analyzer": "alphanumeric_string_analyzer"
           },
+          "nextHearingDetails": {
+            "type": "object",
+            "properties": {
+              "hearingID": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256,
+                    "normalizer": "lowercase_normalizer"
+                  }
+                },
+                "analyzer": "standard",
+                "search_analyzer": "alphanumeric_string_analyzer"
+              },
+              "hearingDateTime": {
+                "type": "date",
+                "ignore_malformed": true
+              }
+            }
+          },
           "caseManagementCategory": {
             "type": "object",
             "properties": {
