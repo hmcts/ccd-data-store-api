@@ -30,7 +30,22 @@
     "_extends_": "Common_200_Response",
     "body": {
       "arrayInMap": [
-        "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body]}"
+        {
+          "__ordering__": "ordered"
+        },
+        {
+          "id": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][id]}",
+          "jurisdiction": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][jurisdiction]}",
+          "state": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][state]}",
+          "version": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][case_type_id]}",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][security_classification]}",
+          "case_data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]"
+        }
       ]
     }
   }
