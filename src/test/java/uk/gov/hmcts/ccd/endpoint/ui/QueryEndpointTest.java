@@ -5,12 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -50,6 +46,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
 
 class QueryEndpointTest {
+    private static final String USER_ID = "userId";
 
     @Mock
     private AuthorisedGetCaseViewOperation getCaseViewOperation;
@@ -70,7 +67,6 @@ class QueryEndpointTest {
 
     private QueryEndpoint queryEndpoint;
 
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
@@ -87,14 +83,15 @@ class QueryEndpointTest {
 
     @Test
     void shouldFailIfAccessParamInvalid() {
-        assertThrows(ResourceNotFoundException.class, () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
+        assertThrows(ResourceNotFoundException.class,
+            () -> queryEndpoint.getCaseTypes(USER_ID, JURISDICTION_ID, "INVALID"));
     }
 
     @Test
     void shouldCallGetCaseViewOperation() {
         CaseView caseView = new CaseView();
         doReturn(caseView).when(getCaseViewOperation).execute(any());
-        queryEndpoint.findCase("jurisdictionId", "caseTypeId", "caseId");
+        queryEndpoint.findCase(USER_ID, "jurisdictionId", "caseTypeId", "caseId");
         verify(getCaseViewOperation, times(1)).execute("caseId");
     }
 
@@ -119,9 +116,10 @@ class QueryEndpointTest {
         CaseHistoryView caseView = new CaseHistoryView();
         doReturn(caseView).when(getCaseHistoryViewOperation).execute("caseId", 11L);
 
-        CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent("jurisdictionId", "caseTypeId", "caseId", 11L);
+        CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent(USER_ID, "jurisdictionId", "caseTypeId",
+            "caseId", 11L);
 
-        assertSame(caseView, response);
+        assertThat(response).isSameAs(caseView);
         verify(getCaseHistoryViewOperation, times(1)).execute("caseId", 11L);
     }
 
@@ -135,18 +133,16 @@ class QueryEndpointTest {
         userProfile.setJurisdictions(jurisdictions);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
 
-        List<JurisdictionDisplayProperties> response = queryEndpoint.getJurisdictions("create");
+        List<JurisdictionDisplayProperties> response = queryEndpoint.getJurisdictions(USER_ID, "create");
 
-        assertEquals(jurisdictions.length, response.size());
-        assertThat(response.get(0), is(j1));
-        assertThat(response.get(1), is(j2));
+        assertThat(response).containsExactly(j1, j2);
         verify(getUserProfileOperation, times(1)).execute(CAN_CREATE);
     }
 
     @Test
     @DisplayName("Should throw bad request Exception when access is not correct")
     void shouldThrowBadRequest() {
-        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions("creat"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions(USER_ID, "creat"));
     }
 
     @Test
@@ -177,9 +173,9 @@ class QueryEndpointTest {
             when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised)))
                     .thenReturn(searchResultView);
 
-            SearchResultView result = queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+            SearchResultView result = queryEndpoint.searchNew(USER_ID, "DIVORCE", "DIVORCE", params);
 
-            assertThat(result, is(searchResultView));
+            assertThat(result).isSameAs(searchResultView);
             verify(searchQueryOperation).execute(eq(null), any(MetaData.class), eq(sanitised));
         }
 
@@ -193,9 +189,9 @@ class QueryEndpointTest {
             params.put("last_modified_date", "2021-06-29T::.000");
 
             Exception exception = assertThrows(BadRequestException.class, () -> {
-                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+                queryEndpoint.searchNew(USER_ID, "DIVORCE", "DIVORCE", params);
             });
-            assertTrue(exception.getMessage().contains(expectedErrorMessage));
+            assertThat(exception.getMessage()).contains(expectedErrorMessage);
         }
 
         @Test
@@ -208,10 +204,10 @@ class QueryEndpointTest {
             params.put("last_modified_date", "2021-06-30T::.000");
 
             Exception exception = assertThrows(BadRequestException.class, () -> {
-                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+                queryEndpoint.searchNew(USER_ID, "DIVORCE", "DIVORCE", params);
             });
             String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-30T::.000";
-            assertTrue(exception.getMessage().contains(expectedErrorMessage));
+            assertThat(exception.getMessage()).contains(expectedErrorMessage);
         }
 
         @Test
@@ -224,10 +220,10 @@ class QueryEndpointTest {
             params.put("last_modified_date", "2021-06-30T::.000");
 
             Exception exception = assertThrows(BadRequestException.class, () -> {
-                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+                queryEndpoint.searchNew(USER_ID, "DIVORCE", "DIVORCE", params);
             });
             String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-30T::.000, 2021-06-29T::.000";
-            assertTrue(exception.getMessage().contains(expectedErrorMessage));
+            assertThat(exception.getMessage()).contains(expectedErrorMessage);
         }
 
     }

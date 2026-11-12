@@ -179,7 +179,7 @@ public class ElasticsearchQueryHelper {
         Optional<String> blackListedQueryOpt = blackListedQueries
             .stream()
             .filter(blacklisted -> {
-                Pattern p = Pattern.compile("\\b" + blacklisted + "\\b");
+                Pattern p = Pattern.compile("\\b" + Pattern.quote(blacklisted) + "\\b");
                 Matcher m = p.matcher(jsonSearchRequest);
                 return m.find();
             })
@@ -190,6 +190,9 @@ public class ElasticsearchQueryHelper {
     }
 
     private void validateSupplementaryData(JsonNode searchRequest) {
+        if (searchRequest == null) {
+            return;
+        }
         JsonNode supplementaryDataNode = searchRequest.get(SUPPLEMENTARY_DATA);
         if (supplementaryDataNode != null && !isArrayOfTextFields(supplementaryDataNode)) {
             throw new BadSearchRequest("Requested supplementary_data must be an array of text fields.");

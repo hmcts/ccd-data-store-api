@@ -79,6 +79,7 @@ public class CaseLinkService {
             caseLinkMapper.entitiesToModels(allByCaseReference);
 
         return allLinkedCases.stream()
+            .filter(Objects::nonNull)
             .map(caseLink -> setCaseLinkReferences(Long.parseLong(caseReference), caseLink))
             .collect(Collectors.toList());
     }
@@ -86,8 +87,10 @@ public class CaseLinkService {
     private CaseLink setCaseLinkReferences(Long caseReference, CaseLink caseLink) {
 
         caseLink.setCaseReference(caseReference);
-        caseDetailsRepository.findById(null, caseLink.getLinkedCaseId())
-            .ifPresent(caseDetails -> caseLink.setLinkedCaseReference(caseDetails.getReference()));
+        if (caseLink.getLinkedCaseId() != null) {
+            caseDetailsRepository.findById(null, caseLink.getLinkedCaseId())
+                .ifPresent(caseDetails -> caseLink.setLinkedCaseReference(caseDetails.getReference()));
+        }
 
         return caseLink;
     }

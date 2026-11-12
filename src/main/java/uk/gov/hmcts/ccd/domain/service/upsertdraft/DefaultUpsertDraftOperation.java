@@ -51,6 +51,9 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     @Override
     public DraftResponse executeSave(final String caseTypeId, final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
+        if (caseDataContent == null) {
+            throw new ValidationException("Validation error. Case data content is missing");
+        }
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
         if (!caseTypeDefinition.hasEventId(eventId)) {
@@ -65,6 +68,9 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     @Override
     public DraftResponse executeUpdate(final String caseTypeId, final String draftId,
                                        final CaseDataContent caseDataContent) {
+        if (caseDataContent == null) {
+            throw new ValidationException("Validation error. Case data content is missing");
+        }
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final String eventId = caseDataContent.getEventId();
         if (!caseTypeDefinition.hasEventId(eventId)) {

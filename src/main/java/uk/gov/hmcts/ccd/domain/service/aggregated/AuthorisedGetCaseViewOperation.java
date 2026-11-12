@@ -75,13 +75,13 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
         List<CaseViewField> metadataFieldsToAdd = new ArrayList<>();
 
-        if (caseAccessMetadata.getAccessGrants() != null) {
+        if (caseAccessMetadata != null && caseAccessMetadata.getAccessGrants() != null) {
             metadataFieldsToAdd.add(createCaseViewField(ACCESS_GRANTED,
                 ACCESS_GRANTED_LABEL,
                 caseAccessMetadata.getAccessGrantsString()));
         }
 
-        if (caseAccessMetadata.getAccessProcess() != null) {
+        if (caseAccessMetadata != null && caseAccessMetadata.getAccessProcess() != null) {
             metadataFieldsToAdd.add(createCaseViewField(ACCESS_PROCESS,
                 ACCESS_PROCESS_LABEL,
                 caseAccessMetadata.getAccessProcessString()));
@@ -115,10 +115,12 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                                         Set<AccessProfile> userRoles,
                                         CaseView caseView) {
         CaseViewActionableEvent[] authorisedActionableEvents;
+        String caseStateId = caseView.getState() != null ? caseView.getState().getId() : null;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,
             userRoles,
             CAN_UPDATE)
-            || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
+            || caseStateId == null
+            || !getAccessControlService().canAccessCaseStateWithCriteria(caseStateId,
             caseTypeDefinition,
             userRoles,
             CAN_UPDATE)) {
@@ -128,11 +130,11 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                 caseReference,
                 caseTypeDefinition.getId(),
                 caseTypeDefinition.getVersion() != null ? caseTypeDefinition.getVersion().getNumber() : "",
-                caseView.getState() != null ? caseView.getState().getId() : "",
+                caseStateId != null ? caseStateId : "",
                 caseTypeDefinition.getAccessControlLists(),
                 caseTypeDefinition.getStates()
                     .stream()
-                    .filter(cState -> cState.getId().equalsIgnoreCase(caseView.getState().getId()))
+                    .filter(cState -> cState.getId().equalsIgnoreCase(caseStateId))
                     .map(CaseStateDefinition::getAccessControlLists)
                     .flatMap(Collection::stream)
                     .collect(toList()),
