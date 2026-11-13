@@ -857,7 +857,8 @@ task smoke(type: JavaExec) {
     generateCucumberReports.enabled = false
     mainClass = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
     classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-    args = ['--plugin', "json:${rootDir}/target/cucumber.json",
+    args = ['--threads', '4',
+            '--plugin', "json:${rootDir}/target/cucumber.json",
             '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
             '--tags', '@Smoke and not @Ignore',
             '--glue', 'uk.gov.hmcts.befta.player',
