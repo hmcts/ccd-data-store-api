@@ -26,7 +26,7 @@
   "expectedResponse": {
     "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
     "body": {
-      "message": "Invalid data provided for the following inputs to the request:\nCase user roles list is empty"
+      "message": "Bad Request"
     }
   }
 }

@@ -16,16 +16,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest",
-      "status": 400,
-      "error": "Bad Request",
-      "message": "Date is not valid",
-      "path": "/internal/searchCases/getClosedCases/2999-01-01",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "CCD_Safe_400_Response"
   }
 }

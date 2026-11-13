@@ -16,16 +16,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-      "status": 404,
-      "error": "Not Found",
-      "message": "Case data not found",
-      "path": "/internal/searchCases/getClosedCases/2024-01-01",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "CCD_Safe_404_Response"
   }
 }

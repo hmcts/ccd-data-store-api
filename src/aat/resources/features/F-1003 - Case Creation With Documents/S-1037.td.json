@@ -18,23 +18,20 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "headers": {
       "Content-Encoding" : "[[ANYTHING_PRESENT]]",
       "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Type" : "application/json"
     },
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "message" : "Case data validation failed",
       "details" : {
         "field_errors" : [ {
           "id" : "DocumentField1",
           "message" : "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary does not match Document Management domain or expected URL path"
         } ]
-      },
-      "callbackErrors": null,
-      "callbackWarnings": null
+      }
     }
   }
 }

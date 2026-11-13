@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
+import uk.gov.hmcts.ccd.security.SafeAuthenticationErrors;
 import uk.gov.hmcts.ccd.customheaders.CustomHeadersFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.AppInsightsJwtDecoder;
@@ -101,6 +102,8 @@ public class SecurityConfiguration {
     @Bean
     @Profile("!SECURITY_MOCK")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // CCD-7882: resource-server failures bypass controller advice; sanitise their Bearer challenges here.
+        SafeAuthenticationErrors safeErrors = new SafeAuthenticationErrors();
         http
             .addFilterBefore(customHeadersFilter, BearerTokenAuthenticationFilter.class)
             .addFilterBefore(exceptionHandlingFilter, BearerTokenAuthenticationFilter.class)
@@ -116,7 +119,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .anyRequest()
                 .authenticated())
-            .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            .oauth2ResourceServer(oauth -> oauth.authenticationEntryPoint(safeErrors)
+                .accessDeniedHandler(safeErrors).jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
             .oauth2Client(Customizer.withDefaults());
         return http.build();
     }
@@ -127,9 +131,9 @@ public class SecurityConfiguration {
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> multiIssuerValidation = 
+        OAuth2TokenValidator<Jwt> multiIssuerValidation =
             new MultiIssuerValidator(idamSecurityConfig.getAllowedIssuers());
-        OAuth2TokenValidator<Jwt> validator = 
+        OAuth2TokenValidator<Jwt> validator =
             new DelegatingOAuth2TokenValidator<>(withTimestamp, multiIssuerValidation);
 
         jwtDecoder.setJwtValidator(validator);

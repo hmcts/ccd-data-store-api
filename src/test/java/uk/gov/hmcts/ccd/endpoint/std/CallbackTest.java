@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
@@ -620,9 +621,8 @@ public class CallbackTest extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 422, mvcResult.getResponse().getStatus());
-        assertEquals("Incorrect Error Message", "\"The event cannot be complete due to a callback returned data "
-                + "validation error (c)\"",
-            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
+        assertEquals("Incorrect Error Message", HttpStatus.valueOf(422).getReasonPhrase(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText());
     }
 
     @Test
