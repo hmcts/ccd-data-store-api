@@ -149,6 +149,15 @@ public class TestingSupportController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping(value = "/date-case-closed/{caseReference}")
+    @Operation(summary = "Delete a DATE_CASE_CLOSED record for a case used by functional tests")
+    @ApiResponse(responseCode = "204", description = "Success; also returned when no record exists")
+    public ResponseEntity<Void> dateCaseClosedDeleteByCaseReference(
+        @Parameter(name = "Case Reference", required = true) @PathVariable("caseReference") Long caseReference) {
+        dateCaseClosedRepository.deleteByCcdCaseNumber(caseReference);
+        return ResponseEntity.noContent().build();
+    }
+
     private <T> void executeSql(Session session, String sql, String parameterName, List<T> ids,
                                 BasicTypeReference<T> type) {
         session.beginTransaction();

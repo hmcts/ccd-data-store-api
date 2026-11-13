@@ -1,0 +1,59 @@
+{
+  "_guid_": "S-151.1",
+  "title": "must return the newly created case when searching by case reference",
+  "productName": "CCD Data Store",
+  "operationName": "get case data for a given case type as a caseworker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "specs": [
+    "an active caseworker profile in CCD",
+    "contains the reference of the newly created case",
+    "contains only the newly created case and its data, along with an HTTP 200 OK"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "BEFTA_CASETYPE_1_1"
+    },
+    "queryParams": {
+      "case_reference": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "arrayInMap": [
+        {
+          "__ordering__": "ordered"
+        },
+        {
+          "id": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][id]}",
+          "jurisdiction": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][jurisdiction]}",
+          "state": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][state]}",
+          "version": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][case_type_id]}",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "${[scenarioContext][childContexts][F-151_CreateCase][testData][actualResponse][body][security_classification]}",
+          "case_data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "supplementary_data": null,
+          "after_submit_callback_response": null,
+          "callback_response_status_code": null,
+          "callback_response_status": null,
+          "callback_error_message": null,
+          "delete_draft_response_status_code": null,
+          "delete_draft_response_status": null
+        }
+      ]
+    }
+  }
+}

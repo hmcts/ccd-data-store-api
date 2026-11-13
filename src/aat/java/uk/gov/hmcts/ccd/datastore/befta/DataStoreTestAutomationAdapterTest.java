@@ -11,11 +11,18 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.DynamicValueInjector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +30,62 @@ import static org.mockito.Mockito.when;
 class DataStoreTestAutomationAdapterTest {
 
     private final DataStoreTestAutomationAdapter adapter = new DataStoreTestAutomationAdapter();
+
+    @Test
+    void reusesScenarioUuidAcrossCallsAndAdapterInstances() {
+        BackEndFunctionalTestScenarioContext context = contextWithTag("S-123.2");
+        String value = (String) adapter.calculateCustomValue(context, "UniqueString");
+
+        assertEquals("S-123.2" + UUID.fromString(value.substring("S-123.2".length())), value);
+        assertEquals(value, adapter.calculateCustomValue(context, "UniqueString"));
+        assertEquals(value, new DataStoreTestAutomationAdapter().calculateCustomValue(context, "UniqueString"));
+    }
+
+    @Test
+    void sharesScenarioUuidWithChildrenAndNestedPrerequisites() {
+        BackEndFunctionalTestScenarioContext root = contextWithTag("S-123.2");
+        BackEndFunctionalTestScenarioContext child = contextWithTag("S-001");
+        BackEndFunctionalTestScenarioContext sibling = contextWithTag("S-002");
+        BackEndFunctionalTestScenarioContext grandchild = contextWithTag("S-003");
+        when(child.getParentContext()).thenReturn(root);
+        when(sibling.getParentContext()).thenReturn(root);
+        when(grandchild.getParentContext()).thenReturn(child);
+
+        Object value = adapter.calculateCustomValue(grandchild, "UniqueString");
+
+        assertEquals(value, adapter.calculateCustomValue(root, "UniqueString"));
+        assertEquals(value, adapter.calculateCustomValue(child, "UniqueString"));
+        assertEquals(value, adapter.calculateCustomValue(sibling, "UniqueString"));
+    }
+
+    @Test
+    void isolatesScenariosSharingATagDuringConcurrentAccess() throws Exception {
+        BackEndFunctionalTestScenarioContext first = contextWithTag("S-123.2");
+        BackEndFunctionalTestScenarioContext second = contextWithTag("S-123.2");
+        int workers = 8;
+        CyclicBarrier start = new CyclicBarrier(workers);
+        var executor = Executors.newFixedThreadPool(workers);
+        try {
+            List<Future<Object>> results = new ArrayList<>();
+            for (int i = 0; i < workers; i++) {
+                BackEndFunctionalTestScenarioContext context = i % 2 == 0 ? first : second;
+                results.add(executor.submit(() -> {
+                    start.await(10, TimeUnit.SECONDS);
+                    return adapter.calculateCustomValue(context, "UniqueString");
+                }));
+            }
+            Object firstValue = results.get(0).get(10, TimeUnit.SECONDS);
+            Object secondValue = results.get(1).get(10, TimeUnit.SECONDS);
+            assertNotEquals(firstValue, secondValue);
+            for (int i = 0; i < workers; i++) {
+                assertEquals(i % 2 == 0 ? firstValue : secondValue, results.get(i).get(10, TimeUnit.SECONDS));
+            }
+            assertEquals(firstValue, adapter.calculateCustomValue(first, "UniqueString"));
+            assertEquals(secondValue, adapter.calculateCustomValue(second, "UniqueString"));
+        } finally {
+            executor.shutdownNow();
+        }
+    }
 
     @ParameterizedTest
     @NullAndEmptySource
@@ -102,6 +165,12 @@ class DataStoreTestAutomationAdapterTest {
     private Map<String, Object> validBuilding() {
         return Map.of("epimms_id", "123", "building_location_name", "Test building",
                       "region_id", "1", "region", "Test region");
+    }
+
+    private BackEndFunctionalTestScenarioContext contextWithTag(String tag) {
+        BackEndFunctionalTestScenarioContext context = mock(BackEndFunctionalTestScenarioContext.class);
+        when(context.getCurrentScenarioTag()).thenReturn(tag);
+        return context;
     }
 
     private BackEndFunctionalTestScenarioContext contextWithLocations(Object locations) {

@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-1005_WaitForMasterCase",
+  "_extends_": "GlobalSearch_Readiness_Base",
+  "title": "Wait until the master case type case is searchable",
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": ["FT_MasterCaseType"],
+        "caseReferences": [
+          "${[scenarioContext][customValues][caseReferenceForGlobalSearchReadiness_F-1005_CreateCaseMasterCaseType]}"
+        ]
+      }
+    }
+  }
+}
