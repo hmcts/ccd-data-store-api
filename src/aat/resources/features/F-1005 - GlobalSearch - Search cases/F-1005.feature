@@ -7,7 +7,7 @@ Feature: F-1005: Global Search - Search cases
     And a successful call [to load all ref-data locations] as in [Get_RefData_BuildingLocations_Load_All]
     And a successful call [to load all ref-data services] as in [Get_RefData_OrgServices_Load_All]
     And a case that has just been created as in [F-1005_CreateCasePreRequisiteCaseworker]
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a successful call [to wait for global search indexing] as in [F-1005_WaitForCreatedCase]
 
   @S-1005.1 #AC1
   Scenario: Successfully search for case with one of the new global search parameters
@@ -84,7 +84,7 @@ Feature: F-1005: Global Search - Search cases
     Given a user with [an active profile in CCD]
     And a successful call [to get a caseworker event token to update the case just created] as in [F-1005_GetCaseworkerUpdateToken]
     And a successful call [to update a case] as in [F-1005_UpdateCasePreRequisiteCaseworker]
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a successful call [to wait for global search indexing] as in [F-1005_WaitForUpdatedCase]
 
     When a request is prepared with appropriate values
     And the request [contains the field that has been updated]
@@ -114,7 +114,7 @@ Feature: F-1005: Global Search - Search cases
   Scenario: Successfully verifies the pagination
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1005_CreateSecondCasePreRequisiteCaseworker]
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a successful call [to wait for global search indexing] as in [F-1005_WaitForSecondCase]
 
     When a request is prepared with appropriate values
     And the request [contains the sortCriteria]
@@ -130,7 +130,7 @@ Feature: F-1005: Global Search - Search cases
   Scenario: Successfully searches across different Case Types
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1005_CreateCaseMasterCaseType]
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a successful call [to wait for global search indexing] as in [F-1005_WaitForMasterCase]
 
     When a request is prepared with appropriate values
     And the request [contains two different Case Types]
@@ -146,7 +146,7 @@ Feature: F-1005: Global Search - Search cases
   Scenario: Successfully searches for a case that was modified by a callback
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1005_CreateCaseWithCallback]
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a successful call [to wait for global search indexing] as in [F-1005_WaitForCallbackCase]
 
     When a request is prepared with appropriate values
     And the request [contains the fields modified by the callback]

@@ -11,12 +11,14 @@ import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
+import uk.gov.hmcts.befta.util.Retryable;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
@@ -64,6 +66,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
+        String readinessPrefix = "caseReferenceForGlobalSearchReadiness_";
+        if (key.toString().startsWith(readinessPrefix)) {
+            return configureGlobalSearchReadiness(scenarioContext, key.toString().substring(readinessPrefix.length()));
+        }
         if ("UniqueString".equals(key)) {
             BackEndFunctionalTestScenarioContext rootContext = scenarioContext;
             while (rootContext.getParentContext() != null) {
@@ -209,6 +215,27 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             return UUID.randomUUID();
         }
         return super.calculateCustomValue(scenarioContext, key);
+    }
+
+    private String configureGlobalSearchReadiness(BackEndFunctionalTestScenarioContext context, String creationId) {
+        // Only this read-only search probe may retry POSTs; case creation and the scenario keep their own policies.
+        if (!"POST".equals(context.getTestData().getMethod())
+            || !"/globalSearch".equals(context.getTestData().getUri())) {
+            throw new FunctionalTestException("Global search readiness requires a POST /globalSearch probe");
+        }
+        String caseReference = context.getParentContext().getChildContexts().get(creationId)
+            .getTestData().getActualResponse().getBody().get("id").toString();
+        BeftaUtils.defaultLog("Waiting for global search case " + caseReference
+                                  + " with up to 11 attempts, 3 seconds apart");
+        context.setRetryableTag(Retryable.builder()
+            .maxAttempts(11)
+            .delay(3000)
+            .statusCodes(Set.of())
+            .match(List.of("\"casesReturned\"\\s*:\\s*0\\s*[,}]"))
+            .nonRetryableHttpMethods(Set.of())
+            .retryListener(Retryable.setRetryListener(true))
+            .build());
+        return caseReference;
     }
 
     private Map<?, ?> selectValidBuildingLocation(Object locations) {
