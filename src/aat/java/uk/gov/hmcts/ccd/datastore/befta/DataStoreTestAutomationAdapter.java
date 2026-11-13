@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
 import com.google.common.collect.MapMaker;
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
@@ -29,6 +31,33 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     // Weak identity keys keep scenarios isolated and allow completed contexts to be collected.
     private static final Map<BackEndFunctionalTestScenarioContext, String> UNIQUE_STRINGS_PER_SCENARIO =
         new MapMaker().weakKeys().makeMap();
+
+    private static final ReentrantLock GLOBAL_SEARCH_SCENARIO_LOCK = new ReentrantLock();
+    private static final ReentrantLock CLOSED_CASES_SCENARIO_LOCK = new ReentrantLock();
+
+    @Before("@F-1005")
+    public void serializeGlobalSearchScenarios() {
+        GLOBAL_SEARCH_SCENARIO_LOCK.lock();
+    }
+
+    @After("@F-1005")
+    public void releaseGlobalSearchScenarioLock() {
+        if (GLOBAL_SEARCH_SCENARIO_LOCK.isHeldByCurrentThread()) {
+            GLOBAL_SEARCH_SCENARIO_LOCK.unlock();
+        }
+    }
+
+    @Before("@F-942 or @F-944 or @F-945")
+    public void serializeClosedCaseScenarios() {
+        CLOSED_CASES_SCENARIO_LOCK.lock();
+    }
+
+    @After("@F-942 or @F-944 or @F-945")
+    public void releaseClosedCaseScenarioLock() {
+        if (CLOSED_CASES_SCENARIO_LOCK.isHeldByCurrentThread()) {
+            CLOSED_CASES_SCENARIO_LOCK.unlock();
+        }
+    }
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {

@@ -13,10 +13,10 @@ Feature: F-942: Get closed cases
     When a request is prepared with appropriate values,
     And the request [contains Date field],
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-942.1_DeleteDateCaseClosed],
 
     Then a positive response is received,
-    And the response has all other details as expected,
-    And a call [to delete the date case closed record for this case] will get the expected response as in [S-942.1_DeleteDateCaseClosed].
+    And the response has all other details as expected.
 
   @S-942.2
   Scenario: Return 400 if date validation fails
