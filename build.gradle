@@ -50,8 +50,8 @@ ext {
     elasticVersion = '9.5.5'
     testContainersVersion = '2.0.5'
     cucumber = '7.34.9'
-    beftaFwVersion = '9.2.12_CCD-8388'
-    ccdTestDefinitionVersion = '7.26.16_CCD-3828-SNAPSHOT4'
+    beftaFwVersion = '9.2.12'
+    ccdTestDefinitionVersion = '7.26.16_CCD-3828-SNAPSHOT5'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -860,7 +860,7 @@ task smoke(type: JavaExec) {
             '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
             '--tags', '@Smoke and not @Ignore',
             '--glue', 'uk.gov.hmcts.befta.player',
-            '--glue', "uk.gov.hmcts.ccd.datastore.befta", 
+            '--glue', "uk.gov.hmcts.ccd.datastore.befta",
             'src/aat/resources/features'
     ]
     jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
