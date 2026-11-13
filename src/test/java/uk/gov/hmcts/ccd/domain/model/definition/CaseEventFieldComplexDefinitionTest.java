@@ -16,8 +16,10 @@ class CaseEventFieldComplexDefinitionTest {
         CaseEventFieldDefinition eventField = objectMapper.readValue(json, CaseEventFieldDefinition.class);
         CaseEventFieldComplexDefinition definition = eventField.getCaseEventFieldComplexDefinitions().get(0);
 
-        assertEquals("#ARGUMENT(Line1, Line2)", definition.getDisplayContextParameter());
-        assertEquals("#ARGUMENT(Line1, Line2)", objectMapper.readTree(objectMapper.writeValueAsString(eventField))
+        assertEquals("#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)",
+            definition.getDisplayContextParameter());
+        assertEquals("#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)",
+            objectMapper.readTree(objectMapper.writeValueAsString(eventField))
             .get("case_fields_complex").get(0)
             .get("display_context_parameter").asText());
         assertEquals(definition.getDisplayContextParameter(), definition.createCopy().getDisplayContextParameter());
