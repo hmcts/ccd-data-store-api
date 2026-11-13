@@ -7,7 +7,7 @@ maintainers:
   - name: HMCTS CCD Dev Team
     email: ccd-devops@HMCTS.NET
 annotations:
-  hmcts.github.io/skip-publish: ccd-core, ccd-definition-store-api
+  hmcts.github.io/skip-publish: ccd-core, ccd-definition-store-api, elasticsearch, logstash
 dependencies:
   - name: java
     version: 6.1.1
