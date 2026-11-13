@@ -414,6 +414,7 @@ dependencies {
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pactProviderVersion
     contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     aatAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    aatImplementation group: 'com.github.rholder', name: 'guava-retrying', version: '2.0.0'
 
     cucumberRuntime group: 'io.cucumber', name: 'cucumber-java', version: cucumber
     cucumberRuntime group: 'io.cucumber', name: 'cucumber-junit', version: cucumber
