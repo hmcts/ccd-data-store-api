@@ -6,7 +6,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "caseReference": "${[scenarioContext][childContexts][S-944.1_Create_Case][testData][actualResponse][body][id]}"
+      "caseReference": "${[scenarioContext][parentContext][childContexts][S-944.1_Create_Case][testData][actualResponse][body][id]}"
     }
   }
 }
