@@ -1,0 +1,30 @@
+{
+	"_guid_": "S-026.03",
+	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return 400 when a case field name targets the reserved access control parameter namespace",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a case field name inside the reserved access control parameter namespace",
+		"contains an error message : Field Names Invalid"
+	],
+
+	"request": {
+		"queryParams": {
+			"case.abac$region_1_basic": "GB-WEST"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"message": "Field Names Invalid",
+			"path": "[[ANYTHING_PRESENT]]",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
+}
