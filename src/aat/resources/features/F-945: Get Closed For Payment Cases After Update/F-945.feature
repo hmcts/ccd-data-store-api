@@ -3,7 +3,6 @@ Feature: F-945: Update closed for payment cases
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a call [to delete existing date case closed records] will get the expected response as in [F-942_DeleteExistingDateCaseClosed],
 
   @S-945.1
   Scenario: Return updated case when update event post state is closed for payment
@@ -18,7 +17,8 @@ Feature: F-945: Update closed for payment cases
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
 
     Then a positive response is received,
-    And the response has all other details as expected.
+    And the response has all other details as expected,
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.2_DeleteDateCaseClosed].
 
   @S-945.2
   Scenario: Do not return updated case when update event post state is not closed for payment
@@ -35,7 +35,9 @@ Feature: F-945: Update closed for payment cases
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
 
     Then a positive response is received,
-    And the response has all other details as expected.
+    And the response has all other details as expected,
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.1_DeleteDateCaseClosed],
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.2_DeleteDateCaseClosed].
 
   @S-945.3
   Scenario: Do not return updated case after moving out of closed for payment state
@@ -54,4 +56,6 @@ Feature: F-945: Update closed for payment cases
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
 
     Then a positive response is received,
-    And the response has all other details as expected.
+    And the response has all other details as expected,
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.1_DeleteDateCaseClosed],
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.2_DeleteDateCaseClosed].

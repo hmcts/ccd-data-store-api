@@ -3,7 +3,6 @@ Feature: F-944: Get closed for payment cases after creation
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a call [to delete existing date case closed records] will get the expected response as in [F-942_DeleteExistingDateCaseClosed],
 
   @S-944.1
   Scenario: Return created case when created case state category is closed for payment
@@ -16,7 +15,8 @@ Feature: F-944: Get closed for payment cases after creation
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
 
     Then a positive response is received,
-    And the response has all other details as expected.
+    And the response has all other details as expected,
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.1_DeleteDateCaseClosed].
 
   @S-944.2
   Scenario: Do not return created case when created case state category is not closed for payment
@@ -30,4 +30,5 @@ Feature: F-944: Get closed for payment cases after creation
 
     Then a negative response is received,
     And the response [code is HTTP-404],
-    And the response has all other details as expected.
+    And the response has all other details as expected,
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-944.2_DeleteDateCaseClosed].

@@ -1,0 +1,12 @@
+{
+  "_guid_": "S-944.1_DeleteDateCaseClosed",
+  "_extends_": "F-942_DeleteDateCaseClosedByCaseReference",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "caseReference": "${[scenarioContext][childContexts][S-944.1_Create_Case][testData][actualResponse][body][id]}"
+    }
+  }
+}
