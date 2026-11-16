@@ -153,6 +153,23 @@ class DataStoreTestAutomationAdapterTest {
     }
 
     @Test
+    void registersCreatedCaseReferenceForFailureSafeCleanup() {
+        DateCaseClosedCleanupContext.beginScenario();
+        BackEndFunctionalTestScenarioContext context = mock(BackEndFunctionalTestScenarioContext.class);
+        HttpTestData testData = mock(HttpTestData.class);
+        ResponseData response = mock(ResponseData.class);
+        when(context.getTestData()).thenReturn(testData);
+        when(testData.getActualResponse()).thenReturn(response);
+        when(response.getBody()).thenReturn(Map.of("id", 1234567890123456L));
+
+        assertEquals(1234567890123456L,
+            adapter.calculateCustomValue(context, "registerDateCaseClosedReference"));
+        assertEquals(List.of(1234567890123456L),
+            DateCaseClosedCleanupContext.currentScenario().getCaseReferences());
+        DateCaseClosedCleanupContext.clear();
+    }
+
+    @Test
     void reportsMissingUsableReferenceData() {
         for (Object locations : List.of(List.of(), List.of(Map.of("epimms_id", "123")), "invalid response")) {
             FunctionalTestException exception = assertThrows(FunctionalTestException.class,

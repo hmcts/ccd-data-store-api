@@ -22,7 +22,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "body": {
-      "ccdCaseNumber": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "ccdCaseNumber": "${[scenarioContext][customValues][registerDateCaseClosedReferenceFrom_Standard_Full_Case_Creation_Data]}",
       "state": "Closed",
       "stateCategory": "Closed",
       "stateChangeDate": "2025-01-01T00:00:00"
