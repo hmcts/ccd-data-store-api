@@ -293,7 +293,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
         String testUrl = EnvironmentVariableUtils.getRequiredVariable("TEST_URL").replaceAll("/+$", "");
         String serviceAuthorization = getNewS2SToken();
-        List<String> failedReferences = new java.util.ArrayList<>();
+        List<String> failedReferences = new ArrayList<>();
         for (Long caseReference : cleanup.getCaseReferences()) {
             try {
                 Response response = given()
