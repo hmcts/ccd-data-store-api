@@ -1,0 +1,71 @@
+{
+  "_guid_": "S-1050.1",
+  "productName": "CCD Data Store",
+  "operationName": "fetch a case for display for Case Worker",
+  "_extends_": "F-1050.1_Test_Data_Base",
+  "prerequisites": [
+    {
+      "Token_Creation": "S-1050.1_Create_Case_Data_Token_Creation"
+    }
+  ],
+  "specs": [
+    "an active profile in CCD",
+    "contains valid caseType id which has defaultFocus value set for tab",
+    "fetch a case for display for Case Worker",
+    "contains HTTP 200"
+  ],
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][S-1050.1_Create_Case_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "channels": "[[ANYTHING_PRESENT]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "tabs": [
+        {
+          "id": "NameTab",
+          "label": "Details",
+          "order": 2,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": true,
+          "show_condition": null
+        },
+        {
+          "id": "CaseLinkTab",
+          "label": "Linked Cases",
+          "order": 3,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": null,
+          "show_condition": null
+        },
+        {
+          "id": "History",
+          "label": "History",
+          "order": 1,
+          "fields": "[[ANYTHING_PRESENT]]",
+          "role": null,
+          "defaultFocus": null,
+          "show_condition": null
+        }
+      ],
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
