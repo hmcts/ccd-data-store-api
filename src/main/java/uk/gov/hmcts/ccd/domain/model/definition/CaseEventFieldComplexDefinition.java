@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
@@ -76,13 +74,10 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
         this.order = order;
     }
 
-    @JsonProperty("display_context_parameter")
-    @JsonAlias("displayContextParameter")
     public String getDisplayContextParameter() {
         return displayContextParameter;
     }
 
-    @JsonProperty("display_context_parameter")
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
     }
