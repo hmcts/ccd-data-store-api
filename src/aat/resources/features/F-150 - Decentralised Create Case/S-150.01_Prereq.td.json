@@ -5,5 +5,10 @@
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][F-150_CreateCase_Token_Creation][testData][actualResponse][body][token]}"
     }
+  },
+  "expectedResponse": {
+    "body": {
+      "data_classification": "[[ANYTHING_PRESENT]]"
+    }
   }
 }

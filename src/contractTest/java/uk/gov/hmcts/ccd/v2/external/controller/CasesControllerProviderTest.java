@@ -53,6 +53,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
@@ -76,8 +77,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
-import uk.gov.hmcts.reform.idam.client.models.TokenExchangeResponse;
+import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -252,15 +252,10 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         doNothing().when(eventTokenService).validateToken(anyString(), anyString(), isA(CaseDetails.class),
             isA(CaseEventDefinition.class), isA(JurisdictionDefinition.class), isA(CaseTypeDefinition.class));
 
-        AuthenticateUserResponse authenticateUserResponse = new AuthenticateUserResponse("200");
+        TokenResponse tokenResponse = new TokenResponse("some access token", null, null, null, null, null);
 
-        stubFor(WireMock.post(urlMatching("/oauth2/authorize"))
-            .willReturn(okJson(objectMapper.writeValueAsString(authenticateUserResponse)).withStatus(200)));
-
-        TokenExchangeResponse tokenExchangeResponse = new TokenExchangeResponse("some access token");
-
-        stubFor(WireMock.post(urlMatching("/oauth2/token"))
-            .willReturn(okJson(objectMapper.writeValueAsString(tokenExchangeResponse)).withStatus(200)));
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(objectMapper.writeValueAsString(tokenResponse)).withStatus(200)));
         when(validateCaseFieldsOperation.validateCaseDetails(any())).thenReturn(new HashMap<>());
     }
 
@@ -286,6 +281,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
 
     @State("adoption-web makes request to get case-users roles")
     public void adoptionWebToGetCaseUsersRoles(Map<String, Object> dataMap) {
+    }
+
+    @State("a case exists")
+    public void acaseExists(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = mockCaseDetailsResponse(
+            "mock_responses/wa_get_case_by_id.json", dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
     @State("adoption-web makes request to get citizen-update-application event token")
@@ -422,7 +424,11 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
             caseworkerPassword);
         securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
             caseworkerPassword);
-        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        CaseDetails caseDetails = contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
+        if (caseDetails.getReference() == null && caseDetails.getId() != null) {
+            caseDetails.setReference(Long.valueOf(caseDetails.getId()));
+        }
+        return caseDetails;
 
     }
 
@@ -564,13 +570,13 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         when(eventTokenService.generateToken(anyString(),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn(null);
+            isA(CaseTypeDefinition.class))).thenReturn("someToken");
 
         when(eventTokenService.generateToken(anyString(),
             isA(CaseDetails.class),
             isA(CaseEventDefinition.class),
             isA((JurisdictionDefinition.class)),
-            isA(CaseTypeDefinition.class))).thenReturn(null);
+            isA(CaseTypeDefinition.class))).thenReturn("someToken");
         return caseDetails;
     }
 }

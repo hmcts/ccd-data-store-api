@@ -2,13 +2,13 @@ package uk.gov.hmcts.ccd.security.idam;
 
 import feign.FeignException;
 import feign.Request;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
+@ExtendWith(MockitoExtension.class)
 class IdamRepositoryTest {
 
     private static final String TEST_USER_TOKEN = "TestUserToken";
@@ -43,17 +45,39 @@ class IdamRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(idamRepository, "selfInstance", idamRepository);
     }
 
     @Test
     @DisplayName("Get user info if token is passed")
     void shouldGetUserInfo() {
-        UserInfo userInfo = UserInfo.builder().build();
+        UserInfo userInfo = UserInfo.builder().roles(ROLES).build();
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
         UserInfo result = idamRepository.getUserInfo(TEST_USER_TOKEN);
         assertThat(result).isSameAs(userInfo);
+    }
+
+    @Test
+    @DisplayName("Get user info with empty roles when IDAM omits roles")
+    void shouldGetUserInfoWithEmptyRolesWhenRolesMissing() {
+        UserInfo userInfo = UserInfo.builder()
+            .sub("user@example.com")
+            .uid(USER_ID)
+            .name("Test User")
+            .givenName("Test")
+            .familyName("User")
+            .roles(null)
+            .build();
+        given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willReturn(userInfo);
+
+        UserInfo result = idamRepository.getUserInfo(TEST_USER_TOKEN);
+
+        assertThat(result.getRoles()).isNotNull().isEmpty();
+        assertThat(result.getSub()).isEqualTo("user@example.com");
+        assertThat(result.getUid()).isEqualTo(USER_ID);
+        assertThat(result.getName()).isEqualTo("Test User");
+        assertThat(result.getGivenName()).isEqualTo("Test");
+        assertThat(result.getFamilyName()).isEqualTo("User");
     }
 
     @Test
@@ -65,7 +89,7 @@ class IdamRepositoryTest {
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
 
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -76,7 +100,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(InvalidTokenException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -87,7 +111,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
+        assertThrows(ServiceException.class, () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
     @Test
@@ -98,7 +122,7 @@ class IdamRepositoryTest {
             Request.create(Request.HttpMethod.GET, "myUniqueExceptionMessage", Map.of(), new byte[0],
                 Charset.defaultCharset(), null), new byte[0], new HashMap<>());
         given(idamClient.getUserInfo("Bearer " + TEST_USER_TOKEN)).willThrow(exception);
-        Assert.assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
             () -> idamRepository.getUserInfo(TEST_USER_TOKEN));
     }
 
@@ -110,6 +134,20 @@ class IdamRepositoryTest {
 
         List<String> idamUserRoles = idamRepository.getUserRoles(USER_ID);
         assertThat(idamUserRoles).isSameAs(ROLES);
+    }
+
+    @Test
+    @DisplayName("Get empty User Roles by UserId when IDAM omits roles")
+    void shouldGetEmptyUserRolesByUserIdWhenRolesMissing() {
+        mockGetDataStoreSystemUserAccessToken();
+        UserDetails userDetails = UserDetails.builder()
+            .id(USER_ID)
+            .roles(null)
+            .build();
+        given(idamClient.getUserByUserId(TEST_USER_TOKEN, USER_ID)).willReturn(userDetails);
+
+        List<String> idamUserRoles = idamRepository.getUserRoles(USER_ID);
+        assertThat(idamUserRoles).isNotNull().isEmpty();
     }
 
     @Test

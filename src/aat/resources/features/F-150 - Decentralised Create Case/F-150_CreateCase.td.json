@@ -55,7 +55,7 @@
         "TextField": "Decentralised case",
         "_stubProcessedBy": "ccd-test-stubs-service"
       },
-      "data_classification": {},
+      "data_classification": "[[ANYTHING_PRESENT]]",
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
