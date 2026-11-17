@@ -12,19 +12,21 @@ public class CaseViewTab {
     @JsonProperty("show_condition")
     private String showCondition;
     private String role;
+    private Boolean defaultFocus;
 
     public CaseViewTab() {
         // default constructor
     }
 
     public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields,
-                       String showCondition, String role) {
+                       String showCondition, String role, Boolean defaultFocus) {
         this.id = id;
         this.label = label;
         this.order = order;
         this.fields = fields;
         this.showCondition = showCondition;
         this.role = role;
+        this.defaultFocus = defaultFocus;
     }
 
     public String getId() {
@@ -73,5 +75,13 @@ public class CaseViewTab {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    public Boolean getDefaultFocus() {
+        return defaultFocus;
+    }
+
+    public void setDefaultFocus(Boolean defaultFocus) {
+        this.defaultFocus = defaultFocus;
     }
 }
