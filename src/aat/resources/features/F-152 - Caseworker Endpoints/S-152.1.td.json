@@ -5,16 +5,19 @@
   "operationName": "Get documents for a caseworker case",
   "method": "GET",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents",
-  "user": { "_extends_": "Common_User_For_Request" },
+  "user": { "_extends_": "BeftaMasterCaseworker" },
   "specs": [ "an active profile in CCD" ],
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT_AUTH_15",
-      "cid": "${[scenarioContext][siblingContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][S-152.1_Case_Creation_Data][testData][actualResponse][body][id]}"
     }
   },
-  "expectedResponse": { "_extends_": "Common_200_Response" }
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": { "arrayInMap": "[[ANYTHING_PRESENT]]" }
+  }
 }
