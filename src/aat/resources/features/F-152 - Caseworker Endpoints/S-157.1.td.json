@@ -26,5 +26,14 @@
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
-  "expectedResponse": { "_extends_": "Common_200_Response" }
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "document": null,
+      "type": null,
+      "created": null,
+      "updated": null
+    }
+  }
 }
