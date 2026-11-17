@@ -54,7 +54,6 @@ This file defines a **stored procedure** (`cleanup_case_data(batch_size int DEFA
 
 **Recommendation:**  
 Use **Script 2** for production or regular maintenance, as it is idempotent, batched, and safe for repeat execution.
-
 # 🧹 CCD Data Store Database Cleanup Process
 1. Case-data cleanup is optional and is not required for re-indexing. If cleanup is intended, `CALL cleanup_case_data(2000, 3);` deletes data older than 3 months in batches of 2000.
 2. Choose the recovery scope: for targeted recovery, retain existing indexes and filter the query to affected cases. Index deletion is not required to requeue cases; do not use a blanket deletion of all Elasticsearch indexes.
