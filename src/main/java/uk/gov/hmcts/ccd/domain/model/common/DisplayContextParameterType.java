@@ -8,8 +8,7 @@ public enum DisplayContextParameterType {
     DATETIMEENTRY,
     DATETIMEDISPLAY,
     TABLE,
-    LIST,
-    ARGUMENT;
+    LIST;
 
     private static final Pattern PATTERN = Pattern.compile("#(.+)\\((.+)\\)");
     private static final int TYPE_GROUP = 1;
