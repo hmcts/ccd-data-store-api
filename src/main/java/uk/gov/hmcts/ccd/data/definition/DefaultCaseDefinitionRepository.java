@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
+@Slf4j
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
 public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository {
@@ -90,6 +92,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
                         .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
             }
+            log.info("retrieved case type definition for case type: {}: {}", caseTypeId, caseTypeDefinition);
             return caseTypeDefinition;
 
         } catch (Exception e) {

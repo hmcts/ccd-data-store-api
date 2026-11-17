@@ -24,4 +24,13 @@ class CaseEventFieldComplexDefinitionTest {
             .get("display_context_parameter").asText());
         assertEquals(definition.getDisplayContextParameter(), definition.createCopy().getDisplayContextParameter());
     }
+
+    @Test
+    void readsCamelCaseDisplayContextParameter() throws Exception {
+        CaseEventFieldComplexDefinition definition = objectMapper.readValue(
+            "{\"displayContextParameter\":\"#ARGUMENT(value)\"}",
+            CaseEventFieldComplexDefinition.class);
+
+        assertEquals("#ARGUMENT(value)", definition.getDisplayContextParameter());
+    }
 }
