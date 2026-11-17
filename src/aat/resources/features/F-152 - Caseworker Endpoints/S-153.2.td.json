@@ -1,13 +1,18 @@
 {
   "_guid_": "S-153.2",
   "title": "reject a malformed case reference when retrieving events",
-  "_extends_": "S-153.1",
+  "productName": "CCD Data Store",
+  "operationName": "Get events for a caseworker case",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+  "user": { "_extends_": "Common_User_For_Request" },
   "specs": [
     "an active profile in CCD",
     "contains a malformed case reference",
     "contains a HTTP-400 Bad Request"
   ],
   "request": {
+    "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "AUTOTEST1",
