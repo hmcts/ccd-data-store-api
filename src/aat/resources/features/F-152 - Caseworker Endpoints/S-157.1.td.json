@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-157.1",
+  "title": "update a caseworker draft",
+  "productName": "CCD Data Store",
+  "operationName": "Update a caseworker draft",
+  "method": "PUT",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}",
+  "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [ "an active profile in CCD" ],
+  "prerequisites": [
+    { "Token_Creation": "F-068_Get_Event_Token" }
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": { "Content-Type": "application/json" },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "etid": "createCase",
+      "did": "${[scenarioContext][childContexts][S-154.1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": { "TextField": "updated field" },
+      "event": { "id": "createCase", "summary": "", "description": "" },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": { "_extends_": "Common_200_Response" }
+}

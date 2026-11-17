@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-153.2",
+  "title": "reject a malformed case reference when retrieving events",
+  "_extends_": "S-153.1",
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed case reference",
+    "contains a HTTP-400 Bad Request"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15",
+      "cid": "not-a-case-reference"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case reference not-a-case-reference is not valid",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null,
+      "status": 400,
+      "error": "Bad Request",
+      "timestamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-154.3",
+  "title": "reject a draft request with a valid event id and malformed case data",
+  "productName": "CCD Data Store",
+  "operationName": "Create a caseworker draft",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts",
+  "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [
+    "an active profile in CCD",
+    "contains a valid event id and case data that is not an object",
+    "contains a HTTP-400 Bad Request"
+  ],
+  "prerequisites": [
+    { "Token_Creation": "F-068_Get_Event_Token" }
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": { "Content-Type": "application/json" },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "etid": "createCase"
+    },
+    "body": {
+      "data": "not-an-object",
+      "event": { "id": "createCase", "summary": "", "description": "" },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_Response",
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "about:blank",
+      "title": "Bad Request",
+      "status": 400,
+      "detail": "Failed to read request",
+      "instance": "[[ANYTHING_PRESENT]]",
+      "properties": "[[ANY_STRING_NULLABLE]]"
+    }
+  }
+}

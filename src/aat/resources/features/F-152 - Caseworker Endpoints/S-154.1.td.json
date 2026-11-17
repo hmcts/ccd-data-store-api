@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-154.1",
+  "title": "create a draft for a caseworker",
+  "productName": "CCD Data Store",
+  "operationName": "Create a caseworker draft",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts",
+   "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [
+    "an active profile in CCD",
+    "to create a caseworker draft"
+  ],
+  "prerequisites": [
+    { "Token_Creation": "F-068_Get_Event_Token" }
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": { "Content-Type": "application/json" },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "etid": "createCase"
+    },
+    "body": {
+      "data": { "TextField": "field1", "TextField2": "field2" },
+      "event": { "id": "createCase", "summary": "", "description": "" },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "document": null,
+      "type": null,
+      "created": null,
+      "updated": null
+    }
+  }
+}
