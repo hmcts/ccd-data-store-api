@@ -16,7 +16,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
-import java.util.jar.JarEntry;
 
 @Slf4j
 @Service
