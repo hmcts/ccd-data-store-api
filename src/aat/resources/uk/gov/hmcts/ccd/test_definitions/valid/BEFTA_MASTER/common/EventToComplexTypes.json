@@ -4,7 +4,7 @@
     "LiveTo": "",
     "ID": "FT_MasterCaseType",
     "CaseEventID": "createCase",
-    "CaseFieldId": "StaffUserComplexField",
+    "CaseFieldID": "StaffUserComplexField",
     "ListElementCode": "staffUser",
     "DefaultValue": "",
     "EventElementLabel": "",
