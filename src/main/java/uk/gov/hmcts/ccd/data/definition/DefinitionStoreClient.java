@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -15,7 +16,9 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
+@Slf4j
 @Service
 public class DefinitionStoreClient {
 
@@ -37,6 +40,7 @@ public class DefinitionStoreClient {
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
     public <T> ResponseEntity<T> invokeGetRequest(final String url, Class<T> responseType,
                                                   Map<String, String> queryParams) {
+        log.info("JEN - client url1: " + url);
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType, queryParams);
     }
 
@@ -44,6 +48,7 @@ public class DefinitionStoreClient {
         maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
     public <T> ResponseEntity<T> invokeGetRequest(final String url, final Class<T> responseType) {
+        log.info("JEN - client url2: " + url);
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType, Collections.emptyMap());
     }
 
@@ -51,6 +56,7 @@ public class DefinitionStoreClient {
         maxAttemptsExpression = "${definition-store.retry.maxAttempts}",
         backoff = @Backoff(delayExpression = "${definition-store.retry.maxDelay}"))
     public <T> ResponseEntity<T> invokeGetRequest(final URI url, final Class<T> responseType) {
+        log.info("JEN - client url3: " + url);
         return restTemplate.exchange(url, HttpMethod.GET, createRequestEntity(), responseType);
     }
 }

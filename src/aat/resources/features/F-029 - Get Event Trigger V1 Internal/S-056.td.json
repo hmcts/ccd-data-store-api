@@ -10,19 +10,8 @@
   "user": {
     "_extends_": "BeftaMasterCaseworker"
   },
-  "request": {
-    "pathVariables": {
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
-      "etid": "createCase"
-    }
-  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Transfer-Encoding": "chunked",
-      "Content-Length": "[[ANY_INTEGER_NULLABLE]]"
-    },
     "body": {
       "id": "createCase",
       "case_fields": [

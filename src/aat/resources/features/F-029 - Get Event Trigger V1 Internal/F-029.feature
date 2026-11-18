@@ -28,7 +28,7 @@ Scenario: must return the display context parameter configured for StaffUser in 
 
      When a request is prepared with appropriate values,
       And the request [is prepared with valid input parameters],
-      And it is submitted to call the [Fetch an event trigger in the context of a case type for Case Worker] operation of [CCD Data Store],
+      And it is submitted to call the [Fetch an event trigger for Case Worker] operation of [CCD Data Store],
 
      Then a positive response is received,
       And the response [has the 200 return code],
