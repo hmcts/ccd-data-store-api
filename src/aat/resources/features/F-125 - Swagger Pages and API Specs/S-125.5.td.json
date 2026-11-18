@@ -12,7 +12,7 @@
 
   "expectedResponse": {
     "body" : {
-      "configUrl" : "/v2/api-docs/swagger-config",
+      "configUrl" : "/v3/api-docs/swagger-config",
       "oauth2RedirectUrl" : "[[ANYTHING_PRESENT]]",
       "urls" : "[[ANYTHING_PRESENT]]",
       "validatorUrl" : ""
