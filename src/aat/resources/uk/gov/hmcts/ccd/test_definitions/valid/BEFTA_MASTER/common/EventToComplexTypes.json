@@ -1,0 +1,20 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "ID": "FT_MasterCaseType",
+    "CaseEventID": "createCase",
+    "CaseFieldId": "StaffUserComplexField",
+    "ListElementCode": "staffUser",
+    "DefaultValue": "",
+    "EventElementLabel": "",
+    "EventHintText": "",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "",
+    "RetainHiddenValue": "",
+    "Publish": "",
+    "PublishAs": "",
+    "DisplayContextParameter": "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)"
+  }
+]
