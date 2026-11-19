@@ -1,1 +1,38 @@
-[ ]
+[
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryPartyWithACL",
+    "ListElementCode": "name",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryPartyWithACL",
+    "ListElementCode": "address",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryPartyWithACL",
+    "ListElementCode": "address.postcode",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryDocumentsWithACL",
+    "ListElementCode": "title",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  }
+]

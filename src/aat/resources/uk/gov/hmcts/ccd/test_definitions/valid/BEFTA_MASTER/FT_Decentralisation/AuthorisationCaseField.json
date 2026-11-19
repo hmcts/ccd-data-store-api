@@ -22,5 +22,45 @@
     "CaseFieldID" : "_stubProcessedBy",
     "UserRole" : "caseworker-befta_master",
     "CRUD" : "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "TextField",
+    "UserRole": "citizen",
+    "CRUD": "CR"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryParty",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryPartyWithACL",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryDocuments",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_Decentralisation",
+    "CaseFieldID": "HistoryDocumentsWithACL",
+    "UserRole": "caseworker-befta_master-solicitor",
+    "CRUD": "R"
   }
 ]

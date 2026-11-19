@@ -1,0 +1,74 @@
+{
+  "_guid_": "S-1047.4",
+  "_extends_": "F1047_Test_Data_Base",
+  "title": "Unknown historical children are pruned with and without complex ACL overrides",
+  "specs": [
+    "an active profile in CCD",
+    "read access to the defined nested fields",
+    "contains the reference of the case just created",
+    "omits unknown historical children and preserves readable siblings and collection IDs"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterSolicitorBecky"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F1047_Nested_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "_extends_": "F1047_Expected_Audit_Event",
+          "data": {
+            "TextField": "Decentralised case",
+            "_stubProcessedBy": "ccd-test-stubs-service",
+            "HistoryParty": {
+              "name": "History party",
+              "address": {
+                "postcode": "EX1 1AA"
+              }
+            },
+            "HistoryPartyWithACL": {
+              "name": "History party",
+              "address": {
+                "postcode": "EX1 1AA"
+              }
+            },
+            "HistoryDocuments": [
+              {
+                "id": "10470000-0000-0000-0000-000000000001",
+                "value": {
+                  "title": "History document 1"
+                }
+              },
+              {
+                "id": "10470000-0000-0000-0000-000000000002",
+                "value": {
+                  "title": "History document 2"
+                }
+              }
+            ],
+            "HistoryDocumentsWithACL": [
+              {
+                "id": "10470000-0000-0000-0000-000000000001",
+                "value": {
+                  "title": "History document 1"
+                }
+              },
+              {
+                "id": "10470000-0000-0000-0000-000000000002",
+                "value": {
+                  "title": "History document 2"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
