@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -66,7 +67,7 @@ public class DocumentsOperation {
 
     public List<Document> getPrintableDocumentsForCase(final String caseReference) {
         if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+            throw new BadRequestException(ValidationMessages.CASE_REFERENCE_INVALID);
         }
 
         CaseDetails caseDetails = getCaseDetails(caseReference);

@@ -23,7 +23,7 @@
 		}
 	},
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+		"_extends_": "CCD_Safe_403_Response",
 		"responseCode" : 403,
 		"headers" : {
 			"Content-Encoding" : "gzip",
@@ -31,11 +31,6 @@
 			"Content-Type" : "[[ANYTHING_PRESENT]]"
 		},
 		"body" : {
-			"timestamp" : "[[ANYTHING_PRESENT]]",
-			"status" : 403,
-			"error" : "Forbidden",
-			"message" : "Access Denied",
-			"path" : "[[ANYTHING_PRESENT]]"
 		}
 	}
 }

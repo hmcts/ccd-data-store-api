@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
@@ -142,7 +143,7 @@ public class QueryEndpoint {
     @ApiResponse(responseCode = "404", description = "No jurisdictions found for given access criteria")
     public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
         if (accessMap.get(access) == null) {
-            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+            throw new BadRequestException(ValidationMessages.ACCESS_INVALID);
         }
         List<JurisdictionDisplayProperties> jurisdictions = Arrays.asList(
             getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
@@ -248,7 +249,7 @@ public class QueryEndpoint {
         method = RequestMethod.GET)
     @Operation(summary = "Fetch an event trigger in the context of a case type")
     @ApiResponse(responseCode = "200", description = "Empty pre-state conditions")
-    @ApiResponse(responseCode = "422", description = "The case status did not qualify for the event")
+    @ApiResponse(responseCode = "422", description = ValidationMessages.EVENT_STATE_INVALID)
     public CaseUpdateViewEvent getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                           @PathVariable("jid") String jurisdictionId,
                                                           @PathVariable("ctid") String caseTypeId,

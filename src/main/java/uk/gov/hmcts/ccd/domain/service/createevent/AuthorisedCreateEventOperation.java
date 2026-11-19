@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -129,7 +130,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         checkCaseCategoryId(createCaseEventDetails.getCaseTypeDefinition(), categoryId);
 
         if (!version.equals(createCaseEventDetails.getCaseDetails().getVersion())) {
-            throw new BadRequestException("003 Wrong CaseVersion");
+            throw new BadRequestException(ValidationMessages.CASE_VERSION_INVALID);
         }
 
         final CaseDetails caseDetails = createEventOperation.createCaseSystemEvent(caseReference,
@@ -145,7 +146,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             .filter(value -> StringUtils.isNotBlank(value))
             .anyMatch(value ->  value.equals(categoryId));
         if (!validCategoryId) {
-            throw new BadRequestException("002 Invalid categoryId");
+            throw new BadRequestException(ValidationMessages.CATEGORY_ID_INVALID);
         }
     }
 

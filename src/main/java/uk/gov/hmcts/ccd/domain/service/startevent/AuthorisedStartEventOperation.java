@@ -6,6 +6,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -72,7 +73,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+            throw new BadRequestException(ValidationMessages.CASE_REFERENCE_INVALID);
         }
 
         Optional<CaseDetails> caseDetailsOptional = caseDetailsRepository.findByReference(

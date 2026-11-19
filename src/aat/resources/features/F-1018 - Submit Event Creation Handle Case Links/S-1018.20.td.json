@@ -44,10 +44,8 @@
 
   "expectedResponse": {
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
       "message" : "Case data validation failed",
-      "path" : "[[ANYTHING_PRESENT]]",
       "details" : {
         "field_errors" : [ {
           "id" : "TextField",

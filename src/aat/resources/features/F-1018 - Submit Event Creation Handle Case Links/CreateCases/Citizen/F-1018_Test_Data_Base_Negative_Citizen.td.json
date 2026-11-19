@@ -9,7 +9,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "CCD_Safe_422_Response",
     "headers" : {
       "Content-Encoding" : "gzip",
       "Content-Length" : "[[ANYTHING_PRESENT]]"

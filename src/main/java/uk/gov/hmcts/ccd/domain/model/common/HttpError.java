@@ -1,21 +1,20 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
+import uk.gov.hmcts.ccd.error.PublicValidationMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.util.UriUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
 public class HttpError<T extends Serializable> implements Serializable {
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
-    public static final String DEFAULT_ERROR = "Unexpected Error";
+    public static final String DEFAULT_ERROR = "Internal Server Error";
 
     private final String exception;
     private final transient LocalDateTime timestamp;
@@ -28,25 +27,18 @@ public class HttpError<T extends Serializable> implements Serializable {
     private List<String> callbackWarnings;
 
     public HttpError(Exception exception, HttpServletRequest request) {
-        final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
-
-        this.exception = exception.getClass().getName();
-        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatusFromResponseStatus(responseStatus);
-        this.error = getErrorReason(responseStatus);
-        this.message = exception.getMessage();
-        this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
+        this(exception, request.getRequestURI(), null);
     }
 
     public HttpError(Exception exception, String path, HttpStatus status) {
         final var responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
-        this.exception = exception.getClass().getName();
+        this.exception = "Exception";
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
-        this.error = getErrorReason(responseStatus, status);
-        this.message = exception.getMessage();
-        this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
+        this.error = HttpStatus.valueOf(this.status).getReasonPhrase();
+        this.message = PublicValidationMessages.messageFor(exception, this.status);
+        this.path = "/";
     }
 
     public HttpError(Exception exception, HttpServletRequest request, HttpStatus upstreamPreferredHttpStatus) {
@@ -67,17 +59,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         return DEFAULT_STATUS;
     }
 
-    private Integer getStatusFromResponseStatus(ResponseStatus responseStatus) {
-        if (null != responseStatus) {
-            final HttpStatus httpStatus = getHttpStatus(responseStatus);
-            if (null != httpStatus) {
-                return httpStatus.value();
-            }
-        }
-
-        return DEFAULT_STATUS;
-    }
-
     private HttpStatus getHttpStatus(ResponseStatus responseStatus) {
         if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.value())) {
             return responseStatus.value();
@@ -86,38 +67,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         }
 
         return null;
-    }
-
-    private String getErrorReason(ResponseStatus responseStatus, HttpStatus status) {
-        if (null != responseStatus) {
-            if (!responseStatus.reason().isEmpty()) {
-                return responseStatus.reason();
-            }
-
-            final var httpStatus = getHttpStatus(responseStatus);
-            if (null != httpStatus) {
-                return httpStatus.getReasonPhrase();
-            }
-        } else if (null != status) {
-            return status.getReasonPhrase();
-        }
-
-        return DEFAULT_ERROR;
-    }
-
-    private String getErrorReason(ResponseStatus responseStatus) {
-        if (null != responseStatus) {
-            if (!responseStatus.reason().isEmpty()) {
-                return responseStatus.reason();
-            }
-
-            final HttpStatus httpStatus = getHttpStatus(responseStatus);
-            if (null != httpStatus) {
-                return httpStatus.getReasonPhrase();
-            }
-        }
-
-        return DEFAULT_ERROR;
     }
 
     public String getException() {
@@ -149,7 +98,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     public HttpError<T> withDetails(T details) {
-        this.details = details;
+        this.details = details instanceof Throwable ? null : details;
         return this;
     }
 
