@@ -62,7 +62,7 @@ class ElasticsearchCaseSearchRequestSecurityRATest {
         doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
         doReturn("{}").when(caseSearchRequest).getQueryValue();
         doReturn("").when(caseSearchRequest).toJsonString();
-        doReturn(Optional.of(QueryBuilders.termQuery("filterTermValue", "filterValue")))
+        doReturn(Optional.of(QueryBuilders.matchAllQuery()))
             .when(caseSearchFilter).getFilter(CASE_TYPE_ID);
         doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(),
             eq(ObjectNode.class));
