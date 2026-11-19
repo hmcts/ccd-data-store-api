@@ -10,10 +10,8 @@
 	],
 
 	"request": {
-		"headers": {
-			"Authorization": "Dummy_Authorization"
-		},
 		"pathVariables": {
+			"uid": "c9545e99-4e30-4cc5-886b-b52c4484251d",
 			"cid": "1234567890"
 		}
 	},
