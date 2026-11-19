@@ -704,90 +704,53 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class AccessControlListBuilder {
-        private final AccessControlList accessControlList;
-
-        private AccessControlListBuilder() {
-            this.accessControlList = new AccessControlList();
-        }
-
-        public static AccessControlListBuilder anAcl() {
-            return new AccessControlListBuilder();
-        }
-
-        public AccessControlListBuilder withRole(String role) {
-            this.accessControlList.setAccessProfile(role);
-            return this;
-        }
-
-        public AccessControlListBuilder withCreate(boolean create) {
-            this.accessControlList.setCreate(create);
-            return this;
-        }
-
-        public AccessControlListBuilder withDelete(boolean delete) {
-            this.accessControlList.setDelete(delete);
-            return this;
-        }
-
-        public AccessControlListBuilder withUpdate(boolean update) {
-            this.accessControlList.setUpdate(update);
-            return this;
-        }
-
-        public AccessControlListBuilder withRead(boolean read) {
-            this.accessControlList.setRead(read);
-            return this;
-        }
-
-        public AccessControlList build() {
-            return accessControlList;
-        }
-    }
-
     public static class ComplexACLBuilder {
-        private final ComplexACL complexACL;
+        private String listElementCode;
+        private String role;
+        private boolean create;
+        private boolean delete;
+        private boolean update;
+        private boolean read;
 
         private ComplexACLBuilder() {
-            this.complexACL = new ComplexACL();
         }
 
         public static ComplexACLBuilder aComplexACL() {
             return new ComplexACLBuilder();
         }
 
-        public ComplexACLBuilder withListElementCode(String code) {
-            this.complexACL.setListElementCode(code);
+        public ComplexACLBuilder listElementCode(String code) {
+            this.listElementCode = code;
             return this;
         }
 
-        public ComplexACLBuilder withRole(String role) {
-            this.complexACL.setAccessProfile(role);
+        public ComplexACLBuilder accessProfile(String role) {
+            this.role = role;
             return this;
         }
 
-        public ComplexACLBuilder withCreate(boolean create) {
-            this.complexACL.setCreate(create);
+        public ComplexACLBuilder create(boolean create) {
+            this.create = create;
             return this;
         }
 
-        public ComplexACLBuilder withDelete(boolean delete) {
-            this.complexACL.setDelete(delete);
+        public ComplexACLBuilder delete(boolean delete) {
+            this.delete = delete;
             return this;
         }
 
-        public ComplexACLBuilder withUpdate(boolean update) {
-            this.complexACL.setUpdate(update);
+        public ComplexACLBuilder update(boolean update) {
+            this.update = update;
             return this;
         }
 
-        public ComplexACLBuilder withRead(boolean read) {
-            this.complexACL.setRead(read);
+        public ComplexACLBuilder read(boolean read) {
+            this.read = read;
             return this;
         }
 
         public ComplexACL build() {
-            return complexACL;
+            return new ComplexACL(role, create, read, update, delete, listElementCode);
         }
 
     }

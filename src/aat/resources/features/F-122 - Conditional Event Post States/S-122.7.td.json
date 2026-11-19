@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-122.7",
-  "_extends_": "F-122-UpdateEventBase",
+  "_extends_": "F-122-UpdateEvent2Base",
   "title": "*(FieldA) will keep the state as is (End state: CaseCreated)",
 
   "productName": "CCD data store",

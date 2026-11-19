@@ -486,8 +486,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     private AccessControlList getCreateAccessControlList() {
-        var accessControlList = new AccessControlList();
-        accessControlList.setCreate(true);
-        return accessControlList;
+        return AccessControlList.builder()
+            .create(true)
+            .build();
     }
 }

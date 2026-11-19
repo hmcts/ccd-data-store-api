@@ -198,7 +198,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel, C
         copy.setRetainHiddenValue(this.getRetainHiddenValue());
         copy.setPublish(this.getPublish());
         copy.setPublishAs(this.getPublishAs());
-        copy.setCaseEventFieldComplexDefinitions(createCopyList(this.getCaseEventFieldComplexDefinitions()));
+        copy.setCaseEventFieldComplexDefinitions(createDeepCopyList(this.getCaseEventFieldComplexDefinitions()));
         copy.setDefaultValue(this.getDefaultValue());
         copy.setNullifyByDefault(this.getNullifyByDefault());
 

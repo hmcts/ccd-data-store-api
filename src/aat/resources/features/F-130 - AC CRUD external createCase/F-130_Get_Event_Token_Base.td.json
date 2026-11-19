@@ -5,7 +5,7 @@
   "operationName": "Start event creation as Case worker",
 
   "method": "GET",
-  "uri": "/case-types/FT_CRUD/event-triggers/{etid}",
+  "uri": "/case-types/{cid}/event-triggers/{etid}",
 
   "specs": [
     "to create a token for case creation"
@@ -13,7 +13,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworker1"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -23,6 +23,7 @@
       "Experimental" : "true"
     },
     "pathVariables": {
+      "cid": "FT_CRUD",
       "etid": "createCase"
     }
   },
@@ -45,7 +46,7 @@
         "jurisdiction" : "BEFTA_MASTER",
         "state" : null,
         "version" : null,
-        "case_type_id" : "FT_CRUD",
+        "case_type_id" : "${[scenarioContext][testData][request][pathVariables][cid]}",
         "created_date" : null,
         "last_modified" : null,
         "last_state_modified_date" : null,
