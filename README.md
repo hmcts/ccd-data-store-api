@@ -189,6 +189,10 @@ fails the verification.
 
 `-Ppact.verifier.publishResults=true` publishes the verification result to the configured broker.
 
+**Note:** Provider verification results can be published to the primary Pact Broker
+only through the CI pipeline. This helps prevent local runs from changing the
+shared verification status of CI-published contracts.
+
 The local HTML test report is generated at:
 
 ```text

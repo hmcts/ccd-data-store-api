@@ -2,11 +2,11 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
+import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
+import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -111,11 +111,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
 @PactBroker(url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
-    consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}", fallbackTag = "Dev")},
-    providerTags = "${pactbroker.providerTags:master}",
+    providerBranch = "${pact.provider.branch:}",
     enablePendingPacts = "${pactbroker.enablePending:true}"
 )
-@IgnoreNoPactsToVerify
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
@@ -128,6 +126,21 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/application.properties")
 @ActiveProfiles("SECURITY_MOCK")
 public class CasesControllerProviderTest extends WireMockBaseContractTest {
+
+    @PactBrokerConsumerVersionSelectors
+    public static SelectorBuilder consumerVersionSelectors() {
+        String branch = System.getenv().getOrDefault("PACT_BRANCH_NAME", "Dev");
+        String consumers = System.getProperty("pactbroker.consumers", "");
+        SelectorBuilder selectors = new SelectorBuilder();
+        if (consumers.isBlank()) {
+            return selectors.branch(branch).selector(branch, true, "Dev", null);
+        }
+        for (String consumer : consumers.split(",")) {
+            selectors.branch(branch, consumer.trim())
+                .selector(branch, true, "Dev", consumer.trim());
+        }
+        return selectors;
+    }
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -237,7 +250,6 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         contractTestIdempotencyKeyHolder.resetKey();
         createEventOperation.setTestCaseReference(null);
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
         when(userRepository.getUserId()).thenReturn("userId");
