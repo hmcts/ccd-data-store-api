@@ -1014,11 +1014,16 @@ void configRemoteRunTask(Task execTask, String env) {
     }
 }
 
+interface InjectedExecOps {
+    @javax.inject.Inject
+    ExecOperations getExecOps()
+}
+
 void loadEnvSecrets(String env) {
     def azCmd = ['az', 'keyvault', 'secret', 'show', '--vault-name', "ccd-${env}", '-o', 'tsv', '--query', 'value', '--name', 'data-store-remote-env']
     if (!project.file("./.${env}-remote-env").exists()) {
         new ByteArrayOutputStream().withStream { os ->
-            exec {
+            project.objects.newInstance(InjectedExecOps).execOps.exec {
                 if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
                     commandLine ['cmd', '/c'] + azCmd
                 } else {
@@ -1026,7 +1031,7 @@ void loadEnvSecrets(String env) {
                 }
                 standardOutput = os
             }
-            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
+            project.file("./.${env}-remote-env").write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
         }
     }
 }
