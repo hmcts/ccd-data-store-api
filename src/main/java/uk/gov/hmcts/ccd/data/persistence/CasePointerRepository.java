@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.persistence;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class CasePointerRepository {
         pointer.setState("");
         if (pointer.getResolvedTTL() == null) {
             // Default a case pointer expiry so dangling pointers are always eventually cleaned up
-            pointer.setResolvedTTL(LocalDate.now().plusYears(DANGLING_POINTER_EXPIRY_TIMEOUT_YEARS));
+            pointer.setResolvedTTL(LocalDate.now(ZoneOffset.UTC).plusYears(DANGLING_POINTER_EXPIRY_TIMEOUT_YEARS));
         }
         var result = caseDetailsRepository.set(pointer);
         caseDetails.setId(result.getId());
