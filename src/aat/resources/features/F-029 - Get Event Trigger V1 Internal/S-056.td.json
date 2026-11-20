@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-056",
+  "_extends_": "F-029_Test_Data_Base",
+  "title": "must return the displayContextParameter configured for StaffUser in EventToComplexTypes",
+  "specs": [
+    "an active profile in CCD",
+    "is prepared with valid input parameters",
+    "has the 200 return code"
+  ],
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "id": "createCase",
+      "case_fields": [
+        {
+          "__operator__": "equivalent",
+          "__ordering__": "unordered"
+        },
+        {
+          "id": "StaffUserComplexField",
+          "field_type": {
+            "complex_fields": [
+              {
+                "__operator__": "equivalent",
+                "__ordering__": "unordered"
+              },
+              {
+                "id": "staffUser",
+                "display_context_parameter": "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
