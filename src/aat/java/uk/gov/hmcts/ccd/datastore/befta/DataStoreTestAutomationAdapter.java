@@ -1,31 +1,80 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import com.google.common.collect.MapMaker;
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
+import io.restassured.response.Response;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
+import uk.gov.hmcts.befta.data.UserData;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
+import uk.gov.hmcts.befta.util.Retryable;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.ReentrantLock;
 
+import static io.restassured.RestAssured.given;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+    // Weak identity keys keep scenarios isolated and allow completed contexts to be collected.
+    private static final Map<BackEndFunctionalTestScenarioContext, String> UNIQUE_STRINGS_PER_SCENARIO =
+        new MapMaker().weakKeys().makeMap();
+
+    private static final ReentrantLock GLOBAL_SEARCH_SCENARIO_LOCK = new ReentrantLock();
+    private static final ReentrantLock CLOSED_CASES_SCENARIO_LOCK = new ReentrantLock();
+
+    @Before("@F-1005 or @F-1006 or @F-1007")
+    public void serializeGlobalSearchScenarios() {
+        GLOBAL_SEARCH_SCENARIO_LOCK.lock();
+    }
+
+    @After("@F-1005 or @F-1006 or @F-1007")
+    public void releaseGlobalSearchScenarioLock() {
+        if (GLOBAL_SEARCH_SCENARIO_LOCK.isHeldByCurrentThread()) {
+            GLOBAL_SEARCH_SCENARIO_LOCK.unlock();
+        }
+    }
+
+    @Before("@F-942 or @F-944 or @F-945")
+    public void serializeClosedCaseScenarios() {
+        CLOSED_CASES_SCENARIO_LOCK.lock();
+        DateCaseClosedCleanupContext.beginScenario();
+    }
+
+    @After("@F-942 or @F-944 or @F-945")
+    public void releaseClosedCaseScenarioLock() {
+        try {
+            cleanUpDateCaseClosedRecords();
+        } finally {
+            DateCaseClosedCleanupContext.clear();
+            if (CLOSED_CASES_SCENARIO_LOCK.isHeldByCurrentThread()) {
+                CLOSED_CASES_SCENARIO_LOCK.unlock();
+            }
+        }
+    }
+
+    @Override
+    public synchronized void authenticate(UserData userData, String clientId) throws ExecutionException {
+        super.authenticate(userData, clientId);
+        DateCaseClosedCleanupContext.setAccessToken(userData.getAccessToken());
+    }
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
@@ -39,22 +88,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (!ofNullable(System.getenv("GROUP_ACCESS_ENABLED")).map(Boolean::valueOf).orElse(false)) {
             throw new AssumptionViolatedException("Group Access not Enabled");
         }
-    }
-
-    @Before
-    public void createUID(Scenario scenario) {
-        String tag = getDataFileTag(scenario);
-        String uid = tag + UUID.randomUUID().toString();
-        uniqueStringsPerTestData.put(tag,uid);
-    }
-
-    private synchronized String getDataFileTag(Scenario scenario) {
-        return scenario.getSourceTagNames().stream()
-            .filter(t -> t.startsWith("@S-"))
-            .findFirst()
-            .map(t -> t.substring(1))
-            .map(Object::toString)
-            .orElse("error cant find tag");
     }
 
     @Override
@@ -79,6 +112,37 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
+        if ("registerDateCaseClosedReference".equals(key.toString())) {
+            Object reference = scenarioContext.getTestData().getActualResponse().getBody().get("id");
+            DateCaseClosedCleanupContext.registerCaseReference(reference);
+            return reference;
+        }
+        String recordCaseReferencePrefix = "registerDateCaseClosedReferenceFrom_";
+        if (key.toString().startsWith(recordCaseReferencePrefix)) {
+            String childContext = key.toString().substring(recordCaseReferencePrefix.length());
+            try {
+                Object reference = ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext,
+                    "parentContext.childContexts." + childContext + ".testData.actualResponse.body.id"
+                );
+                DateCaseClosedCleanupContext.registerCaseReference(reference);
+                return reference.toString();
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem registering date-case-closed case reference", e);
+            }
+        }
+        String readinessPrefix = "caseReferenceForGlobalSearchReadiness_";
+        if (key.toString().startsWith(readinessPrefix)) {
+            return configureGlobalSearchReadiness(scenarioContext, key.toString().substring(readinessPrefix.length()));
+        }
+        if ("UniqueString".equals(key)) {
+            BackEndFunctionalTestScenarioContext rootContext = scenarioContext;
+            while (rootContext.getParentContext() != null) {
+                rootContext = rootContext.getParentContext();
+            }
+            return UNIQUE_STRINGS_PER_SCENARIO.computeIfAbsent(
+                rootContext, context -> context.getCurrentScenarioTag() + UUID.randomUUID());
+        }
         if ("validBuildingLocation".equals(key)) {
             return selectValidBuildingLocation(scenarioContext.getTestData().getActualResponse()
                                                    .getBody().get("arrayInMap"));
@@ -125,15 +189,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         organisationIdentifierContextPath,
                                                                         previousValueContextPath,
                                                                         incrementBy);
-        } else if (key.toString().equals("UniqueString")) {
-
-            String scenarioTag;
-            try {
-                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
-            } catch (NullPointerException e) {
-                scenarioTag = scenarioContext.getCurrentScenarioTag();
-            }
-            return uniqueStringsPerTestData.get(scenarioTag);
         } else if (key.toString().startsWith("approximately ")) {
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
@@ -225,6 +280,59 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             return UUID.randomUUID();
         }
         return super.calculateCustomValue(scenarioContext, key);
+    }
+
+    private void cleanUpDateCaseClosedRecords() {
+        DateCaseClosedCleanupContext.ScenarioCleanup cleanup = DateCaseClosedCleanupContext.currentScenario();
+        if (cleanup == null || cleanup.getCaseReferences().isEmpty()) {
+            return;
+        }
+        if (cleanup.getAccessToken() == null) {
+            throw new FunctionalTestException("Cannot clean up date-case-closed records without a user token");
+        }
+
+        String testUrl = EnvironmentVariableUtils.getRequiredVariable("TEST_URL").replaceAll("/+$", "");
+        String serviceAuthorization = getNewS2SToken();
+        List<String> failedReferences = new ArrayList<>();
+        for (Long caseReference : cleanup.getCaseReferences()) {
+            try {
+                Response response = given()
+                    .header("Authorization", "Bearer " + cleanup.getAccessToken())
+                    .header("ServiceAuthorization", serviceAuthorization)
+                    .when()
+                    .delete(testUrl + "/testing-support/date-case-closed/{caseReference}", caseReference);
+                if (response.statusCode() != 204) {
+                    failedReferences.add(caseReference + " (response code " + response.statusCode() + ")");
+                }
+            } catch (RuntimeException e) {
+                failedReferences.add(caseReference + " (" + e.getMessage() + ")");
+            }
+        }
+        if (!failedReferences.isEmpty()) {
+            throw new FunctionalTestException("Failed to clean up date-case-closed records for cases "
+                + failedReferences);
+        }
+    }
+
+    private String configureGlobalSearchReadiness(BackEndFunctionalTestScenarioContext context, String creationId) {
+        // Only this read-only search probe may retry POSTs; case creation and the scenario keep their own policies.
+        if (!"POST".equals(context.getTestData().getMethod())
+            || !"/globalSearch".equals(context.getTestData().getUri())) {
+            throw new FunctionalTestException("Global search readiness requires a POST /globalSearch probe");
+        }
+        String caseReference = context.getParentContext().getChildContexts().get(creationId)
+            .getTestData().getActualResponse().getBody().get("id").toString();
+        BeftaUtils.defaultLog("Waiting for global search case " + caseReference
+                                  + " with up to 11 attempts, 3 seconds apart");
+        context.setRetryableTag(Retryable.builder()
+            .maxAttempts(11)
+            .delay(3000)
+            .statusCodes(Set.of())
+            .match(List.of("\"casesReturned\"\\s*:\\s*0\\s*[,}]"))
+            .nonRetryableHttpMethods(Set.of())
+            .retryListener(Retryable.setRetryListener(true))
+            .build());
+        return caseReference;
     }
 
     private Map<?, ?> selectValidBuildingLocation(Object locations) {
