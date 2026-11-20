@@ -123,6 +123,11 @@ with their new equivalents using befta fw so that the new ones will be
 doing a lot more detailed verifications.  
 
 To find out more about BEFTA Framework, see the repository and its README [here](https://github.com/hmcts/befta-fw).
+
+The BEFTA smoke and functional tasks tear down roles for each scenario's new cases, even after failed assertions.
+This uses `CCD_BEFTA_CASEWORKER_CAA_PWD` and `BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT`, already supplied by CI.
+Other cases and organisation roles are untouched; cleanup failures fail the scenario.
+
 #### To Run the Functional Tests (FT)
 
 #####  All Functional Tests
