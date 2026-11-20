@@ -111,6 +111,8 @@ env.BEFTA_RETRY_MAX_ATTEMPTS = "3"
 env.BEFTA_RETRY_STATUS_CODES = "500,502,503,504"
 env.BEFTA_RETRY_MAX_DELAY = "1000"
 env.BEFTA_RETRY_NON_RETRYABLE_HTTP_METHODS = "POST,PUT"
+// Refresh user tokens throughout long functional runs, including role-assignment teardown.
+env.BEFTA_USER_TOKEN_CACHE_TTL_SECONDS = "1"
 
 withNightlyPipeline(type, product, component) {
     enableCveDashboardIngestion()
