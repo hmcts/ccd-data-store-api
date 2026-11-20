@@ -2,14 +2,12 @@ package uk.gov.hmcts.ccd.v2.internal.resource;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.util.FieldTypeUtil;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -41,8 +39,7 @@ public class WorkbasketInputsViewResource extends RepresentationModel {
 
     private void copyProperties(WorkbasketInput[] workbasketInputs) {
         this.workbasketInputs = Arrays.stream(workbasketInputs)
-            .map(this::buildUIWorkbasketInput)
-            .collect(Collectors.toList()).toArray(new WorkbasketInputView[]{});
+            .map(this::buildUIWorkbasketInput).toArray(WorkbasketInputView[]::new);
     }
 
     private WorkbasketInputView buildUIWorkbasketInput(WorkbasketInput workbasketInput) {
@@ -50,7 +47,7 @@ public class WorkbasketInputsViewResource extends RepresentationModel {
         workbasketInputView.setField(workbasketInput.getField());
         workbasketInputView.setLabel(workbasketInput.getLabel());
         workbasketInputView.setOrder(workbasketInput.getOrder());
-        workbasketInputView.setDataType(FieldTypeUtil.getDataTypeFromField(workbasketInput.getField()));
+        workbasketInputView.setDataType(workbasketInput.getDataType());
         workbasketInputView.setDisplayContextParameter(workbasketInput.getDisplayContextParameter());
         return workbasketInputView;
     }

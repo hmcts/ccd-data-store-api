@@ -1,0 +1,12 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "ID": "CaseCreated",
+    "Name": "Created",
+    "Description": "",
+    "DisplayOrder": 1,
+    "TitleDisplay": ""
+  }
+]

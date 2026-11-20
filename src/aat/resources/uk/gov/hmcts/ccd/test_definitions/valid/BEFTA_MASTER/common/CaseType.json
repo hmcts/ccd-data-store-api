@@ -700,5 +700,18 @@
     "SecurityClassification" : "Public",
     "CallbackGetCaseUrl" : "",
     "RetriesGetCaseUrl" : ""
+  },
+  {
+    "LiveFrom" : "01/11/2026",
+    "LiveTo" : "",
+    "ID" : "FT_NestedCollectionDataType",
+    "Name" : "FT-Nested Collection DataType",
+    "Description" : "CCD-8155 nested collection input classification",
+    "JurisdictionID" : "BEFTA_MASTER",
+    "PrintableDocumentsUrl" : "",
+    "RetriesTimeoutURLPrintEvent" : "",
+    "SecurityClassification" : "Public",
+    "CallbackGetCaseUrl" : "",
+    "RetriesGetCaseUrl" : ""
   }
 ]
