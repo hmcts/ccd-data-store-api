@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-155.2",
+  "title": "reject a draft request with a malformed draft id",
+  "productName": "CCD Data Store",
+  "operationName": "Get a caseworker draft",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
+  "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed draft id",
+    "contains a HTTP-404 Not Found"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "did": "not-a-draft-id"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No draft found ( draft reference = 'not-a-draft-id' )",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null,
+      "status": 404,
+      "error": "Not Found",
+      "timestamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

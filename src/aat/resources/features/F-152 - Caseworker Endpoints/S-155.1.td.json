@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-155.1",
+  "title": "get a caseworker draft",
+  "productName": "CCD Data Store",
+  "operationName": "Get a caseworker draft",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
+  "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [ "an active profile in CCD" ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "did": "${[scenarioContext][childContexts][S-154.1][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": null,
+      "channels": "[[ANYTHING_PRESENT]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

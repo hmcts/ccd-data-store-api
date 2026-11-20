@@ -1,0 +1,29 @@
+{
+  "_guid_": "F-942_DeleteDateCaseClosedByCaseReference",
+  "title": "Delete the date case closed record for a case",
+  "specs": [
+    "to delete the date case closed record for this case"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "delete date case closed record by case reference",
+
+  "method": "DELETE",
+  "uri": "/testing-support/date-case-closed/{caseReference}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 204
+  }
+}

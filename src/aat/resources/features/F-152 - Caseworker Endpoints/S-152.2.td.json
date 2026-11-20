@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-152.2",
+  "title": "reject a malformed case reference when retrieving documents",
+  "productName": "CCD Data Store",
+  "operationName": "Get documents for a caseworker case",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents",
+  "user": { "_extends_": "Common_User_For_Request" },
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed case reference",
+    "contains a HTTP-400 Bad Request"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15",
+      "cid": "not-a-case-reference"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+    "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case reference is not valid",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null,
+      "status": 400,
+      "error": "Bad Request",
+      "timestamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

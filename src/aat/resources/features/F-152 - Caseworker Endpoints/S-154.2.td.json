@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-154.2",
+  "title": "reject a draft request with an unknown event id",
+  "productName": "CCD Data Store",
+  "operationName": "Create a caseworker draft",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts",
+  "user": { "_extends_": "BeftaMasterCaseworker" },
+  "specs": [
+    "an active profile in CCD",
+    "contains an unknown event id",
+    "contains a HTTP-422 Unprocessable Entity"
+  ],
+  "prerequisites": [
+    { "Token_Creation": "F-068_Get_Event_Token" }
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": { "Content-Type": "application/json" },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD",
+      "etid": "createCase"
+    },
+    "body": {
+      "data": { "TextField": "field1", "TextField2": "field2" },
+      "event": { "id": "UNKNOWN_EVENT", "summary": "", "description": "" },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "message": "Validation error. Event id UNKNOWN_EVENT is not found in case type definition",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null,
+      "status": 422,
+      "error": "Unprocessable Entity",
+      "timestamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

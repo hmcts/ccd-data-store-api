@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-153.1",
+  "title": "get events for a caseworker case",
+  "productName": "CCD Data Store",
+  "operationName": "Get events for a caseworker case",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+  "user": { "_extends_": "Common_User_For_Request" },
+  "specs": [ "an active profile in CCD" ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15",
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": { "arrayInMap": "[[ANYTHING_PRESENT]]" }
+  }
+}

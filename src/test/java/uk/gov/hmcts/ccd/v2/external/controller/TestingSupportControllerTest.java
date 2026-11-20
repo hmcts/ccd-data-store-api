@@ -129,4 +129,14 @@ class TestingSupportControllerTest {
         );
         verify(nativeQuery).setParameter("stateChangeDateEnd", Timestamp.valueOf("2025-01-02 00:00:00"));
     }
+
+    @Test
+    void shouldDeleteDateCaseClosedRecordByCaseReference() {
+        Long caseReference = 1234567890123456L;
+
+        ResponseEntity<Void> response = testingSupportController.dateCaseClosedDeleteByCaseReference(caseReference);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(dateCaseClosedRepository).deleteByCcdCaseNumber(caseReference);
+    }
 }
