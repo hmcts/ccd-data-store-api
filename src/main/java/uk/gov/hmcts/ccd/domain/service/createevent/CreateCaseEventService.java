@@ -212,6 +212,8 @@ public class CreateCaseEventService {
         final boolean isDecentralisedCase = resolver.isDecentralised(caseDetailsInDatabase);
         final String uid = userAuthorisation.getUserId();
 
+        validatePreState(caseDetails, caseEventDefinition);
+
         eventTokenService.validateToken(content.getToken(),
             uid,
             caseDetails,
@@ -219,8 +221,6 @@ public class CreateCaseEventService {
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition,
             isDecentralisedCase);
-
-        validatePreState(caseDetails, caseEventDefinition);
 
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
         final String oldState = caseDetails.getState();

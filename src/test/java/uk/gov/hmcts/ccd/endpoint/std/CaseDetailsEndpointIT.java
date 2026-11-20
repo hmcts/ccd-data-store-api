@@ -183,6 +183,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     private static final String REFERENCE_2 = "1504259907353545";
+    private static final String VALIDATE_PAGE_ID = "createCaseInfoPage";
+    private static final String CASEWORKER_ROLE = "caseworkers";
 
     @BeforeEach
     void setUp() {
@@ -1025,7 +1027,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         triggeringEvent.setSummary(SHORT_COMMENT);
         caseDetailsToSave.setEvent(triggeringEvent);
 
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY, TEST_EVENT_ID));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -1243,7 +1246,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
-        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID));
+        caseDetailsToSave.setToken(generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY, TEST_EVENT_ID));
         caseDetailsToSave.setData(GlobalSearchTestFixture.createCaseData());
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -3681,7 +3685,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         );
         Map data = JacksonUtils.convertValue(DATA);
         caseDetailsToSave.setData(data);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, CREATE_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_NO_READ_CASE_TYPE_ACCESS, CREATE_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
 
@@ -4426,7 +4431,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
-        final String caseReference = "1504259907353545";
         final JsonNode DATA = mapper.readTree(exampleData());
 
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4435,7 +4439,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(SHORT_COMMENT)
                 .withDescription(LONG_COMMENT)
                 .build())
-            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
             .withData(JacksonUtils.convertValue(DATA))
             .withIgnoreWarning(Boolean.FALSE)
@@ -4546,6 +4549,99 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"Case data validation failed\"",
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").toString());
 
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn404WhenPostValidateCaseDetailsWithMismatchedCaseTypeAndPageIdForCaseworker() throws Exception {
+        final JsonNode data = mapper.readTree(exampleData());
+        final String token = generateEventToken(
+            template, UID, JURISDICTION, CASE_TYPE, REFERENCE_2, PRE_STATES_EVENT_ID);
+
+        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
+            PRE_STATES_EVENT_ID, REFERENCE_2, token, data);
+
+        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE_VALIDATE, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 404);
+
+        verifyWireMock(0, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+    }
+
+    @Test
+    void shouldReturn400WhenPostValidateCaseDetailsWithMissingEventTokenAndPageIdForCaseworker() throws Exception {
+        final JsonNode data = mapper.readTree(exampleData());
+
+        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
+            TEST_EVENT_ID, null, null, data);
+
+        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 400);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn422WhenPostValidateCaseDetailsWithInvalidPreStateAndPageIdForCaseworker() throws Exception {
+        final JsonNode data = mapper.readTree(exampleData());
+        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, REFERENCE_2, TEST_EVENT_ID);
+
+        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
+            TEST_EVENT_ID, REFERENCE_2, token, data);
+
+        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 422);
+    }
+
+    @Test
+    void shouldReturn404WhenPostValidateCaseDetailsWithNoCreateFieldAccessAndPageIdForCaseworker() throws Exception {
+        final JsonNode data = mapper.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\"\n"
+                + "}\n");
+        final String token = generateEventTokenNewCase(
+            UID, JURISDICTION, CASE_TYPE_NO_CREATE_FIELD_ACCESS, TEST_EVENT_ID);
+
+        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
+            TEST_EVENT_ID, null, token, data);
+
+        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE_NO_CREATE_FIELD_ACCESS, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 404);
+    }
+
+    @Test
+    void shouldReturn422WhenPostValidateCaseDetailsWithNoEventAndPageIdForCaseworker() throws Exception {
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withData(JacksonUtils.convertValue(mapper.readTree(exampleData())))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 422);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    void shouldReturn200WhenPostValidateCaseDetailsForUpdateWithPageIdForCaseworker() throws Exception {
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK);
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        final JsonNode data = mapper.readTree(exampleData());
+        final String token = generateEventToken(
+            template, UID, JURISDICTION, CASE_TYPE, REFERENCE_2, PRE_STATES_EVENT_ID);
+
+        final CaseDataContent caseDetailsToValidate = buildValidateCaseDataContent(
+            PRE_STATES_EVENT_ID, REFERENCE_2, token, data);
+
+        final MvcResult mvcResult = postValidateCaseDetailsWithPageId(CASEWORKER_ROLE, CASE_TYPE, VALIDATE_PAGE_ID,
+            caseDetailsToValidate, 200);
+
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+
+        final JsonNode response = mapper.readTree(mvcResult.getResponse().getContentAsString());
+        assertTrue(response.has("data"));
+        assertEquals("George", response.get("data").get("PersonFirstName").asText());
+        assertEquals("Roof", response.get("data").get("PersonLastName").asText());
     }
 
     @Test
@@ -5330,8 +5426,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageId() throws Exception {
-        final String caseReference = "1504259907353545";
-
         final JsonNode data = mapper.readTree(exampleCaseData());
         final JsonNode eventData = mapper.readTree(exampleEventData());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK);
@@ -5346,7 +5440,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
-            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5427,7 +5520,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldFilterRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
-        final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
@@ -5452,7 +5544,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
-            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_RESTORE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5481,7 +5572,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldFilterSkipRestoreCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages()
         throws Exception {
-        final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataFieldRestore());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_FIELD_RESTORE);
@@ -5506,7 +5596,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
-            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_FIELD_SKIP_RESTORE,
                 TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5535,7 +5624,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
-        final String caseReference = "1504259907353529";
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
         WizardPageCollection wizardPageCollection = createWizardPageCollection(MID_EVENT_CALL_BACK_MULTI_PAGE);
@@ -5560,7 +5648,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .withSummary(summary)
                 .withDescription(description)
                 .build())
-            .withCaseReference(caseReference)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE_MULTI_PAGE, TEST_EVENT_ID))
             .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
             .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
@@ -5611,7 +5698,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
 
         caseDetailsToSave.setToken(token);
 
@@ -5668,7 +5756,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -5715,7 +5804,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + CASE_TYPE_CASELINK + "/cases";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_CASELINK, "TEST_EVENT_NO_PRE_STATE");
         caseDetailsToSave.setToken(token);
 
         final JsonNode data = mapper.readTree(
@@ -7182,6 +7272,41 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         return anEvent()
             .withEventId(eventId)
             .build();
+    }
+
+    private CaseDataContent buildValidateCaseDataContent(String eventId,
+                                                         String caseReference,
+                                                         String token,
+                                                         JsonNode data) {
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(eventId)
+                .withSummary(SHORT_COMMENT)
+                .withDescription(LONG_COMMENT)
+                .build())
+            .withData(JacksonUtils.convertValue(data))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+        if (caseReference != null) {
+            caseDetailsToValidate.setCaseReference(caseReference);
+        }
+        if (token != null) {
+            caseDetailsToValidate.setToken(token);
+        }
+        return caseDetailsToValidate;
+    }
+
+    private MvcResult postValidateCaseDetailsWithPageId(String userRole,
+                                                        String caseTypeId,
+                                                        String pageId,
+                                                        CaseDataContent caseDetailsToValidate,
+                                                        int expectedStatus) throws Exception {
+        final String url = String.format("/%s/0/jurisdictions/%s/case-types/%s/validate?pageId=%s",
+            userRole, JURISDICTION, caseTypeId, pageId);
+        return mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(expectedStatus)).andReturn();
     }
 
 }

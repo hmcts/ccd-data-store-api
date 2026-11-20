@@ -14,6 +14,7 @@
 			"ctid": "AAT_AUTH_15"
 		},
 		"body": {
+			"event_token": "${[scenarioContext][parentContext][childContexts][F-038_Token_Creation][testData][actualResponse][body][token]}",
 			"data": {
 				"_extends_": "F-038-Full-Case-Data"
 			}
