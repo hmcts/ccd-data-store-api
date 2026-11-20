@@ -70,6 +70,28 @@ class CaseTypeDefinitionTest {
     }
 
     @Test
+    public void displayContextParameterRoundTripsForEventComplexDefinition() throws JsonProcessingException {
+        String displayContextParameter = "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)";
+        String json = """
+            {
+              "reference": "staffUser",
+              "order": 1,
+              "display_context_parameter": "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)"
+            }
+            """;
+
+        CaseEventFieldComplexDefinition definition = objectMapper.readValue(json,
+            CaseEventFieldComplexDefinition.class);
+        CaseEventFieldComplexDefinition copy = definition.createCopy();
+        String serialized = objectMapper.writeValueAsString(copy);
+
+        assertEquals(displayContextParameter, definition.getDisplayContextParameter());
+        assertEquals(displayContextParameter, copy.getDisplayContextParameter());
+        assertEquals(displayContextParameter,
+            objectMapper.readTree(serialized).path("display_context_parameter").asText());
+    }
+
+    @Test
     public void beftaCaseType31HashStringComparison() throws JsonProcessingException {
         String fileContent = fromFileAsString("tests/BEFTA-CASETYPE-3-1-payload.json");
 

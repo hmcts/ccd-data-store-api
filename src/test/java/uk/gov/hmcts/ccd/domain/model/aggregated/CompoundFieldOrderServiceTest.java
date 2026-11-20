@@ -394,6 +394,30 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(4)))));
     }
 
+    @Test
+    @DisplayName("should apply event display context parameter to the matching nested field")
+    void shouldApplyEventDisplayContextParameterToMatchingNestedField() {
+        String displayContextParameter = "#ARGUMENT(CATEGORY-LEGAL-OPS,CATEGORY-ADMIN,REGION-1235)";
+        CaseFieldDefinition caseField = newCaseField()
+            .withId("StaffUser")
+            .withFieldType(aFieldType()
+                .withType(COMPLEX)
+                .withComplexField(simpleField("StaffUserComplexField", 1))
+                .build())
+            .build();
+        List<CaseEventFieldComplexDefinition> eventComplexFields = Lists.newArrayList(
+            builder()
+                .reference("StaffUserComplexField")
+                .order(1)
+                .displayContextParameter(displayContextParameter)
+                .build());
+
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseField, eventComplexFields, ROOT);
+
+        assertThat(caseField.getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
+            is(displayContextParameter));
+    }
+
     private CaseFieldDefinition simpleField(final String id, final Integer order) {
         return newCaseField()
             .withId(id)
