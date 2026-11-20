@@ -1,6 +1,6 @@
 {
   "_guid_": "S-056",
-  "_extends_": "F-029_Test_Data_Base",
+  "_extends_": "F-029_56_Test_Data_Base",
   "title": "must return the displayContextParameter configured for StaffUser in EventToComplexTypes",
   "specs": [
     "an active profile in CCD",
