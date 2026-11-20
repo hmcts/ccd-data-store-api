@@ -21,6 +21,7 @@ import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,7 @@ class RoleAssignmentCleanupTest {
     private List<Filter> previousFilters;
     private MockedStatic<EnvironmentVariableUtils> environment;
     private Object searchReply;
+    private String creationResponseBody;
     private String failingDelete;
 
     @BeforeEach
@@ -164,6 +166,37 @@ class RoleAssignmentCleanupTest {
         verifyNoInteractions(adapter);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"{\"id\":null,\"data\":null}", "null", ""})
+    void acceptsCreationResponsesWithoutReadAccess(String responseBody) {
+        creationResponseBody = responseBody;
+        create("/case-types/test/cases", FIRST, 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertTrue(searches.isEmpty());
+        assertTrue(deletions.isEmpty());
+        verifyNoInteractions(adapter);
+    }
+
+    @Test
+    void stillCleansKnownCasesAfterCreationWithoutReadAccess() {
+        create("/case-types/test/cases", FIRST, 201);
+        creationResponseBody = "{\"id\":null}";
+        create("/case-types/test/cases", SECOND, 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertTrue(roles.containsKey(SECOND));
+        assertEquals(List.of(List.of(FIRST), List.of(FIRST)), searches);
+    }
+
+    @Test
+    void cleansCasesWithNumericReferences() {
+        creationResponseBody = "{\"id\":" + FIRST + "}";
+        create("/caseworkers/user/jurisdictions/test/case-types/test/cases", FIRST, 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(List.of(List.of(FIRST), List.of(FIRST)), searches);
+    }
+
     @Test
     void rejectsMalformedCreationWithoutLosingEarlierCases() {
         create("/case-types/test/cases", FIRST, 201);
@@ -248,6 +281,7 @@ class RoleAssignmentCleanupTest {
             String path = exchange.getRequestURI().getPath();
             int status = "status=400".equals(exchange.getRequestURI().getQuery()) ? 400 : 201;
             Object response = Map.of();
+            String rawResponse = null;
             if ("/case-users/search".equals(path) || "DELETE".equals(exchange.getRequestMethod())) {
                 assertEquals("Bearer cleanup-user", exchange.getRequestHeaders().getFirst("Authorization"));
                 assertEquals("cleanup-service", exchange.getRequestHeaders().getFirst("ServiceAuthorization"));
@@ -283,8 +317,10 @@ class RoleAssignmentCleanupTest {
                 String id = body.get("id").asText();
                 roles.put(id, new CopyOnWriteArrayList<>(List.of(tuple(id, "creator", "[CREATOR]"))));
                 response = Map.of("id", id);
+                rawResponse = creationResponseBody;
             }
-            byte[] bytes = MAPPER.writeValueAsBytes(response);
+            byte[] bytes = rawResponse == null ? MAPPER.writeValueAsBytes(response)
+                : rawResponse.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(status, bytes.length);
             exchange.getResponseBody().write(bytes);

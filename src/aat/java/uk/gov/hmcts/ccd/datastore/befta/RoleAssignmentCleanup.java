@@ -6,6 +6,8 @@ import io.restassured.RestAssured;
 import io.restassured.filter.Filter;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.befta.TestAutomationAdapter;
 import uk.gov.hmcts.befta.auth.UserTokenProviderConfig;
 import uk.gov.hmcts.befta.data.UserData;
@@ -33,6 +35,7 @@ import java.util.regex.Pattern;
 /** Tracks successful case creation and removes those cases' assignments after each BEFTA scenario. */
 final class RoleAssignmentCleanup {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RoleAssignmentCleanup.class);
     private static final ThreadLocal<RoleAssignmentCleanup> CURRENT = new ThreadLocal<>();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
@@ -96,8 +99,14 @@ final class RoleAssignmentCleanup {
         String path = actual.getRawPath().substring(basePath.length());
         try {
             if (CREATION_PATH.matcher(path).matches()) {
-                JsonNode body = MAPPER.readTree(response.asString());
+                String content = response.asString();
+                JsonNode body = content.isBlank() ? null : MAPPER.readTree(content);
                 JsonNode id = body == null ? null : body.get("id");
+                // Creation succeeds without disclosing case details when the user lacks read access.
+                if (body == null || body.isNull() || (id != null && id.isNull())) {
+                    LOG.warn("Cannot track role assignment cleanup: case creation returned no case reference");
+                    return;
+                }
                 if (id == null || !(id.isTextual() || id.isIntegralNumber())
                     || !id.asText().matches("[0-9]{16}")) {
                     throw new IllegalArgumentException();
