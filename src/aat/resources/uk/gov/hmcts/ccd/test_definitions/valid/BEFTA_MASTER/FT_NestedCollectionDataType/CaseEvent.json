@@ -1,0 +1,27 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "ID": "createCase",
+    "Name": "Create a case",
+    "Description": "Minimal event for the input metadata fixture",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "",
+    "PostConditionState": "CaseCreated",
+    "EventEnablingCondition": "",
+    "CallBackURLAboutToStartEvent": "",
+    "RetriesTimeoutAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "",
+    "RetriesTimeoutURLAboutToSubmitEvent": "",
+    "CallBackURLSubmittedEvent": "",
+    "RetriesTimeoutURLSubmittedEvent": "",
+    "SecurityClassification": "Public",
+    "ShowSummary": "Y",
+    "ShowEventNotes": "",
+    "CanSaveDraft": "N",
+    "EndButtonLabel": "",
+    "Publish": "N",
+    "TTLIncrement": ""
+  }
+]

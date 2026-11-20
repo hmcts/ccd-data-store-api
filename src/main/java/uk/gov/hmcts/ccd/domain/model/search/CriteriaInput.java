@@ -1,49 +1,24 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CommonDCPModel;
 
+@Setter
+@Getter
 public class CriteriaInput implements CommonDCPModel {
     private String label;
     private int order;
     private Field field;
     private String role;
+    // Classification for V2 input responses; excluded from legacy criteria JSON.
+    @JsonIgnore
+    private String dataType;
     @JsonProperty("display_context_parameter")
     private String displayContextParameter;
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public void setField(Field field) {
-        this.field = field;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(final String role) {
-        this.role = role;
-    }
 
     public String buildCaseFieldId() {
         if (this.field != null) {
@@ -53,11 +28,4 @@ public class CriteriaInput implements CommonDCPModel {
         return null;
     }
 
-    public String getDisplayContextParameter() {
-        return displayContextParameter;
-    }
-
-    public void setDisplayContextParameter(String displayContextParameter) {
-        this.displayContextParameter = displayContextParameter;
-    }
 }
