@@ -5,6 +5,7 @@ import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
+import uk.gov.hmcts.befta.data.UserData;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
@@ -13,12 +14,14 @@ import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
 import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
@@ -26,6 +29,13 @@ import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+
+    private final FunctionalTestUserTokenCache userTokenCache = new FunctionalTestUserTokenCache(Clock.systemUTC());
+
+    @Override
+    public void authenticate(UserData user, String userTokenClientId) throws ExecutionException {
+        userTokenCache.authenticate(user, userTokenClientId, super::authenticate);
+    }
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
