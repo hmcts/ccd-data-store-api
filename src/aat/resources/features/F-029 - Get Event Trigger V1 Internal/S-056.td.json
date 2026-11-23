@@ -3757,7 +3757,7 @@
           "metadata" : false,
           "hint_text" : null,
           "field_type" : {
-            "id" : "CaseLinkCollection-794c66fe-1a1f-4c41-a402-bff767437381",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
@@ -4106,7 +4106,7 @@
           "metadata" : false,
           "hint_text" : null,
           "field_type" : {
-            "id" : "caseLinks-17223ca6-92a7-4dec-a571-cad48ab2bcc0",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
@@ -4455,7 +4455,7 @@
           "metadata" : false,
           "hint_text" : null,
           "field_type" : {
-            "id" : "CaseAccessGroups-54e1123b-7da7-4323-a5c8-95eedc2aea8b",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
@@ -4714,7 +4714,7 @@
           "metadata" : false,
           "hint_text" : null,
           "field_type" : {
-            "id" : "RichTextAreaMinField-2d2e0513-90f2-413a-b8ec-18b4d2900a48",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "RichTextArea",
             "min" : 10,
             "max" : null,
@@ -4757,7 +4757,7 @@
           "metadata" : false,
           "hint_text" : null,
           "field_type" : {
-            "id" : "StaffUserCollection-c712d621-7ec6-4314-9021-1991b2841690",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
