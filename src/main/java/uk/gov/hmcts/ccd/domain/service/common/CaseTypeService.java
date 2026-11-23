@@ -44,10 +44,20 @@ public class CaseTypeService {
             .stream()
             .filter(state -> state.getId().equals(stateId))
             .findFirst();
-        return optionalState.orElseThrow(() -> new //
-            ResourceNotFoundException(String.format("No state found with id '%s' for case type '%s'",
-                                                    stateId,
-                                                    caseTypeDefinition.getId())));
+        return optionalState.orElseThrow(() -> new ResourceNotFoundException(
+            String.format("No state found with id '%s' for case type '%s'",
+                stateId,
+                caseTypeDefinition.getId())));
+    }
+
+    public Optional<CaseStateDefinition> findStateIfPresent(CaseTypeDefinition caseTypeDefinition, String stateId) {
+        if (caseTypeDefinition.getStates() == null || stateId == null) {
+            return Optional.empty();
+        }
+        return caseTypeDefinition.getStates()
+            .stream()
+            .filter(state -> stateId.equals(state.getId()))
+            .findFirst();
     }
 
     public Boolean isJurisdictionValid(final String jurisdictionId,
