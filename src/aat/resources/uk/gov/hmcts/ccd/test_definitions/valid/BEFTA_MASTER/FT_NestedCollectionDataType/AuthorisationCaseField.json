@@ -1,6 +1,6 @@
 [
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "Documents",
@@ -8,7 +8,7 @@
     "CRUD": "R"
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "DocumentDetails",
@@ -16,7 +16,7 @@
     "CRUD": "R"
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "TextField",

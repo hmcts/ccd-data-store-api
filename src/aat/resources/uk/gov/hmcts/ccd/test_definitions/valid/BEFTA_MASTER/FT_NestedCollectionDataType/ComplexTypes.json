@@ -1,6 +1,6 @@
 [
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "ID": "F070Details",
     "ListElementCode": "reference",
@@ -22,7 +22,7 @@
     "Searchable": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "ID": "F070Document",
     "ListElementCode": "controlNumber",
@@ -44,7 +44,7 @@
     "Searchable": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "ID": "F070Document",
     "ListElementCode": "pageCount",
@@ -66,7 +66,7 @@
     "Searchable": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "ID": "F070Document",
     "ListElementCode": "details",

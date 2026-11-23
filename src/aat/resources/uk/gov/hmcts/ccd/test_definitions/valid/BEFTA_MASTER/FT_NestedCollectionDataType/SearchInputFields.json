@@ -1,6 +1,6 @@
 [
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "Documents",
@@ -10,7 +10,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "Documents",
@@ -20,7 +20,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "DocumentDetails",
@@ -30,7 +30,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "Documents",
@@ -40,7 +40,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "DocumentDetails",
@@ -50,7 +50,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "TextField",
@@ -60,7 +60,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "Documents",
@@ -70,7 +70,7 @@
     "DisplayContextParameter": ""
   },
   {
-    "LiveFrom": "01/01/2017",
+    "LiveFrom": "01/11/2026",
     "LiveTo": "",
     "CaseTypeID": "FT_NestedCollectionDataType",
     "CaseFieldID": "DocumentDetails",
