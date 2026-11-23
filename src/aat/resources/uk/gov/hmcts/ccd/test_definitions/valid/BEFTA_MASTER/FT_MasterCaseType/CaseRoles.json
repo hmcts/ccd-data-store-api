@@ -1,0 +1,21 @@
+[ {
+  "CaseTypeID" : "FT_MasterCaseType",
+  "ID" : "[Claimant]",
+  "Name" : "Claimant",
+  "Description" : "The person created the case"
+}, {
+  "CaseTypeID" : "FT_MasterCaseType",
+  "ID" : "[Defendant]",
+  "Name" : "Defendant",
+  "Description" : "The defending party"
+}, {
+  "CaseTypeID" : "FT_MasterCaseType",
+  "ID" : "[ClaimantSolicitor]",
+  "Name" : "Claimant solicitor",
+  "Description" : "The claiming solicitor"
+}, {
+  "CaseTypeID" : "FT_MasterCaseType",
+  "ID" : "[DefendantSolicitor]",
+  "Name" : "Defendant solicitor",
+  "Description" : "The defending solicitor"
+} ]
