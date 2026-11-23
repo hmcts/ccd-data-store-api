@@ -63,6 +63,7 @@ class RoleAssignmentCleanupTest {
     private Object searchReply;
     private String creationResponseBody;
     private String failingDelete;
+    private boolean rejectHttp2Upgrade;
 
     @BeforeEach
     void startLoopbackServer() throws Exception {
@@ -164,6 +165,17 @@ class RoleAssignmentCleanupTest {
     void emptyScenarioDoesNotAuthenticate() {
         RoleAssignmentCleanup.finish(adapter);
         verifyNoInteractions(adapter);
+    }
+
+    @Test
+    void cleansAssignmentsWhenGatewayRejectsCleartextHttp2Upgrades() {
+        rejectHttp2Upgrade = true;
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(tuple(FIRST, "assignee", "[CR-1]")), 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(2, deletions.size());
+        assertEquals(List.of(List.of(FIRST), List.of(FIRST)), searches);
     }
 
     @ParameterizedTest
@@ -277,6 +289,11 @@ class RoleAssignmentCleanupTest {
 
     private void handle(HttpExchange exchange) throws IOException {
         try {
+            if (rejectHttp2Upgrade && (exchange.getRequestHeaders().containsKey("Upgrade")
+                || exchange.getRequestHeaders().containsKey("HTTP2-Settings"))) {
+                exchange.sendResponseHeaders(403, -1);
+                return;
+            }
             JsonNode body = MAPPER.readTree(exchange.getRequestBody());
             String path = exchange.getRequestURI().getPath();
             int status = "status=400".equals(exchange.getRequestURI().getQuery()) ? 400 : 201;

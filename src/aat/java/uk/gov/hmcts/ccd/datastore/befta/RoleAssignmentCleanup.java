@@ -38,7 +38,9 @@ final class RoleAssignmentCleanup {
     private static final Logger LOG = LoggerFactory.getLogger(RoleAssignmentCleanup.class);
     private static final ThreadLocal<RoleAssignmentCleanup> CURRENT = new ThreadLocal<>();
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    // Application Gateway rejects cleartext HTTP/2 upgrade requests with HTTP 403.
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
         .connectTimeout(Duration.ofSeconds(10)).build();
     private static final Pattern CREATION_PATH = Pattern.compile(
         "/(?:case-types/[^/]+/cases|(?:caseworkers|citizens)/[^/]+/jurisdictions/[^/]+/case-types/[^/]+/cases)/?"
