@@ -129,6 +129,8 @@ even after failed assertions. Creation responses that hide case details because 
 skipped with a warning, as they provide no reference to clean up safely.
 This uses `CCD_BEFTA_CASEWORKER_CAA_PWD` and `BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT`, already supplied by CI.
 Other cases and organisation roles are untouched; cleanup failures fail the scenario.
+The Jenkins console logs each cleanup URL, JSON request body, response status and response body under
+`Role assignment cleanup request` and `Role assignment cleanup response`. Authentication headers are excluded.
 
 #### To Run the Functional Tests (FT)
 

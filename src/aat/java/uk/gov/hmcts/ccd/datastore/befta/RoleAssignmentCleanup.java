@@ -206,12 +206,17 @@ final class RoleAssignmentCleanup {
 
     private HttpResponse<String> send(String path, String method, Map<String, ?> body, Map<String, String> headers)
         throws IOException, InterruptedException {
-        HttpRequest.Builder request = HttpRequest.newBuilder(URI.create(testUrl + path))
+        URI uri = URI.create(testUrl + path);
+        String payload = MAPPER.writeValueAsString(body);
+        HttpRequest.Builder request = HttpRequest.newBuilder(uri)
             .timeout(Duration.ofSeconds(30)).header("Content-Type", "application/json")
             .header("Accept", "application/json")
-            .method(method, HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(body)));
+            .method(method, HttpRequest.BodyPublishers.ofString(payload));
         headers.forEach(request::header);
+        LOG.info("Role assignment cleanup request: {} {} body={}", method, uri, payload);
         HttpResponse<String> response = HTTP_CLIENT.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        LOG.info("Role assignment cleanup response: {} {} status={} body={}",
+            method, uri, response.statusCode(), response.body());
         if (response.statusCode() != 200) {
             throw new FunctionalTestException(method + " " + path + " returned HTTP " + response.statusCode());
         }
