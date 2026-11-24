@@ -248,6 +248,19 @@ withPipeline(type, product, component) {
       ]
     }
 
+    // Temporary CME-1113 PR check: publish Cases verification results from CI.
+    afterSuccess('pact-provider-verification') {
+        if (env.CHANGE_ID?.trim() && env.CHANGE_BRANCH == 'CME-1113') {
+            withEnv(['PACT_BRANCH_NAME=CME-1113', 'PACT_FALLBACK_TAG=CME-1113']) {
+                builder.gradle('-Ppact.verifier.publishResults=true ' +
+                    '-Ppactbroker.consumers=wa_task_management_api ' +
+                    'runProviderPactVerification ' +
+                    '--tests uk.gov.hmcts.ccd.v2.external.controller.CasesControllerProviderTest ' +
+                    '--rerun-tasks')
+            }
+        }
+    }
+
     afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
          publishHTML target: [

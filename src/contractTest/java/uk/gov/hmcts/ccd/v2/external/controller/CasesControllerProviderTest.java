@@ -130,13 +130,14 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
         String branch = System.getenv().getOrDefault("PACT_BRANCH_NAME", "Dev");
+        String fallbackTag = System.getenv().getOrDefault("PACT_FALLBACK_TAG", "Dev");
         String consumers = System.getProperty("pactbroker.consumers", "");
         SelectorBuilder selectors = new SelectorBuilder();
         if (consumers.isBlank()) {
-            return selectors.selector(branch, true, "Dev", null);
+            return selectors.selector(branch, true, fallbackTag, null);
         }
         for (String consumer : consumers.split(",")) {
-            selectors.selector(branch, true, "Dev", consumer.trim());
+            selectors.selector(branch, true, fallbackTag, consumer.trim());
         }
         return selectors;
     }
