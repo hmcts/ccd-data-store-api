@@ -133,11 +133,10 @@ public class CasesControllerProviderTest extends WireMockBaseContractTest {
         String consumers = System.getProperty("pactbroker.consumers", "");
         SelectorBuilder selectors = new SelectorBuilder();
         if (consumers.isBlank()) {
-            return selectors.branch(branch).selector(branch, true, "Dev", null);
+            return selectors.selector(branch, true, "Dev", null);
         }
         for (String consumer : consumers.split(",")) {
-            selectors.branch(branch, consumer.trim())
-                .selector(branch, true, "Dev", consumer.trim());
+            selectors.selector(branch, true, "Dev", consumer.trim());
         }
         return selectors;
     }
