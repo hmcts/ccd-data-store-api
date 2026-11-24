@@ -23,14 +23,19 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -54,6 +59,10 @@ class RoleAssignmentCleanupTest {
     private final Map<String, List<Map<String, String>>> roles = new ConcurrentHashMap<>();
     private final List<List<String>> searches = new CopyOnWriteArrayList<>();
     private final List<Map<String, String>> deletions = new CopyOnWriteArrayList<>();
+    private final Queue<Integer> searchStatuses = new ConcurrentLinkedQueue<>();
+    private final Queue<Integer> deleteStatuses = new ConcurrentLinkedQueue<>();
+    private final Queue<Integer> committedDeleteStatuses = new ConcurrentLinkedQueue<>();
+    private final AtomicInteger deleteCalls = new AtomicInteger();
     private final AtomicReference<Throwable> serverFailure = new AtomicReference<>();
     private final TestAutomationAdapter adapter = mock(TestAutomationAdapter.class);
     private HttpServer server;
@@ -64,6 +73,7 @@ class RoleAssignmentCleanupTest {
     private String creationResponseBody;
     private String failingDelete;
     private boolean rejectHttp2Upgrade;
+    private boolean closeSearchResponse;
 
     @BeforeEach
     void startLoopbackServer() throws Exception {
@@ -141,6 +151,7 @@ class RoleAssignmentCleanupTest {
         assertThrows(FunctionalTestException.class, () -> RoleAssignmentCleanup.finish(adapter));
         assertTrue(deletions.isEmpty());
         assertTrue(roles.containsKey(FIRST));
+        assertEquals(List.of(List.of(FIRST)), searches);
     }
 
     @Test
@@ -154,11 +165,95 @@ class RoleAssignmentCleanupTest {
         assertFalse(failure.getMessage().contains("cleanup-user"));
         assertTrue(roles.containsKey(FIRST));
         assertFalse(roles.containsKey(SECOND));
+        assertEquals(List.of(List.of(FIRST), List.of(FIRST), List.of(FIRST), List.of(SECOND), List.of(SECOND)),
+            searches);
         final int previousSearches = searches.size();
         RoleAssignmentCleanup.finish(adapter);
         RoleAssignmentCleanup.begin(url);
         RoleAssignmentCleanup.finish(adapter);
         assertEquals(previousSearches, searches.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {408, 429, 500, 502, 503, 504})
+    void retriesTransientSearchFailures(int status) {
+        create("/case-types/test/cases", FIRST, 201);
+        searchStatuses.add(status);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(3, searches.size());
+        assertEquals(1, deletions.size());
+        assertEquals(1, deleteCalls.get());
+    }
+
+    @Test
+    void retriesTransientDeleteFailuresAfterSearchingAgain() {
+        create("/case-types/test/cases", FIRST, 201);
+        deleteStatuses.add(503);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(3, searches.size());
+        assertEquals(1, deletions.size());
+        assertEquals(2, deleteCalls.get());
+    }
+
+    @Test
+    void reconcilesADeleteThatCommittedBeforeItsResponseFailed() {
+        create("/case-types/test/cases", FIRST, 201);
+        committedDeleteStatuses.add(503);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(2, searches.size());
+        assertEquals(1, deletions.size());
+        assertEquals(1, deleteCalls.get());
+    }
+
+    @Test
+    void retriesVerificationFailuresWithoutDeletingAgain() {
+        create("/case-types/test/cases", FIRST, 201);
+        searchStatuses.addAll(List.of(200, 503));
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(3, searches.size());
+        assertEquals(1, deletions.size());
+        assertEquals(1, deleteCalls.get());
+    }
+
+    @Test
+    void retriesWhenTheSearchConnectionClosesWithoutAResponse() {
+        create("/case-types/test/cases", FIRST, 201);
+        closeSearchResponse = true;
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(3, searches.size());
+        assertEquals(1, deletions.size());
+        assertEquals(1, deleteCalls.get());
+    }
+
+    @Test
+    void exhaustsSearchRetriesBeforeContinuingWithTheNextOwnedCase() {
+        create("/case-types/test/cases", FIRST, 201);
+        create("/case-types/test/cases", SECOND, 201);
+        searchStatuses.addAll(List.of(503, 503, 503));
+        FunctionalTestException failure = assertThrows(FunctionalTestException.class,
+            () -> RoleAssignmentCleanup.finish(adapter));
+        assertTrue(failure.getMessage().contains(FIRST));
+        assertTrue(roles.containsKey(FIRST));
+        assertFalse(roles.containsKey(SECOND));
+        assertEquals(List.of(List.of(FIRST), List.of(FIRST), List.of(FIRST), List.of(SECOND), List.of(SECOND)),
+            searches);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"POST,400", "POST,401", "POST,403", "POST,404", "POST,422",
+        "DELETE,400", "DELETE,401", "DELETE,403", "DELETE,404", "DELETE,422"})
+    void doesNotRetryAuthenticationOrValidationFailures(String method, int status) {
+        create("/case-types/test/cases", FIRST, 201);
+        ("DELETE".equals(method) ? deleteStatuses : searchStatuses).add(status);
+        assertThrows(FunctionalTestException.class, () -> RoleAssignmentCleanup.finish(adapter));
+        assertEquals(List.of(List.of(FIRST)), searches);
+        assertTrue(deletions.isEmpty());
+        assertTrue(roles.containsKey(FIRST));
     }
 
     @Test
@@ -235,6 +330,79 @@ class RoleAssignmentCleanupTest {
         assertTrue(deletions.contains(tuple(FIRST, "assignee", "[CR-2]")));
         assertTrue(deletions.stream().allMatch(role -> FIRST.equals(role.get("case_id"))));
         assertEquals(2, roles.get(EXISTING).size());
+        assertEquals(Map.of("owned-org", 1L), organisationDecrements());
+    }
+
+    @Test
+    void doesNotDecrementOrganisationForAdditionalRoleOnUncountedUser() {
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(tuple(FIRST, "assignee", "[CR-1]")), 201);
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-2]", "uncounted-org")), 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(3, deletions.size());
+        assertEquals(Map.of(), organisationDecrements());
+    }
+
+    @Test
+    void countsOrganisationsAcrossTheWholeFirstGrantBatch() {
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(tuple(FIRST, "assignee", "[CR-1]"),
+                      organisationTuple(FIRST, "assignee", "[CR-2]", "first-org"),
+                      organisationTuple(FIRST, "assignee", "[CR-2]", "second-org"),
+                      organisationTuple(FIRST, "creator", "[CREATOR]", "creator-org")), 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(Map.of("first-org", 1L, "second-org", 1L), organisationDecrements());
+        assertTrue(deletions.stream().filter(role -> "[CREATOR]".equals(role.get("case_role")))
+            .noneMatch(role -> role.containsKey("organisation_id")));
+    }
+
+    @Test
+    void carriesCountedOrganisationToSurvivingRoleAfterPartialDelete() {
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "counted-org")), 201);
+        grant(List.of(tuple(FIRST, "assignee", "[CR-2]")), 201);
+        revoke(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "counted-org")));
+        deletions.clear();
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(Map.of("counted-org", 1L), organisationDecrements());
+        assertTrue(deletions.contains(organisationTuple(FIRST, "assignee", "[CR-2]", "counted-org")));
+    }
+
+    @Test
+    void rebuildsOrganisationCreditAfterFullDeleteAndReAdd() {
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "old-org")), 201);
+        revoke(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "old-org")));
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "new-org")), 201);
+        deletions.clear();
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(Map.of("new-org", 1L), organisationDecrements());
+        assertTrue(deletions.contains(organisationTuple(FIRST, "assignee", "[CR-1]", "new-org")));
+    }
+
+    @Test
+    void doesNotCountOrganisationAfterRolesWerePutWithoutOrganisation() {
+        create("/case-types/test/cases", FIRST, 201);
+        putRoles("assignee", List.of("[CREATOR]", "[CR-1]"));
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-2]", "uncounted-org")), 201);
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(Map.of(), organisationDecrements());
+    }
+
+    @Test
+    void preservesCountedOrganisationWhenPutReplacesNonCreatorRoles() {
+        create("/case-types/test/cases", FIRST, 201);
+        grant(List.of(organisationTuple(FIRST, "assignee", "[CR-1]", "counted-org")), 201);
+        putRoles("assignee", List.of("[CR-2]"));
+        RoleAssignmentCleanup.finish(adapter);
+        assertFalse(roles.containsKey(FIRST));
+        assertEquals(Map.of("counted-org", 1L), organisationDecrements());
+        assertTrue(deletions.contains(organisationTuple(FIRST, "assignee", "[CR-2]", "counted-org")));
     }
 
     @Test
@@ -283,6 +451,29 @@ class RoleAssignmentCleanupTest {
             .post(url + "/case-users?status=" + status).then().statusCode(status);
     }
 
+    private void revoke(List<Map<String, String>> assignments) {
+        RestAssured.given().contentType("application/json").header("Authorization", "Bearer cleanup-user")
+            .header("ServiceAuthorization", "cleanup-service").body(Map.of("case_users", assignments))
+            .delete(url + "/case-users").then().statusCode(200);
+    }
+
+    private void putRoles(String user, List<String> caseRoles) {
+        RestAssured.given().contentType("application/json").body(Map.of("case_roles", caseRoles))
+            .put(url + "/cases/" + FIRST + "/users/" + user).then().statusCode(204);
+    }
+
+    private Map<String, Long> organisationDecrements() {
+        return deletions.stream().filter(role -> role.containsKey("organisation_id"))
+            .collect(Collectors.groupingBy(role -> role.get("organisation_id"), Collectors.counting()));
+    }
+
+    private static Map<String, String> organisationTuple(String reference, String user, String role,
+                                                        String organisation) {
+        Map<String, String> result = new HashMap<>(tuple(reference, user, role));
+        result.put("organisation_id", organisation);
+        return result;
+    }
+
     private static Map<String, String> tuple(String reference, String user, String role) {
         return Map.of("case_id", reference, "user_id", user, "case_role", role);
     }
@@ -304,10 +495,27 @@ class RoleAssignmentCleanupTest {
                 assertEquals("cleanup-service", exchange.getRequestHeaders().getFirst("ServiceAuthorization"));
                 status = 200;
             }
+            if ("DELETE".equals(exchange.getRequestMethod())) {
+                deleteCalls.incrementAndGet();
+                Integer failureStatus = deleteStatuses.poll();
+                if (failureStatus != null) {
+                    exchange.sendResponseHeaders(failureStatus, -1);
+                    return;
+                }
+            }
             if ("/case-users/search".equals(path)) {
                 List<String> ids = MAPPER.convertValue(body.path("case_ids"),
                     MAPPER.getTypeFactory().constructCollectionType(List.class, String.class));
                 searches.add(ids);
+                if (closeSearchResponse) {
+                    closeSearchResponse = false;
+                    return;
+                }
+                Integer failureStatus = searchStatuses.poll();
+                if (failureStatus != null && failureStatus != 200) {
+                    exchange.sendResponseHeaders(failureStatus, -1);
+                    return;
+                }
                 response = searchReply != null ? searchReply : Map.of("case_users", ids.stream()
                     .flatMap(id -> roles.getOrDefault(id, List.of()).stream()).toList());
             } else if ("/case-users".equals(path) && (status == 200 || status == 201)) {
@@ -322,19 +530,40 @@ class RoleAssignmentCleanupTest {
                             status = 500;
                             break;
                         }
-                        roles.get(id).remove(role);
-                        if (roles.get(id).isEmpty()) {
+                        List<Map<String, String>> current = roles.get(id);
+                        if (current != null) {
+                            current.remove(role);
+                        }
+                        if (current != null && current.isEmpty()) {
                             roles.remove(id);
                         }
-                    } else {
+                    } else if (!roles.get(id).contains(role)) {
                         roles.get(id).add(role);
                     }
                 }
+            } else if ("PUT".equals(exchange.getRequestMethod()) && path.startsWith("/cases/")) {
+                String[] parts = path.split("/");
+                String id = parts[2];
+                String user = parts[4];
+                List<Map<String, String>> current = roles.get(id);
+                current.removeIf(role -> user.equals(role.get("user_id")));
+                for (JsonNode role : body.path("case_roles")) {
+                    current.add(tuple(id, user, role.asText()));
+                }
+                exchange.sendResponseHeaders(204, -1);
+                return;
             } else if (body.has("id")) {
                 String id = body.get("id").asText();
                 roles.put(id, new CopyOnWriteArrayList<>(List.of(tuple(id, "creator", "[CREATOR]"))));
                 response = Map.of("id", id);
                 rawResponse = creationResponseBody;
+            }
+            if ("DELETE".equals(exchange.getRequestMethod()) && status == 200) {
+                Integer failureStatus = committedDeleteStatuses.poll();
+                if (failureStatus != null) {
+                    exchange.sendResponseHeaders(failureStatus, -1);
+                    return;
+                }
             }
             byte[] bytes = rawResponse == null ? MAPPER.writeValueAsBytes(response)
                 : rawResponse.getBytes(StandardCharsets.UTF_8);
