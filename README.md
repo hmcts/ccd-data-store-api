@@ -124,11 +124,15 @@ doing a lot more detailed verifications.
 
 To find out more about BEFTA Framework, see the repository and its README [here](https://github.com/hmcts/befta-fw).
 
-The BEFTA smoke and functional tasks tear down roles for each scenario's new cases whose references are returned,
+The BEFTA smoke and functional tasks tear down CASE roles for each scenario's new cases whose references are returned,
 even after failed assertions. Creation responses that hide case details because the user lacks read access are
 skipped with a warning, as they provide no reference to clean up safely.
 This uses `CCD_BEFTA_CASEWORKER_CAA_PWD` and `BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT`, already supplied by CI.
-Other cases and organisation roles are untouched; cleanup failures fail the scenario.
+Cleanup makes up to three attempts per case on transient failures. Each attempt searches for the remaining roles
+before deleting. It tracks which organisations the scenario credited when a user received their first non-creator
+role on the case.
+If cleanup still fails, the scenario fails. Run its offline regression tests with
+`./gradlew roleAssignmentCleanupTest`. Gradle also runs them as part of `check`.
 The Jenkins console logs each cleanup URL, JSON request body, response status and response body under
 `Role assignment cleanup request` and `Role assignment cleanup response`. Authentication headers are excluded.
 
