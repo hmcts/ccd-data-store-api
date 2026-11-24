@@ -966,7 +966,8 @@ tasks.named('runProviderPactVerification', Test) { verificationTask ->
             def brokerUrl = verificationTask.systemProperties['PACT_BROKER_FULL_URL'] ?:
                 verificationTask.environment['PACT_BROKER_FULL_URL'] ?: 'http://localhost:9292'
             if (!isPactPublishingAllowed(brokerUrl.toString())) {
-                throw new GradleException('Publishing provider verification results to a remote Broker is restricted to Jenkins.')
+                throw new GradleException('Publishing Pact provider verification results to the primary Pact Broker is restricted to the CI pipeline only. ' +
+                    'Use a local Broker on localhost port 9292 for local provider verification result publication.')
             }
             validatePactPublicationMetadata(verificationTask.systemProperties['pact.provider.version'].toString(),
                 verificationTask.systemProperties['pact.provider.branch'].toString(), pactInput('pact.provider.version'))
