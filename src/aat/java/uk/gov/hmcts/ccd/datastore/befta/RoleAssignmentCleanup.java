@@ -24,18 +24,24 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Tracks successful case creation and removes those cases' assignments after each BEFTA scenario. */
 final class RoleAssignmentCleanup {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoleAssignmentCleanup.class);
+    private static final String CREATOR = "[CREATOR]";
+    private static final int CLEANUP_ATTEMPTS = 3;
+    private static final long RETRY_DELAY_MILLIS = 250;
+    private static final Set<Integer> RETRYABLE_STATUS_CODES = Set.of(408, 429, 500, 502, 503, 504);
     private static final ThreadLocal<RoleAssignmentCleanup> CURRENT = new ThreadLocal<>();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     // Application Gateway rejects cleartext HTTP/2 upgrade requests with HTTP 403.
@@ -45,10 +51,11 @@ final class RoleAssignmentCleanup {
     private static final Pattern CREATION_PATH = Pattern.compile(
         "/(?:case-types/[^/]+/cases|(?:caseworkers|citizens)/[^/]+/jurisdictions/[^/]+/case-types/[^/]+/cases)/?"
     );
+    private static final Pattern USER_ROLES_PATH = Pattern.compile("/cases/([^/]+)/users/([^/]+)/?");
     private static final Filter TRACKER = (request, specification, context) -> {
         Response response = context.next(request, specification);
         RoleAssignmentCleanup cleanup = CURRENT.get();
-        if (cleanup != null && "POST".equalsIgnoreCase(request.getMethod()) && response.statusCode() == 201) {
+        if (cleanup != null) {
             cleanup.track(request, response);
         }
         return response;
@@ -57,7 +64,7 @@ final class RoleAssignmentCleanup {
     private final String testUrl;
     private final URI endpoint;
     private final Set<String> caseReferences = new LinkedHashSet<>();
-    private final Map<Assignment, String> organisations = new HashMap<>();
+    private final Map<CaseUser, UserAssignments> assignmentsByUser = new HashMap<>();
 
     private RoleAssignmentCleanup(String testUrl) {
         this.testUrl = testUrl.replaceAll("/+$", "");
@@ -89,6 +96,14 @@ final class RoleAssignmentCleanup {
     }
 
     private void track(FilterableRequestSpecification request, Response response) {
+        String method = request.getMethod();
+        int status = response.statusCode();
+        boolean created = "POST".equalsIgnoreCase(method) && status == 201;
+        boolean deleted = "DELETE".equalsIgnoreCase(method) && status == 200;
+        boolean replaced = "PUT".equalsIgnoreCase(method) && status == 204;
+        if (!created && !deleted && !replaced) {
+            return;
+        }
         URI actual = URI.create(request.getURI()).normalize();
         if (!endpoint.getScheme().equalsIgnoreCase(actual.getScheme())
             || !endpoint.getHost().equalsIgnoreCase(actual.getHost()) || port(endpoint) != port(actual)) {
@@ -99,51 +114,84 @@ final class RoleAssignmentCleanup {
             return;
         }
         String path = actual.getRawPath().substring(basePath.length());
+        Matcher userRoles = USER_ROLES_PATH.matcher(path);
         try {
-            if (CREATION_PATH.matcher(path).matches()) {
-                String content = response.asString();
-                JsonNode body = content.isBlank() ? null : MAPPER.readTree(content);
-                JsonNode id = body == null ? null : body.get("id");
-                // Creation succeeds without disclosing case details when the user lacks read access.
-                if (body == null || body.isNull() || (id != null && id.isNull())) {
-                    LOG.warn("Cannot track role assignment cleanup: case creation returned no case reference");
-                    return;
+            if (created && CREATION_PATH.matcher(path).matches()) {
+                trackCreatedCase(response);
+            } else if ((created || deleted)
+                && ("/case-users".equals(path) || "/case-users/".equals(path)) && !caseReferences.isEmpty()) {
+                trackAssignments(request.getBody(), created);
+            } else if (replaced && userRoles.matches() && caseReferences.contains(userRoles.group(1))) {
+                CaseUser user = new CaseUser(userRoles.group(1), userRoles.group(2));
+                UserAssignments current = assignmentsByUser.computeIfAbsent(user, key -> new UserAssignments());
+                current.roles.clear();
+                for (JsonNode role : readBody(request.getBody()).path("case_roles")) {
+                    if (!CREATOR.equalsIgnoreCase(role.asText())) {
+                        current.roles.add(role.asText().toLowerCase(Locale.ROOT));
+                    }
                 }
-                if (id == null || !(id.isTextual() || id.isIntegralNumber())
-                    || !id.asText().matches("[0-9]{16}")) {
-                    throw new IllegalArgumentException();
+                if (current.roles.isEmpty()) {
+                    assignmentsByUser.remove(user);
                 }
-                caseReferences.add(id.asText());
-            } else if (("/case-users".equals(path) || "/case-users/".equals(path)) && !caseReferences.isEmpty()) {
-                trackOrganisations(request.getBody());
             }
         } catch (IOException | RuntimeException e) {
             throw new FunctionalTestException("Could not track a successful case or case-role assignment response");
         }
     }
 
-    private void trackOrganisations(Object body) throws IOException {
-        JsonNode json;
-        if (body instanceof String) {
-            json = MAPPER.readTree((String) body);
-        } else if (body instanceof byte[]) {
-            json = MAPPER.readTree((byte[]) body);
-        } else {
-            json = MAPPER.valueToTree(body);
+    private void trackCreatedCase(Response response) throws IOException {
+        String content = response.asString();
+        JsonNode body = content.isBlank() ? null : MAPPER.readTree(content);
+        JsonNode id = body == null ? null : body.get("id");
+        // Creation succeeds without disclosing case details when the user lacks read access.
+        if (body == null || body.isNull() || (id != null && id.isNull())) {
+            LOG.warn("Cannot track role assignment cleanup: case creation returned no case reference");
+            return;
         }
-        JsonNode assignments = json == null ? null : json.get("case_users");
-        if (assignments != null && assignments.isArray()) {
-            for (JsonNode assignment : assignments) {
-                String caseId = assignment.path("case_id").asText("");
-                String userId = assignment.path("user_id").asText("");
-                String role = assignment.path("case_role").asText("");
+        if (id == null || !(id.isTextual() || id.isIntegralNumber()) || !id.asText().matches("[0-9]{16}")) {
+            throw new IllegalArgumentException();
+        }
+        caseReferences.add(id.asText());
+    }
+
+    private void trackAssignments(Object body, boolean adding) throws IOException {
+        // CCD credits organisations only for users who had no non-creator roles before this request.
+        Set<CaseUser> newUsersInBatch = new HashSet<>();
+        for (JsonNode assignment : readBody(body).path("case_users")) {
+            String caseId = assignment.path("case_id").asText("");
+            String userId = assignment.path("user_id").asText("");
+            String role = assignment.path("case_role").asText("").toLowerCase(Locale.ROOT);
+            if (!caseReferences.contains(caseId) || userId.isBlank() || role.isBlank()
+                || CREATOR.equalsIgnoreCase(role)) {
+                continue;
+            }
+            CaseUser user = new CaseUser(caseId, userId);
+            UserAssignments current = assignmentsByUser.computeIfAbsent(user, key -> new UserAssignments());
+            if (adding) {
+                if (current.roles.isEmpty()) {
+                    newUsersInBatch.add(user);
+                }
+                current.roles.add(role);
                 String organisation = assignment.path("organisation_id").asText("");
-                if (caseReferences.contains(caseId) && !userId.isBlank() && !role.isBlank()
-                    && !organisation.isBlank()) {
-                    organisations.putIfAbsent(new Assignment(caseId, userId, role), organisation);
+                if (newUsersInBatch.contains(user) && !organisation.isBlank()) {
+                    current.countedOrganisations.add(organisation);
+                }
+            } else {
+                current.roles.remove(role);
+                if (current.roles.isEmpty()) {
+                    assignmentsByUser.remove(user);
                 }
             }
         }
+    }
+
+    private static JsonNode readBody(Object body) throws IOException {
+        if (body instanceof String) {
+            return MAPPER.readTree((String) body);
+        } else if (body instanceof byte[]) {
+            return MAPPER.readTree((byte[]) body);
+        }
+        return MAPPER.valueToTree(body);
     }
 
     private void cleanUp(TestAutomationAdapter adapter) {
@@ -156,13 +204,7 @@ final class RoleAssignmentCleanup {
         List<String> failures = new ArrayList<>();
         for (String caseReference : caseReferences) {
             try {
-                List<Map<String, String>> assignments = findAssignments(caseReference, headers);
-                if (!assignments.isEmpty()) {
-                    send("/case-users", "DELETE", Map.of("case_users", assignments), headers);
-                    if (!findAssignments(caseReference, headers).isEmpty()) {
-                        throw new FunctionalTestException("Assignments remain after deletion");
-                    }
-                }
+                cleanUpCase(caseReference, headers);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 failures.add("Case " + caseReference + ": cleanup interrupted");
@@ -178,6 +220,31 @@ final class RoleAssignmentCleanup {
         }
     }
 
+    private void cleanUpCase(String caseReference, Map<String, String> headers)
+        throws IOException, InterruptedException {
+        for (int attempt = 1; attempt <= CLEANUP_ATTEMPTS; attempt++) {
+            try {
+                // Reconcile before every DELETE: an earlier response may have failed after deletion committed.
+                List<Map<String, String>> assignments = findAssignments(caseReference, headers);
+                if (assignments.isEmpty()) {
+                    return;
+                }
+                send("/case-users", "DELETE", Map.of("case_users", assignments), headers);
+                if (findAssignments(caseReference, headers).isEmpty()) {
+                    return;
+                }
+                throw new RetryableCleanupException("Assignments remain after deletion");
+            } catch (RetryableCleanupException e) {
+                if (attempt == CLEANUP_ATTEMPTS) {
+                    throw e;
+                }
+                LOG.warn("Retrying role assignment cleanup for case {} after attempt {}/{}: {}",
+                    caseReference, attempt, CLEANUP_ATTEMPTS, e.getMessage());
+                Thread.sleep(RETRY_DELAY_MILLIS);
+            }
+        }
+    }
+
     private List<Map<String, String>> findAssignments(String caseReference, Map<String, String> headers)
         throws IOException, InterruptedException {
         HttpResponse<String> response = send("/case-users/search", "POST",
@@ -187,7 +254,9 @@ final class RoleAssignmentCleanup {
         if (assignments == null || !assignments.isArray()) {
             throw new FunctionalTestException("Search response has no case_users array");
         }
-        Map<Assignment, Map<String, String>> unique = new LinkedHashMap<>();
+        Set<Assignment> seen = new HashSet<>();
+        Set<CaseUser> countedUsers = new HashSet<>();
+        List<Map<String, String>> result = new ArrayList<>();
         for (JsonNode assignment : assignments) {
             String caseId = text(assignment, "case_id");
             String userId = text(assignment, "user_id");
@@ -195,15 +264,22 @@ final class RoleAssignmentCleanup {
             if (!caseReference.equals(caseId) || userId.isBlank() || !role.matches("\\[.+]")) {
                 throw new FunctionalTestException("Search returned an invalid or unowned case-user-role tuple");
             }
-            Assignment key = new Assignment(caseId, userId, role);
-            Map<String, String> tuple = new LinkedHashMap<>(Map.of(
-                "case_id", caseId, "user_id", userId, "case_role", role));
-            if (organisations.containsKey(key)) {
-                tuple.put("organisation_id", organisations.get(key));
+            if (!seen.add(new Assignment(caseId, userId, role))) {
+                continue;
             }
-            unique.putIfAbsent(key, tuple);
+            CaseUser user = new CaseUser(caseId, userId);
+            UserAssignments current = assignmentsByUser.get(user);
+            if (current != null && !current.countedOrganisations.isEmpty()
+                && !CREATOR.equalsIgnoreCase(role) && countedUsers.add(user)) {
+                for (String organisation : current.countedOrganisations) {
+                    result.add(Map.of("case_id", caseId, "user_id", userId, "case_role", role,
+                                      "organisation_id", organisation));
+                }
+            } else {
+                result.add(Map.of("case_id", caseId, "user_id", userId, "case_role", role));
+            }
         }
-        return new ArrayList<>(unique.values());
+        return result;
     }
 
     private HttpResponse<String> send(String path, String method, Map<String, ?> body, Map<String, String> headers)
@@ -216,11 +292,21 @@ final class RoleAssignmentCleanup {
             .method(method, HttpRequest.BodyPublishers.ofString(payload));
         headers.forEach(request::header);
         LOG.info("Role assignment cleanup request: {} {} body={}", method, uri, payload);
-        HttpResponse<String> response = HTTP_CLIENT.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = HTTP_CLIENT.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RetryableCleanupException(method + " " + path + " failed ("
+                + e.getClass().getSimpleName() + ")");
+        }
         LOG.info("Role assignment cleanup response: {} {} status={} body={}",
             method, uri, response.statusCode(), response.body());
         if (response.statusCode() != 200) {
-            throw new FunctionalTestException(method + " " + path + " returned HTTP " + response.statusCode());
+            String message = method + " " + path + " returned HTTP " + response.statusCode();
+            if (RETRYABLE_STATUS_CODES.contains(response.statusCode())) {
+                throw new RetryableCleanupException(message);
+            }
+            throw new FunctionalTestException(message);
         }
         return response;
     }
@@ -256,5 +342,22 @@ final class RoleAssignmentCleanup {
     }
 
     private record Assignment(String caseId, String userId, String role) {
+    }
+
+    private record CaseUser(String caseId, String userId) {
+    }
+
+    private static final class UserAssignments {
+        private final Set<String> roles = new HashSet<>();
+        private final Set<String> countedOrganisations = new LinkedHashSet<>();
+    }
+
+    private static final class RetryableCleanupException extends FunctionalTestException {
+
+        private static final long serialVersionUID = 1L;
+
+        private RetryableCleanupException(String message) {
+            super(message);
+        }
     }
 }
