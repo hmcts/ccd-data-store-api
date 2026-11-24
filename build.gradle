@@ -252,6 +252,15 @@ task aatTest(type: Test) {
     failFast = true
 }
 
+task roleAssignmentCleanupTest(type: Test) {
+    description = "Runs offline BEFTA role assignment cleanup regression tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.aat.output.classesDirs
+    classpath = sourceSets.aat.runtimeClasspath
+    include 'uk/gov/hmcts/ccd/datastore/befta/RoleAssignmentCleanupTest.class'
+    maxParallelForks = 1
+}
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${junit}",
@@ -817,7 +826,7 @@ test {
     ]
 }
 
-check.dependsOn jacocoTestReport
+check.dependsOn jacocoTestReport, roleAssignmentCleanupTest
 
 task fortifyScan(type: JavaExec)  {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
