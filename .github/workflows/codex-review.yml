@@ -1,0 +1,24 @@
+name: Codex PR review
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    branches: [master]
+    types: [opened, ready_for_review, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  review:
+    permissions:
+      actions: write
+      checks: write
+      contents: read
+      issues: write
+      pull-requests: write
+    uses: hmcts/dtscs-code-review-action/.github/workflows/codex-review.yml@a04090836f7408791b0479abbd8c83604c7bfa37 # v1.0.0
+    with:
+      target_branch: master
+    secrets:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
