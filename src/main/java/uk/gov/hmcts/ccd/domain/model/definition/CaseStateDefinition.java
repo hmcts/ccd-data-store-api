@@ -104,7 +104,7 @@ public class CaseStateDefinition implements Serializable, Copyable<CaseStateDefi
         copy.setDisplayOrder(this.getDisplayOrder());
         copy.setTitleDisplay(this.getTitleDisplay());
         copy.setAccessControlLists(this.getAccessControlLists() == null
-            ? null : createACLCopyList(this.getAccessControlLists()));
+            ? null : createShallowCopyList(this.getAccessControlLists()));
         copy.setStateCategory(this.getStateCategory());
 
         return copy;
