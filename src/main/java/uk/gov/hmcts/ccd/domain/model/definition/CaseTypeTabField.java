@@ -66,6 +66,9 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
 
     public void setCaseFieldSubfieldCode(String caseFieldSubfieldCode) {
         this.caseFieldSubfieldCode = caseFieldSubfieldCode;
+    }
+
+    @Schema
     @JsonProperty("default_focus")
     public Boolean getDefaultFocus() {
         return defaultFocus;
