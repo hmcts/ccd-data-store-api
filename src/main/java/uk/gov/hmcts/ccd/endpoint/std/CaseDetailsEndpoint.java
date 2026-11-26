@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.validator.annotation.ValidCaseTypeId;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -68,6 +70,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 @RestController
+@Validated
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
@@ -227,7 +230,7 @@ public class CaseDetailsEndpoint {
         @Parameter(name = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @Parameter(name = "Case type ID", required = true)
-        @PathVariable("ctid") final String caseTypeId,
+        @PathVariable("ctid") @ValidCaseTypeId final String caseTypeId,
         @Parameter(name = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
         @Parameter(name = "Should `AboutToStart` callback warnings be ignored")
