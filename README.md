@@ -157,7 +157,7 @@ The commands below expect the broker to be available directly at `http://localho
 
 #### Run All Pact Provider Verification Tests
 
-Will run all Pact provider verification tests against all of the latest consumer pacts on  `Dev` branch and publish the verification result and provider version to the local Pact Broker:
+Will run all Pact provider verification tests against all of the latest consumer pacts on  `Dev` tag and publish the verification result and provider version to the local Pact Broker:
 
 ```bash
 PACT_BROKER_FULL_URL=http://localhost:9292 \
@@ -171,7 +171,7 @@ PACT_BRANCH_NAME=Dev \
 
 Will run the `ccdDataStoreAPI_Cases` Pact provider verification tests defined in
 `src/contractTest/java/uk/gov/hmcts/ccd/v2/external/controller/CasesControllerProviderTest.java` against the latest
-`wa_task_monitor` consumer Pact on the `Dev` branch and publish the verification result and provider version to the
+`wa_task_monitor` consumer Pact on the `Dev` tag and publish the verification result and provider version to the
 local Pact Broker:
 
 ```bash
@@ -188,6 +188,10 @@ PACT_BRANCH_NAME=Dev \
 fails the verification.
 
 `-Ppact.verifier.publishResults=true` publishes the verification result to the configured broker.
+
+**Note:** Provider verification results can be published to the primary Pact Broker
+only through the CI pipeline. This helps prevent local runs from changing the
+shared verification status of CI-published contracts.
 
 The local HTML test report is generated at:
 

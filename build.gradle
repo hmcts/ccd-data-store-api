@@ -927,7 +927,10 @@ project.ext {
 }
 
 def getCheckedOutGitCommitHash() {
-    'git rev-parse --verify --short HEAD'.execute().text.trim()
+    providers.exec {
+        commandLine 'git', 'rev-parse', '--verify', 'HEAD'
+        ignoreExitValue = true
+    }.standardOutput.asText.map { it.trim() }.get()
 }
 
 task runProviderPactVerification(type:Test) {
@@ -935,21 +938,92 @@ task runProviderPactVerification(type:Test) {
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    if (project.hasProperty('pact.verifier.publishResults')) {
-        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-    }
     if (project.hasProperty('pactbroker.consumers')) {
         systemProperty 'pactbroker.consumers', project.property('pactbroker.consumers')
     }
-    if (project.hasProperty('pactbroker.enablePending')) {
-        systemProperty 'pactbroker.enablePending', project.property('pactbroker.enablePending')
-    }
-    systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/**"
     include "uk/gov/hmcts/ccd/**"
+    reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/contractTest')
 }
 
 runProviderPactVerification.finalizedBy pactVerify
+
+// Keep the result-publication policy scoped to the provider verification entry point.
+tasks.named('runProviderPactVerification', Test) { verificationTask ->
+    systemProperty 'pact.verifier.publishResults', pactInput('pact.verifier.publishResults', 'false')
+    systemProperty 'pact.provider.version', project.pactVersion
+    systemProperty 'pact.provider.branch', resolvePactProviderBranch()
+    def enablePending = pactInput('pactbroker.enablePending', null)
+    if (enablePending != null) {
+        systemProperty 'pactbroker.enablePending', enablePending
+    }
+    doFirst {
+        if (!verificationTask.systemProperties['pact.provider.branch'].toString().trim()) {
+            throw new GradleException('Provider verification requires a branch. For a detached checkout, ' +
+                'set -Ppact.provider.branch to the actual provider branch.')
+        }
+        if (verificationTask.systemProperties['pact.verifier.publishResults'].toString().toBoolean()) {
+            def brokerUrl = verificationTask.systemProperties['PACT_BROKER_FULL_URL'] ?:
+                verificationTask.environment['PACT_BROKER_FULL_URL'] ?: 'http://localhost:9292'
+            if (!isPactPublishingAllowed(brokerUrl.toString())) {
+                throw new GradleException('Publishing Pact provider verification results to the primary Pact Broker is restricted to the CI pipeline only. ' +
+                    'Use a local Broker on localhost port 9292 for local provider verification result publication.')
+            }
+            validatePactPublicationMetadata(verificationTask.systemProperties['pact.provider.version'].toString(),
+                verificationTask.systemProperties['pact.provider.branch'].toString(), pactInput('pact.provider.version'))
+        }
+    }
+}
+
+// Temporary accident-prevention policy; replace with centrally enforced Broker authorisation.
+boolean isPactPublishingAllowed(String brokerUrl, Map environment = System.getenv()) {
+    if (!brokerUrl?.trim()) {
+        return false
+    }
+    URI broker
+    try {
+        broker = new URI(brokerUrl)
+    } catch (IllegalArgumentException | URISyntaxException ignored) {
+        return false
+    }
+    if (!(broker.scheme in ['http', 'https']) || !broker.host || broker.userInfo || broker.query || broker.fragment) {
+        return false
+    }
+    def runningInJenkins = ['BUILD_URL', 'JOB_NAME', 'BUILD_NUMBER'].every { environment[it]?.trim() }
+    def localBroker = broker.scheme == 'http' && broker.host in ['localhost', '127.0.0.1'] &&
+        broker.port == 9292 && broker.path in ['', '/']
+    return runningInJenkins || localBroker
+}
+
+String pactInput(String name, String fallback = '') {
+    def value = project.findProperty(name)
+    return value != null ? value.toString() : System.getProperty(name, fallback)
+}
+
+String resolvePactProviderBranch() {
+    def override = pactInput('pact.provider.branch', null)
+    if (override != null) {
+        return override.trim()
+    }
+    def ciBranch = [System.getenv('CHANGE_BRANCH'), System.getenv('BRANCH_NAME')].find { it?.trim() }
+    if (ciBranch != null) {
+        return ciBranch.trim()
+    }
+    return providers.exec {
+        commandLine 'git', 'symbolic-ref', '--quiet', '--short', 'HEAD'
+        ignoreExitValue = true
+    }.standardOutput.asText.map { it.trim() }.get()
+}
+
+void validatePactPublicationMetadata(String version, String branch, String requestedVersion) {
+    if (!(version ==~ /[0-9a-f]{40}/) || !branch?.trim()) {
+        throw new GradleException('Pact publication requires the full checked-out Git SHA and explicit branch metadata.')
+    }
+    // Preserve compatibility with the shared library's short version argument.
+    if (requestedVersion && (!(requestedVersion ==~ /[0-9a-f]{7,40}/) || !version.startsWith(requestedVersion))) {
+        throw new GradleException('The CI Pact version input does not match the checked-out Git commit.')
+    }
+}
 
 def timestamp() {
     def date = new Date()
