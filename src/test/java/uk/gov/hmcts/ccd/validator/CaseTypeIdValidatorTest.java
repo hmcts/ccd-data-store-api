@@ -8,8 +8,11 @@ import org.mockito.MockitoAnnotations;
 
 import jakarta.validation.ConstraintValidatorContext;
 
+import java.time.Duration;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 public class CaseTypeIdValidatorTest {
 
@@ -53,6 +56,21 @@ public class CaseTypeIdValidatorTest {
     public void failForInvalidCharacter() {
         final boolean result = caseTypeIdValidator.isValid(CASE_TYPE_ID_INVALID_CHARACTER, constraintValidatorContext);
         assertFalse("Case Type Id " + CASE_TYPE_ID_INVALID_CHARACTER + " should not be valid", result);
+    }
+
+    @Test
+    public void validateLongCaseTypeIdWithoutExcessiveBacktracking() {
+        final String validCaseTypeId = "A".repeat(90_000);
+
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            assertTrue(caseTypeIdValidator.isValid(validCaseTypeId, constraintValidatorContext));
+            assertFalse(caseTypeIdValidator.isValid(validCaseTypeId + "@", constraintValidatorContext));
+        });
+    }
+
+    @Test
+    public void passForSingleCharacterCaseTypeId() {
+        assertTrue(caseTypeIdValidator.isValid("A", constraintValidatorContext));
     }
 
     @Test

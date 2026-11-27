@@ -3,13 +3,21 @@ package uk.gov.hmcts.ccd.endpoint.std;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -28,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.OperationContext;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.RestExceptionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +45,7 @@ import java.util.Optional;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -45,6 +55,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -184,6 +198,70 @@ class CaseDetailsEndpointTest {
         verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                                                             EVENT_TRIGGER_ID,
                                                             IGNORE_WARNING);
+    }
+
+    @Nested
+    @DisplayName("startCaseForCaseworker() validation")
+    class StartCaseForCaseworkerValidation {
+
+        private static final String START_CASE_PATH = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION_ID
+            + "/case-types/{caseTypeId}/event-triggers/" + EVENT_TRIGGER_ID + "/token";
+
+        private LocalValidatorFactoryBean validator;
+        private MockMvc mockMvc;
+
+        @BeforeEach
+        void setUpValidation() {
+            validator = new LocalValidatorFactoryBean();
+            validator.afterPropertiesSet();
+
+            final MethodValidationPostProcessor validationPostProcessor = new MethodValidationPostProcessor();
+            validationPostProcessor.setValidator(validator);
+            validationPostProcessor.setProxyTargetClass(true);
+            validationPostProcessor.afterPropertiesSet();
+            final Object validatedEndpoint = validationPostProcessor.postProcessAfterInitialization(
+                endpoint, "caseDetailsEndpoint");
+
+            mockMvc = MockMvcBuilders.standaloneSetup(validatedEndpoint)
+                .setControllerAdvice(new RestExceptionHandler(appInsights))
+                .setValidator(validator)
+                .build();
+        }
+
+        @AfterEach
+        void closeValidator() {
+            validator.close();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "@@@@@", "Case+Type", "Case&Type", "Case=Type", "Case,Type", "Case:Type", "Case!Type", "Case$Type",
+            "Case'Type", "Case(Type", "Case)Type", "Case~Type", "Case#Type", "Case?Type", "Case[Type", "Case]Type",
+            "Case{Type", "Case}Type", "CaséType", "Case Type", "Case*Type", "_CaseType", "-CaseType", ".CaseType"
+        })
+        void shouldReturn400ForMalformedCaseTypeWithoutStartingEvent(String malformedCaseTypeId) throws Exception {
+            mockMvc.perform(get(START_CASE_PATH, malformedCaseTypeId).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.error", is("Bad Request")))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.path").isNotEmpty())
+                .andExpect(jsonPath("$.message", containsString("Case Type Id is invalid")));
+
+            verifyNoInteractions(startEventOperation);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {CASE_TYPE_ID, "Case.Type_1-2"})
+        void shouldStartEventForValidCaseType(String caseTypeId) throws Exception {
+            given(startEventOperation.triggerStartForCaseType(caseTypeId, EVENT_TRIGGER_ID, null))
+                .willReturn(new StartEventResult());
+
+            mockMvc.perform(get(START_CASE_PATH, caseTypeId).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+            verify(startEventOperation).triggerStartForCaseType(caseTypeId, EVENT_TRIGGER_ID, null);
+        }
     }
 
     @Test
