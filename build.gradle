@@ -378,7 +378,7 @@ dependencies {
 //    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
-    implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.15'
+    implementation group: 'org.jooq', name: 'jool-java-8', version: '0.9.16'
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
     implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
 
