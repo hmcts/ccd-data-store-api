@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-156.2",
+  "title": "reject a draft delete request with a malformed draft id",
+  "_extends_": "S-156.1",
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed draft id",
+    "contains a HTTP-404 Not Found"
+  ],
+  "request": {
+    "pathVariables": { "did": "not-a-draft-id" }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No draft found ( draft reference = 'not-a-draft-id' )",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null,
+      "status": 404,
+      "error": "Not Found",
+      "timestamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
