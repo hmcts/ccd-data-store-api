@@ -84,12 +84,14 @@
         CVE-2026-102411 refer [Ticket]
         CVE-2026-103005 refer [Ticket]
         CVE-2026-103006 refer [Ticket]
-        CVE-2026-103008 refer [Ticket]</notes>
+        CVE-2026-103008 refer [Ticket]
+        CVE-2026-133981 refer [Ticket]</notes>
     <cve>CVE-2026-103007</cve>
     <cve>CVE-2026-103009</cve>
     <cve>CVE-2026-102411</cve>
     <cve>CVE-2026-103005</cve>
     <cve>CVE-2026-103006</cve>
     <cve>CVE-2026-103008</cve>
+    <cve>CVE-2026-133981</cve>
   </suppress>
 </suppressions>
