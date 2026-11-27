@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -128,7 +129,7 @@ public class EventTokenService {
                               final CaseTypeDefinition caseTypeDefinition,
                               final boolean revisionRequired) {
         if (token == null || token.isEmpty()) {
-            throw new BadRequestException("Missing start trigger token");
+            throw new BadRequestException(ValidationMessages.START_TRIGGER_TOKEN_MISSING);
         }
 
         try {
@@ -178,7 +179,7 @@ public class EventTokenService {
         } else if (revisionRequired) {
             // Old start-event tokens (minted before we added the revision claim) cannot safely
             // participate in decentralised optimistic locking, so ask the caller to restart.
-            throw new BadRequestException("Start trigger token has expired. Please restart the event.");
+            throw new BadRequestException(ValidationMessages.START_TRIGGER_TOKEN_EXPIRED);
         }
     }
 }

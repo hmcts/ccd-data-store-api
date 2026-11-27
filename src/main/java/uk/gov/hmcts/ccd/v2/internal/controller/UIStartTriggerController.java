@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
@@ -29,7 +30,7 @@ import static uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.
 @RestController
 @RequestMapping(path = "/internal")
 public class UIStartTriggerController {
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+    private static final String ERROR_CASE_ID_INVALID = ValidationMessages.CASE_ID_INVALID;
 
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final UIDService caseReferenceService;

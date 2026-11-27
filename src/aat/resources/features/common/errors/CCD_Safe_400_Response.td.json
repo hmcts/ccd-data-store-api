@@ -1,0 +1,11 @@
+{
+  "_guid_": "CCD_Safe_400_Response",
+  "responseCode": 400,
+  "responseMessage": "Bad Request",
+  "headers": {
+    "_extends_": "Common_400_Response_Headers"
+  },
+  "body": {
+    "_extends_": "CCD_Safe_400_Response_Body"
+  }
+}

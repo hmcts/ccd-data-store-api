@@ -10,6 +10,6 @@
 	],
 
 	"expectedResponse": {
-		"_extends_": "Common_409_Response"
+		"_extends_": "CCD_Safe_409_Response"
 	}
 }

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -26,7 +27,7 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.EVENT_TRIGGER_NOT_FOUND;
 @RestController
 @RequestMapping(path = "/")
 public class StartEventController {
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+    private static final String ERROR_CASE_ID_INVALID = ValidationMessages.CASE_ID_INVALID;
 
     private final StartEventOperation startEventOperation;
     private final UIDService caseReferenceService;

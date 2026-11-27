@@ -24,7 +24,7 @@
 	"expectedResponse": {
 		"responseCode" : 404,
 		"headers" : {
-			"_extends_": "Common_404_Response"
+			"_extends_": "CCD_Safe_404_Response"
 		}
 	}
 }

@@ -38,7 +38,7 @@
   "expectedResponse": {
     "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
     "body": {
-      "message": "Invalid data provided for the following inputs to the request:\nCase role name format is invalid"
+      "message": "Bad Request"
     }
   }
 }

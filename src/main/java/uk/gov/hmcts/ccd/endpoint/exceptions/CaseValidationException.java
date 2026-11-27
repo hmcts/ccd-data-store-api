@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseValidationError;
 
@@ -14,7 +15,7 @@ public class CaseValidationException extends ValidationException {
     private final List<String> fields;
 
     public CaseValidationException(List<CaseFieldValidationError> fieldErrors) {
-        super("Case data validation failed");
+        super(ValidationMessages.CASE_DATA_INVALID);
 
         // prepare APiException.Details for use in HttpError response
         super.withDetails(new CaseValidationError(fieldErrors));

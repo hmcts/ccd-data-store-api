@@ -21,6 +21,7 @@ Store/search cases and provide workbaskets.
 - [Running](#running)
 - [Functional Tests](#functional-tests)
 - [Pact Provider Verification](#pact-provider-verification)
+- [Support investigation](#support-investigation)
 - [License](#license)
   
 ### Prerequisites
@@ -197,6 +198,12 @@ build/reports/tests/runProviderPactVerification/index.html
 
 When publishing is enabled, the official Pact verification results can also be viewed in the local Pact Broker at
 [`http://localhost:9292`](http://localhost:9292).
+
+## Support investigation
+
+For failure investigation, see the
+[support investigation guide](docs/CCD-7882-error-contract.md#support) for Application Insights
+Logs, KQL examples, correlation and local/production verification limits.
 
 ## LICENSE
 

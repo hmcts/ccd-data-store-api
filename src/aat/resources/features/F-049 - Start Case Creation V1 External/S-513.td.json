@@ -16,16 +16,11 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_404_Response",
+		"_extends_": "CCD_Safe_404_Response",
 		"headers": {
 			"Content-Encoding": "gzip"
 		},
 		"body": {
-			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Cannot find event Dummy for case type AAT",
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
 		}
 	}
 }

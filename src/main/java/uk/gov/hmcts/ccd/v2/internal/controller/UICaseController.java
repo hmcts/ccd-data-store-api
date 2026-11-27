@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import uk.gov.hmcts.ccd.error.ValidationMessages;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -34,7 +35,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE_HISTORY;
 @RestController
 @RequestMapping(path = "/internal/cases")
 public class UICaseController {
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+    private static final String ERROR_CASE_ID_INVALID = ValidationMessages.CASE_ID_INVALID;
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
