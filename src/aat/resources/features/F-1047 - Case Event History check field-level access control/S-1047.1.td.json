@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-1047.1",
+  "_extends_": "F1047_Test_Data_Base",
+  "title": "A caseworker with read access to both fields sees the complete historical snapshot",
+  "specs": [
+    "an active profile in CCD",
+    "read access to both historical case fields",
+    "contains both readable fields in the historical snapshot",
+    "contains the reference of the case just created"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "_extends_": "F1047_Expected_Audit_Event",
+          "data": {
+            "TextField": "Decentralised case",
+            "_stubProcessedBy": "ccd-test-stubs-service"
+          }
+        }
+      ]
+    }
+  }
+}
