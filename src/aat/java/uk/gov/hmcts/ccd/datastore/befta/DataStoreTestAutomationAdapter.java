@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaMain;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
@@ -26,6 +28,20 @@ import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+
+    static {
+        RoleAssignmentCleanup.install();
+    }
+
+    @Before(order = Integer.MIN_VALUE)
+    public void beginRoleAssignmentCleanup() {
+        RoleAssignmentCleanup.begin(BeftaMain.getConfig().getTestUrl());
+    }
+
+    @After(order = Integer.MAX_VALUE)
+    public void cleanUpRoleAssignments() {
+        RoleAssignmentCleanup.finish(BeftaMain.getAdapter());
+    }
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
