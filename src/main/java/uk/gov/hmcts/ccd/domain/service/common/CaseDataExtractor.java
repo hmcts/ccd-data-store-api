@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -62,7 +61,7 @@ public class CaseDataExtractor {
             : data.entrySet().stream()
             .map(entry -> extractMetadata(entry, caseFieldDefinitions, fieldIdPrefix, paths, fieldType))
             .flatMap(List::stream)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
     private List<CaseFieldMetadata> extractMetadata(final Map.Entry<String, JsonNode> caseDataPair,
@@ -89,7 +88,12 @@ public class CaseDataExtractor {
                                                  final List<CaseFieldMetadata> paths,
                                                  final String fieldType) {
 
-        final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
+        final FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
+        if (fieldTypeDefinition == null || fieldTypeDefinition.getType() == null) {
+            return Collections.emptyList();
+        }
+
+        final String caseFieldType = fieldTypeDefinition.getType();
 
         if (isNotABaseType(caseFieldType)) {
             log.debug("Ignoring Unknown Type: " + caseFieldType);
@@ -140,6 +144,10 @@ public class CaseDataExtractor {
 
         List<CaseFieldMetadata> tempList = new ArrayList<>(extractionResults);
 
+        if (nodeEntry.getValue() == null || !nodeEntry.getValue().isArray()) {
+            return Collections.unmodifiableList(tempList);
+        }
+
         final Iterator<JsonNode> collectionIterator = nodeEntry.getValue().iterator();
 
         int index = 0;
@@ -169,6 +177,10 @@ public class CaseDataExtractor {
                                                           final String categoryId) {
         final String index = nodeEntry.getKey();
         final String itemFieldId = fieldIdPrefix + index;
+
+        if (fieldTypeDefinition == null || fieldTypeDefinition.getType() == null) {
+            return Collections.emptyList();
+        }
 
         final JsonNode itemValue = nodeEntry.getValue().get(VALUE_FIELD);
 

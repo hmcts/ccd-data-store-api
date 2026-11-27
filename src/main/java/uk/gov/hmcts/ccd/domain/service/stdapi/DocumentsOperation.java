@@ -99,6 +99,9 @@ public class DocumentsOperation {
     private List<Document> retrieveDocuments(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         try {
             String documentListUrl = caseTypeDefinition.getPrintableDocumentsUrl();
+            if (documentListUrl == null) {
+                throw new ServiceException("Printable documents URL is not configured.");
+            }
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = securityUtils.authorizationHeaders();

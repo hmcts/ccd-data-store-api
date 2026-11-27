@@ -6,13 +6,14 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
-import java.util.Properties;
-import java.util.regex.Pattern;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.hibernate.query.NativeQuery;
 import pl.jalokim.propertiestojson.util.PropertiesToJsonConverter;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.util.Objects;
+import java.util.Properties;
 
 public interface SupplementaryDataQueryBuilder {
 
@@ -27,7 +28,7 @@ public interface SupplementaryDataQueryBuilder {
                                      String caseReference,
                                      String fieldPath,
                                      Object fieldValue) {
-        String key = fieldPath.replaceAll(Pattern.quote("."), ",");
+        String key = Objects.requireNonNull(fieldPath, "fieldPath must not be null").replace('.', ',');
         query.setParameter("leaf_node_key", "{" + key + "}");
         query.setParameter("value", fieldValue);
         query.setParameter("reference", caseReference);

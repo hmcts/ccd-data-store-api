@@ -1,11 +1,8 @@
 package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.jexl3.JexlOperator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -23,21 +20,19 @@ import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionConverter;
 @Qualifier("jexl")
 public class JexlEnablingConditionConverter implements EnablingConditionConverter {
 
-    private static final String AND_CONDITION_REGEX = "\\sAND\\s(?=(([^\"]*\"){2})*[^\"]*$)";
+    private static final String AND_CONDITION = "AND";
 
-    private static final String OR_CONDITION_REGEX = "\\sOR\\s(?=(([^\"]*\"){2})*[^\"]*$)";
+    private static final String OR_CONDITION = "OR";
 
     private static final String AND_OPERATOR = " and ";
 
     private static final String OR_OPERATOR = " or ";
 
-    private static final Pattern EQUALITY_CONDITION_PATTERN =
-        Pattern.compile("\\s*?(.*)\\s*?(=|CONTAINS)\\s*?(\".*\")\\s*?");
+    private static final String EQUALS_CONDITION = "=";
 
-    private static final Pattern NOT_EQUAL_CONDITION_PATTERN =
-        Pattern.compile("\\s*?(.*)\\s*?(!=|CONTAINS)\\s*?(\".*\")\\s*?");
+    private static final String NOT_EQUALS_CONDITION = "!=";
 
-    private Pattern orConditionPattern = Pattern.compile(OR_CONDITION_REGEX);
+    private static final String CONTAINS_CONDITION = "CONTAINS";
 
     private static final String WILD_CARD = "\"*\"";
 
@@ -56,60 +51,139 @@ public class JexlEnablingConditionConverter implements EnablingConditionConverte
     private Optional<String> parseEnablingCondition(String enablingCondition) {
         if (enablingCondition != null) {
             String conditionalOperator = AND_OPERATOR;
-            String[] conditions;
-            Matcher matcher = orConditionPattern.matcher(enablingCondition);
-            if (matcher.find()) {
-                conditions = enablingCondition.split(OR_CONDITION_REGEX);
+            List<String> conditions;
+            if (containsOutsideQuotes(enablingCondition, OR_CONDITION)) {
+                conditions = splitOutsideQuotes(enablingCondition, OR_CONDITION);
                 conditionalOperator = OR_OPERATOR;
             } else {
-                conditions = enablingCondition.split(AND_CONDITION_REGEX);
+                conditions = splitOutsideQuotes(enablingCondition, AND_CONDITION);
             }
-            return Optional.of(buildEnablingCondition(conditions, conditionalOperator));
+            return buildEnablingCondition(conditions, conditionalOperator);
         }
         return Optional.empty();
     }
 
-    private String buildEnablingCondition(String[] conditions, String conditionalOperator) {
-        List<String> parsedConditions = new LinkedList<>();
+    private Optional<String> buildEnablingCondition(List<String> conditions, String conditionalOperator) {
+        List<String> parsedConditions = new ArrayList<>();
         for (String condition : conditions) {
-            Matcher equalityMatcher = EQUALITY_CONDITION_PATTERN.matcher(condition);
-            Matcher notEqualityMatcher = NOT_EQUAL_CONDITION_PATTERN.matcher(condition);
-            if (notEqualityMatcher.find()) {
-                parsedConditions.add(parseEqualityCondition(notEqualityMatcher, false));
-            } else if (equalityMatcher.find()) {
-                parsedConditions.add(parseEqualityCondition(equalityMatcher, true));
+            Optional<ParsedCondition> parsedCondition = parseCondition(condition);
+            if (parsedCondition.isEmpty()) {
+                return Optional.empty();
             }
+            parsedConditions.add(parseEqualityCondition(parsedCondition.get()));
         }
-        return parsedConditions
-            .stream()
-            .collect(Collectors.joining(conditionalOperator));
+        return Optional.of(String.join(conditionalOperator, parsedConditions));
     }
 
-    private String parseEqualityCondition(Matcher matcher, boolean equality) {
-        String rightHandValue = getRightHandSideOfEquals(matcher);
+    private Optional<ParsedCondition> parseCondition(String condition) {
+        String normalisedCondition = stripTrailingCloseParentheses(condition);
+        Optional<ParsedCondition> notEqualsCondition = parseCondition(normalisedCondition, NOT_EQUALS_CONDITION, false);
+        if (notEqualsCondition.isPresent()) {
+            return notEqualsCondition;
+        }
+
+        Optional<ParsedCondition> containsCondition = parseCondition(normalisedCondition, CONTAINS_CONDITION, false);
+        if (containsCondition.isPresent()) {
+            return containsCondition;
+        }
+
+        return parseCondition(normalisedCondition, EQUALS_CONDITION, true);
+    }
+
+    private Optional<ParsedCondition> parseCondition(String condition, String operator, boolean equality) {
+        int operatorIndex = CONTAINS_CONDITION.equals(operator)
+            ? findOutsideQuotes(condition, operator, 0)
+            : condition.indexOf(operator);
+        if (operatorIndex < 0) {
+            return Optional.empty();
+        }
+
+        String leftHandSide = condition.substring(0, operatorIndex).trim();
+        String rightHandValue = condition.substring(operatorIndex + operator.length()).trim();
+        if (leftHandSide.isEmpty() || !isQuotedValue(rightHandValue)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParsedCondition(leftHandSide, operator, rightHandValue, equality));
+    }
+
+    private String stripTrailingCloseParentheses(String condition) {
+        String strippedCondition = condition.trim();
+        while (strippedCondition.endsWith(")")) {
+            strippedCondition = strippedCondition.substring(0, strippedCondition.length() - 1).trim();
+        }
+        return strippedCondition;
+    }
+
+    private boolean isQuotedValue(String value) {
+        return value.length() >= 2
+            && value.charAt(0) == '"'
+            && value.charAt(value.length() - 1) == '"'
+            && value.indexOf('"', 1) == value.length() - 1;
+    }
+
+    private String parseEqualityCondition(ParsedCondition condition) {
+        String rightHandValue = condition.rightHandValue();
         String value = rightHandValue;
         if (rightHandValue.equals(WILD_CARD)) {
             value = WILD_CARD_VALUE;
         }
-        return getLeftHandSideOfEquals(matcher) + getEqualsSign(matcher, rightHandValue, equality) + value;
+        return getLeftHandSideOfEquals(condition) + getEqualsSign(condition, rightHandValue) + value;
     }
 
-    private String getLeftHandSideOfEquals(Matcher matcher) {
-        String variable = matcher.group(1).trim().replace("[", "");
-        return variable.replaceAll("]", "");
+    private String getLeftHandSideOfEquals(ParsedCondition condition) {
+        String variable = condition.leftHandSide().replace("[", "");
+        return variable.replace("]", "");
     }
 
-    private String getEqualsSign(Matcher matcher, String value, boolean equality) {
+    private String getEqualsSign(ParsedCondition condition, String value) {
         if (value.equals(WILD_CARD)) {
-            return equality ? CONTAINS_OPERATOR : NOT_CONTAINS_OPERATOR;
+            return condition.equality() ? CONTAINS_OPERATOR : NOT_CONTAINS_OPERATOR;
         }
 
-        return equality
-            ? matcher.group(2).trim() + "" + matcher.group(2).trim()
-            : matcher.group(2).trim();
+        return condition.equality()
+            ? condition.operator() + condition.operator()
+            : condition.operator();
     }
 
-    private String getRightHandSideOfEquals(Matcher matcher) {
-        return matcher.group(3).trim();
+    private boolean containsOutsideQuotes(String value, String operator) {
+        return findOutsideQuotes(value, operator, 0) >= 0;
+    }
+
+    private List<String> splitOutsideQuotes(String value, String operator) {
+        List<String> parts = new ArrayList<>();
+        int start = 0;
+        int operatorIndex = findOutsideQuotes(value, operator, start);
+        while (operatorIndex >= 0) {
+            parts.add(value.substring(start, operatorIndex));
+            start = operatorIndex + operator.length();
+            operatorIndex = findOutsideQuotes(value, operator, start);
+        }
+        parts.add(value.substring(start));
+        return parts;
+    }
+
+    private int findOutsideQuotes(String value, String operator, int fromIndex) {
+        boolean inQuotes = false;
+        for (int i = 0; i <= value.length() - operator.length(); i++) {
+            if (value.charAt(i) == '"') {
+                inQuotes = !inQuotes;
+            }
+            if (i >= fromIndex && !inQuotes && value.startsWith(operator, i)
+                && isBoundedByWhitespace(value, i, operator.length())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isBoundedByWhitespace(String value, int operatorIndex, int operatorLength) {
+        return operatorIndex > 0
+            && Character.isWhitespace(value.charAt(operatorIndex - 1))
+            && operatorIndex + operatorLength < value.length()
+            && Character.isWhitespace(value.charAt(operatorIndex + operatorLength));
+    }
+
+    private record ParsedCondition(String leftHandSide, String operator, String rightHandValue, boolean equality) {
     }
 }

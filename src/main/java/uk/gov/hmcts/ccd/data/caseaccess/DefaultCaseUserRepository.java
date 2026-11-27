@@ -8,9 +8,10 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Repository
 @Qualifier(DefaultCaseUserRepository.QUALIFIER)
@@ -32,9 +33,11 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
     }
 
     public void grantAccess(Long caseId, String userId, String caseRole) {
-        em.merge(new CaseUserEntity(caseId, userId, caseRole,
+        CaseUserEntity caseUser = em.merge(new CaseUserEntity(caseId, userId, caseRole,
             roleAssignmentCategoryService.getRoleCategory(userId).name()));
-        auditRepo.auditGrant(caseId, userId, caseRole);
+        auditRepo.auditGrant(caseUser.getCasePrimaryKey().getCaseDataId(),
+            caseUser.getCasePrimaryKey().getUserId(),
+            caseUser.getCasePrimaryKey().getCaseRole());
     }
 
     public void revokeAccess(Long caseId, String userId, String caseRole) {
@@ -65,7 +68,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
 
     public List<CaseUserEntity> findCaseUserRoles(final List<Long> caseIds, final List<String> userIds) {
         TypedQuery<CaseUserEntity> namedQuery = null;
-        if (userIds.size() == 0) {
+        if (userIds.isEmpty()) {
             namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS, CaseUserEntity.class);
         } else {
             namedQuery =
@@ -80,6 +83,6 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         TypedQuery<String> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_USER_ID, String.class);
         namedQuery.setParameter("userId", userId);
 
-        return namedQuery.getResultList().stream().collect(Collectors.toSet());
+        return new HashSet<>(namedQuery.getResultList());
     }
 }

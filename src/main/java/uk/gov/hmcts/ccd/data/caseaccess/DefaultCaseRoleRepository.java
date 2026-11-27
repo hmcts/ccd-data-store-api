@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
@@ -30,8 +29,6 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
 
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
 
     @Inject
