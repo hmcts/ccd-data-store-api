@@ -1,0 +1,12 @@
+{
+  "_guid_": "F-1005_WaitForUpdatedCase",
+  "_extends_": "F-1005_WaitForCreatedCase",
+  "title": "Wait until the updated address is searchable",
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "parties": [{"addressLine1": "updated Address"}]
+      }
+    }
+  }
+}

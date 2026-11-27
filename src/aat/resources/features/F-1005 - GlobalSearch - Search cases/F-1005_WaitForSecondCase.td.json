@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-1005_WaitForSecondCase",
+  "_extends_": "GlobalSearch_Readiness_Base",
+  "title": "Wait until the second case is searchable",
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": ["FT_GlobalSearch"],
+        "caseReferences": [
+          "${[scenarioContext][customValues][caseReferenceForGlobalSearchReadiness_F-1005_CreateSecondCasePreRequisiteCaseworker]}"
+        ]
+      }
+    }
+  }
+}

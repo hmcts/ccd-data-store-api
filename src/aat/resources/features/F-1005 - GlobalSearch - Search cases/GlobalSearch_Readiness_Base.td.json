@@ -1,0 +1,18 @@
+{
+  "_guid_": "GlobalSearch_Readiness_Base",
+  "_extends_": "F-1005_SearchCaseBase",
+  "specs": [
+    "to wait for global search indexing"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

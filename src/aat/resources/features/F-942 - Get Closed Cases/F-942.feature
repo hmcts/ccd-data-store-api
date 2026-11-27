@@ -3,17 +3,17 @@ Feature: F-942: Get closed cases
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a call [to delete existing date case closed records] will get the expected response as in [F-942_DeleteExistingDateCaseClosed],
 
   @S-942.1
   Scenario: Return 200 when get closed cases requested
-    Given a case that has just been created as in [Standard_Full_Case_Creation_Data],
+    Given a user with [an active profile in CCD],
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data],
     And a successful call [to create a date case closed record] as in [S-942.1_CreateDateCaseClosed],
-    And a user with [an active profile in CCD],
 
     When a request is prepared with appropriate values,
     And the request [contains Date field],
     And it is submitted to call the [get closed cases] operation of [CCD Data Store],
+    And a call [to delete the date case closed record for this case] will get the expected response as in [S-942.1_DeleteDateCaseClosed],
 
     Then a positive response is received,
     And the response has all other details as expected.

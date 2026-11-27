@@ -1,0 +1,9 @@
+{
+  "_guid_": "F-151_CreateCase",
+  "_extends_": "Befta_Default_Full_Case_Creation_Data",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][Befta_Default_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}
