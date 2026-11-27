@@ -38,6 +38,7 @@ public class CompoundFieldOrderService {
             children.forEach(childField -> {
                 String newListElementCode =
                     isBlank(listElementCode) ? childField.getId() : listElementCode + "." + childField.getId();
+                applyDisplayContextParameter(childField, caseEventComplexFields, newListElementCode);
                 sortNestedFieldsFromCaseEventComplexFields(childField,
                             getNestedComplexFields(caseEventComplexFields, newListElementCode), newListElementCode);
             });
@@ -45,6 +46,17 @@ public class CompoundFieldOrderService {
                 getSortedCompoundTypeFields(caseEventComplexFields, children, listElementCode);
             caseFieldDefinition.getFieldTypeDefinition().setChildren(sortedFields);
         }
+    }
+
+    private void applyDisplayContextParameter(CaseFieldDefinition caseFieldDefinition,
+                                              List<CaseEventFieldComplexDefinition> caseEventComplexFields,
+                                              String reference) {
+        caseEventComplexFields.stream()
+            .filter(eventComplexField -> reference.equals(eventComplexField.getReference()))
+            .map(CaseEventFieldComplexDefinition::getDisplayContextParameter)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .ifPresent(caseFieldDefinition::setDisplayContextParameter);
     }
 
     private List<CaseEventFieldComplexDefinition> getNestedComplexFields(final List<CaseEventFieldComplexDefinition>
