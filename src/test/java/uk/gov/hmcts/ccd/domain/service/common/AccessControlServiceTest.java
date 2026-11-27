@@ -1855,6 +1855,70 @@ public class AccessControlServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("Should retain hearing ID while filtering an unauthorised hearing date")
+    void shouldRetainHearingIdWhileFilteringUnauthorisedHearingDate() throws IOException {
+        CaseFieldDefinition hearingId = newCaseField()
+            .withId("hearingID")
+            .withFieldType(aFieldType().withType(TEXT).build())
+            .build();
+        CaseFieldDefinition hearingDateTime = newCaseField()
+            .withId("hearingDateTime")
+            .withFieldType(aFieldType().withType(TEXT).build())
+            .build();
+        CaseFieldDefinition nextHearingDetails = newCaseField()
+            .withId("nextHearingDetails")
+            .withFieldType(aFieldType()
+                .withType(COMPLEX)
+                .withComplexField(hearingId)
+                .withComplexField(hearingDateTime)
+                .build())
+            .withAcl(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(true)
+                .build())
+            .withComplexACL(aComplexACL()
+                .withListElementCode("hearingID")
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(true)
+                .build())
+            .withComplexACL(aComplexACL()
+                .withListElementCode("hearingDateTime")
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(false)
+                .build())
+            .withComplexACL(aComplexACL()
+                .withListElementCode("hearingDateTime")
+                .withRole(ROLE_NOT_IN_USER_ROLES)
+                .withRead(true)
+                .build())
+            .build();
+        CaseTypeDefinition caseType = newCaseType().withField(nextHearingDetails).build();
+        caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+        Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree("""
+            {
+              "nextHearingDetails": {
+                "hearingID": "2000000001",
+                "hearingDateTime": "2026-10-12T09:30:00.000"
+              }
+            }
+            """));
+
+        JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(
+            JacksonUtils.convertValueJsonNode(data),
+            caseType.getCaseFieldDefinitions(),
+            ACCESS_PROFILES,
+            CAN_READ,
+            false
+        );
+
+        JsonNode filteredHearingDetails = filteredData.get("nextHearingDetails");
+        assertAll(
+            () -> assertThat(filteredHearingDetails.get("hearingID").asText(), is("2000000001")),
+            () -> assertThat(filteredHearingDetails.get("hearingDateTime"), is(nullValue()))
+        );
+    }
+
     @Nested
     @DisplayName("return fields data with collection value tests")
     class ReturnsDataWithCaseFieldAccessCollectionValueTypeTests {

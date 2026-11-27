@@ -8,20 +8,17 @@ import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
 
 import jakarta.validation.ConstraintValidatorContext;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class SortByValidatorTest {
 
-    @Mock
-    private ConstraintValidatorContext constraintValidatorContext;
-
+    private final SortByValidator validator = new SortByValidator();
     @Mock
     ConstraintValidatorContext.ConstraintViolationBuilder constraintViolationBuilder;
-
-    private final SortByValidator validator = new SortByValidator();
+    @Mock
+    private ConstraintValidatorContext constraintValidatorContext;
 
     @BeforeEach
     void setUp() {
@@ -33,17 +30,19 @@ class SortByValidatorTest {
 
     @Test
     void returnsTrueWhenSortByNull() {
-        assertTrue(validator.isValid(null, constraintValidatorContext));
+        assertThat(validator.isValid(null, constraintValidatorContext)).isTrue();
     }
 
     @Test
     void returnsTrueWhenSortByIsValid() {
-        assertTrue(validator.isValid(GlobalSearchSortByCategory.CASE_NAME.getCategoryName(),
-            constraintValidatorContext));
+        assertThat(validator.isValid(GlobalSearchSortByCategory.CASE_NAME.getCategoryName(),
+            constraintValidatorContext)).isTrue();
+        assertThat(validator.isValid(GlobalSearchSortByCategory.NEXT_HEARING_DATE.getCategoryName(),
+            constraintValidatorContext)).isTrue();
     }
 
     @Test
     void returnsFalseWhenSortByInvalid() {
-        assertFalse(validator.isValid("invalid", constraintValidatorContext));
+        assertThat(validator.isValid("invalid", constraintValidatorContext)).isFalse();
     }
 }
