@@ -297,7 +297,7 @@ dependencies {
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: httpcore5Version // httpclient5
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5-h2', version: httpcore5Version // httpclient5
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.21.0'            // java-property-to-json     // spring-boot-starter-data-jpa
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.58.Final'      // spring-boot-starter-data-jpa
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.59.Final'      // spring-boot-starter-data-jpa
     implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20260313.1' // java-html-sanitizer
 
 
