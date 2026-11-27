@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,15 +40,18 @@ interface ServicePersistenceAPI {
      *       <b>same idempotency key</b>, it will not re-process the event. Instead, it will
      *       retrieve the details of the previously created case and respond with an
      *       HTTP {@code 200 OK} status. The response body <b>>must be the same as that returned by
-     *       the previously successful request.</b></li>
+     *       the previously successful request.</b> Any {@code Client-Context} response header must also
+     *       be replayed so callers receive the same context update.</li>
      * </ul>
      *
      */
     @PostMapping(value = "/ccd-persistence/cases", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    DecentralisedSubmitEventResponse submitEvent(URI baseURI,
-                                                 @RequestHeader("Idempotency-Key") String idempotencyKey,
-                                                 @RequestBody DecentralisedCaseEvent caseEvent);
+    ResponseEntity<DecentralisedSubmitEventResponse> submitEvent(
+        URI baseURI,
+        @RequestHeader("Idempotency-Key") String idempotencyKey,
+        @RequestHeader(value = "Client-Context", required = false) String clientContext,
+        @RequestBody DecentralisedCaseEvent caseEvent);
 
     @PostMapping(value = "/ccd-persistence/cases/{case-ref}/supplementary-data",
         consumes = MediaType.APPLICATION_JSON_VALUE,
