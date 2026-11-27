@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseEventID": "createCase",
+    "UserRole": "caseworker-befta_master",
+    "CRUD": "R"
+  }
+]

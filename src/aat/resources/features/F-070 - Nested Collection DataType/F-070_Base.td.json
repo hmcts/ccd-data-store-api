@@ -1,0 +1,22 @@
+{
+  "_guid_": "F-070_Base",
+  "productName": "CCD Data Store",
+  "method": "GET",
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "ctid": "FT_NestedCollectionDataType"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}

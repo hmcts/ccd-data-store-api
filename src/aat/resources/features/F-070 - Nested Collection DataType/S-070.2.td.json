@@ -1,0 +1,153 @@
+{
+  "_guid_": "S-070.2",
+  "_extends_": "F-070_Base",
+  "title": "workbasketInputs fill null collection classifications and preserve existing classifications",
+  "operationName": "retrieve workbasket input details for dynamic display",
+  "uri": "/internal/case-types/{ctid}/work-basket-inputs",
+  "specs": [
+    "read access to the nested collection case type",
+    "fills missing collection classifications and preserves existing classifications"
+  ],
+  "request": {
+    "headers": {
+      "Accept": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json"
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "workbasketInputs": [
+        {
+          "label": "Collection text child",
+          "order": 1,
+          "field": {
+            "id": "Documents",
+            "elementPath": "controlNumber",
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseTextFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": "collection",
+          "display_context_parameter": null
+        },
+        {
+          "label": "Collection number child",
+          "order": 2,
+          "field": {
+            "id": "Documents",
+            "elementPath": "pageCount",
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseNumberFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": "collection",
+          "display_context_parameter": null
+        },
+        {
+          "label": "Whole complex",
+          "order": 3,
+          "field": {
+            "id": "DocumentDetails",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseComplexFieldType",
+              "id": "F070Document",
+              "complex_fields": "[[ANYTHING_PRESENT]]"
+            },
+            "show_condition": null
+          },
+          "dataType": "complex",
+          "display_context_parameter": null
+        },
+        {
+          "label": "Whole collection",
+          "order": 4,
+          "field": {
+            "id": "Documents",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseCollectionFieldType",
+              "collection_field_type": "[[ANYTHING_PRESENT]]"
+            },
+            "show_condition": null
+          },
+          "dataType": "collection",
+          "display_context_parameter": null
+        },
+        {
+          "label": "Ordinary complex text child",
+          "order": 5,
+          "field": {
+            "id": "DocumentDetails",
+            "elementPath": "controlNumber",
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseTextFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": null,
+          "display_context_parameter": null
+        },
+        {
+          "label": "Top-level text",
+          "order": 6,
+          "field": {
+            "id": "TextField",
+            "elementPath": null,
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseTextFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": null,
+          "display_context_parameter": null
+        },
+        {
+          "label": "Collection deeper text child",
+          "order": 7,
+          "field": {
+            "id": "Documents",
+            "elementPath": "details.reference",
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseTextFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": "collection",
+          "display_context_parameter": null
+        },
+        {
+          "label": "Ordinary complex deeper text child",
+          "order": 8,
+          "field": {
+            "id": "DocumentDetails",
+            "elementPath": "details.reference",
+            "metadata": false,
+            "field_type": {
+              "_extends_": "BaseTextFieldType"
+            },
+            "show_condition": null
+          },
+          "dataType": null,
+          "display_context_parameter": null
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

@@ -14,17 +14,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CriteriaField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
+import uk.gov.hmcts.ccd.domain.model.search.DataType;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.util.FieldTypeUtil;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 
@@ -107,6 +111,16 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         field.setMetadata(caseFieldDefinitionByPath.isMetadata());
         field.setShowCondition(in.getShowCondition());
         result.setField(field);
+        if (field.getType() != null && field.getType().getType() != null) {
+            String dataType = FieldTypeUtil.getDataTypeFromField(field);
+            FieldTypeDefinition rootType = caseFieldDefinition.getFieldTypeDefinition();
+            // Only fill a missing classification for a nested field in a top-level collection.
+            if (dataType == null && !Strings.isNullOrEmpty(in.getCaseFieldPath())
+                && rootType != null && COLLECTION.equalsIgnoreCase(rootType.getType())) {
+                dataType = DataType.COLLECTION.toString();
+            }
+            result.setDataType(dataType);
+        }
         return result;
     }
 

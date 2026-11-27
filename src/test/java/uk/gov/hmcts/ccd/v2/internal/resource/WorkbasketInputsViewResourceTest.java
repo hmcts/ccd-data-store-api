@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -78,12 +79,14 @@ class WorkbasketInputsViewResourceTest {
             .withCollectionFieldType(collectionComplexFieldTypeDefinition)
             .build());
         WorkbasketInput workbasketInput3 = aWorkbasketInput().withField(field).build();
+        workbasketInput3.setDataType("collection");
 
         Field field1 = field(FieldTestUtil.COMPLEX_FIELD, aFieldType().withId(FieldTestUtil.COMPLEX_FIELD)
             .withType(FieldTypeDefinition.COMPLEX).withComplexField(
                 newCaseField().withId("OtherNestedField")
                     .withFieldType(FieldTestUtil.fieldType("Date")).build()).build());
         WorkbasketInput workbasketInput4 = aWorkbasketInput().withField(field1).build();
+        workbasketInput4.setDataType("complex");
 
         WorkbasketInput[] workbasketInputs1 = new WorkbasketInput[]{
             workbasketInput3, workbasketInput4
@@ -93,6 +96,8 @@ class WorkbasketInputsViewResourceTest {
         List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputsResult =
             Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
+            () -> assertThat(resource.getWorkbasketInputs()[0].getDataType()).isEqualTo("collection"),
+            () -> assertThat(resource.getWorkbasketInputs()[1].getDataType()).isEqualTo("complex"),
             () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
             () -> assertThat(workbasketInputsResult, hasItems(hasProperty("field",
                     hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),

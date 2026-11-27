@@ -1,0 +1,82 @@
+[
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "Documents",
+    "ListElementCode": "controlNumber",
+    "Label": "Collection text child",
+    "DisplayOrder": 1,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "Documents",
+    "ListElementCode": "pageCount",
+    "Label": "Collection number child",
+    "DisplayOrder": 2,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "DocumentDetails",
+    "ListElementCode": "",
+    "Label": "Whole complex",
+    "DisplayOrder": 3,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "Documents",
+    "ListElementCode": "",
+    "Label": "Whole collection",
+    "DisplayOrder": 4,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "DocumentDetails",
+    "ListElementCode": "controlNumber",
+    "Label": "Ordinary complex text child",
+    "DisplayOrder": 5,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "TextField",
+    "ListElementCode": "",
+    "Label": "Top-level text",
+    "DisplayOrder": 6,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "Documents",
+    "ListElementCode": "details.reference",
+    "Label": "Collection deeper text child",
+    "DisplayOrder": 7,
+    "DisplayContextParameter": ""
+  },
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "DocumentDetails",
+    "ListElementCode": "details.reference",
+    "Label": "Ordinary complex deeper text child",
+    "DisplayOrder": 8,
+    "DisplayContextParameter": ""
+  }
+]

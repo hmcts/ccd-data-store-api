@@ -1,0 +1,13 @@
+[
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseFieldID": "[CASE_REFERENCE]",
+    "Label": "Case Reference",
+    "ListElementCode": "",
+    "DisplayOrder": 1,
+    "ResultsOrdering": "",
+    "DisplayContextParameter": ""
+  }
+]

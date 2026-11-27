@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -77,12 +78,14 @@ class SearchInputsViewResourceTest {
             .withCollectionFieldType(collectionComplexFieldTypeDefinition)
             .build());
         SearchInput searchInput3 = aSearchInput().withField(field).build();
+        searchInput3.setDataType("collection");
 
         Field field1 = field(FieldTestUtil.COMPLEX_FIELD, aFieldType().withId(FieldTestUtil.COMPLEX_FIELD)
             .withType(FieldTypeDefinition.COMPLEX).withComplexField(
                 newCaseField().withId("OtherNestedField")
                     .withFieldType(FieldTestUtil.fieldType("Date")).build()).build());
         SearchInput searchInput4 = aSearchInput().withField(field1).build();
+        searchInput4.setDataType("complex");
 
         SearchInput[] searchInputs1 = new SearchInput[]{
             searchInput3, searchInput4
@@ -92,6 +95,8 @@ class SearchInputsViewResourceTest {
         List<SearchInputsViewResource.SearchInputView> searchInputsResult =
             Lists.newArrayList(resource.getSearchInputs());
         assertAll(
+            () -> assertThat(resource.getSearchInputs()[0].getDataType()).isEqualTo("collection"),
+            () -> assertThat(resource.getSearchInputs()[1].getDataType()).isEqualTo("complex"),
             () -> assertThat(resource.getSearchInputs(), not(sameInstance(this.searchInputs))),
             () -> assertThat(searchInputsResult, hasItems(hasProperty("field",
                     hasProperty("id", is(FieldTestUtil.COLLECTION_FIELD))),

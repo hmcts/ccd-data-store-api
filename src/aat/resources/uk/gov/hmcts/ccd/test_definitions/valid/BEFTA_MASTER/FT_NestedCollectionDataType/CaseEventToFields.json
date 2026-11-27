@@ -1,0 +1,26 @@
+[
+  {
+    "LiveFrom": "01/11/2026",
+    "LiveTo": "",
+    "CaseTypeID": "FT_NestedCollectionDataType",
+    "CaseEventID": "createCase",
+    "CaseFieldID": "TextField",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "SingleFormPage",
+    "PageLabel": "Data Field Types Page",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": "",
+    "FieldShowCondition": "",
+    "RetainHiddenValue": "",
+    "PageShowCondition": "",
+    "DisplayContextParameter": "",
+    "ShowSummaryChangeOption": "Y",
+    "ShowSummaryContentOption": "",
+    "CallBackURLMidEvent": "",
+    "Publish": "",
+    "PublishAs": "",
+    "DefaultValue": "",
+    "NullifyByDefault": ""
+  }
+]
