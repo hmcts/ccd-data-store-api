@@ -118,7 +118,7 @@ public class WizardPage implements Serializable, Copyable<WizardPage> {
         clonedPage.setCallBackURLMidEvent(this.callBackURLMidEvent);
         clonedPage.setRetriesTimeoutMidEvent(this.retriesTimeoutMidEvent != null
             ? new ArrayList<>(this.retriesTimeoutMidEvent) : null);
-        clonedPage.setWizardPageFields(createCopyList(this.wizardPageFields));
+        clonedPage.setWizardPageFields(createDeepCopyList(this.wizardPageFields));
 
         return clonedPage;
     }
